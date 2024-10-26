@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../customs/table_custom.dart';
 
 class ClientListView extends StatefulWidget {
-  const ClientListView({super.key});
+  final Function(Map<String, String>) onClientTap; // Agregar callback
+
+  const ClientListView({super.key, required this.onClientTap});
 
   @override
   _ClientListViewState createState() => _ClientListViewState();
@@ -16,6 +18,7 @@ class _ClientListViewState extends State<ClientListView> {
 
   void _showPrint(Map<String, String> clientData) {
     _updateClientFields(clientData);
+    widget.onClientTap(clientData); // Invocar el callback
   }
 
   void _updateClientFields(Map<String, String> clientData) {
@@ -31,7 +34,7 @@ class _ClientListViewState extends State<ClientListView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Column(
         children: [
           Row(
@@ -113,7 +116,7 @@ class _ClientListViewState extends State<ClientListView> {
               ),
             ],
           ),
-           SizedBox(height: screenHeight * 0.03),
+          SizedBox(height: screenHeight * 0.03),
           Container(
             height: screenHeight * 0.35, // Aumentar la altura del contenedor
             width: screenWidth,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../info/detail_clients.dart';
+import '../info/info_clients.dart';
 
 class DataTableWidget extends StatefulWidget {
   final List<Map<String, String>> data;
@@ -40,8 +40,6 @@ class _DataTableWidgetState extends State<DataTableWidget> {
             ],
           );
         }),
-        if (selectedRow != null)
-          DetailsView(data: selectedRow!), // Muestra la vista de detalles
       ],
     );
   }
