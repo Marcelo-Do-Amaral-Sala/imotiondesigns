@@ -153,23 +153,39 @@ class _ClientsViewState extends State<ClientsView> {
                       // Columna más amplia
                       Expanded(
                         flex: 3, // Proporción para la columna amplia
-                        child: Container(
-                          child: Center(
-                            child: Stack(
+                        child: Stack(
+                          children: [
+                            Row(
                               children: [
-                                SizedBox(
-                                  width: screenWidth * 0.5,
-                                  height: screenHeight * 0.5,
-                                  child: Image.asset(
-                                    'assets/images/logo.png',
-                                    fit: BoxFit.contain,
+                                Center(
+                                  child: SizedBox(
+                                    width: screenWidth * 0.5,
+                                    height: screenHeight * 0.5,
+                                    child: Image.asset(
+                                      'assets/images/logo.png',
+                                      fit: BoxFit.contain,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
+                            // Imagen de fondo en la esquina superior derecha
+                            Positioned(
+                              top: 0, // Ajuste a la esquina superior
+                              right: 0, // Ajuste a la esquina derecha
+                              child: Container(
+                                width: screenWidth * 0.1, // Limita el ancho de la imagen
+                                height: screenHeight * 0.1, // Limita el alto de la imagen
+                                child: Image.asset(
+                                  'assets/images/back.png',
+                                  fit: BoxFit.scaleDown,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+
                     ],
                   ),
                 ),
