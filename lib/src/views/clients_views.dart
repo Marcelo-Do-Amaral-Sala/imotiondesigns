@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../customs/overlay_content.dart';
 
 class ClientsView extends StatefulWidget {
@@ -224,6 +225,7 @@ class _ClientsViewState extends State<ClientsView> {
                             // Contenedor superpuesto en el segundo Expanded
                             if (isOverlayVisible)
                               Positioned.fill(
+                                top: screenHeight * 0.15,
                                 child: OverlayContent(
                                   contentType: overlayContentType, // Pasamos el tipo de contenido
                                   onClose: () {
