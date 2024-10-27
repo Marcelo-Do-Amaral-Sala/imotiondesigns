@@ -4,15 +4,15 @@ import 'package:imotion_designs/src/info/clients_list_view.dart';
 import '../info/info_clients.dart';
 
 class OverlayContent extends StatefulWidget {
-  late String contentType; // Agregamos contentType para decidir qué mostrar
+  late String contentType;
   final VoidCallback onClose;
-  late Map<String, String>? clientData; // Agregar para pasar datos del cliente
+  late Map<String, String>? clientData;
 
   OverlayContent({
     Key? key,
     required this.contentType,
     required this.onClose,
-    this.clientData, // Aceptar datos del cliente si están disponibles
+    this.clientData,
   }) : super(key: key);
 
   @override
@@ -20,6 +20,21 @@ class OverlayContent extends StatefulWidget {
 }
 
 class _OverlayContentState extends State<OverlayContent> {
+  void _handleClose() {
+    if (widget.contentType == 'info') {
+      setState(() {
+        widget.contentType = 'listado'; // Volver a la lista si está en 'info'
+        widget.clientData = null; // Limpiar los datos del cliente
+      });
+    } else if (widget.contentType == 'crear') {
+      setState(() {
+        widget.contentType = 'listado'; // Volver a la lista si está en 'crear'
+      });
+    } else {
+      widget.onClose(); // Cerrar completamente el overlay si está en 'listado'
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -29,7 +44,7 @@ class _OverlayContentState extends State<OverlayContent> {
       width: screenWidth,
       decoration: BoxDecoration(
         color: Color(0xFF494949),
-        border: Border.all(color: Color(0xFF2be4f3), width: 2), // Borde en todos los lados
+        border: Border.all(color: Color(0xFF2be4f3), width: 2),
         borderRadius: BorderRadius.circular(7),
       ),
       child: Column(
@@ -44,14 +59,13 @@ class _OverlayContentState extends State<OverlayContent> {
             ),
             child: Stack(
               children: [
-                // Texto centrado
                 Center(
                   child: Text(
                     widget.contentType == 'listado'
                         ? 'LISTADO DE CLIENTES'
-                        : widget.contentType == 'info' // Cambiar el título aquí
-                            ? 'FICHA CLIENTE'
-                            : 'Crear Clientes',
+                        : widget.contentType == 'info'
+                        ? 'FICHA CLIENTE'
+                        : 'Crear Clientes',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 35,
@@ -60,15 +74,12 @@ class _OverlayContentState extends State<OverlayContent> {
                     ),
                   ),
                 ),
-                // Imagen a la derecha
                 Positioned(
                   right: screenWidth * 0.005,
                   top: 0,
                   bottom: 0,
                   child: IconButton(
-                    onPressed: () {
-                      widget.onClose();
-                    },
+                    onPressed: _handleClose, // Llama a la función de cierre
                     icon: const Icon(
                       Icons.close_sharp,
                       color: Colors.white,
@@ -79,15 +90,13 @@ class _OverlayContentState extends State<OverlayContent> {
               ],
             ),
           ),
-          // Contenido dinámico según el tipo
           if (widget.contentType == 'listado')
             Column(
               children: [
                 ClientListView(onClientTap: (clientData) {
-                  // Cambiar el tipo de contenido a 'info' y pasar los datos del cliente
                   setState(() {
-                    widget.contentType = 'info'; // Cambiar el tipo a 'info'
-                    widget.clientData = clientData; // Pasar los datos del cliente
+                    widget.contentType = 'info';
+                    widget.clientData = clientData;
                   });
                 }),
               ],
@@ -107,8 +116,8 @@ class _OverlayContentState extends State<OverlayContent> {
                 ),
               ],
             )
-          else if (widget.contentType == 'info' && widget.clientData != null) // Mostrar InfoClients
-            InfoClients(clientData: widget.clientData!), // Pasar datos del cliente
+          else if (widget.contentType == 'info' && widget.clientData != null)
+              InfoClients(clientData: widget.clientData!),
         ],
       ),
     );
