@@ -34,7 +34,7 @@ class _ClientListViewState extends State<ClientListView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
         children: [
           Row(
@@ -118,7 +118,7 @@ class _ClientListViewState extends State<ClientListView> {
           ),
           SizedBox(height: screenHeight * 0.03),
           Container(
-            height: screenHeight * 0.35, // Aumentar la altura del contenedor
+            height: screenHeight * 0.4, // Aumentar la altura del contenedor
             width: screenWidth,
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 46, 46, 46),

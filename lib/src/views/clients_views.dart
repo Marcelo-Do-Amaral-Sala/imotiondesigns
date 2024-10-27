@@ -77,7 +77,7 @@ class _ClientsViewState extends State<ClientsView> {
                                         '- CLIENTES',
                                         style: TextStyle(
                                           color: Colors.lightBlueAccent,
-                                          fontSize: 28,
+                                          fontSize: 35,
                                           fontWeight: FontWeight.bold,
                                         ),
                                         textAlign: TextAlign.center,
@@ -104,7 +104,7 @@ class _ClientsViewState extends State<ClientsView> {
                                     duration: const Duration(milliseconds: 100),
                                     child: SizedBox(
                                       width: screenWidth * 0.2,
-                                      height: screenHeight * 0.15,
+                                      height: screenHeight * 0.1,
                                       child: Stack(
                                         alignment: Alignment.center,
                                         children: [
@@ -112,7 +112,7 @@ class _ClientsViewState extends State<ClientsView> {
                                             'assets/images/recuadro.png',
                                             fit: BoxFit.fill,
                                             width: screenWidth * 0.2,
-                                            height: screenHeight * 0.15,
+                                            height: screenHeight * 0.1,
                                           ),
                                           const Padding(
                                             padding: EdgeInsets.all(8.0),
@@ -120,7 +120,7 @@ class _ClientsViewState extends State<ClientsView> {
                                               'Listado de clientes',
                                               style: TextStyle(
                                                 color: Colors.lightBlueAccent,
-                                                fontSize: 28,
+                                                fontSize: 24,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                               textAlign: TextAlign.center,
@@ -132,7 +132,7 @@ class _ClientsViewState extends State<ClientsView> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 25),
+                              SizedBox(height: screenHeight * 0.02),
                               // Botón para crear clientes
                               Align(
                                 alignment: Alignment.centerRight,
@@ -150,7 +150,7 @@ class _ClientsViewState extends State<ClientsView> {
                                     duration: const Duration(milliseconds: 100),
                                     child: SizedBox(
                                       width: screenWidth * 0.2,
-                                      height: screenHeight * 0.15,
+                                      height: screenHeight * 0.1,
                                       child: Stack(
                                         alignment: Alignment.center,
                                         children: [
@@ -158,7 +158,7 @@ class _ClientsViewState extends State<ClientsView> {
                                             'assets/images/recuadro.png',
                                             fit: BoxFit.fill,
                                             width: screenWidth * 0.2,
-                                            height: screenHeight * 0.15,
+                                            height: screenHeight * 0.1,
                                           ),
                                           const Padding(
                                             padding: EdgeInsets.all(8.0),
@@ -166,7 +166,7 @@ class _ClientsViewState extends State<ClientsView> {
                                               'Crear clientes',
                                               style: TextStyle(
                                                 color: Colors.lightBlueAccent,
-                                                fontSize: 28,
+                                                fontSize: 24,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                               textAlign: TextAlign.center,
@@ -225,7 +225,8 @@ class _ClientsViewState extends State<ClientsView> {
                             // Contenedor superpuesto en el segundo Expanded
                             if (isOverlayVisible)
                               Positioned.fill(
-                                top: screenHeight * 0.15,
+                                top: screenHeight * 0.12,
+                                right: 0,
                                 child: OverlayContent(
                                   contentType: overlayContentType, // Pasamos el tipo de contenido
                                   onClose: () {

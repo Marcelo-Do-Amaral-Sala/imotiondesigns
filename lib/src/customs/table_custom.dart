@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../info/info_clients.dart';
@@ -17,30 +19,32 @@ class _DataTableWidgetState extends State<DataTableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        buildHeaderRow(),
-        const SizedBox(height: 20),
-        ...widget.data.map((row) {
-          return Column(
-            children: [
-              DataRowWidget(
-                id: row['id'] ?? '',
-                name: row['name'] ?? '',
-                phone: row['phone'] ?? '',
-                status: row['status'] ?? '',
-                onTap: () {
-                  setState(() {
-                    selectedRow = row; // Guarda la fila seleccionada.
-                  });
-                  widget.onRowTap(row); // Llama a onRowTap con la fila seleccionada.
-                },
-              ),
-              const SizedBox(height: 20),
-            ],
-          );
-        }),
-      ],
+    return SingleChildScrollView( // Añadir SingleChildScrollView
+      child: Column(
+        children: [
+          buildHeaderRow(),
+          const SizedBox(height: 20),
+          ...widget.data.map((row) {
+            return Column(
+              children: [
+                DataRowWidget(
+                  id: row['id'] ?? '',
+                  name: row['name'] ?? '',
+                  phone: row['phone'] ?? '',
+                  status: row['status'] ?? '',
+                  onTap: () {
+                    setState(() {
+                      selectedRow = row; // Guarda la fila seleccionada.
+                    });
+                    widget.onRowTap(row); // Llama a onRowTap con la fila seleccionada.
+                  },
+                ),
+                const SizedBox(height: 20),
+              ],
+            );
+          }).toList(), // Asegúrate de convertir el Iterable a List
+        ],
+      ),
     );
   }
 
@@ -86,6 +90,13 @@ class DataRowWidget extends StatefulWidget {
 
 class _DataRowWidgetState extends State<DataRowWidget> {
   bool isPressed = false;
+  Timer? _timer; // Añadido para el temporizador
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancela el temporizador si está en ejecución
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +107,13 @@ class _DataRowWidgetState extends State<DataRowWidget> {
           isPressed = true;
         });
 
-        Future.delayed(const Duration(milliseconds: 200), () {
-          setState(() {
-            isPressed = false;
-          });
+        // Usa el temporizador para revertir el estado después de un breve retraso
+        _timer = Timer(const Duration(milliseconds: 200), () {
+          if (mounted) { // Verifica si el widget sigue montado
+            setState(() {
+              isPressed = false;
+            });
+          }
         });
       },
       child: Container(
@@ -130,3 +144,4 @@ class _DataRowWidgetState extends State<DataRowWidget> {
     );
   }
 }
+

@@ -25,9 +25,11 @@ class _OverlayContentState extends State<OverlayContent> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
+      height: screenHeight,
+      width: screenWidth,
       decoration: BoxDecoration(
         color: Color(0xFF494949),
-        border: Border(bottom: BorderSide(color: Color(0xFF2be4f3), width: 2)),
+        border: Border.all(color: Color(0xFF2be4f3), width: 2), // Borde en todos los lados
         borderRadius: BorderRadius.circular(7),
       ),
       child: Column(
@@ -51,7 +53,11 @@ class _OverlayContentState extends State<OverlayContent> {
                             ? 'FICHA CLIENTE'
                             : 'Crear Clientes',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Color(0xFF2be4f3)),
+                    style: const TextStyle(
+                      fontSize: 35,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2be4f3),
+                    ),
                   ),
                 ),
                 // Imagen a la derecha
@@ -84,7 +90,6 @@ class _OverlayContentState extends State<OverlayContent> {
                     widget.clientData = clientData; // Pasar los datos del cliente
                   });
                 }),
-                SizedBox(height: screenHeight * 0.02),
               ],
             )
           else if (widget.contentType == 'crear')
@@ -93,7 +98,7 @@ class _OverlayContentState extends State<OverlayContent> {
                 const TextField(
                   decoration: InputDecoration(labelText: 'Nombre del Cliente'),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: screenHeight * 0.02),
                 ElevatedButton(
                   onPressed: () {
                     // Lógica para crear cliente
@@ -104,7 +109,6 @@ class _OverlayContentState extends State<OverlayContent> {
             )
           else if (widget.contentType == 'info' && widget.clientData != null) // Mostrar InfoClients
             InfoClients(clientData: widget.clientData!), // Pasar datos del cliente
-          const SizedBox(height: 20),
         ],
       ),
     );
