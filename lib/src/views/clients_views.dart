@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../customs/overlay_content.dart';
 
 class ClientsView extends StatefulWidget {
@@ -91,8 +90,8 @@ class _ClientsViewState extends State<ClientsView> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: GestureDetector(
-                                  onTapDown: (_) => setState(() => scaleFactorListado = 0.95),
-                                  onTapUp: (_) {
+                                  onTapDown: (isOverlayVisible) ? null : (_) => setState(() => scaleFactorListado = 0.95),
+                                  onTapUp: (isOverlayVisible) ? null : (_) {
                                     setState(() {
                                       scaleFactorListado = 1.0;
                                       isOverlayVisible = true; // Muestra el contenedor superpuesto
@@ -137,8 +136,8 @@ class _ClientsViewState extends State<ClientsView> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: GestureDetector(
-                                  onTapDown: (_) => setState(() => scaleFactorCrear = 0.95),
-                                  onTapUp: (_) {
+                                  onTapDown: (isOverlayVisible) ? null : (_) => setState(() => scaleFactorCrear = 0.95),
+                                  onTapUp: (isOverlayVisible) ? null : (_) {
                                     setState(() {
                                       scaleFactorCrear = 1.0;
                                       isOverlayVisible = true; // Muestra el contenedor superpuesto
