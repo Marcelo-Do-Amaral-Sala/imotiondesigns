@@ -28,7 +28,7 @@ class _OverlayContentState extends State<OverlayContent> {
       });
     } else if (widget.contentType == 'crear') {
       setState(() {
-        widget.contentType = 'listado'; // Volver a la lista si está en 'crear'
+        widget.onClose();
       });
     } else {
       widget.onClose(); // Cerrar completamente el overlay si está en 'listado'
