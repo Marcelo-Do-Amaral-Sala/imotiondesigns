@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'clients_data.dart'; // Make sure to import your ClientsData class
 
 class InfoClients extends StatefulWidget {
   final Map<String, String> clientData;
@@ -9,7 +10,8 @@ class InfoClients extends StatefulWidget {
   _InfoClientsState createState() => _InfoClientsState();
 }
 
-class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStateMixin {
+class _InfoClientsState extends State<InfoClients>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   double scaleFactorTick = 1.0;
@@ -19,9 +21,6 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
-    _tabController.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
@@ -38,20 +37,15 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
       children: [
         _buildTabBar(),
         _buildTabBarView(),
-        _buildBottomMenu(),
       ],
     );
   }
 
   Widget _buildTabBar() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: screenHeight * 0.1,
-      width: screenWidth,
+      height: 50,
       color: Colors.black,
       child: TabBar(
-        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
         controller: _tabController,
         tabs: [
           _buildTab('DATOS PERSONALES', 0),
@@ -65,10 +59,7 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
           borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
         ),
         labelColor: const Color(0xFF2be4f3),
-        labelStyle: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-        ),
+        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
         unselectedLabelColor: Colors.white,
       ),
     );
@@ -82,7 +73,9 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
           text,
           textAlign: TextAlign.center,
           style: TextStyle(
-            decoration: _tabController.index == index ? TextDecoration.underline : TextDecoration.none,
+            decoration: _tabController.index == index
+                ? TextDecoration.underline
+                : TextDecoration.none,
           ),
         ),
       ),
@@ -90,15 +83,18 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
   }
 
   Widget _buildTabBarView() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
-      height: screenHeight * 0.45,
-      width: screenWidth,
+      height: 400,
       child: TabBarView(
         controller: _tabController,
         children: [
-          _buildTabContent('Contenido de Opción 1'),
+          ClientsData(
+            clientData: widget.clientData, // Pass the client data
+            onDataChanged: (data) {
+              // Handle data changes if needed
+              print(data);
+            },
+          ),
           _buildTabContent('Contenido de Opción 2'),
           _buildTabContent('Contenido de Opción 3'),
           _buildTabContent('Contenido de Opción 4'),
@@ -110,77 +106,24 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
 
   Widget _buildTabContent(String content) {
     return Center(
-      child: Text(content, style: TextStyle(color: Colors.white)),
+      child: Text(content, style: const TextStyle(color: Colors.white)),
     );
   }
 
-  Widget _buildBottomMenu() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      padding: const EdgeInsets.all(2.0),
-      height: screenHeight * 0.09,
-      width: screenWidth,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
-            onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-            onTap: () {
-              print("PAPELARA PULSADA");
-            },
-            child: AnimatedScale(
-              scale: scaleFactorRemove,
-              duration: const Duration(milliseconds: 100),
-              child: SizedBox(
-                width: screenWidth * 0.1,
-                height: screenHeight * 0.1,
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/papelera.png',
-                    fit: BoxFit.scaleDown,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-            onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-            onTap: () {
-              print("TICK PULSADA");
-            },
-            child: AnimatedScale(
-              scale: scaleFactorTick,
-              duration: const Duration(milliseconds: 100),
-              child: SizedBox(
-                width: screenWidth * 0.1,
-                height: screenHeight * 0.1,
-                child: ClipOval(
-                  child:   Image.asset(
-                    'assets/images/tick.png',
-                    fit: BoxFit.scaleDown,
-                  ),
-                ),
-              ),
-            ),
-          ),
 
-        ],
-      ),
-    );
-  }
-
-/*Widget _buildClientInfo() {
+ /*  Widget _buildClientInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('ID: ${widget.clientData['id']}', style: TextStyle(color: Colors.white)),
-        Text('Nombre: ${widget.clientData['name']}', style: TextStyle(color: Colors.white)),
-        Text('Teléfono: ${widget.clientData['phone']}', style: TextStyle(color: Colors.white)),
-        Text('Estado: ${widget.clientData['status']}', style: TextStyle(color: Colors.white)),
+        Text('ID: ${widget.clientData['id']}',
+            style: TextStyle(color: Colors.white)),
+        Text('Nombre: ${widget.clientData['name']}',
+            style: TextStyle(color: Colors.white)),
+        Text('Teléfono: ${widget.clientData['phone']}',
+            style: TextStyle(color: Colors.white)),
+        Text('Estado: ${widget.clientData['status']}',
+            style: TextStyle(color: Colors.white)),
       ],
     );
-  }*/
+  } */
 }

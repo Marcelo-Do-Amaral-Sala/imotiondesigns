@@ -61,7 +61,6 @@ class _CreateClientsState extends State<CreateClients>
       children: [
         _buildTabBar(),
         _buildTabBarView(),
-        //_buildBottomMenu(),
       ],
     );
   }
@@ -74,7 +73,7 @@ class _CreateClientsState extends State<CreateClients>
       width: screenWidth,
       color: Colors.black,
       child: TabBar(
-        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
         controller: _tabController,
         tabs: [
           _buildTab('DATOS PERSONALES', 0),
@@ -121,7 +120,8 @@ class _CreateClientsState extends State<CreateClients>
       child: TabBarView(
         controller: _tabController,
         children: [
-          PersonalDataForm(onDataChanged: _onDataChanged), // Integrando PersonalDataForm
+          PersonalDataForm(
+              onDataChanged: _onDataChanged), // Integrando PersonalDataForm
           _buildTabContent('Contenido de Opción 2'),
           _buildTabContent('Contenido de Opción 3'),
         ],
@@ -131,46 +131,7 @@ class _CreateClientsState extends State<CreateClients>
 
   Widget _buildTabContent(String content) {
     return Center(
-      child: Text(content, style: TextStyle(color: Colors.white)),
-    );
-  }
-
-  Widget _buildBottomMenu() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    return SizedBox(
-      height: screenHeight * 0.09,
-      width: screenWidth,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-            onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-            onTapCancel: () => setState(() => scaleFactorTick = 1.0), // Añadido para mejor manejo
-            onTap: () {
-              // Imprime los datos recogidos al hacer tap en el ícono de tick
-              print("Datos recogidos:");
-              print(clientData);
-            },
-            child: AnimatedScale(
-              scale: scaleFactorTick,
-              duration: const Duration(milliseconds: 100),
-              child: SizedBox(
-                width: screenWidth * 0.09,
-                height: screenHeight * 0.09,
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/tick.png',
-                    fit: BoxFit.scaleDown,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: Text(content, style: const TextStyle(color: Colors.white)),
     );
   }
 }

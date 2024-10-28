@@ -17,6 +17,7 @@ class OverlayContent extends StatefulWidget {
   }) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _OverlayContentState createState() => _OverlayContentState();
 }
 
@@ -45,8 +46,8 @@ class _OverlayContentState extends State<OverlayContent> {
       height: screenHeight,
       width: screenWidth,
       decoration: BoxDecoration(
-        color: Color(0xFF494949),
-        border: Border.all(color: Color(0xFF2be4f3), width: 2),
+        color: const Color(0xFF494949),
+        border: Border.all(color: const Color(0xFF2be4f3), width: 2),
         borderRadius: BorderRadius.circular(7),
       ),
       child: Column(
