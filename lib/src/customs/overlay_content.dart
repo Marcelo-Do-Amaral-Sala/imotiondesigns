@@ -50,7 +50,7 @@ class _OverlayContentState extends State<OverlayContent> {
         borderRadius: BorderRadius.circular(7),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: [
           Container(
             width: screenWidth,

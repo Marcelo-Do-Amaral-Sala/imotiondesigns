@@ -50,27 +50,25 @@ class _ClientListViewState extends State<ClientListView> {
     super.initState();
     filteredClients = allClients; // Inicialmente muestra todos los clientes
 
-    // Agrega listener para el campo de nombre
+    // Agrega listener para los campos de nombre e índice
     _clientNameController.addListener(_filterClients);
+    _clientIndexController.addListener(_filterClients); // Agrega este listener
   }
 
   void _filterClients() {
     setState(() {
       String searchText = _clientNameController.text.toLowerCase();
+      String indexText = _clientIndexController.text;
 
-      // Filtra solo si hay texto en el campo de nombre o una opción seleccionada en el dropdown
-      if (searchText.isNotEmpty || selectedOption != null) {
-        filteredClients = allClients.where((client) {
-          final matchesName =
-              client['name']!.toLowerCase().contains(searchText);
-          final matchesStatus =
-              selectedOption == null || client['status'] == selectedOption;
-          return matchesName && matchesStatus;
-        }).toList();
-      } else {
-        filteredClients =
-            allClients; // Mostrar todos los clientes si no hay filtros
-      }
+      // Filtra solo si hay texto en el campo de nombre, índice o una opción seleccionada en el dropdown
+      filteredClients = allClients.where((client) {
+        final matchesName = client['name']!.toLowerCase().contains(searchText);
+        final matchesIndex = indexText.isEmpty ||
+            client['id'] == indexText; // Cambia 'index' a 'id'
+        final matchesStatus =
+            selectedOption == null || client['status'] == selectedOption;
+        return matchesName && matchesIndex && matchesStatus;
+      }).toList();
     });
   }
 
@@ -98,17 +96,18 @@ class _ClientListViewState extends State<ClientListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'ID',
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                     TextField(
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
+                      controller: _clientIndexController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Color(0xFF313030),
@@ -180,6 +179,7 @@ class _ClientListViewState extends State<ClientListView> {
                         onChanged: (value) {
                           setState(() {
                             selectedOption = value;
+                            _filterClients();
                           });
                         },
                         dropdownColor: const Color(0xFF313030),

@@ -130,39 +130,41 @@ class _CreateClientsState extends State<CreateClients>
   }
 
   Widget _buildBottomMenu() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.all(2.0),
-      height: screenHeight * 0.1,
-      width: screenWidth,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-            onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-            onTap: () {
-              print("TICK PULSADA");
-            },
-            child: AnimatedScale(
-              scale: scaleFactorTick,
-              duration: const Duration(milliseconds: 100),
-              child: SizedBox(
-                width: screenWidth * 0.1,
-                height: screenHeight * 0.1,
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/tick.png',
-                    fit: BoxFit.scaleDown,
-                  ),
+  double screenWidth = MediaQuery.of(context).size.width;
+  double screenHeight = MediaQuery.of(context).size.height;
+
+  return Container(
+    padding: EdgeInsets.all(2.0),
+    height: screenHeight * 0.1,
+    width: screenWidth,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        GestureDetector(
+          onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+          onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+          onTapCancel: () => setState(() => scaleFactorTick = 1.0), // Añadido para mejor manejo
+          onTap: () {
+            print("TICK PULSADA");
+          },
+          child: AnimatedScale(
+            scale: scaleFactorTick,
+            duration: const Duration(milliseconds: 100),
+            child: SizedBox(
+              width: screenWidth * 0.1,
+              height: screenHeight * 0.1,
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/tick.png',
+                  fit: BoxFit.scaleDown,
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 }
