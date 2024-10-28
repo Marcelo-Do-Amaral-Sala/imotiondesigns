@@ -21,7 +21,7 @@ class _CreateClientsState extends State<CreateClients>
   String gender = '';
   int height = 0;
   int weight = 0;
-  DateTime dateBirth = DateTime.now();
+  String dateBirth = '';
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _CreateClientsState extends State<CreateClients>
   }
 
   void _onDataChanged(String name, String email, String phone, String gender,
-      int height, int weight, DateTime dateBirth) {
+      int height, int weight, String dateBirth) {
     setState(() {
       this.name = name;
       this.email = email;
@@ -133,7 +133,7 @@ class _CreateClientsState extends State<CreateClients>
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Container(
+    return SizedBox(
       height: screenHeight * 0.09,
       width: screenWidth,
       child: Row(

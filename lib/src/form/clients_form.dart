@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class PersonalDataForm extends StatefulWidget {
-  final Function(String, String, String, String, int, int, DateTime) onDataChanged;
+  final Function(String, String, String, String, int, int, String)
+      onDataChanged;
 
-  PersonalDataForm({Key? key, required this.onDataChanged}) : super(key: key);
+  // ignore: use_super_parameters
+  const PersonalDataForm({Key? key, required this.onDataChanged})
+      : super(key: key);
 
   @override
   _PersonalDataFormState createState() => _PersonalDataFormState();
@@ -13,22 +18,20 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _genderController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
-  final _birthDateController = TextEditingController();
 
   String? selectedOption;
+  String? selectedGender;
+  String? _birthDate; // Variable para almacenar la fecha
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _genderController.dispose();
     _heightController.dispose();
     _weightController.dispose();
-    _birthDateController.dispose();
     super.dispose();
   }
 
@@ -37,11 +40,26 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
       _nameController.text,
       _emailController.text,
       _phoneController.text,
-      _genderController.text,
+      selectedGender ?? '',
       int.parse(_heightController.text),
       int.parse(_weightController.text),
-      DateTime.parse(_birthDateController.text),
+      _birthDate ?? '', // Se pasa la fecha seleccionada
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _birthDate =
+            DateFormat('dd/MM/yyyy').format(picked); // Formatear la fecha
+      });
+    }
   }
 
   @override
@@ -73,7 +91,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             border: OutlineInputBorder(),
                             filled: true,
                             fillColor: Color(0xFF313030),
-                            isDense: true, // Compactar el campo
+                            isDense: true,
                           ),
                         ),
                       ],
@@ -90,12 +108,13 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                         ),
                         TextField(
                           controller: _nameController,
-                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 12),
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             filled: true,
                             fillColor: Color(0xFF313030),
-                            isDense: true, // Compactar el campo
+                            isDense: true,
                           ),
                         ),
                       ],
@@ -119,7 +138,8 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           child: DropdownButton<String>(
                             hint: const Text(
                               'Seleccione',
-                              style: TextStyle(color: Colors.white, fontSize: 12),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
                             ),
                             value: selectedOption,
                             items: const [
@@ -127,14 +147,16 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                 value: 'Activo',
                                 child: Text(
                                   'Activo',
-                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
                                 ),
                               ),
                               DropdownMenuItem(
                                 value: 'Inactivo',
                                 child: Text(
                                   'Inactivo',
-                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
                                 ),
                               ),
                             ],
@@ -147,7 +169,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             icon: const Icon(
                               Icons.arrow_drop_down,
                               color: Color(0xFF2be4f3),
-                              size: 30, // Reducir tamaño del icono
+                              size: 30,
                             ),
                           ),
                         ),
@@ -183,35 +205,38 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             child: DropdownButton<String>(
                               hint: const Text(
                                 'Seleccione',
-                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12),
                               ),
-                              value: selectedOption,
+                              value: selectedGender,
                               items: const [
                                 DropdownMenuItem(
                                   value: 'Hombre',
                                   child: Text(
                                     'Hombre',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 12),
                                   ),
                                 ),
                                 DropdownMenuItem(
                                   value: 'Mujer',
                                   child: Text(
                                     'Mujer',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 12),
                                   ),
                                 ),
                               ],
                               onChanged: (value) {
                                 setState(() {
-                                  selectedOption = value;
+                                  selectedGender = value;
                                 });
                               },
                               dropdownColor: const Color(0xFF313030),
                               icon: const Icon(
                                 Icons.arrow_drop_down,
                                 color: Color(0xFF2be4f3),
-                                size: 30, // Reducir tamaño del icono
+                                size: 30,
                               ),
                             ),
                           ),
@@ -220,14 +245,22 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             'FECHA DE NACIMIENTO',
                             style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
-                          TextField(
-                            controller: _birthDateController,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Color(0xFF313030),
-                              isDense: true, // Compactar el campo
+                          GestureDetector(
+                            onTap: () => _selectDate(context),
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF313030),
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              child: Text(
+                                _birthDate ?? 'DD/MM/YYYY',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -237,12 +270,18 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           ),
                           TextField(
                             controller: _phoneController,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            keyboardType: TextInputType.number, // Solo números
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter
+                                  .digitsOnly, // Restringe a solo dígitos
+                            ],
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
-                              isDense: true, // Compactar el campo
+                              isDense: true,
                             ),
                           ),
                         ],
@@ -259,12 +298,18 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           ),
                           TextField(
                             controller: _heightController,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            keyboardType: TextInputType.number, // Solo números
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter
+                                  .digitsOnly, // Restringe a solo dígitos
+                            ],
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
-                              isDense: true, // Compactar el campo
+                              isDense: true,
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -274,12 +319,18 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           ),
                           TextField(
                             controller: _weightController,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            keyboardType: TextInputType.number, // Solo números
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter
+                                  .digitsOnly, // Restringe a solo dígitos
+                            ],
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
-                              isDense: true, // Compactar el campo
+                              isDense: true,
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -289,12 +340,19 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           ),
                           TextField(
                             controller: _emailController,
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            keyboardType: TextInputType
+                                .emailAddress, // Teclado específico para correos
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.deny(
+                                  RegExp(r'\s')) // Evitar espacios en blanco
+                            ],
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
-                              isDense: true, // Compactar el campo
+                              isDense: true,
                             ),
                           ),
                         ],
