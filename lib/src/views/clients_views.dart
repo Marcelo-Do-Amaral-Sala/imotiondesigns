@@ -9,7 +9,12 @@ class ClientsView extends StatefulWidget {
 }
 
 class _ClientsViewState extends State<ClientsView> {
-  final List<String> clients = ["Cliente 1", "Cliente 2", "Cliente 3", "Cliente 4"];
+  final List<String> clients = [
+    "Cliente 1",
+    "Cliente 2",
+    "Cliente 3",
+    "Cliente 4"
+  ];
 
   // Variables para controlar el efecto de escala en las imágenes
   double scaleFactorBack = 1.0;
@@ -38,13 +43,12 @@ class _ClientsViewState extends State<ClientsView> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.05,
-              vertical: screenHeight * 0.1,
+              horizontal: screenWidth * 0.02,
+              vertical: screenHeight * 0.07,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
                 Expanded(
                   child: Row(
                     children: [
@@ -90,14 +94,21 @@ class _ClientsViewState extends State<ClientsView> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: GestureDetector(
-                                  onTapDown: (isOverlayVisible) ? null : (_) => setState(() => scaleFactorListado = 0.95),
-                                  onTapUp: (isOverlayVisible) ? null : (_) {
-                                    setState(() {
-                                      scaleFactorListado = 1.0;
-                                      isOverlayVisible = true; // Muestra el contenedor superpuesto
-                                      overlayContentType = 'listado'; // Establece el tipo de contenido
-                                    });
-                                  },
+                                  onTapDown: (isOverlayVisible)
+                                      ? null
+                                      : (_) => setState(
+                                          () => scaleFactorListado = 0.95),
+                                  onTapUp: (isOverlayVisible)
+                                      ? null
+                                      : (_) {
+                                          setState(() {
+                                            scaleFactorListado = 1.0;
+                                            isOverlayVisible =
+                                                true; // Muestra el contenedor superpuesto
+                                            overlayContentType =
+                                                'listado'; // Establece el tipo de contenido
+                                          });
+                                        },
                                   child: AnimatedScale(
                                     scale: scaleFactorListado,
                                     duration: const Duration(milliseconds: 100),
@@ -136,14 +147,21 @@ class _ClientsViewState extends State<ClientsView> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: GestureDetector(
-                                  onTapDown: (isOverlayVisible) ? null : (_) => setState(() => scaleFactorCrear = 0.95),
-                                  onTapUp: (isOverlayVisible) ? null : (_) {
-                                    setState(() {
-                                      scaleFactorCrear = 1.0;
-                                      isOverlayVisible = true; // Muestra el contenedor superpuesto
-                                      overlayContentType = 'crear'; // Establece el tipo de contenido
-                                    });
-                                  },
+                                  onTapDown: (isOverlayVisible)
+                                      ? null
+                                      : (_) => setState(
+                                          () => scaleFactorCrear = 0.95),
+                                  onTapUp: (isOverlayVisible)
+                                      ? null
+                                      : (_) {
+                                          setState(() {
+                                            scaleFactorCrear = 1.0;
+                                            isOverlayVisible =
+                                                true; // Muestra el contenedor superpuesto
+                                            overlayContentType =
+                                                'crear'; // Establece el tipo de contenido
+                                          });
+                                        },
                                   child: AnimatedScale(
                                     scale: scaleFactorCrear,
                                     duration: const Duration(milliseconds: 100),
@@ -181,7 +199,7 @@ class _ClientsViewState extends State<ClientsView> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: screenWidth * 0.01),
                       Expanded(
                         flex: 3,
                         child: Stack(
@@ -200,8 +218,10 @@ class _ClientsViewState extends State<ClientsView> {
                               top: 0,
                               right: 0,
                               child: GestureDetector(
-                                onTapDown: (_) => setState(() => scaleFactorBack = 0.95),
-                                onTapUp: (_) => setState(() => scaleFactorBack = 1.0),
+                                onTapDown: (_) =>
+                                    setState(() => scaleFactorBack = 0.95),
+                                onTapUp: (_) =>
+                                    setState(() => scaleFactorBack = 1.0),
                                 onTap: () {
                                   // NAVEGACION A PANTALLA ANTERIOR
                                 },
@@ -224,13 +244,16 @@ class _ClientsViewState extends State<ClientsView> {
                             // Contenedor superpuesto en el segundo Expanded
                             if (isOverlayVisible)
                               Positioned.fill(
-                                top: screenHeight * 0.12,
+                                top: screenHeight * 0.11,
                                 right: 0,
+                                left: 0,
                                 child: OverlayContent(
-                                  contentType: overlayContentType, // Pasamos el tipo de contenido
+                                  contentType:
+                                      overlayContentType, // Pasamos el tipo de contenido
                                   onClose: () {
                                     setState(() {
-                                      isOverlayVisible = false; // Oculta el contenedor superpuesto
+                                      isOverlayVisible =
+                                          false; // Oculta el contenedor superpuesto
                                     });
                                   },
                                 ),

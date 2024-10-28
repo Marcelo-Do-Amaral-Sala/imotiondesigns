@@ -38,7 +38,6 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
       children: [
         _buildTabBar(),
         _buildTabBarView(),
-        // _buildClientInfo(),
         _buildBottomMenu(),
       ],
     );
@@ -94,7 +93,7 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
-      height: screenHeight * 0.34,
+      height: screenHeight * 0.45,
       width: screenWidth,
       child: TabBarView(
         controller: _tabController,
@@ -119,8 +118,8 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      padding: EdgeInsets.all(2.0),
-      height: screenHeight * 0.1,
+      padding: const EdgeInsets.all(2.0),
+      height: screenHeight * 0.09,
       width: screenWidth,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

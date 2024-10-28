@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 import '../customs/table_custom.dart';
@@ -102,15 +104,16 @@ class _ClientListViewState extends State<ClientListView> {
                   children: [
                     const Text(
                       'ID',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     TextField(
                       controller: _clientIndexController,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Color(0xFF313030),
+                        isDense: true, // Compactar el campo
                       ),
                     ),
                   ],
@@ -121,17 +124,18 @@ class _ClientListViewState extends State<ClientListView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'NOMBRE',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     TextField(
                       controller: _clientNameController,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Color(0xFF313030),
+                        isDense: true, // Compactar el campo
                       ),
                     ),
                   ],
@@ -142,20 +146,20 @@ class _ClientListViewState extends State<ClientListView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Estado',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    const Text(
+                      'ESTADO',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Color(0xFF313030),
+                        color: const Color(0xFF313030),
                         borderRadius: BorderRadius.circular(7),
                       ),
                       child: DropdownButton<String>(
                         hint: const Text(
                           'Seleccione',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          style: TextStyle(color: Colors.white, fontSize: 12),
                         ),
                         value: selectedOption,
                         items: const [
@@ -164,7 +168,7 @@ class _ClientListViewState extends State<ClientListView> {
                             child: Text(
                               'Activo',
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
+                                  TextStyle(color: Colors.white, fontSize: 12),
                             ),
                           ),
                           DropdownMenuItem(
@@ -172,7 +176,7 @@ class _ClientListViewState extends State<ClientListView> {
                             child: Text(
                               'Inactivo',
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
+                                  TextStyle(color: Colors.white, fontSize: 12),
                             ),
                           ),
                         ],
@@ -186,7 +190,7 @@ class _ClientListViewState extends State<ClientListView> {
                         icon: const Icon(
                           Icons.arrow_drop_down,
                           color: Color(0xFF2be4f3),
-                          size: 50,
+                          size: 30, // Reducir tamaño del icono
                         ),
                       ),
                     ),
@@ -197,7 +201,7 @@ class _ClientListViewState extends State<ClientListView> {
           ),
           SizedBox(height: screenHeight * 0.03),
           Container(
-            height: screenHeight * 0.4,
+            height: screenHeight * 0.45,
             width: screenWidth,
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 46, 46, 46),
