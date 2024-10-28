@@ -19,12 +19,27 @@ class _ClientListViewState extends State<ClientListView> {
   // Lista completa de clientes
   List<Map<String, String>> allClients = [
     {'id': '1', 'name': 'Cliente A', 'phone': '123456789', 'status': 'Activo'},
-    {'id': '2', 'name': 'Cliente B', 'phone': '987654321', 'status': 'Inactivo'},
+    {
+      'id': '2',
+      'name': 'Cliente B',
+      'phone': '987654321',
+      'status': 'Inactivo'
+    },
     {'id': '3', 'name': 'Cliente C', 'phone': '555555555', 'status': 'Activo'},
     {'id': '4', 'name': 'Cliente D', 'phone': '654321789', 'status': 'Activo'},
-    {'id': '5', 'name': 'Cliente E', 'phone': '321456987', 'status': 'Inactivo'},
+    {
+      'id': '5',
+      'name': 'Cliente E',
+      'phone': '321456987',
+      'status': 'Inactivo'
+    },
     {'id': '6', 'name': 'Cliente F', 'phone': '987123654', 'status': 'Activo'},
-    {'id': '7', 'name': 'Cliente G', 'phone': '147258369', 'status': 'Inactivo'},
+    {
+      'id': '7',
+      'name': 'Cliente G',
+      'phone': '147258369',
+      'status': 'Inactivo'
+    },
   ];
 
   // Lista que se muestra filtrada
@@ -46,12 +61,15 @@ class _ClientListViewState extends State<ClientListView> {
       // Filtra solo si hay texto en el campo de nombre o una opción seleccionada en el dropdown
       if (searchText.isNotEmpty || selectedOption != null) {
         filteredClients = allClients.where((client) {
-          final matchesName = client['name']!.toLowerCase().contains(searchText);
-          final matchesStatus = selectedOption == null || client['status'] == selectedOption;
+          final matchesName =
+              client['name']!.toLowerCase().contains(searchText);
+          final matchesStatus =
+              selectedOption == null || client['status'] == selectedOption;
           return matchesName && matchesStatus;
         }).toList();
       } else {
-        filteredClients = allClients; // Mostrar todos los clientes si no hay filtros
+        filteredClients =
+            allClients; // Mostrar todos los clientes si no hay filtros
       }
     });
   }
@@ -80,76 +98,99 @@ class _ClientListViewState extends State<ClientListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _clientIndexController,
-                  enabled: false,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'ID',
-                    labelStyle: TextStyle(color: Colors.white, fontSize: 20),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Color(0xFF313030),
-                  ),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ID',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    TextField(
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Color(0xFF313030),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(width: screenWidth * 0.02),
               Expanded(
-                child: TextField(
-                  controller: _clientNameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'NOMBRE',
-                    labelStyle: TextStyle(color: Colors.white, fontSize: 20),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Color(0xFF313030),
-                  ),
-                ),
-              ),
-              SizedBox(width: screenWidth * 0.07),
-              Container(
-                alignment: Alignment.center,
-                width: screenWidth * 0.15,
-                decoration: BoxDecoration(
-                  color: Color(0xFF313030),
-                  borderRadius: BorderRadius.circular(7),
-                ),
-                child: DropdownButton<String>(
-                  hint: const Text(
-                    'Estado',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  value: selectedOption,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Activo',
-                      child: Text(
-                        'Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'NOMBRE',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    DropdownMenuItem(
-                      value: 'Inactivo',
-                      child: Text(
-                        'Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
+                    TextField(
+                      controller: _clientNameController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Color(0xFF313030),
                       ),
                     ),
                   ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedOption = value;
-                      _filterClients(); // Llamar al filtro al cambiar el dropdown
-                    });
-                  },
-                  dropdownColor: const Color(0xFF313030),
-                  icon: const Icon(
-                    Icons.arrow_drop_down,
-                    color: Color(0xFF2be4f3),
-                    size: 50,
-                  ),
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.02),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Estado',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF313030),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      child: DropdownButton<String>(
+                        hint: const Text(
+                          'Seleccione',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                        value: selectedOption,
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Activo',
+                            child: Text(
+                              'Activo',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Inactivo',
+                            child: Text(
+                              'Inactivo',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            selectedOption = value;
+                          });
+                        },
+                        dropdownColor: const Color(0xFF313030),
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: Color(0xFF2be4f3),
+                          size: 50,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -1,162 +1,266 @@
 import 'package:flutter/material.dart';
 
-class ClientForm extends StatefulWidget {
-  final Function(Map<String, String>) onSave;
+class PersonalDataForm extends StatefulWidget {
+  final Function(String, String, String, String, int, int, DateTime)
+      onDataChanged;
 
-  ClientForm({Key? key, required this.onSave}) : super(key: key);
+  PersonalDataForm({Key? key, required this.onDataChanged}) : super(key: key);
 
   @override
-  _ClientFormState createState() => _ClientFormState();
+  _PersonalDataFormState createState() => _PersonalDataFormState();
 }
 
-class _ClientFormState extends State<ClientForm> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _PersonalDataFormState extends State<PersonalDataForm> {
   final _nameController = TextEditingController();
-  final _addressController = TextEditingController();
+  final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  double scaleFactorTick = 1.0;
-  double scaleFactorRemove = 1.0;
+  final _genderController = TextEditingController();
+  final _heightController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _birthDateController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(() {
-      setState(() {});
-    });
-  }
+  String? selectedOption;
 
   @override
   void dispose() {
-    _tabController.dispose();
     _nameController.dispose();
-    _addressController.dispose();
+    _emailController.dispose();
     _phoneController.dispose();
+    _genderController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    _birthDateController.dispose();
     super.dispose();
   }
 
-  void _saveClient() {
-    // Creamos un mapa con los datos del cliente
-    final clientData = {
-      'name': _nameController.text,
-      'address': _addressController.text,
-      'phone': _phoneController.text,
-    };
-    widget.onSave(clientData); // Pasamos los datos al padre
+  void _onDataChanged() {
+    widget.onDataChanged(
+      _nameController.text,
+      _emailController.text,
+      _phoneController.text,
+      _genderController.text,
+      int.parse(_heightController.text),
+      int.parse(_weightController.text),
+      DateTime.parse(_birthDateController.text),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _buildTabBar(),
-        _buildTabBarView(),
-        _buildBottomMenu(),
-      ],
-    );
-  }
-
-  Widget _buildTabBar() {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
-      height: screenHeight * 0.1,
-      width: screenWidth,
-      color: Colors.black,
-      child: TabBar(
-        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-        controller: _tabController,
-        tabs: [
-          _buildTab('DATOS PERSONALES', 0),
-          _buildTab('BONOS', 1),
-          _buildTab('GRUPOS ACTIVOS', 2),
-        ],
-        indicator: const BoxDecoration(
-          color: Color(0xFF494949),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
-        ),
-        labelColor: const Color(0xFF2be4f3),
-        labelStyle: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-        ),
-        unselectedLabelColor: Colors.white,
-      ),
-    );
-  }
-
-  Widget _buildTab(String text, int index) {
-    return Tab(
-      child: SizedBox(
-        width: 200,
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            decoration: _tabController.index == index ? TextDecoration.underline : TextDecoration.none,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabBarView() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return SizedBox(
-      height: screenHeight * 0.34,
-      width: screenWidth,
-      child: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildTabContent('Contenido de Opción 1'),
-          _buildTabContent('Contenido de Opción 2'),
-          _buildTabContent('Contenido de Opción 3'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabContent(String content) {
-    return Center(
-      child: Text(content, style: TextStyle(color: Colors.white)),
-    );
-  }
-
-  Widget _buildBottomMenu() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      padding: EdgeInsets.all(10.0),
-      height: screenHeight * 0.1,
-      width: screenWidth,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-            onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-            onTap: () {
-              print("TICK PULSADA");
-            },
-            child: AnimatedScale(
-              scale: scaleFactorTick,
-              duration: const Duration(milliseconds: 100),
-              child: SizedBox(
-                width: screenWidth * 0.1,
-                height: screenHeight * 0.1,
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/tick.png',
-                    fit: BoxFit.scaleDown,
+      color: Colors.red, // Contenedor rojo
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ID',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15),
+                      ),
+                      TextField(
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Color(0xFF313030),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                SizedBox(width: screenWidth * 0.02),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'NOMBRE',
+                        style: TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                      TextField(
+                        controller: _nameController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Color(0xFF313030),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: screenWidth * 0.02),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'ESTADO',
+                        style: TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF313030),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: DropdownButton<String>(
+                          hint: const Text(
+                            'Seleccione',
+                            style: TextStyle(color: Colors.white, fontSize: 15),
+                          ),
+                          value: selectedOption,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'Activo',
+                              child: Text(
+                                'Activo',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 15),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Inactivo',
+                              child: Text(
+                                'Inactivo',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 15),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedOption = value;
+                            });
+                          },
+                          dropdownColor: const Color(0xFF313030),
+                          icon: const Icon(
+                            Icons.arrow_drop_down,
+                            color: Color(0xFF2be4f3),
+                            size: 50,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            SizedBox(
+              width: screenWidth,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'ALTURA',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                        TextField(
+                          controller: _heightController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Color(0xFF313030),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          'PESO',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                        TextField(
+                          controller: _weightController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Color(0xFF313030),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          'FECHA DE NACIMIENTO',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                        TextField(
+                          controller: _birthDateController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Color(0xFF313030),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.1),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'GÉNERO',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                        TextField(
+                          controller: _genderController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Color(0xFF313030),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          'EMAIL',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                        TextField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Color(0xFF313030),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          'TELÉFONO',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        ),
+                        TextField(
+                          controller: _phoneController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Color(0xFF313030),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

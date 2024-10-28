@@ -1,33 +1,51 @@
 import 'package:flutter/material.dart';
+import 'clients_form.dart'; // Asegúrate de que este archivo esté correctamente importado.
 
-class InfoClients extends StatefulWidget {
-  final Map<String, String> clientData;
+class CreateClients extends StatefulWidget {
+  final Function(Map<String, String>) onSave;
 
-  const InfoClients({Key? key, required this.clientData}) : super(key: key);
+  CreateClients({Key? key, required this.onSave}) : super(key: key);
 
   @override
-  _InfoClientsState createState() => _InfoClientsState();
+  _CreateClientsState createState() => _CreateClientsState();
 }
 
-class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStateMixin {
+class _CreateClientsState extends State<CreateClients>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   double scaleFactorTick = 1.0;
-  double scaleFactorRemove = 1.0;
+  String name = '';
+  String email = '';
+  String phone = '';
+  String gender = '';
+  int height = 0;
+  int weight = 0;
+  DateTime dateBirth = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
-    _tabController.addListener(() {
-      setState(() {});
-    });
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _onDataChanged(String name, String email, String phone, String gender,
+      int height, int weight, DateTime dateBirth) {
+    setState(() {
+      this.name = name;
+      this.email = email;
+      this.phone = phone;
+      this.gender = gender;
+      this.height = height;
+      this.weight = weight;
+      this.dateBirth = dateBirth;
+    });
   }
 
   @override
@@ -38,28 +56,23 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
       children: [
         _buildTabBar(),
         _buildTabBarView(),
-        // _buildClientInfo(),
         _buildBottomMenu(),
       ],
     );
   }
 
   Widget _buildTabBar() {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
       height: screenHeight * 0.1,
-      width: screenWidth,
       color: Colors.black,
       child: TabBar(
         padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
         controller: _tabController,
         tabs: [
           _buildTab('DATOS PERSONALES', 0),
-          _buildTab('ACTIVIDAD', 1),
-          _buildTab('BONOS', 2),
-          _buildTab('BIOIMPEDANCIA', 3),
-          _buildTab('GRUPOS ACTIVOS', 4),
+          _buildTab('BONOS', 1),
+          _buildTab('GRUPOS ACTIVOS', 2),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
@@ -76,14 +89,18 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
   }
 
   Widget _buildTab(String text, int index) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Tab(
       child: SizedBox(
-        width: 200,
+        width: screenWidth,
         child: Text(
           text,
           textAlign: TextAlign.center,
           style: TextStyle(
-            decoration: _tabController.index == index ? TextDecoration.underline : TextDecoration.none,
+            decoration: _tabController.index == index
+                ? TextDecoration.underline
+                : TextDecoration.none,
           ),
         ),
       ),
@@ -91,19 +108,16 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
   }
 
   Widget _buildTabBarView() {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
-      height: screenHeight * 0.34,
-      width: screenWidth,
+      height: screenHeight * 0.35,
       child: TabBarView(
         controller: _tabController,
         children: [
-          _buildTabContent('Contenido de Opción 1'),
+          PersonalDataForm(
+              onDataChanged: _onDataChanged), // Integrando PersonalDataForm
           _buildTabContent('Contenido de Opción 2'),
           _buildTabContent('Contenido de Opción 3'),
-          _buildTabContent('Contenido de Opción 4'),
-          _buildTabContent('Contenido de Opción 5'),
         ],
       ),
     );
@@ -119,33 +133,13 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
+      color: Colors.white,
       padding: EdgeInsets.all(2.0),
       height: screenHeight * 0.1,
       width: screenWidth,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          GestureDetector(
-            onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
-            onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-            onTap: () {
-              print("PAPELARA PULSADA");
-            },
-            child: AnimatedScale(
-              scale: scaleFactorRemove,
-              duration: const Duration(milliseconds: 100),
-              child: SizedBox(
-                width: screenWidth * 0.1,
-                height: screenHeight * 0.1,
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/papelera.png',
-                    fit: BoxFit.scaleDown,
-                  ),
-                ),
-              ),
-            ),
-          ),
           GestureDetector(
             onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
             onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
@@ -159,7 +153,7 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
                 width: screenWidth * 0.1,
                 height: screenHeight * 0.1,
                 child: ClipOval(
-                  child:   Image.asset(
+                  child: Image.asset(
                     'assets/images/tick.png',
                     fit: BoxFit.scaleDown,
                   ),
@@ -167,21 +161,8 @@ class _InfoClientsState extends State<InfoClients> with SingleTickerProviderStat
               ),
             ),
           ),
-
         ],
       ),
     );
   }
-
-/*Widget _buildClientInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('ID: ${widget.clientData['id']}', style: TextStyle(color: Colors.white)),
-        Text('Nombre: ${widget.clientData['name']}', style: TextStyle(color: Colors.white)),
-        Text('Teléfono: ${widget.clientData['phone']}', style: TextStyle(color: Colors.white)),
-        Text('Estado: ${widget.clientData['status']}', style: TextStyle(color: Colors.white)),
-      ],
-    );
-  }*/
 }
