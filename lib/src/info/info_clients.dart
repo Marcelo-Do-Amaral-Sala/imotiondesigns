@@ -21,6 +21,9 @@ class _InfoClientsState extends State<InfoClients>
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -42,24 +45,31 @@ class _InfoClientsState extends State<InfoClients>
   }
 
   Widget _buildTabBar() {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      height: 50,
+      height: screenHeight * 0.1,
+      width: screenWidth,
       color: Colors.black,
       child: TabBar(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
         controller: _tabController,
         tabs: [
           _buildTab('DATOS PERSONALES', 0),
           _buildTab('ACTIVIDAD', 1),
           _buildTab('BONOS', 2),
-          _buildTab('BIOIMPEDANCIA', 3),
-          _buildTab('GRUPOS ACTIVOS', 4),
+          _buildTab('BIOIMPEDANCIA', 4),
+          _buildTab('GRUPOS ACTIVOS', 5),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
           borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
         ),
         labelColor: const Color(0xFF2be4f3),
-        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        labelStyle: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+        ),
         unselectedLabelColor: Colors.white,
       ),
     );
@@ -83,8 +93,11 @@ class _InfoClientsState extends State<InfoClients>
   }
 
   Widget _buildTabBarView() {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: 400,
+      height: screenHeight * 0.5,
+      width: screenWidth,
       child: TabBarView(
         controller: _tabController,
         children: [
@@ -110,8 +123,7 @@ class _InfoClientsState extends State<InfoClients>
     );
   }
 
-
- /*  Widget _buildClientInfo() {
+  /*  Widget _buildClientInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
