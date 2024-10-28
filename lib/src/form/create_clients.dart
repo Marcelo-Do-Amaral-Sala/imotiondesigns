@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'clients_form.dart'; // Asegúrate de que este archivo esté correctamente importado.
 
 class CreateClients extends StatefulWidget {
-  final Function(Map<String, String>) onSave;
+   final Function(Map<String, String>) onSave;
 
   CreateClients({Key? key, required this.onSave}) : super(key: key);
 
@@ -17,16 +17,19 @@ class _CreateClientsState extends State<CreateClients>
   double scaleFactorTick = 1.0;
   String name = '';
   String email = '';
-  String phone = '';
+  String dateBirth = '';
   String gender = '';
   int height = 0;
   int weight = 0;
-  String dateBirth = '';
+  int phone = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -35,17 +38,20 @@ class _CreateClientsState extends State<CreateClients>
     super.dispose();
   }
 
-  void _onDataChanged(String name, String email, String phone, String gender,
-      int height, int weight, String dateBirth) {
+  void _onDataChanged(String name, String email, String gender,
+      String dateBirth, int height, int weight, int phone) {
     setState(() {
       this.name = name;
       this.email = email;
-      this.phone = phone;
       this.gender = gender;
+      this.dateBirth = dateBirth;
       this.height = height;
       this.weight = weight;
-      this.dateBirth = dateBirth;
+      this.phone = phone;
     });
+
+    print(
+        'Nombre: $name, Email: $email, Género: $gender, Fecha de Nacimiento: $dateBirth, Altura: $height, Peso: $weight, Teléfono: $phone');
   }
 
   @override
@@ -63,8 +69,10 @@ class _CreateClientsState extends State<CreateClients>
 
   Widget _buildTabBar() {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       height: screenHeight * 0.1,
+      width: screenWidth,
       color: Colors.black,
       child: TabBar(
         padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -89,11 +97,9 @@ class _CreateClientsState extends State<CreateClients>
   }
 
   Widget _buildTab(String text, int index) {
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Tab(
       child: SizedBox(
-        width: screenWidth,
+        width: 200,
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -109,8 +115,10 @@ class _CreateClientsState extends State<CreateClients>
 
   Widget _buildTabBarView() {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
       height: screenHeight * 0.45,
+      width: screenWidth,
       child: TabBarView(
         controller: _tabController,
         children: [

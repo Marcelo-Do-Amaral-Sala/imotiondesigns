@@ -3,7 +3,6 @@ import 'package:imotion_designs/src/info/clients_list_view.dart';
 import '../form/create_clients.dart';
 import '../info/info_clients.dart';
 
-// ignore: must_be_immutable
 class OverlayContent extends StatefulWidget {
   late String contentType;
   final VoidCallback onClose;
@@ -50,7 +49,7 @@ class _OverlayContentState extends State<OverlayContent> {
         borderRadius: BorderRadius.circular(7),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: screenWidth,
@@ -100,7 +99,8 @@ class _OverlayContentState extends State<OverlayContent> {
               children: [
                 ClientListView(onClientTap: (clientData) {
                   setState(() {
-                    widget.contentType = 'info'; // Navigate to 'info' when a client is tapped
+                    widget.contentType =
+                        'info'; // Navigate to 'info' when a client is tapped
                     widget.clientData = clientData;
                   });
                 }),
@@ -112,7 +112,8 @@ class _OverlayContentState extends State<OverlayContent> {
               children: [
                 CreateClients(onSave: (onSave) {
                   setState(() {
-                    widget.contentType = 'form'; // Navigate to 'form' after saving
+                    widget.contentType =
+                        'form'; // Navigate to 'form' after saving
                     widget.clientData = onSave;
                   });
                 }),
@@ -125,7 +126,8 @@ class _OverlayContentState extends State<OverlayContent> {
           else if (widget.contentType == 'form')
             CreateClients(onSave: (onSave) {
               setState(() {
-                widget.contentType = 'info'; // Navigate to 'info' after form submission
+                widget.contentType =
+                    'info'; // Navigate to 'info' after form submission
                 widget.clientData = onSave;
               });
             }),
