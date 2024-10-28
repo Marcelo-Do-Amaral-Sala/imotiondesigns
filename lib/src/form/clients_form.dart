@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class PersonalDataForm extends StatefulWidget {
-  final Function(String, String, String, String, int, int, int) onDataChanged;
+  final Function(Map<String, dynamic>) onDataChanged;
 
   const PersonalDataForm({Key? key, required this.onDataChanged})
       : super(key: key);
@@ -22,7 +22,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
   String? selectedOption;
   String? selectedGender;
   String? _birthDate;
-
+  double scaleFactorTick = 1.0;
 
   @override
   void dispose() {
@@ -32,13 +32,6 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
     _heightController.dispose();
     _weightController.dispose();
     super.dispose();
-  }
-
-  bool _isValidEmail(String email) {
-    final RegExp emailRegExp = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    return emailRegExp.hasMatch(email);
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -55,9 +48,42 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
     }
   }
 
+  void _collectData() {
+    final clientData = {
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'phone': _phoneController.text,
+      'height': _heightController.text,
+      'weight': _weightController.text,
+      'gender': selectedGender,
+      'birthDate': _birthDate,
+      'status': selectedOption,
+    };
+
+    widget.onDataChanged(clientData);
+    // Crear un string con todos los datos
+    String dataString = 'Nombre: ${clientData['name']}\n'
+        'Email: ${clientData['email']}\n'
+        'Teléfono: ${clientData['phone']}\n'
+        'Altura: ${clientData['height']} cm\n'
+        'Peso: ${clientData['weight']} kg\n'
+        'Género: ${clientData['gender']}\n'
+        'Fecha de Nacimiento: ${clientData['birthDate']}\n'
+        'Estado: ${clientData['status']}';
+
+    // Mostrar Snackbar con todos los datos
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(dataString),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -102,9 +128,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           style: const TextStyle(
                               color: Colors.white, fontSize: 12),
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                             
-                            ),
+                            border: OutlineInputBorder(),
                             filled: true,
                             fillColor: Color(0xFF313030),
                             isDense: true,
@@ -163,7 +187,6 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
             const SizedBox(height: 5),
             // Segundo contenedor para el segundo row de inputs
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
               child: SizedBox(
                 width: screenWidth,
                 child: Row(
@@ -245,9 +268,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 12),
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                
-                              ),
+                              border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
                               isDense: true,
@@ -273,9 +294,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 12),
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                               
-                              ),
+                              border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
                               isDense: true,
@@ -294,9 +313,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 12),
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                               
-                              ),
+                              border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
                               isDense: true,
@@ -315,9 +332,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 12),
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                               
-                              ),
+                              border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Color(0xFF313030),
                               isDense: true,
@@ -330,11 +345,41 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                 ),
               ),
             ),
-            
+            const SizedBox(height: 8),
+            SizedBox(
+              height: screenHeight * 0.09,
+              width: screenWidth,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                    onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                    onTapCancel: () => setState(() => scaleFactorTick = 1.0),
+                    onTap: () {
+                      _collectData(); // Llama a la función que recoge los datos
+                    },
+                    child: AnimatedScale(
+                      scale: scaleFactorTick,
+                      duration: const Duration(milliseconds: 100),
+                      child: SizedBox(
+                        width: screenWidth * 0.09,
+                        height: screenHeight * 0.09,
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/tick.png',
+                            fit: BoxFit.scaleDown,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

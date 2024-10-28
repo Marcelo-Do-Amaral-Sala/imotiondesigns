@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'clients_form.dart'; // Asegúrate de que este archivo esté correctamente importado.
 
 class CreateClients extends StatefulWidget {
-   final Function(Map<String, String>) onSave;
+  final Function(Map<String, String>) onSave;
 
   CreateClients({Key? key, required this.onSave}) : super(key: key);
 
@@ -15,13 +15,17 @@ class _CreateClientsState extends State<CreateClients>
   late TabController _tabController;
 
   double scaleFactorTick = 1.0;
-  String name = '';
-  String email = '';
-  String dateBirth = '';
-  String gender = '';
-  int height = 0;
-  int weight = 0;
-  int phone = 0;
+
+  // Mapa para almacenar datos del formulario
+  Map<String, dynamic> clientData = {
+    'name': '',
+    'email': '',
+    'gender': '',
+    'dateBirth': '',
+    'height': 0,
+    'weight': 0,
+    'phone': 0,
+  };
 
   @override
   void initState() {
@@ -38,20 +42,15 @@ class _CreateClientsState extends State<CreateClients>
     super.dispose();
   }
 
-  void _onDataChanged(String name, String email, String gender,
-      String dateBirth, int height, int weight, int phone) {
+  void _onDataChanged(Map<String, dynamic> data) {
     setState(() {
-      this.name = name;
-      this.email = email;
-      this.gender = gender;
-      this.dateBirth = dateBirth;
-      this.height = height;
-      this.weight = weight;
-      this.phone = phone;
+      clientData = data; // Almacena todos los datos en un mapa
     });
 
-    print(
-        'Nombre: $name, Email: $email, Género: $gender, Fecha de Nacimiento: $dateBirth, Altura: $height, Peso: $weight, Teléfono: $phone');
+    // Imprime los datos en la consola
+    print('Nombre: ${data['name']}, Email: ${data['email']}, '
+        'Género: ${data['gender']}, Fecha de Nacimiento: ${data['dateBirth']}, '
+        'Altura: ${data['height']}, Peso: ${data['weight']}, Teléfono: ${data['phone']}');
   }
 
   @override
@@ -62,7 +61,7 @@ class _CreateClientsState extends State<CreateClients>
       children: [
         _buildTabBar(),
         _buildTabBarView(),
-        _buildBottomMenu(),
+        //_buildBottomMenu(),
       ],
     );
   }
@@ -117,13 +116,12 @@ class _CreateClientsState extends State<CreateClients>
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: screenHeight * 0.45,
+      height: screenHeight * 0.5,
       width: screenWidth,
       child: TabBarView(
         controller: _tabController,
         children: [
-          PersonalDataForm(
-              onDataChanged: _onDataChanged), // Integrando PersonalDataForm
+          PersonalDataForm(onDataChanged: _onDataChanged), // Integrando PersonalDataForm
           _buildTabContent('Contenido de Opción 2'),
           _buildTabContent('Contenido de Opción 3'),
         ],
@@ -150,10 +148,11 @@ class _CreateClientsState extends State<CreateClients>
           GestureDetector(
             onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
             onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-            onTapCancel: () => setState(
-                () => scaleFactorTick = 1.0), // Añadido para mejor manejo
+            onTapCancel: () => setState(() => scaleFactorTick = 1.0), // Añadido para mejor manejo
             onTap: () {
-              print("TICK PULSADA");
+              // Imprime los datos recogidos al hacer tap en el ícono de tick
+              print("Datos recogidos:");
+              print(clientData);
             },
             child: AnimatedScale(
               scale: scaleFactorTick,

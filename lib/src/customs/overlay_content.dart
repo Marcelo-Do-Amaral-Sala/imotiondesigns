@@ -3,6 +3,7 @@ import 'package:imotion_designs/src/info/clients_list_view.dart';
 import '../form/create_clients.dart';
 import '../info/info_clients.dart';
 
+// ignore: must_be_immutable
 class OverlayContent extends StatefulWidget {
   late String contentType;
   final VoidCallback onClose;
