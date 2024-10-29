@@ -174,23 +174,26 @@ class _ClientsBonosState extends State<ClientsBonos> {
               Expanded(
                 flex: 1,
                 child: OutlinedButton(
-                  onPressed: () {
-                    debugPrint("BONOS PULSADOS");
-                  },
+                  onPressed: () {}, // Mantener vacío para que InkWell funcione
                   style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0), // Añadir padding aquí
                     side:
                         const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
+                    backgroundColor:
+                        Colors.transparent, // Mantener el fondo transparente
                   ),
-                  child: const Text('AÑADIR BONOS',
-                      style: TextStyle(
-                        color: Color(0xFF2be4f3),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center),
+                  child: const Text(
+                    'AÑADIR BONOS',
+                    style: TextStyle(
+                      color: Color(0xFF2be4f3),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ],
@@ -272,7 +275,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
           SizedBox(height: screenHeight * 0.01),
           // Fila con dos contenedores centrados
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: Container(
@@ -282,8 +285,29 @@ class _ClientsBonosState extends State<ClientsBonos> {
                     borderRadius: BorderRadius.circular(7.0),
                   ),
                   child: const Padding(
-                    padding: EdgeInsets.all(20.0),
-                    // Puedes añadir contenido aquí
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Espacio entre los textos
+                      children: [
+                        Text(
+                          "TOTAL",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "123", // Reemplaza con el número que desees mostrar
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -296,8 +320,30 @@ class _ClientsBonosState extends State<ClientsBonos> {
                     color: const Color.fromARGB(255, 46, 46, 46),
                     borderRadius: BorderRadius.circular(7.0),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Espacio entre los textos
+                      children: [
+                        Text(
+                          "TOTAL", // Puedes cambiar el texto según necesites
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "456", // Reemplaza con el número que desees mostrar
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
