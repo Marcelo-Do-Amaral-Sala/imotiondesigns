@@ -17,6 +17,7 @@ class ClientsData extends StatefulWidget {
 }
 
 class _ClientsDataState extends State<ClientsData> {
+  final _indexController = TextEditingController();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -31,6 +32,7 @@ class _ClientsDataState extends State<ClientsData> {
   @override
   void initState() {
     super.initState();
+    _indexController.text = widget.clientData['id'] ?? '';
     _nameController.text = widget.clientData['name'] ?? '';
     _emailController.text = widget.clientData['email'] ?? '';
     _phoneController.text = widget.clientData['phone'] ?? '';
@@ -43,6 +45,7 @@ class _ClientsDataState extends State<ClientsData> {
 
   @override
   void dispose() {
+    _indexController.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -101,7 +104,7 @@ class _ClientsDataState extends State<ClientsData> {
     double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
         child: Column(
           children: [
             Expanded(
@@ -131,6 +134,7 @@ class _ClientsDataState extends State<ClientsData> {
                                   borderRadius: BorderRadius.circular(7),
                                 ),
                                 child: TextField(
+                                  controller: _indexController,
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
@@ -472,7 +476,6 @@ class _ClientsDataState extends State<ClientsData> {
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () {
-                      
                       print("TICK PULSADA");
                     },
                     child: AnimatedScale(

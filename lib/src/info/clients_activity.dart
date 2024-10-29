@@ -15,6 +15,7 @@ class ClientsActivity extends StatefulWidget {
 }
 
 class _ClientsActivityState extends State<ClientsActivity> {
+  final _indexController = TextEditingController();
   final _nameController = TextEditingController();
   String? selectedOption;
 
@@ -61,13 +62,14 @@ class _ClientsActivityState extends State<ClientsActivity> {
   @override
   void initState() {
     super.initState();
-    // Establecer valores predeterminados desde clientData
+    _indexController.text = widget.clientDataActivity['id'] ?? '';
     _nameController.text = widget.clientDataActivity['name'] ?? '';
     selectedOption = widget.clientDataActivity['status'];
   }
 
   @override
   void dispose() {
+    _indexController.dispose();
     _nameController.dispose();
     super.dispose();
   }
@@ -78,7 +80,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
     double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
         child: Column(
           children: [
             // Primer contenedor para el primer row de inputs
@@ -104,6 +106,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
                             borderRadius: BorderRadius.circular(7),
                           ),
                           child: TextField(
+                            controller: _indexController,
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 12),
                             decoration: InputDecoration(
@@ -218,7 +221,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
               ),
             ),
             const SizedBox(height: 5),
-           /*  SizedBox(
+            /*  SizedBox(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

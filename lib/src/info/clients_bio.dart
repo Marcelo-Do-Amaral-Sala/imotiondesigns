@@ -15,7 +15,8 @@ class ClientsBio extends StatefulWidget {
 }
 
 class _ClientsBioState extends State<ClientsBio> {
-  final TextEditingController _nameController = TextEditingController();
+  final _indexController = TextEditingController();
+  final _nameController = TextEditingController();
   String? selectedOption;
 
   // Lista completa de clientes
@@ -30,6 +31,7 @@ class _ClientsBioState extends State<ClientsBio> {
   @override
   void initState() {
     super.initState();
+    _indexController.text = widget.clientDataBio['id'] ?? '';
     _nameController.text = widget.clientDataBio['name'] ?? '';
     selectedOption = widget.clientDataBio['status'];
   }
@@ -44,7 +46,7 @@ class _ClientsBioState extends State<ClientsBio> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
       child: Column(
         children: [
           Row(
@@ -67,6 +69,7 @@ class _ClientsBioState extends State<ClientsBio> {
                         borderRadius: BorderRadius.circular(7),
                       ),
                       child: TextField(
+                        controller: _indexController,
                         style:
                             const TextStyle(color: Colors.white, fontSize: 12),
                         decoration: InputDecoration(

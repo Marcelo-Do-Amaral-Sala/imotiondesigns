@@ -61,7 +61,7 @@ class _OverlayContentState extends State<OverlayContent> {
   Widget _buildHeader(double screenWidth) {
     return Container(
       width: screenWidth,
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: MediaQuery.of(context).size.height * 0.08,
       alignment: Alignment.center,
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: Color(0xFF2be4f3))),
@@ -73,7 +73,7 @@ class _OverlayContentState extends State<OverlayContent> {
               _getTitle(),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 35,
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF2be4f3),
               ),
@@ -138,7 +138,7 @@ class _OverlayContentState extends State<OverlayContent> {
           });
         });
       default:
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
     }
   }
 }
