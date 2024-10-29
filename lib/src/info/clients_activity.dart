@@ -202,7 +202,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
               ),
             ),
             Container(
-              height: screenHeight * 0.28,
+              height: screenHeight * 0.35,
               width: screenWidth,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 46, 46, 46),
@@ -218,7 +218,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
               ),
             ),
             const SizedBox(height: 5),
-            SizedBox(
+           /*  SizedBox(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -266,7 +266,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
                   ),
                 ],
               ),
-            ),
+            ), */
           ],
         ),
       ),

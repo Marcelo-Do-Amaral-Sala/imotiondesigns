@@ -66,11 +66,11 @@ class _ClientsViewState extends State<ClientsView> {
                                     const Padding(
                                       padding: EdgeInsets.all(8.0),
                                       child: Text(
-                                        '- CLIENTES',
+                                        '-CLIENTES',
                                         style: TextStyle(
-                                          color: Colors.lightBlueAccent,
-                                          fontSize: 35,
-                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF28E2F5),
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -115,9 +115,9 @@ class _ClientsViewState extends State<ClientsView> {
                                             child: Text(
                                               'Listado de clientes',
                                               style: TextStyle(
-                                                color: Colors.lightBlueAccent,
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF28E2F5),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
@@ -165,9 +165,9 @@ class _ClientsViewState extends State<ClientsView> {
                                             child: Text(
                                               'Crear clientes',
                                               style: TextStyle(
-                                                color: Colors.lightBlueAccent,
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF28E2F5),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
