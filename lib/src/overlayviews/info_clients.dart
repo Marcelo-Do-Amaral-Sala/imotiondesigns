@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/info/clients_bonos.dart';
 import '../info/clients_activity.dart';
 import '../info/clients_data.dart';
 
@@ -105,7 +106,8 @@ class _InfoClientsState extends State<InfoClients>
       width: screenWidth,
       child: PageView(
         controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(), // Deshabilita el deslizamiento
+        physics:
+            const NeverScrollableScrollPhysics(), // Deshabilita el deslizamiento
         children: [
           ClientsData(
             clientData: widget.clientData,
@@ -117,7 +119,9 @@ class _InfoClientsState extends State<InfoClients>
           ClientsActivity(
             clientDataActivity: widget.clientData,
           ),
-          _buildTabContent('Contenido de Opción 3'),
+          ClientsBonos(
+            clientDataBonos: widget.clientData,
+          ),
           _buildTabContent('Contenido de Opción 4'),
           _buildTabContent('Contenido de Opción 5'),
         ],
