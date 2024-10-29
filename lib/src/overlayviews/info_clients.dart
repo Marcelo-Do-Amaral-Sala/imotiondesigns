@@ -14,6 +14,7 @@ class InfoClients extends StatefulWidget {
 class _InfoClientsState extends State<InfoClients>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late PageController _pageController;
 
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
@@ -22,7 +23,9 @@ class _InfoClientsState extends State<InfoClients>
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
+    _pageController = PageController(initialPage: 0);
     _tabController.addListener(() {
+      _pageController.jumpToPage(_tabController.index);
       setState(() {});
     });
   }
@@ -30,6 +33,7 @@ class _InfoClientsState extends State<InfoClients>
   @override
   void dispose() {
     _tabController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -59,8 +63,8 @@ class _InfoClientsState extends State<InfoClients>
           _buildTab('DATOS PERSONALES', 0),
           _buildTab('ACTIVIDAD', 1),
           _buildTab('BONOS', 2),
-          _buildTab('BIOIMPEDANCIA', 4),
-          _buildTab('GRUPOS ACTIVOS', 5),
+          _buildTab('BIOIMPEDANCIA', 3),
+          _buildTab('GRUPOS ACTIVOS', 4),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
@@ -97,20 +101,21 @@ class _InfoClientsState extends State<InfoClients>
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: screenHeight*0.5,
+      height: screenHeight * 0.5,
       width: screenWidth,
-      child: TabBarView(
-        controller: _tabController,
+      child: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(), // Deshabilita el deslizamiento
         children: [
           ClientsData(
-            clientData: widget.clientData, // Pass the client data
+            clientData: widget.clientData,
             onDataChanged: (data) {
-              // Handle data changes if needed
+              // Manejar cambios de datos si es necesario
               print(data);
             },
           ),
           ClientsActivity(
-            clientDataActivity: widget.clientData, // Pass the client data
+            clientDataActivity: widget.clientData,
           ),
           _buildTabContent('Contenido de Opción 3'),
           _buildTabContent('Contenido de Opción 4'),
@@ -125,20 +130,4 @@ class _InfoClientsState extends State<InfoClients>
       child: Text(content, style: const TextStyle(color: Colors.white)),
     );
   }
-
-  /*  Widget _buildClientInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('ID: ${widget.clientData['id']}',
-            style: TextStyle(color: Colors.white)),
-        Text('Nombre: ${widget.clientData['name']}',
-            style: TextStyle(color: Colors.white)),
-        Text('Teléfono: ${widget.clientData['phone']}',
-            style: TextStyle(color: Colors.white)),
-        Text('Estado: ${widget.clientData['status']}',
-            style: TextStyle(color: Colors.white)),
-      ],
-    );
-  } */
 }

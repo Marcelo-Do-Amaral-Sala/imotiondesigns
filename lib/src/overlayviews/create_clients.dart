@@ -14,6 +14,7 @@ class CreateClients extends StatefulWidget {
 class _CreateClientsState extends State<CreateClients>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late PageController _pageController;
 
   double scaleFactorTick = 1.0;
 
@@ -32,7 +33,9 @@ class _CreateClientsState extends State<CreateClients>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _pageController = PageController(initialPage: 0);
     _tabController.addListener(() {
+      _pageController.jumpToPage(_tabController.index);
       setState(() {});
     });
   }
@@ -40,6 +43,7 @@ class _CreateClientsState extends State<CreateClients>
   @override
   void dispose() {
     _tabController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -118,8 +122,10 @@ class _CreateClientsState extends State<CreateClients>
     return SizedBox(
       height: screenHeight * 0.5,
       width: screenWidth,
-      child: TabBarView(
-        controller: _tabController,
+      child: PageView(
+        controller: _pageController,
+        physics:
+            const NeverScrollableScrollPhysics(), // Deshabilita el deslizamiento
         children: [
           PersonalDataForm(
               onDataChanged: _onDataChanged), // Integrando PersonalDataForm
