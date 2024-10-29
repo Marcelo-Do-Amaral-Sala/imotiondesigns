@@ -22,7 +22,6 @@ class _ClientsDataState extends State<ClientsData> {
   final _phoneController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
-
   String? selectedOption;
   String? selectedGender;
   String? _birthDate;
@@ -40,7 +39,8 @@ class _ClientsDataState extends State<ClientsData> {
     _weightController.text = widget.clientData['weight']?.toString() ?? '';
     selectedOption = widget.clientData['status'];
     selectedGender = widget.clientData['gender'];
-    _birthDate = widget.clientData['birthDate'];
+    _birthDate = widget.clientData['birthDate']; // Aquí se inicializa
+    print('Birth Date: $_birthDate'); // Verifica el valor
   }
 
   @override
@@ -120,8 +120,10 @@ class _ClientsDataState extends State<ClientsData> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('ID',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           style: TextStyle(color: Colors.white, fontSize: 12),
                           decoration: InputDecoration(
@@ -140,8 +142,10 @@ class _ClientsDataState extends State<ClientsData> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('NOMBRE',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _nameController,
                           style: const TextStyle(
@@ -162,8 +166,10 @@ class _ClientsDataState extends State<ClientsData> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('ESTADO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -216,8 +222,10 @@ class _ClientsDataState extends State<ClientsData> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('GÉNERO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -253,8 +261,10 @@ class _ClientsDataState extends State<ClientsData> {
                         ),
                         const SizedBox(height: 5),
                         const Text('FECHA DE NACIMIENTO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         GestureDetector(
                           onTap: () => _selectDate(context),
                           child: Container(
@@ -273,8 +283,10 @@ class _ClientsDataState extends State<ClientsData> {
                         ),
                         const SizedBox(height: 5),
                         const Text('TELÉFONO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _phoneController,
                           keyboardType: TextInputType.number,
@@ -299,8 +311,10 @@ class _ClientsDataState extends State<ClientsData> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('ALTURA (cm)',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _heightController,
                           keyboardType: TextInputType.number,
@@ -318,8 +332,10 @@ class _ClientsDataState extends State<ClientsData> {
                         ),
                         const SizedBox(height: 5),
                         const Text('PESO (kg)',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _weightController,
                           keyboardType: TextInputType.number,
@@ -337,8 +353,10 @@ class _ClientsDataState extends State<ClientsData> {
                         ),
                         const SizedBox(height: 5),
                         const Text('E-MAIL',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -396,7 +414,7 @@ class _ClientsDataState extends State<ClientsData> {
                     onTap: () {
                       print("TICK PUuuuLSADA");
                     },
-                    child: AnimatedScale(        
+                    child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),
                       child: SizedBox(

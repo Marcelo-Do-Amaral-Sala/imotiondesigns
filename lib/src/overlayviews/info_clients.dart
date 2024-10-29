@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../info/clients_activity.dart';
 import '../info/clients_data.dart';
 
 class InfoClients extends StatefulWidget {
@@ -108,7 +109,9 @@ class _InfoClientsState extends State<InfoClients>
               print(data);
             },
           ),
-          _buildTabContent('Contenido de Opción 2'),
+          ClientsActivity(
+            clientDataActivity: widget.clientData, // Pass the client data
+          ),
           _buildTabContent('Contenido de Opción 3'),
           _buildTabContent('Contenido de Opción 4'),
           _buildTabContent('Contenido de Opción 5'),

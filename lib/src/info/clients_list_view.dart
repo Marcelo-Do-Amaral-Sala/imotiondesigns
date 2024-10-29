@@ -20,28 +20,62 @@ class _ClientListViewState extends State<ClientListView> {
 
   // Lista completa de clientes
   List<Map<String, String>> allClients = [
-    {'id': '1', 'name': 'Cliente A', 'phone': '123456789', 'status': 'Activo'},
+     {
+      'id': '1',
+      'name': 'Cliente A',
+      'email': 'clientea@gmail.com',
+      'gender': 'Mujer',
+      'height': '167',
+      'weight': '49',
+      'birthDate': '12/02/1994',
+      'phone': '987654556',
+      'status': 'Inactivo'
+    },
     {
       'id': '2',
       'name': 'Cliente B',
+      'email': 'clienteb@gmail.com',
+      'gender': 'Hombre',
+      'height': '187',
+      'weight': '89',
+      'birthDate': '12/09/1990',
       'phone': '987654321',
       'status': 'Inactivo'
     },
-    {'id': '3', 'name': 'Cliente C', 'phone': '555555555', 'status': 'Activo'},
-    {'id': '4', 'name': 'Cliente D', 'phone': '654321789', 'status': 'Activo'},
+    {
+      'id': '3',
+      'name': 'Cliente C',
+      'email': 'clientec@gmail.com',
+      'gender': 'Hombre',
+      'height': '180',
+      'weight': '79',
+      'birthDate': '22/09/1980',
+      'phone': '666654321',
+      'status': 'Activo'
+    },
+    {
+      'id': '4',
+      'name': 'Cliente D',
+      'email': 'cliented@gmail.com',
+      'gender': 'Hombre',
+      'height': '177',
+      'weight': '71',
+      'birthDate': '11/01/2000',
+      'phone': '987652221',
+      'status': 'Activo'
+    },
     {
       'id': '5',
       'name': 'Cliente E',
-      'phone': '321456987',
+      'email': 'clientee@gmail.com',
+      'gender': 'Mujer',
+      'height': '147',
+      'weight': '49',
+      'birthDate': '19/12/2004',
+      'phone': '987612321',
       'status': 'Inactivo'
     },
-    {'id': '6', 'name': 'Cliente F', 'phone': '987123654', 'status': 'Activo'},
-    {
-      'id': '7',
-      'name': 'Cliente G',
-      'phone': '147258369',
-      'status': 'Inactivo'
-    },
+
   ];
 
   // Lista que se muestra filtrada
@@ -77,6 +111,8 @@ class _ClientListViewState extends State<ClientListView> {
   void _showPrint(Map<String, String> clientData) {
     _updateClientFields(clientData);
     widget.onClientTap(clientData);
+    print('Client Data: $clientData');
+
   }
 
   void _updateClientFields(Map<String, String> clientData) {
@@ -104,11 +140,17 @@ class _ClientListViewState extends State<ClientListView> {
                   children: [
                     const Text(
                       'ID',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                     ),
                     TextField(
                       controller: _clientIndexController,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         filled: true,
@@ -126,11 +168,17 @@ class _ClientListViewState extends State<ClientListView> {
                   children: [
                     const Text(
                       'NOMBRE',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                     ),
                     TextField(
                       controller: _clientNameController,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         filled: true,
@@ -148,7 +196,10 @@ class _ClientListViewState extends State<ClientListView> {
                   children: [
                     const Text(
                       'ESTADO',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                     ),
                     Container(
                       alignment: Alignment.center,

@@ -64,7 +64,9 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   Widget buildCell(String text) {
     return Container(
       padding: const EdgeInsets.all(8.0),
-      child: Text(text, style: const TextStyle(color: Colors.white)),
+      child: Text(text,
+          style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold)),
     );
   }
 }

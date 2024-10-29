@@ -101,8 +101,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('ID',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           style: TextStyle(color: Colors.white, fontSize: 12),
                           decoration: InputDecoration(
@@ -121,8 +123,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('NOMBRE',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _nameController,
                           style: const TextStyle(
@@ -143,8 +147,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('ESTADO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -197,8 +203,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('GÉNERO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
@@ -234,8 +242,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                         ),
                         const SizedBox(height: 5),
                         const Text('FECHA DE NACIMIENTO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         GestureDetector(
                           onTap: () => _selectDate(context),
                           child: Container(
@@ -254,8 +264,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                         ),
                         const SizedBox(height: 5),
                         const Text('TELÉFONO',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _phoneController,
                           keyboardType: TextInputType.number,
@@ -280,8 +292,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('ALTURA (cm)',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _heightController,
                           keyboardType: TextInputType.number,
@@ -299,8 +313,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                         ),
                         const SizedBox(height: 5),
                         const Text('PESO (kg)',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _weightController,
                           keyboardType: TextInputType.number,
@@ -318,8 +334,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                         ),
                         const SizedBox(height: 5),
                         const Text('E-MAIL',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 12)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
