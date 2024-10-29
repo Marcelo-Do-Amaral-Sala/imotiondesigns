@@ -239,7 +239,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                     children: [
                       Expanded(
                         child: Container(
-                          height: screenHeight * 0.2,
+                          height: screenHeight * 0.25,
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 46, 46, 46),
                             borderRadius: BorderRadius.circular(7.0),
@@ -261,7 +261,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                               0.02), // Espacio entre los contenedores
                       Expanded(
                         child: Container(
-                          height: screenHeight * 0.2,
+                          height: screenHeight * 0.25,
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 46, 46, 46),
                             borderRadius: BorderRadius.circular(7.0),

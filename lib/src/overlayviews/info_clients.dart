@@ -21,6 +21,9 @@ class _InfoClientsState extends State<InfoClients>
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
 
+  bool _showSubTab = false;
+  Map<String, String>? _subTabData;
+
   @override
   void initState() {
     super.initState();
@@ -28,7 +31,9 @@ class _InfoClientsState extends State<InfoClients>
     _pageController = PageController(initialPage: 0);
     _tabController.addListener(() {
       _pageController.jumpToPage(_tabController.index);
-      setState(() {});
+      setState(() {
+        _showSubTab = false; // Reiniciar la subpestaña al cambiar de tab
+      });
     });
   }
 
@@ -37,6 +42,13 @@ class _InfoClientsState extends State<InfoClients>
     _tabController.dispose();
     _pageController.dispose();
     super.dispose();
+  }
+
+  void onTapClient(Map<String, String> clientData) {
+    setState(() {
+      _showSubTab = true; // Mostrar subpestaña
+      _subTabData = clientData; // Asignar datos a mostrar
+    });
   }
 
   @override
@@ -107,13 +119,11 @@ class _InfoClientsState extends State<InfoClients>
       width: screenWidth,
       child: PageView(
         controller: _pageController,
-        physics:
-            const NeverScrollableScrollPhysics(), // Deshabilita el deslizamiento
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           ClientsData(
             clientData: widget.clientData,
             onDataChanged: (data) {
-              // Manejar cambios de datos si es necesario
               print(data);
             },
           ),
@@ -123,10 +133,12 @@ class _InfoClientsState extends State<InfoClients>
           ClientsBonos(
             clientDataBonos: widget.clientData,
           ),
-          ClientsBio(
-            onClientTap: (clientData) {},
-            clientDataBio: widget.clientData,
-          ),
+          _showSubTab
+              ? _buildSubTabView() // Mostrar subpestaña
+              : ClientsBio(
+                  onClientTap: onTapClient,
+                  clientDataBio: widget.clientData,
+                ),
           _buildTabContent('Contenido de Opción 5'),
         ],
       ),
@@ -136,6 +148,15 @@ class _InfoClientsState extends State<InfoClients>
   Widget _buildTabContent(String content) {
     return Center(
       child: Text(content, style: const TextStyle(color: Colors.white)),
+    );
+  }
+
+  Widget _buildSubTabView() {
+    return Center(
+      child: Text(
+        'Subpestaña: ${_subTabData?['nombre'] ?? 'No disponible'}', // Ejemplo de datos
+        style: const TextStyle(color: Colors.white),
+      ),
     );
   }
 }
