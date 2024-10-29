@@ -2,13 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../info/info_clients.dart';
-
 class DataTableWidget extends StatefulWidget {
   final List<Map<String, String>> data;
   final Function(Map<String, String>) onRowTap; // Cambiado a aceptar un Map
 
-  const DataTableWidget({super.key, required this.data, required this.onRowTap});
+  const DataTableWidget(
+      {super.key, required this.data, required this.onRowTap});
 
   @override
   _DataTableWidgetState createState() => _DataTableWidgetState();
@@ -19,7 +18,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView( // Añadir SingleChildScrollView
+    return SingleChildScrollView(
+      // Añadir SingleChildScrollView
       child: Column(
         children: [
           buildHeaderRow(),
@@ -36,7 +36,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                     setState(() {
                       selectedRow = row; // Guarda la fila seleccionada.
                     });
-                    widget.onRowTap(row); // Llama a onRowTap con la fila seleccionada.
+                    widget.onRowTap(
+                        row); // Llama a onRowTap con la fila seleccionada.
                   },
                 ),
                 const SizedBox(height: 20),
@@ -109,7 +110,8 @@ class _DataRowWidgetState extends State<DataRowWidget> {
 
         // Usa el temporizador para revertir el estado después de un breve retraso
         _timer = Timer(const Duration(milliseconds: 200), () {
-          if (mounted) { // Verifica si el widget sigue montado
+          if (mounted) {
+            // Verifica si el widget sigue montado
             setState(() {
               isPressed = false;
             });
@@ -144,4 +146,3 @@ class _DataRowWidgetState extends State<DataRowWidget> {
     );
   }
 }
-

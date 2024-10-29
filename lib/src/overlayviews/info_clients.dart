@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'clients_data.dart'; // Make sure to import your ClientsData class
+import '../info/clients_data.dart';
 
 class InfoClients extends StatefulWidget {
   final Map<String, String> clientData;

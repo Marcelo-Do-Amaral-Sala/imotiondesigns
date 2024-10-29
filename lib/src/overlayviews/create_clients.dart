@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'clients_form.dart'; // Asegúrate de que este archivo esté correctamente importado.
+
+import '../forms/clients_form.dart';
 
 class CreateClients extends StatefulWidget {
   final Function(Map<String, String>) onSave;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:imotion_designs/src/views/clients_views.dart';
-
+import 'package:imotion_designs/src/mainviews/clients_main_view.dart';
 
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
@@ -8,11 +7,9 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       initialRoute: '/ClientsMenu',
       routes: {
         '/ClientsMenu': (context) => const ClientsView(),
-
       },
     );
   }
