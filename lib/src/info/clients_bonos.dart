@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
 
+import '../customs/bonos_table_custom.dart';
+
 class ClientsBonos extends StatefulWidget {
   final Map<String, dynamic> clientDataBonos;
 
   const ClientsBonos({super.key, required this.clientDataBonos});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ClientsBonosState createState() => _ClientsBonosState();
 }
 
 class _ClientsBonosState extends State<ClientsBonos> {
   final TextEditingController _nameController = TextEditingController();
   String? selectedOption;
+// Lista completa de clientes
+  // Lista de bonos disponibles (sin hora)
+  List<Map<String, String>> availableBonos = [
+    {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/02/2024', 'quantity': '15'},
+  ];
+
+// Lista de bonos consumidos (con hora)
+  List<Map<String, String>> consumedBonos = [
+    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
+    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
+  ];
 
   @override
   void initState() {
@@ -172,7 +187,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                   child: const Text('AÑADIR BONOS',
                       style: TextStyle(
                         color: Color(0xFF2be4f3),
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center),
@@ -185,27 +200,27 @@ class _ClientsBonosState extends State<ClientsBonos> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
+              const Expanded(
                 child: Center(
                   // Centrar el texto
-                  child: const Text(
+                  child: Text(
                     "BONOS DISPONIBLES",
                     style: TextStyle(
                         color: Color(0xFF2be4f3),
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               SizedBox(width: screenWidth * 0.02),
-              Expanded(
+              const Expanded(
                 child: Center(
                   // Centrar el texto
-                  child: const Text(
+                  child: Text(
                     "BONOS CONSUMIDOS",
                     style: TextStyle(
                         color: Color(0xFF2be4f3),
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -224,8 +239,13 @@ class _ClientsBonosState extends State<ClientsBonos> {
                     borderRadius: BorderRadius.circular(7.0),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    // Puedes añadir contenido aquí
+                    padding: const EdgeInsets.all(10.0),
+                    child: SingleChildScrollView(
+                      child: BonosTableWidget(
+                        bonosData: availableBonos, // Lista de bonos disponibles
+                        showHour: false, // Oculta la columna "HORA"
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -239,8 +259,11 @@ class _ClientsBonosState extends State<ClientsBonos> {
                     borderRadius: BorderRadius.circular(7.0),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    // Puedes añadir contenido aquí
+                    padding: const EdgeInsets.all(10.0),
+                    child: BonosTableWidget(
+                      bonosData: consumedBonos, // Lista de bonos disponibles
+                      showHour: true, // Oculta la columna "HORA"
+                    ),
                   ),
                 ),
               ),
@@ -258,8 +281,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
                     color: const Color.fromARGB(255, 46, 46, 46),
                     borderRadius: BorderRadius.circular(7.0),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                  child: const Padding(
+                    padding: EdgeInsets.all(20.0),
                     // Puedes añadir contenido aquí
                   ),
                 ),
@@ -275,7 +298,6 @@ class _ClientsBonosState extends State<ClientsBonos> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
-                    // Puedes añadir contenido aquí
                   ),
                 ),
               ),
