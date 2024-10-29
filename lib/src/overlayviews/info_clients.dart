@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/info/clients_bonos.dart';
 import '../info/clients_activity.dart';
+import '../info/clients_bio.dart';
 import '../info/clients_data.dart';
 
 class InfoClients extends StatefulWidget {
@@ -122,7 +123,10 @@ class _InfoClientsState extends State<InfoClients>
           ClientsBonos(
             clientDataBonos: widget.clientData,
           ),
-          _buildTabContent('Contenido de Opción 4'),
+          ClientsBio(
+            onClientTap: (clientData) {},
+            clientDataBio: widget.clientData,
+          ),
           _buildTabContent('Contenido de Opción 5'),
         ],
       ),
