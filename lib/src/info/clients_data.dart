@@ -105,12 +105,12 @@ class _ClientsDataState extends State<ClientsData> {
     double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 30.0),
         child: Column(
           children: [
             // Primer contenedor para el primer row de inputs
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -209,7 +209,7 @@ class _ClientsDataState extends State<ClientsData> {
                 ],
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 2),
             // Segundo contenedor para el segundo row de inputs
             SizedBox(
               width: screenWidth,
@@ -380,56 +380,60 @@ class _ClientsDataState extends State<ClientsData> {
             ),
 
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(2.0),
-              height: screenHeight * 0.09,
-              width: screenWidth,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
-                    onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-                    onTap: () {
-                      print("PAPELARA PULSADA");
-                    },
-                    child: AnimatedScale(
-                      scale: scaleFactorRemove,
-                      duration: const Duration(milliseconds: 100),
-                      child: SizedBox(
-                        width: screenWidth * 0.1,
-                        height: screenHeight * 0.1,
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/papelera.png',
-                            fit: BoxFit.scaleDown,
+            Positioned(
+              bottom: 0,
+              child: Container(
+                padding: const EdgeInsets.all(5.0),
+                height: screenHeight * 0.09,
+                width: screenWidth,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTapDown: (_) =>
+                          setState(() => scaleFactorRemove = 0.95),
+                      onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
+                      onTap: () {
+                        print("PAPELARA PULSADA");
+                      },
+                      child: AnimatedScale(
+                        scale: scaleFactorRemove,
+                        duration: const Duration(milliseconds: 100),
+                        child: SizedBox(
+                          width: screenWidth * 0.1,
+                          height: screenHeight * 0.1,
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/papelera.png',
+                              fit: BoxFit.scaleDown,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                    onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    onTap: () {
-                      print("TICK PUuuuLSADA");
-                    },
-                    child: AnimatedScale(
-                      scale: scaleFactorTick,
-                      duration: const Duration(milliseconds: 100),
-                      child: SizedBox(
-                        width: screenWidth * 0.1,
-                        height: screenHeight * 0.1,
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/tick.png',
-                            fit: BoxFit.scaleDown,
+                    GestureDetector(
+                      onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                      onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                      onTap: () {
+                        print("TICK PUuuuLSADA");
+                      },
+                      child: AnimatedScale(
+                        scale: scaleFactorTick,
+                        duration: const Duration(milliseconds: 100),
+                        child: SizedBox(
+                          width: screenWidth * 0.1,
+                          height: screenHeight * 0.1,
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/tick.png',
+                              fit: BoxFit.scaleDown,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

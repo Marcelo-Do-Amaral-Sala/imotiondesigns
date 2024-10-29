@@ -20,7 +20,7 @@ class _ClientListViewState extends State<ClientListView> {
 
   // Lista completa de clientes
   List<Map<String, String>> allClients = [
-     {
+    {
       'id': '1',
       'name': 'Cliente A',
       'email': 'clientea@gmail.com',
@@ -75,7 +75,6 @@ class _ClientListViewState extends State<ClientListView> {
       'phone': '987612321',
       'status': 'Inactivo'
     },
-
   ];
 
   // Lista que se muestra filtrada
@@ -112,7 +111,6 @@ class _ClientListViewState extends State<ClientListView> {
     _updateClientFields(clientData);
     widget.onClientTap(clientData);
     print('Client Data: $clientData');
-
   }
 
   void _updateClientFields(Map<String, String> clientData) {
@@ -128,7 +126,7 @@ class _ClientListViewState extends State<ClientListView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
       child: Column(
         children: [
           Row(
