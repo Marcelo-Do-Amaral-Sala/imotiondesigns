@@ -97,7 +97,7 @@ class _InfoClientsState extends State<InfoClients>
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: screenHeight * 0.5,
+      height: screenHeight*0.5,
       width: screenWidth,
       child: TabBarView(
         controller: _tabController,

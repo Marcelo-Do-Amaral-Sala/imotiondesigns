@@ -3,38 +3,34 @@ import '../info/clients_list_view.dart';
 import '../overlayviews/create_clients.dart';
 import '../overlayviews/info_clients.dart';
 
-// ignore: must_be_immutable
 class OverlayContent extends StatefulWidget {
   late String contentType;
-  final VoidCallback onClose;
+  late VoidCallback onClose;
   late Map<String, String>? clientData;
 
-  OverlayContent({
+   OverlayContent({
     Key? key,
     required this.contentType,
     required this.onClose,
-    this.clientData,
+    required this.clientData,
   }) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _OverlayContentState createState() => _OverlayContentState();
 }
 
 class _OverlayContentState extends State<OverlayContent> {
   void _handleClose() {
-    if (widget.contentType == 'info') {
-      setState(() {
-        widget.contentType = 'listado'; // Regresa a 'listado' si está en 'info'
+    setState(() {
+      if (widget.contentType == 'info') {
         widget.clientData = null;
-      });
-    } else if (widget.contentType == 'form') {
-      setState(() {
-        widget.contentType = 'crear'; // Regresa a 'crear' si está en 'form'
-      });
-    } else {
-      widget.onClose(); // Cierra el overlay si no está en ninguna subrama
-    }
+        widget.contentType = 'listado';
+      } else if (widget.contentType == 'form') {
+        widget.contentType = 'crear';
+      } else {
+        widget.onClose();
+      }
+    });
   }
 
   @override
@@ -53,88 +49,96 @@ class _OverlayContentState extends State<OverlayContent> {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Container(
-            width: screenWidth,
-            height: screenHeight * 0.1,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Color(0xFF2be4f3))),
-            ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Text(
-                    widget.contentType == 'listado'
-                        ? 'LISTADO DE CLIENTES'
-                        : widget.contentType == 'info'
-                            ? 'FICHA CLIENTE'
-                            : widget.contentType == 'form'
-                                ? 'FORMULARIO DE CLIENTE'
-                                : 'CREAR NUEVO CLIENTE',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2be4f3),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: screenWidth * 0.005,
-                  top: 0,
-                  bottom: 0,
-                  child: IconButton(
-                    onPressed: _handleClose,
-                    icon: const Icon(
-                      Icons.close_sharp,
-                      color: Colors.white,
-                      size: 50,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          _buildHeader(screenWidth),
+          Expanded(
+            child: _buildContent(),
           ),
-          // Branch for "listado"
-          if (widget.contentType == 'listado')
-            Column(
-              children: [
-                ClientListView(onClientTap: (clientData) {
-                  setState(() {
-                    widget.contentType =
-                        'info'; // Navigate to 'info' when a client is tapped
-                    widget.clientData = clientData;
-                  });
-                }),
-              ],
-            )
-          // Branch for "crear"
-          else if (widget.contentType == 'crear')
-            Column(
-              children: [
-                CreateClients(onSave: (onSave) {
-                  setState(() {
-                    widget.contentType =
-                        'form'; // Navigate to 'form' after saving
-                    widget.clientData = onSave;
-                  });
-                }),
-              ],
-            )
-          // Sub-branch for 'info' under 'listado'
-          else if (widget.contentType == 'info' && widget.clientData != null)
-            InfoClients(clientData: widget.clientData!)
-          // Sub-branch for 'form' under 'crear'
-          else if (widget.contentType == 'form')
-            CreateClients(onSave: (onSave) {
-              setState(() {
-                widget.contentType =
-                    'info'; // Navigate to 'info' after form submission
-                widget.clientData = onSave;
-              });
-            }),
         ],
       ),
     );
+  }
+
+  Widget _buildHeader(double screenWidth) {
+    return Container(
+      width: screenWidth,
+      height: MediaQuery.of(context).size.height * 0.1,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFF2be4f3))),
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Text(
+              _getTitle(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2be4f3),
+              ),
+            ),
+          ),
+          Positioned(
+            right: screenWidth * 0.005,
+            top: 0,
+            bottom: 0,
+            child: IconButton(
+              onPressed: _handleClose,
+              icon: const Icon(
+                Icons.close_sharp,
+                color: Colors.white,
+                size: 50,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getTitle() {
+    switch (widget.contentType) {
+      case 'listado':
+        return 'LISTADO DE CLIENTES';
+      case 'info':
+        return 'FICHA CLIENTE';
+      case 'form':
+        return 'FORMULARIO DE CLIENTE';
+      case 'crear':
+        return 'CREAR NUEVO CLIENTE';
+      default:
+        return '';
+    }
+  }
+
+  Widget _buildContent() {
+    switch (widget.contentType) {
+      case 'listado':
+        return ClientListView(onClientTap: (clientData) {
+          setState(() {
+            widget.clientData = clientData;
+            widget.contentType = 'info';
+          });
+        });
+      case 'crear':
+        return CreateClients(onSave: (onSave) {
+          setState(() {
+            widget.clientData = onSave;
+            widget.contentType = 'form';
+          });
+        });
+      case 'info':
+        return widget.clientData != null ? InfoClients(clientData: widget.clientData!) : SizedBox.shrink();
+      case 'form':
+        return CreateClients(onSave: (onSave) {
+          setState(() {
+            widget.clientData = onSave;
+            widget.contentType = 'info';
+          });
+        });
+      default:
+        return SizedBox.shrink();
+    }
   }
 }

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-
+import 'package:imotion_designs/src/customs/activity_table_custom.dart';
 
 class ClientsActivity extends StatefulWidget {
   final Map<String, dynamic> clientDataActivity; // Agregar clientData
 
   const ClientsActivity({
-    Key? key,
+    super.key,
     required this.clientDataActivity, // Recibir clientData
-  }) : super(key: key);
+  });
 
   @override
+  // ignore: library_private_types_in_public_api
   _ClientsActivityState createState() => _ClientsActivityState();
 }
 
@@ -82,27 +83,37 @@ class _ClientsActivityState extends State<ClientsActivity> {
           children: [
             // Primer contenedor para el primer row de inputs
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Campos de ID y NOMBRE
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('ID',
+                        const Text('ID',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold)),
-                        TextField(
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF313030),
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          child: TextField(
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              filled: true,
+                              fillColor: const Color(0xFF313030),
+                              isDense: true,
+                            ),
                           ),
                         ),
                       ],
@@ -118,15 +129,24 @@ class _ClientsActivityState extends State<ClientsActivity> {
                                 color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold)),
-                        TextField(
-                          controller: _nameController,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF313030),
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          child: TextField(
+                            controller: _nameController,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              filled: true,
+                              fillColor: const Color(0xFF313030),
+                              isDense: true,
+                            ),
                           ),
                         ),
                       ],
@@ -181,64 +201,70 @@ class _ClientsActivityState extends State<ClientsActivity> {
                 ],
               ),
             ),
-            const SizedBox(height: 5),
-            // Segundo contenedor para el segundo row de inputs
-         
-            const SizedBox(height: 8),
-            Positioned(
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.all(5.0),
-                height: screenHeight * 0.09,
-                width: screenWidth,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTapDown: (_) =>
-                          setState(() => scaleFactorRemove = 0.95),
-                      onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-                      onTap: () {
-                        print("PAPELARA PULSADA");
-                      },
-                      child: AnimatedScale(
-                        scale: scaleFactorRemove,
-                        duration: const Duration(milliseconds: 100),
-                        child: SizedBox(
-                          width: screenWidth * 0.1,
-                          height: screenHeight * 0.1,
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/papelera.png',
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                      onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                      onTap: () {
-                        print("TICK PUuuuLSADA");
-                      },
-                      child: AnimatedScale(
-                        scale: scaleFactorTick,
-                        duration: const Duration(milliseconds: 100),
-                        child: SizedBox(
-                          width: screenWidth * 0.1,
-                          height: screenHeight * 0.1,
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/tick.png',
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+            Container(
+              height: screenHeight * 0.28,
+              width: screenWidth,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 46, 46, 46),
+                borderRadius: BorderRadius.circular(7.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SingleChildScrollView(
+                  child: ActivityTableWidget(
+                    activityData: allSesions,
+                  ),
                 ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            SizedBox(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
+                    onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
+                    onTap: () {
+                      print("PAPELARA PULSADA");
+                    },
+                    child: AnimatedScale(
+                      scale: scaleFactorRemove,
+                      duration: const Duration(milliseconds: 100),
+                      child: SizedBox(
+                        width: screenWidth * 0.08,
+                        height: screenHeight * 0.08,
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/papelera.png',
+                            fit: BoxFit.scaleDown,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                    onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                    onTap: () {
+                      print("TICK PULSADA");
+                    },
+                    child: AnimatedScale(
+                      scale: scaleFactorTick,
+                      duration: const Duration(milliseconds: 100),
+                      child: SizedBox(
+                        width: screenWidth * 0.08,
+                        height: screenHeight * 0.08,
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/tick.png',
+                            fit: BoxFit.scaleDown,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -246,7 +272,4 @@ class _ClientsActivityState extends State<ClientsActivity> {
       ),
     );
   }
-}
-
-class ActivityTableWidget {
 }

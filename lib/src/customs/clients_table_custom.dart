@@ -1,13 +1,11 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 class DataTableWidget extends StatefulWidget {
   final List<Map<String, String>> data;
-  final Function(Map<String, String>) onRowTap; // Cambiado a aceptar un Map
+  final Function(Map<String, String>) onRowTap;
 
-  const DataTableWidget(
-      {super.key, required this.data, required this.onRowTap});
+  const DataTableWidget({super.key, required this.data, required this.onRowTap});
 
   @override
   _DataTableWidgetState createState() => _DataTableWidgetState();
@@ -19,7 +17,6 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      // Añadir SingleChildScrollView
       child: Column(
         children: [
           buildHeaderRow(),
@@ -34,16 +31,15 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                   status: row['status'] ?? '',
                   onTap: () {
                     setState(() {
-                      selectedRow = row; // Guarda la fila seleccionada.
+                      selectedRow = row;
                     });
-                    widget.onRowTap(
-                        row); // Llama a onRowTap con la fila seleccionada.
+                    widget.onRowTap(row);
                   },
                 ),
                 const SizedBox(height: 20),
               ],
             );
-          }).toList(), // Asegúrate de convertir el Iterable a List
+          }).toList(),
         ],
       ),
     );
@@ -62,11 +58,18 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   }
 
   Widget buildCell(String text) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(text,
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center, // Alineación centrada
           style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold)),
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -93,11 +96,11 @@ class DataRowWidget extends StatefulWidget {
 
 class _DataRowWidgetState extends State<DataRowWidget> {
   bool isPressed = false;
-  Timer? _timer; // Añadido para el temporizador
+  Timer? _timer;
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancela el temporizador si está en ejecución
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -110,10 +113,8 @@ class _DataRowWidgetState extends State<DataRowWidget> {
           isPressed = true;
         });
 
-        // Usa el temporizador para revertir el estado después de un breve retraso
         _timer = Timer(const Duration(milliseconds: 200), () {
           if (mounted) {
-            // Verifica si el widget sigue montado
             setState(() {
               isPressed = false;
             });
@@ -142,9 +143,15 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   }
 
   Widget buildCell(String text) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(text, style: const TextStyle(color: Colors.white)),
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center, // Alineación centrada
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
     );
   }
 }

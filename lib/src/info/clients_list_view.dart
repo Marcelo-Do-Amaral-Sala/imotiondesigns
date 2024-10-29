@@ -1,8 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-
-import '../customs/table_custom.dart';
+import 'package:imotion_designs/src/customs/clients_table_custom.dart';
 
 class ClientListView extends StatefulWidget {
   final Function(Map<String, String>) onClientTap;
@@ -132,28 +131,34 @@ class _ClientListViewState extends State<ClientListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Campos de ID y NOMBRE
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'ID',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    TextField(
-                      controller: _clientIndexController,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                    const Text('ID',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)),
+                    Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF313030),
+                        borderRadius: BorderRadius.circular(7),
                       ),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Color(0xFF313030),
-                        isDense: true, // Compactar el campo
+                      child: TextField(
+                        controller: _clientIndexController,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xFF313030),
+                          isDense: true,
+                        ),
                       ),
                     ),
                   ],
@@ -164,24 +169,29 @@ class _ClientListViewState extends State<ClientListView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'NOMBRE',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    TextField(
-                      controller: _clientNameController,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                    const Text('NOMBRE',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)),
+                    Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF313030),
+                        borderRadius: BorderRadius.circular(7),
                       ),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Color(0xFF313030),
-                        isDense: true, // Compactar el campo
+                      child: TextField(
+                        controller: _clientNameController,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xFF313030),
+                          isDense: true,
+                        ),
                       ),
                     ),
                   ],
@@ -192,13 +202,11 @@ class _ClientListViewState extends State<ClientListView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'ESTADO',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
+                    const Text('ESTADO',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)),
                     Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
@@ -206,41 +214,31 @@ class _ClientListViewState extends State<ClientListView> {
                         borderRadius: BorderRadius.circular(7),
                       ),
                       child: DropdownButton<String>(
-                        hint: const Text(
-                          'Seleccione',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
+                        hint: const Text('Seleccione',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 12)),
                         value: selectedOption,
                         items: const [
                           DropdownMenuItem(
-                            value: 'Activo',
-                            child: Text(
-                              'Activo',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 12),
-                            ),
-                          ),
+                              value: 'Activo',
+                              child: Text('Activo',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12))),
                           DropdownMenuItem(
-                            value: 'Inactivo',
-                            child: Text(
-                              'Inactivo',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 12),
-                            ),
-                          ),
+                              value: 'Inactivo',
+                              child: Text('Inactivo',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12))),
                         ],
                         onChanged: (value) {
                           setState(() {
                             selectedOption = value;
-                            _filterClients();
+                            filteredClients;
                           });
                         },
                         dropdownColor: const Color(0xFF313030),
-                        icon: const Icon(
-                          Icons.arrow_drop_down,
-                          color: Color(0xFF2be4f3),
-                          size: 30, // Reducir tamaño del icono
-                        ),
+                        icon: const Icon(Icons.arrow_drop_down,
+                            color: Color(0xFF2be4f3), size: 30),
                       ),
                     ),
                   ],

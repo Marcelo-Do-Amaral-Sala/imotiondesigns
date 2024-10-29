@@ -9,23 +9,13 @@ class ClientsView extends StatefulWidget {
 }
 
 class _ClientsViewState extends State<ClientsView> {
-  final List<String> clients = [
-    "Cliente 1",
-    "Cliente 2",
-    "Cliente 3",
-    "Cliente 4"
-  ];
-
-  // Variables para controlar el efecto de escala en las imágenes
   double scaleFactorBack = 1.0;
   double scaleFactorListado = 1.0;
   double scaleFactorCrear = 1.0;
 
-  // Variable para controlar la visibilidad del contenedor superpuesto
   bool isOverlayVisible = false;
-
-  // Variable para determinar el tipo de contenido del overlay
   String overlayContentType = '';
+  Map<String, String>? clientData; // Define aquí tu variable clientData
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +51,6 @@ class _ClientsViewState extends State<ClientsView> {
                           ),
                           child: Column(
                             children: [
-                              // Primer botón (sin animación)
                               SizedBox(
                                 width: screenWidth * 0.25,
                                 height: screenHeight * 0.15,
@@ -90,7 +79,6 @@ class _ClientsViewState extends State<ClientsView> {
                                 ),
                               ),
                               SizedBox(height: screenHeight * 0.05),
-                              // Botón para listado de clientes
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: GestureDetector(
@@ -103,10 +91,8 @@ class _ClientsViewState extends State<ClientsView> {
                                       : (_) {
                                           setState(() {
                                             scaleFactorListado = 1.0;
-                                            isOverlayVisible =
-                                                true; // Muestra el contenedor superpuesto
-                                            overlayContentType =
-                                                'listado'; // Establece el tipo de contenido
+                                            isOverlayVisible = true;
+                                            overlayContentType = 'listado';
                                           });
                                         },
                                   child: AnimatedScale(
@@ -143,7 +129,6 @@ class _ClientsViewState extends State<ClientsView> {
                                 ),
                               ),
                               SizedBox(height: screenHeight * 0.02),
-                              // Botón para crear clientes
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: GestureDetector(
@@ -156,10 +141,8 @@ class _ClientsViewState extends State<ClientsView> {
                                       : (_) {
                                           setState(() {
                                             scaleFactorCrear = 1.0;
-                                            isOverlayVisible =
-                                                true; // Muestra el contenedor superpuesto
-                                            overlayContentType =
-                                                'crear'; // Establece el tipo de contenido
+                                            isOverlayVisible = true;
+                                            overlayContentType = 'crear';
                                           });
                                         },
                                   child: AnimatedScale(
@@ -241,21 +224,23 @@ class _ClientsViewState extends State<ClientsView> {
                                 ),
                               ),
                             ),
-                            // Contenedor superpuesto en el segundo Expanded
+                            // Contenedor superpuesto
                             if (isOverlayVisible)
                               Positioned.fill(
                                 top: screenHeight * 0.11,
                                 right: 0,
                                 left: 0,
                                 child: OverlayContent(
-                                  contentType:
-                                      overlayContentType, // Pasamos el tipo de contenido
+                                  contentType: overlayContentType,
                                   onClose: () {
                                     setState(() {
-                                      isOverlayVisible =
-                                          false; // Oculta el contenedor superpuesto
+                                      isOverlayVisible = false;
+                                      clientData =
+                                          null; // Reinicia si es necesario
                                     });
                                   },
+                                  clientData:
+                                      clientData, // Pasa los datos del cliente si es necesario
                                 ),
                               ),
                           ],

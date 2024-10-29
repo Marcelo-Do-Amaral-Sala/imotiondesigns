@@ -4,12 +4,12 @@ import 'package:intl/intl.dart';
 
 class ClientsData extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
-  final Map<String, dynamic> clientData; // Agregar clientData
+  final Map<String, dynamic> clientData;
 
   const ClientsData({
     Key? key,
     required this.onDataChanged,
-    required this.clientData, // Recibir clientData
+    required this.clientData,
   }) : super(key: key);
 
   @override
@@ -31,7 +31,6 @@ class _ClientsDataState extends State<ClientsData> {
   @override
   void initState() {
     super.initState();
-    // Establecer valores predeterminados desde clientData
     _nameController.text = widget.clientData['name'] ?? '';
     _emailController.text = widget.clientData['email'] ?? '';
     _phoneController.text = widget.clientData['phone'] ?? '';
@@ -39,8 +38,7 @@ class _ClientsDataState extends State<ClientsData> {
     _weightController.text = widget.clientData['weight']?.toString() ?? '';
     selectedOption = widget.clientData['status'];
     selectedGender = widget.clientData['gender'];
-    _birthDate = widget.clientData['birthDate']; // Aquí se inicializa
-    print('Birth Date: $_birthDate'); // Verifica el valor
+    _birthDate = widget.clientData['birthDate'];
   }
 
   @override
@@ -80,7 +78,6 @@ class _ClientsDataState extends State<ClientsData> {
     };
 
     widget.onDataChanged(clientData);
-    // Crear un string con todos los datos
     String dataString = 'Nombre: ${clientData['name']}\n'
         'Email: ${clientData['email']}\n'
         'Teléfono: ${clientData['phone']}\n'
@@ -90,7 +87,6 @@ class _ClientsDataState extends State<ClientsData> {
         'Fecha de Nacimiento: ${clientData['birthDate']}\n'
         'Estado: ${clientData['status']}';
 
-    // Mostrar Snackbar con todos los datos
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(dataString),
@@ -108,99 +104,336 @@ class _ClientsDataState extends State<ClientsData> {
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
         child: Column(
           children: [
-            // Primer contenedor para el primer row de inputs
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // Campos de ID y NOMBRE
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  // Primer contenedor para el primer row de inputs
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('ID',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        TextField(
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.02),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('NOMBRE',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        TextField(
-                          controller: _nameController,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.02),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('ESTADO',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF313030),
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          child: DropdownButton<String>(
-                            hint: const Text('Seleccione',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 12)),
-                            value: selectedOption,
-                            items: const [
-                              DropdownMenuItem(
-                                  value: 'Activo',
-                                  child: Text('Activo',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
-                              DropdownMenuItem(
-                                  value: 'Inactivo',
-                                  child: Text('Inactivo',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
+                        // Campos de ID y NOMBRE
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('ID',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: TextField(
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color(0xFF313030),
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
                             ],
-                            onChanged: (value) {
-                              setState(() {
-                                selectedOption = value;
-                              });
-                            },
-                            dropdownColor: const Color(0xFF313030),
-                            icon: const Icon(Icons.arrow_drop_down,
-                                color: Color(0xFF2be4f3), size: 30),
+                          ),
+                        ),
+                        SizedBox(width: screenWidth * 0.02),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('NOMBRE',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: TextField(
+                                  controller: _nameController,
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color(0xFF313030),
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: screenWidth * 0.02),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('ESTADO',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: DropdownButton<String>(
+                                  hint: const Text('Seleccione',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12)),
+                                  value: selectedOption,
+                                  items: const [
+                                    DropdownMenuItem(
+                                        value: 'Activo',
+                                        child: Text('Activo',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12))),
+                                    DropdownMenuItem(
+                                        value: 'Inactivo',
+                                        child: Text('Inactivo',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12))),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedOption = value;
+                                    });
+                                  },
+                                  dropdownColor: const Color(0xFF313030),
+                                  icon: const Icon(Icons.arrow_drop_down,
+                                      color: Color(0xFF2be4f3), size: 30),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  // Segundo contenedor para el segundo row de inputs
+                  SizedBox(
+                    width: screenWidth,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Campos de GÉNERO, FECHA DE NACIMIENTO y TELÉFONO
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('GÉNERO',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: DropdownButton<String>(
+                                  hint: const Text('Seleccione',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12)),
+                                  value: selectedGender,
+                                  items: const [
+                                    DropdownMenuItem(
+                                        value: 'Hombre',
+                                        child: Text('Hombre',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12))),
+                                    DropdownMenuItem(
+                                        value: 'Mujer',
+                                        child: Text('Mujer',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12))),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedGender = value;
+                                    });
+                                  },
+                                  dropdownColor: const Color(0xFF313030),
+                                  icon: const Icon(Icons.arrow_drop_down,
+                                      color: Color(0xFF2be4f3), size: 30),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              const Text('FECHA DE NACIMIENTO',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              GestureDetector(
+                                onTap: () => _selectDate(context),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7),
+                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 15),
+                                  child: Text(
+                                    _birthDate ?? 'DD/MM/YYYY',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 12),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              const Text('TELÉFONO',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: TextField(
+                                  controller: _phoneController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color(0xFF313030),
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: screenWidth * 0.1),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('ALTURA (cm)',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: TextField(
+                                  controller: _heightController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color(0xFF313030),
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              const Text('PESO (kg)',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: TextField(
+                                  controller: _weightController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color(0xFF313030),
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              const Text('E-MAIL',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: TextField(
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.deny(
+                                        RegExp(r'\s')),
+                                  ],
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color(0xFF313030),
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -209,231 +442,55 @@ class _ClientsDataState extends State<ClientsData> {
                 ],
               ),
             ),
-            const SizedBox(height: 2),
-            // Segundo contenedor para el segundo row de inputs
+            const SizedBox(height: 5),
             SizedBox(
-              width: screenWidth,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Campos de GÉNERO, FECHA DE NACIMIENTO y TELÉFONO
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('GÉNERO',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF313030),
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          child: DropdownButton<String>(
-                            hint: const Text('Seleccione',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 12)),
-                            value: selectedGender,
-                            items: const [
-                              DropdownMenuItem(
-                                  value: 'Hombre',
-                                  child: Text('Hombre',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
-                              DropdownMenuItem(
-                                  value: 'Mujer',
-                                  child: Text('Mujer',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                selectedGender = value;
-                              });
-                            },
-                            dropdownColor: const Color(0xFF313030),
-                            icon: const Icon(Icons.arrow_drop_down,
-                                color: Color(0xFF2be4f3), size: 30),
+                  GestureDetector(
+                    onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
+                    onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
+                    onTap: () {
+                      print("PAPELARA PULSADA");
+                    },
+                    child: AnimatedScale(
+                      scale: scaleFactorRemove,
+                      duration: const Duration(milliseconds: 100),
+                      child: SizedBox(
+                        width: screenWidth * 0.08,
+                        height: screenHeight * 0.08,
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/papelera.png',
+                            fit: BoxFit.scaleDown,
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        const Text('FECHA DE NACIMIENTO',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        GestureDetector(
-                          onTap: () => _selectDate(context),
-                          child: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF313030),
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            child: Text(
-                              _birthDate ?? 'DD/MM/YYYY',
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        const Text('TELÉFONO',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        TextField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                  SizedBox(width: screenWidth * 0.1),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('ALTURA (cm)',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        TextField(
-                          controller: _heightController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
+                  GestureDetector(
+                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                    onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                    onTap: () {
+                      
+                      print("TICK PULSADA");
+                    },
+                    child: AnimatedScale(
+                      scale: scaleFactorTick,
+                      duration: const Duration(milliseconds: 100),
+                      child: SizedBox(
+                        width: screenWidth * 0.08,
+                        height: screenHeight * 0.08,
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/tick.png',
+                            fit: BoxFit.scaleDown,
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        const Text('PESO (kg)',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        TextField(
-                          controller: _weightController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        const Text('E-MAIL',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        TextField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                          ],
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Color(0xFF313030),
-                            isDense: true,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-            Positioned(
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.all(5.0),
-                height: screenHeight * 0.09,
-                width: screenWidth,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTapDown: (_) =>
-                          setState(() => scaleFactorRemove = 0.95),
-                      onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-                      onTap: () {
-                        print("PAPELARA PULSADA");
-                      },
-                      child: AnimatedScale(
-                        scale: scaleFactorRemove,
-                        duration: const Duration(milliseconds: 100),
-                        child: SizedBox(
-                          width: screenWidth * 0.1,
-                          height: screenHeight * 0.1,
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/papelera.png',
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                      onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                      onTap: () {
-                        print("TICK PUuuuLSADA");
-                      },
-                      child: AnimatedScale(
-                        scale: scaleFactorTick,
-                        duration: const Duration(milliseconds: 100),
-                        child: SizedBox(
-                          width: screenWidth * 0.1,
-                          height: screenHeight * 0.1,
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/tick.png',
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ],
