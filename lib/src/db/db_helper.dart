@@ -1,5 +1,5 @@
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -27,7 +27,7 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
+    await db.execute(''' 
       CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -36,29 +36,18 @@ class DatabaseHelper {
         height INTEGER NOT NULL,
         weight INTEGER NOT NULL,
         birthdate TEXT NOT NULL,
-        phone INTEGER NOT NULL,
+        phone TEXT NOT NULL,
         email TEXT NOT NULL
       )
     ''');
   }
 
+  Future<void> initializeDatabase() async {
+    await database; // Asegura que la base de datos esté inicializada
+  }
+
   Future<void> insertClient(Map<String, dynamic> client) async {
     final db = await database;
-
-    // Asegúrate de que la tabla existe
-    await db.execute('''
-    CREATE TABLE IF NOT EXISTS clientes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      status TEXT NOT NULL,
-      gender TEXT NOT NULL,
-      height INTEGER NOT NULL,
-      weight INTEGER NOT NULL,
-      birthdate TEXT NOT NULL,
-      phone INTEGER NOT NULL,
-      email TEXT NOT NULL
-    )
-  ''');
 
     try {
       await db.insert(
@@ -71,14 +60,27 @@ class DatabaseHelper {
     }
   }
 
-
-// READ
   Future<List<Map<String, dynamic>>> getClients() async {
     final db = await database;
-    return await db.query('clientes');
+    // Asegúrate de que el ID se maneje como int
+    final List<Map<String, dynamic>> clients = await db.query('clientes');
+
+    // Aquí podrías verificar que todos los campos se recuperen correctamente
+    return clients.map((client) {
+      return {
+        'id': client['id'], // El ID debe ser un int
+        'name': client['name'],
+        'status': client['status'],
+        'gender': client['gender'],
+        'height': client['height'],
+        'weight': client['weight'],
+        'birthdate': client['birthdate'],
+        'phone': client['phone'],
+        'email': client['email'],
+      };
+    }).toList();
   }
 
-// UPDATE
   Future<void> updateClient(int id, Map<String, dynamic> client) async {
     final db = await database;
     await db.update(
@@ -89,7 +91,6 @@ class DatabaseHelper {
     );
   }
 
-// DELETE
   Future<void> deleteClient(int id) async {
     final db = await database;
     await db.delete(

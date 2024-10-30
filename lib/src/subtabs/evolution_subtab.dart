@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/customs/activity_table_custom.dart';
+import '../db/db_helper.dart';
 
 class EvolutionSubTab extends StatefulWidget {
   const EvolutionSubTab({
@@ -12,53 +13,30 @@ class EvolutionSubTab extends StatefulWidget {
 
 class _EvolutionSubTabState extends State<EvolutionSubTab> {
   double scaleFactorBack = 1.0;
-
-  List<Map<String, String>> allBioEvo = [
-    {
-      'date': '12/09/2024',
-      'hour': '10:00',
-      'bonos': '30',
-      'points': '450',
-      'ekal': '1230'
-    },
-    {
-      'date': '12/02/2024',
-      'hour': '11:00',
-      'bonos': '40',
-      'points': '460',
-      'ekal': '1270'
-    },
-    {
-      'date': '02/09/2023',
-      'hour': '13:00',
-      'bonos': '35',
-      'points': '450',
-      'ekal': '1200'
-    },
-    {
-      'date': '01/09/2023',
-      'hour': '08:00',
-      'bonos': '40',
-      'points': '550',
-      'ekal': '1030'
-    },
-    {
-      'date': '18/12/2023',
-      'hour': '06:30',
-      'bonos': '50',
-      'points': '500',
-      'ekal': '1250'
-    },
-  ];
+  List<Map<String, dynamic>> clients = [];
 
   @override
   void initState() {
     super.initState();
+    _initializeDatabase(); // Inicializar la base de datos y cargar datos
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  Future<void> _initializeDatabase() async {
+    final dbHelper = DatabaseHelper();
+    await dbHelper.initializeDatabase(); // Inicializa la base de datos
+    _fetchClients(); // Cargar los datos después de la inicialización
+  }
+
+  Future<void> _fetchClients() async {
+    final dbHelper = DatabaseHelper();
+    try {
+      final clientData = await dbHelper.getClients();
+      setState(() {
+        clients = clientData;
+      });
+    } catch (e) {
+      print('Error fetching clients: $e');
+    }
   }
 
   @override
@@ -70,7 +48,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab> {
       child: Padding(
         padding: EdgeInsets.symmetric(
           vertical: screenHeight * 0.01,
-          horizontal: screenWidth * 0.02, // Ajustar el padding
+          horizontal: screenWidth * 0.02,
         ),
         child: Column(
           children: [
@@ -107,58 +85,34 @@ class _EvolutionSubTabState extends State<EvolutionSubTab> {
             ),
 
             SizedBox(height: screenHeight * 0.01),
-            // Espacio entre los contenedores
-            // Row con dos contenedores del mismo tamaño
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: screenHeight * 0.4, // Altura del contenedor
-                    child: const Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          'FECHA: ',
-                          style: TextStyle(
-                              color: const Color(0xFF2be4f3),
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'HORA: ',
-                          style: TextStyle(
-                              color: const Color(0xFF2be4f3),
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: screenWidth * 0.01),
-                // Espacio entre los contenedores
-                Expanded(
-                  child: Container(
-                    height: screenHeight * 0.4, // Altura del contenedor
-                    decoration: BoxDecoration(
-                      color: Colors.green, // Color del segundo contenedor
-                      borderRadius: BorderRadius.circular(7.0),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Contenedor 2',
-                        style: TextStyle(color: Colors.white),
+
+            // Lista de clientes
+            Expanded(
+              child: ListView.builder(
+                itemCount: clients.length,
+                itemBuilder: (context, index) {
+                  final client = clients[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 5.0),
+                    child: ListTile(
+                      title: Text(client['name'] ?? 'Nombre no disponible'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Estado: ${client['status'] ?? 'No disponible'}'),
+                          Text('Género: ${client['gender'] ?? 'No disponible'}'),
+                          Text('Altura: ${client['height'] ?? 'No disponible'} cm'),
+                          Text('Peso: ${client['weight'] ?? 'No disponible'} kg'),
+                          Text('Fecha de nacimiento: ${client['birthdate'] ?? 'No disponible'}'),
+                          Text('Teléfono: ${client['phone'] ?? 'No disponible'}'),
+                          Text('Email: ${client['email'] ?? 'No disponible'}'),
+                        ],
                       ),
                     ),
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-
-            const SizedBox(height: 10),
-            // Espacio entre los contenedores
-            // Aquí puedes añadir el contenedor para la tabla de actividades
           ],
         ),
       ),

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class DataTableWidget extends StatefulWidget {
-  final List<Map<String, String>> data;
-  final Function(Map<String, String>) onRowTap;
+  final List<Map<String, dynamic>> data; // Mantener el tipo como dynamic
+  final Function(Map<String, dynamic>) onRowTap; // Callback con el tipo correcto
 
   const DataTableWidget({super.key, required this.data, required this.onRowTap});
 
@@ -12,8 +12,6 @@ class DataTableWidget extends StatefulWidget {
 }
 
 class _DataTableWidgetState extends State<DataTableWidget> {
-  Map<String, String>? selectedRow;
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,15 +25,12 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 return Column(
                   children: [
                     DataRowWidget(
-                      id: row['id'] ?? '',
+                      id: (row['id'] is int) ? row['id'] : int.tryParse(row['id'].toString()) ?? 0,
                       name: row['name'] ?? '',
-                      phone: row['phone'] ?? '',
+                      phone: (row['phone'] is int) ? row['phone'] : int.tryParse(row['phone'].toString()) ?? 0,
                       status: row['status'] ?? '',
                       onTap: () {
-                        setState(() {
-                          selectedRow = row;
-                        });
-                        widget.onRowTap(row);
+                        widget.onRowTap(row); // Pasar el mapa completo
                       },
                     ),
                     const SizedBox(height: 20), // Espaciado entre filas
@@ -79,9 +74,9 @@ class _DataTableWidgetState extends State<DataTableWidget> {
 }
 
 class DataRowWidget extends StatefulWidget {
-  final String id;
+  final int id; // Cambiar a int
   final String name;
-  final String phone;
+  final int phone; // Cambiar a int
   final String status;
   final VoidCallback onTap;
 
@@ -136,9 +131,9 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            buildCell(widget.id),
+            buildCell(widget.id.toString()), // Convertir a String solo para mostrar
             buildCell(widget.name),
-            buildCell(widget.phone),
+            buildCell(widget.phone.toString()), // Convertir a String para mostrar
             buildCell(widget.status),
           ],
         ),

@@ -51,6 +51,32 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
   }
 
   void _collectData() async {
+    // Verificar que todos los campos estén rellenos
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _heightController.text.isEmpty ||
+        _weightController.text.isEmpty ||
+        selectedGender == null ||
+        selectedOption == null ||
+        _birthDate == null) {
+      // Mostrar Snackbar de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Por favor, complete todos los campos.",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+          backgroundColor: Colors.red, // Cambia el color del fondo del snackbar
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return; // Salir del método si hay campos vacíos
+    }
+
     final clientData = {
       'name': _nameController.text,
       'email': _emailController.text,
@@ -66,34 +92,32 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
     DatabaseHelper dbHelper = DatabaseHelper();
     await dbHelper.insertClient(clientData);
 
-    // Crear un string con todos los datos
-    String dataString = 'Nombre: ${clientData['name']}\n'
-        'Email: ${clientData['email']}\n'
-        'Teléfono: ${clientData['phone']}\n'
-        'Altura: ${clientData['height']} cm\n'
-        'Peso: ${clientData['weight']} kg\n'
-        'Género: ${clientData['gender']}\n'
-        'Fecha de Nacimiento: ${clientData['birthDate']}\n'
-        'Estado: ${clientData['status']}';
-
-    // Mostrar Snackbar con todos los datos
+    // Mostrar Snackbar de éxito
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(dataString),
-        duration: const Duration(seconds: 14),
+      const SnackBar(
+        content: Text(
+          "Cliente añadido correctamente",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Color(0xFF2be4f3),
+        duration: Duration(seconds: 4),
       ),
     );
   }
-
-  // Función para exportar la base de datos
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+        padding: EdgeInsets.symmetric(
+            vertical: screenHeight * 0.01,
+            horizontal: screenWidth * 0.03), // Ajustar el padding
         child: Column(
           children: [
             Expanded(
@@ -107,7 +131,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Campos de ID y NOMBRE
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -119,16 +143,14 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -143,7 +165,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.02),
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -155,17 +177,15 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _nameController,
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -179,7 +199,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.02),
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -191,9 +211,8 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: DropdownButton<String>(
                                   hint: const Text('Seleccione',
                                       style: TextStyle(
@@ -236,8 +255,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Campos de GÉNERO, FECHA DE NACIMIENTO y TELÉFONO
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -249,9 +267,8 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: DropdownButton<String>(
                                   hint: const Text('Seleccione',
                                       style: TextStyle(
@@ -292,18 +309,13 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                 child: Container(
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF313030),
-                                    borderRadius: BorderRadius.circular(7),
-                                  ),
+                                      color: const Color(0xFF313030),
+                                      borderRadius: BorderRadius.circular(7)),
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 15),
-                                  child: Text(
-                                    _birthDate ?? 'DD/MM/YYYY',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                                  child: Text(_birthDate ?? 'DD/MM/YYYY',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 12)),
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -315,25 +327,23 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _phoneController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
-                                    hintText: 'Introduce teléfono',
+                                    hintText: 'Introducir teléfono',
                                     hintStyle:
                                         const TextStyle(color: Colors.grey),
                                   ),
@@ -343,7 +353,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.1),
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -355,21 +365,19 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _heightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -388,21 +396,19 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _weightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -421,22 +427,20 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s')),
+                                        RegExp(r'\s'))
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -455,9 +459,9 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                 ],
               ),
             ),
-            const SizedBox(height: 5),
             SizedBox(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
