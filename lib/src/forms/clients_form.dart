@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../db/db_helper.dart';
+
 class PersonalDataForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
 
@@ -48,7 +50,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
     }
   }
 
-  void _collectData() {
+  void _collectData() async {
     final clientData = {
       'name': _nameController.text,
       'email': _emailController.text,
@@ -60,7 +62,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
       'birthDate': _birthDate,
     };
 
-    widget.onDataChanged(clientData);
+    // Insertar en la base de datos
+    DatabaseHelper dbHelper = DatabaseHelper();
+    await dbHelper.insertClient(clientData);
+
     // Crear un string con todos los datos
     String dataString = 'Nombre: ${clientData['name']}\n'
         'Email: ${clientData['email']}\n'
@@ -79,6 +84,8 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
       ),
     );
   }
+
+  // Función para exportar la base de datos
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +132,10 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
+                                    enabled: false,
+                                    hintText: 'Automático',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -158,6 +169,9 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
+                                    hintText: 'Introducir nombre',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -286,7 +300,9 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                   child: Text(
                                     _birthDate ?? 'DD/MM/YYYY',
                                     style: const TextStyle(
-                                        color: Colors.white, fontSize: 12),
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -317,6 +333,9 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
+                                    hintText: 'Introduce teléfono',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -354,6 +373,9 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
+                                    hintText: 'Introducir altura',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -384,6 +406,9 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
+                                    hintText: 'Introducir peso',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -415,6 +440,9 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
+                                    hintText: 'Introducir e-mail',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -436,7 +464,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () {
-                      _collectData(); // Llama a la función que recoge los datos
+                      _collectData();
                       print("TICK PULSADA");
                     },
                     child: AnimatedScale(
