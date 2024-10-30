@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/info/clients_bonos.dart';
+import 'package:imotion_designs/src/subtabs/evolution_subtab.dart';
 import '../info/clients_activity.dart';
 import '../info/clients_bio.dart';
 import '../info/clients_data.dart';
@@ -168,11 +169,6 @@ class _InfoClientsState extends State<InfoClients>
   }
 
   Widget _buildEvolutionSubTabView() {
-    return Center(
-      child: Text(
-        'Subpestaña Evolución: ${_subTabData?['nombre'] ?? 'No disponible'}',
-        style: const TextStyle(color: Colors.white),
-      ),
-    );
+    return EvolutionSubTab();
   }
 }
