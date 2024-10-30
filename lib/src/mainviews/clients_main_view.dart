@@ -62,16 +62,39 @@ class _ClientsViewState extends State<ClientsView> {
                                       'assets/images/recuadro.png',
                                       fit: BoxFit.fill,
                                     ),
-                                    const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text(
-                                        '-CLIENTES',
-                                        style: TextStyle(
-                                          color: Color(0xFF28E2F5),
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        textAlign: TextAlign.center,
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          // Contenedor para el ícono
+                                          Container(
+                                            padding: const EdgeInsets.all(10.0),
+                                            width: screenWidth * 0.05,
+                                            // Ajusta el tamaño del ícono aquí
+                                            height: screenHeight * 0.1,
+                                            // Ajusta la altura del ícono aquí
+                                            child: Image.asset(
+                                              'assets/images/cliente.png',
+                                              fit: BoxFit
+                                                  .contain, // Ajuste para llenar el contenedor
+                                            ),
+                                          ),
+
+                                          // Contenedor para el texto
+                                          const Expanded(
+                                            child: Text(
+                                              "CLIENTES",
+                                              style: const TextStyle(
+                                                color: Color(0xFF28E2F5),
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
