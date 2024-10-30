@@ -238,11 +238,9 @@ class _ClientListViewState extends State<ClientListView> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: DataTableWidget(
-            data: filteredClients,
-            onRowTap: _showPrint,
-          ),
+        child: DataTableWidget(
+          data: filteredClients,
+          onRowTap: _showPrint,
         ),
       ),
     );

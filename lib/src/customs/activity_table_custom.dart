@@ -12,27 +12,31 @@ class ActivityTableWidget extends StatefulWidget {
 class _ActivityTableWidgetState extends State<ActivityTableWidget> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          buildHeaderRow(),
-          const SizedBox(height: 10),
-          ...widget.activityData.map((row) {
-            return Column(
-              children: [
-                DataRowWidget(
-                  date: row['date'] ?? '',
-                  hour: row['hour'] ?? '',
-                  bonos: row['bonos'] ?? '',
-                  points: row['points'] ?? '',
-                  ekal: row['ekal'] ?? '',
-                ),
-                const SizedBox(height: 5),
-              ],
-            );
-          }).toList(),
-        ],
-      ),
+    return Column(
+      children: [
+        buildHeaderRow(), // Encabezado fijo
+        const SizedBox(height: 10),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: widget.activityData.map((row) {
+                return Column(
+                  children: [
+                    DataRowWidget(
+                      date: row['date'] ?? '',
+                      hour: row['hour'] ?? '',
+                      bonos: row['bonos'] ?? '',
+                      points: row['points'] ?? '',
+                      ekal: row['ekal'] ?? '',
+                    ),
+                    const SizedBox(height: 5),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

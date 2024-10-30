@@ -82,7 +82,8 @@ class _ClientsActivityState extends State<ClientsActivity> {
     return SizedBox(
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: 10, horizontal: screenWidth * 0.05), // Padding dinámico
+            vertical: screenHeight * 0.01,
+            horizontal: screenWidth * 0.03), // Ajustar el padding
         child: Column(
           children: [
             // Contenedor para los campos de entrada
@@ -121,9 +122,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: SingleChildScrollView(
-                  child: ActivityTableWidget(activityData: allSesions),
-                ),
+                child: ActivityTableWidget(activityData: allSesions),
               ),
             ),
             const SizedBox(height: 5),

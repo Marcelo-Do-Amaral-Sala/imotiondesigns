@@ -5,8 +5,11 @@ class BioimpedanciaTableWidget extends StatefulWidget {
   final List<Map<String, String>> dataRegister;
   final Function(Map<String, String>) onRowTap;
 
-  const BioimpedanciaTableWidget(
-      {super.key, required this.dataRegister, required this.onRowTap});
+  const BioimpedanciaTableWidget({
+    super.key,
+    required this.dataRegister,
+    required this.onRowTap,
+  });
 
   @override
   _BioimpedanciaTableWidgetState createState() =>
@@ -18,30 +21,34 @@ class _BioimpedanciaTableWidgetState extends State<BioimpedanciaTableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          buildHeaderRow(),
-          const SizedBox(height: 20),
-          ...widget.dataRegister.map((row) {
-            return Column(
-              children: [
-                DataRowWidget(
-                  date: row['date'] ?? '',
-                  hour: row['hour'] ?? '',
-                  onTap: () {
-                    setState(() {
-                      selectedRow = row;
-                    });
-                    widget.onRowTap(row);
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
-            );
-          }).toList(),
-        ],
-      ),
+    return Column(
+      children: [
+        buildHeaderRow(), // Encabezado fijo
+        const SizedBox(height: 20),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: widget.dataRegister.map((row) {
+                return Column(
+                  children: [
+                    DataRowWidget(
+                      date: row['date'] ?? '',
+                      hour: row['hour'] ?? '',
+                      onTap: () {
+                        setState(() {
+                          selectedRow = row;
+                        });
+                        widget.onRowTap(row);
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -75,7 +82,6 @@ class _BioimpedanciaTableWidgetState extends State<BioimpedanciaTableWidget> {
 class DataRowWidget extends StatefulWidget {
   final String date;
   final String hour;
-
   final VoidCallback onTap;
 
   const DataRowWidget({

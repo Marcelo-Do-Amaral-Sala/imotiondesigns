@@ -4,8 +4,7 @@ class BonosTableWidget extends StatefulWidget {
   final List<Map<String, String>> bonosData;
   final bool showHour; // Parámetro para mostrar u ocultar la columna "HORA"
 
-  const BonosTableWidget(
-      {super.key, required this.bonosData, this.showHour = true});
+  const BonosTableWidget({super.key, required this.bonosData, this.showHour = true});
 
   @override
   _BonosTableWidgetState createState() => _BonosTableWidgetState();
@@ -14,26 +13,30 @@ class BonosTableWidget extends StatefulWidget {
 class _BonosTableWidgetState extends State<BonosTableWidget> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          buildHeaderRow(),
-          const SizedBox(height: 5),
-          ...widget.bonosData.map((row) {
-            return Column(
-              children: [
-                DataRowWidget(
-                  date: row['date'] ?? '',
-                  hour: widget.showHour ? (row['hour'] ?? '') : '',
-                  quantity: row['quantity'] ?? '',
-                  showHour: widget.showHour, // Pasar el estado de showHour
-                ),
-                const SizedBox(height: 2),
-              ],
-            );
-          }).toList(),
-        ],
-      ),
+    return Column(
+      children: [
+        buildHeaderRow(), // Encabezado fijo
+        const SizedBox(height: 5),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: widget.bonosData.map((row) {
+                return Column(
+                  children: [
+                    DataRowWidget(
+                      date: row['date'] ?? '',
+                      hour: widget.showHour ? (row['hour'] ?? '') : '',
+                      quantity: row['quantity'] ?? '',
+                      showHour: widget.showHour, // Pasar el estado de showHour
+                    ),
+                    const SizedBox(height: 2),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

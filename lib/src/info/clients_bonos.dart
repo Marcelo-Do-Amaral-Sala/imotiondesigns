@@ -18,9 +18,23 @@ class _ClientsBonosState extends State<ClientsBonos> {
   List<Map<String, String>> availableBonos = [
     {'date': '12/12/2024', 'quantity': '5'},
     {'date': '12/02/2024', 'quantity': '15'},
+     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/02/2024', 'quantity': '15'},
+     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/02/2024', 'quantity': '15'},
+     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/02/2024', 'quantity': '15'},
+     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/02/2024', 'quantity': '15'},
   ];
 
   List<Map<String, String>> consumedBonos = [
+    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
+    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
+    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
+    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
+    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
+    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
     {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
     {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
   ];
@@ -48,7 +62,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
     return SizedBox(
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: 10, horizontal: screenWidth * 0.05), // Padding dinámico
+            vertical: screenHeight * 0.01,
+            horizontal: screenWidth * 0.03), // Ajustar el padding
         child: Column(
           children: [
             Expanded(
@@ -63,7 +78,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                   _buildBonosContainers(screenHeight, screenWidth),
                   const SizedBox(height: 10),
                   // Fila con dos contenedores centrados para totales
-                  _buildTotalRow(screenHeight),
+                  _buildTotalRow(screenHeight, screenWidth),
                 ],
               ),
             ),
@@ -167,23 +182,21 @@ class _ClientsBonosState extends State<ClientsBonos> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: SingleChildScrollView(
-            child: BonosTableWidget(
-              bonosData: bonosData,
-              showHour: showHour,
-            ),
+          child: BonosTableWidget(
+            bonosData: bonosData,
+            showHour: showHour,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTotalRow(double screenHeight) {
+  Widget _buildTotalRow(double screenHeight, double screenWidth) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildTotalContainer(screenHeight, "TOTAL", "123", Colors.green),
-        const SizedBox(width: 10),
+        SizedBox(width: screenWidth * 0.02),
         _buildTotalContainer(screenHeight, "TOTAL", "456", Colors.red),
       ],
     );

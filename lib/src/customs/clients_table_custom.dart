@@ -16,32 +16,36 @@ class _DataTableWidgetState extends State<DataTableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          buildHeaderRow(),
-          const SizedBox(height: 20),
-          ...widget.data.map((row) {
-            return Column(
-              children: [
-                DataRowWidget(
-                  id: row['id'] ?? '',
-                  name: row['name'] ?? '',
-                  phone: row['phone'] ?? '',
-                  status: row['status'] ?? '',
-                  onTap: () {
-                    setState(() {
-                      selectedRow = row;
-                    });
-                    widget.onRowTap(row);
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
-            );
-          }).toList(),
-        ],
-      ),
+    return Column(
+      children: [
+        buildHeaderRow(), // Encabezado fijo
+        const SizedBox(height: 10), // Espaciado entre encabezado y filas
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: widget.data.map((row) {
+                return Column(
+                  children: [
+                    DataRowWidget(
+                      id: row['id'] ?? '',
+                      name: row['name'] ?? '',
+                      phone: row['phone'] ?? '',
+                      status: row['status'] ?? '',
+                      onTap: () {
+                        setState(() {
+                          selectedRow = row;
+                        });
+                        widget.onRowTap(row);
+                      },
+                    ),
+                    const SizedBox(height: 20), // Espaciado entre filas
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

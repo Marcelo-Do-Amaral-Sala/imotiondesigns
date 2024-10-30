@@ -29,7 +29,7 @@ class _ClientsBioState extends State<ClientsBio> {
   ];
 
   bool _showSubTab = false;
-  bool _showEvolutionTab = false;
+
   Map<String, String>? _subTabData;
 
   @override
@@ -44,14 +44,12 @@ class _ClientsBioState extends State<ClientsBio> {
     setState(() {
       _showSubTab = true;
       _subTabData = clientData;
-      _showEvolutionTab = false;
     });
     widget.onClientTap(clientData);
   }
 
   void _showEvolution() {
     setState(() {
-      _showEvolutionTab = true;
       _showSubTab = false;
     });
   }
@@ -126,11 +124,9 @@ class _ClientsBioState extends State<ClientsBio> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: SingleChildScrollView(
-            child: BioimpedanciaTableWidget(
-              dataRegister: allBio,
-              onRowTap: _showPrint,
-            ),
+          child: BioimpedanciaTableWidget(
+            dataRegister: allBio,
+            onRowTap: _showPrint,
           ),
         ),
       ),
