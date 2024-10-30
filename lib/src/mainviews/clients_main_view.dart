@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../customs/overlay_custom.dart';
 
 class ClientsView extends StatefulWidget {
-  const ClientsView({super.key});
+  final Function() onBack; // Callback para navegar de vuelta
+  const ClientsView({super.key, required this.onBack});
 
   @override
   State<ClientsView> createState() => _ClientsViewState();
@@ -135,7 +136,8 @@ class _ClientsViewState extends State<ClientsView> {
                                 onTapUp: (_) =>
                                     setState(() => scaleFactorBack = 1.0),
                                 onTap: () {
-                                  // NAVEGACION A PANTALLA ANTERIOR
+                                  widget
+                                      .onBack(); // Llama al callback para volver a la vista anterior
                                 },
                                 child: AnimatedScale(
                                   scale: scaleFactorBack,

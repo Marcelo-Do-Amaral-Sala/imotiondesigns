@@ -33,23 +33,7 @@ class _CreateClientsState extends State<CreateClients>
     super.dispose();
   }
 
-  void _onDataChanged(Map<String, dynamic> data) {
-    // Convierte los valores a String
-    Map<String, String> stringData = {
-      'name': data['name']?.toString() ?? '',
-      'email': data['email']?.toString() ?? '',
-      'gender': data['gender']?.toString() ?? '',
-      'dateBirth': data['dateBirth']?.toString() ?? '',
-      'height': data['height']?.toString() ?? '',
-      'weight': data['weight']?.toString() ?? '',
-      'phone': data['phone']?.toString() ?? '',
-    };
-
-    // Llama al callback onSave con el mapa convertido
-    widget.onSave(stringData);
-  }
-
-   @override
+  @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     return Column(
@@ -65,8 +49,12 @@ class _CreateClientsState extends State<CreateClients>
   }
 
   Widget _buildTabBar() {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: screenHeight * 0.1,
+      width: screenWidth,
       color: Colors.black,
       child: TabBar(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -82,7 +70,7 @@ class _CreateClientsState extends State<CreateClients>
         ),
         labelColor: const Color(0xFF2be4f3),
         labelStyle: const TextStyle(
-          fontSize: 16, // Ajusta el tamaño para mejorar la legibilidad
+          fontSize: 13,
           fontWeight: FontWeight.bold,
         ),
         unselectedLabelColor: Colors.white,
@@ -92,13 +80,16 @@ class _CreateClientsState extends State<CreateClients>
 
   Widget _buildTab(String text, int index) {
     return Tab(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          decoration: _tabController.index == index
-              ? TextDecoration.underline
-              : TextDecoration.none,
+      child: SizedBox(
+        width: 200,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            decoration: _tabController.index == index
+                ? TextDecoration.underline
+                : TextDecoration.none,
+          ),
         ),
       ),
     );
@@ -112,7 +103,11 @@ class _CreateClientsState extends State<CreateClients>
         physics:
             const NeverScrollableScrollPhysics(), // Deshabilita el deslizamiento
         children: [
-          PersonalDataForm(onDataChanged: _onDataChanged),
+          PersonalDataForm(
+            onDataChanged: (data) {
+              print(data);
+            },
+          ),
           _buildTabContent('Contenido de Opción 2'),
           _buildTabContent('Contenido de Opción 3'),
         ],

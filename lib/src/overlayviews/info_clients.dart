@@ -18,7 +18,8 @@ class _InfoClientsState extends State<InfoClients>
   late TabController _tabController;
   late PageController _pageController;
 
-  bool _showSubTab = false;
+  bool _showSubTabBio = false; // Para mostrar la subpestaña de bioimpedancia
+  bool _showSubTabEvolution = false; // Para mostrar la subpestaña de evolución
   Map<String, String>? _subTabData;
 
   @override
@@ -29,7 +30,8 @@ class _InfoClientsState extends State<InfoClients>
     _tabController.addListener(() {
       _pageController.jumpToPage(_tabController.index);
       setState(() {
-        _showSubTab = false; // Reiniciar la subpestaña al cambiar de tab
+        _showSubTabBio = false;
+        _showSubTabEvolution = false;
       });
     });
   }
@@ -42,9 +44,18 @@ class _InfoClientsState extends State<InfoClients>
   }
 
   void onTapClient(Map<String, String> clientData) {
+    print('Client tapped: $clientData');
     setState(() {
-      _showSubTab = true; // Mostrar subpestaña
-      _subTabData = clientData; // Asignar datos a mostrar
+      _showSubTabBio = true;
+      _subTabData = clientData;
+    });
+  }
+
+  void onButtonTap(Map<String, String> buttonData) {
+    print('Button tapped: $buttonData');
+    setState(() {
+      _showSubTabEvolution = true;
+      _subTabData = buttonData;
     });
   }
 
@@ -125,10 +136,11 @@ class _InfoClientsState extends State<InfoClients>
         ),
         ClientsActivity(clientDataActivity: widget.clientData),
         ClientsBonos(clientDataBonos: widget.clientData),
-        _showSubTab
-            ? _buildSubTabView()
+        _showSubTabBio || _showSubTabEvolution
+            ? _buildSubTabView() // Muestra la subpestaña si es necesario
             : ClientsBio(
                 onClientTap: onTapClient,
+                onButtonTap: onButtonTap,
                 clientDataBio: widget.clientData,
               ),
         _buildTabContent('Contenido de Opción 5'),
@@ -143,11 +155,22 @@ class _InfoClientsState extends State<InfoClients>
   }
 
   Widget _buildSubTabView() {
-    return Center(
-      child: Text(
-        'Subpestaña: ${_subTabData?['nombre'] ?? 'No disponible'}', // Ejemplo de datos
-        style: const TextStyle(color: Colors.white),
-      ),
-    );
+    if (_showSubTabBio) {
+      return Center(
+        child: Text(
+          'Subpestaña Bioimpedancia: ${_subTabData?['nombre'] ?? 'No disponible'}',
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
+    } else if (_showSubTabEvolution) {
+      return Center(
+        child: Text(
+          'Subpestaña Evolución: ${_subTabData?['nombre'] ?? 'No disponible'}',
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
+    }
+    return const SizedBox
+        .shrink(); // Devuelve un widget vacío si no hay subpestaña activa
   }
 }

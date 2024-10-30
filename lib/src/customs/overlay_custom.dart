@@ -3,6 +3,7 @@ import '../info/clients_list_view.dart';
 import '../overlayviews/create_clients.dart';
 import '../overlayviews/info_clients.dart';
 
+// ignore: must_be_immutable
 class OverlayContent extends StatefulWidget {
   String contentType;
   final VoidCallback onClose;
@@ -77,7 +78,7 @@ class _OverlayContentState extends State<OverlayContent> {
             ),
           ),
           Positioned(
-            right: 8,
+            right: 0,
             top: 0,
             bottom: 0,
             child: IconButton(

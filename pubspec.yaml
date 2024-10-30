@@ -67,6 +67,12 @@ flutter:
     - assets/images/back.png
     - assets/images/tick.png
     - assets/images/papelera.png
+    - assets/images/ajustes.png
+    - assets/images/bio.png
+    - assets/images/cliente.png
+    - assets/images/panel.png
+    - assets/images/programas.png
+    - assets/images/tutoriales.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
