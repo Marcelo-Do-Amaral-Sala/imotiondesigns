@@ -3,14 +3,14 @@ import 'package:imotion_designs/src/customs/bioimpedancia_table_custom.dart';
 
 class ClientsBio extends StatefulWidget {
   final Function(Map<String, String>) onClientTap;
-  final Function(Map<String, String>) onButtonTap; // Nueva función
   final Map<String, dynamic> clientDataBio;
+  final VoidCallback onEvolutionPressed; // Callback requerido
 
   const ClientsBio({
     super.key,
     required this.onClientTap,
-    required this.onButtonTap, // Asegúrate de pasar esta función
     required this.clientDataBio,
+    required this.onEvolutionPressed,
   });
 
   @override
@@ -30,8 +30,6 @@ class _ClientsBioState extends State<ClientsBio> {
     {'date': '31/01/2024', 'hour': '11:20'},
   ];
 
-  bool _showSessionSubTab = false;
-  bool _showEvolutionSubTab = false; // Para la subpestaña de evolución
   Map<String, String>? _subTabData;
 
   @override
@@ -44,17 +42,13 @@ class _ClientsBioState extends State<ClientsBio> {
 
   void _showSession(Map<String, String> clientData) {
     setState(() {
-      _showSessionSubTab = true;
       _subTabData = clientData;
     });
     widget.onClientTap(clientData);
   }
 
-  void _onButtonTap(Map<String, String> clientData) {
-    setState(() {
-      _showEvolutionSubTab = true; // Mostrar la subpestaña de evolución
-      _subTabData = clientData; // Asignar datos a mostrar
-    });
+  void _showEvolution() {
+    print("BOTON PULSADO");
   }
 
   @override
@@ -138,9 +132,10 @@ class _ClientsBioState extends State<ClientsBio> {
   Widget _buildEvolutionButton() {
     return Expanded(
       flex: 1,
-      child: _buildOutlinedButton('EVOLUCIÓN', () {
-        _showSession;
-      }),
+      child: _buildOutlinedButton(
+        'EVOLUCIÓN',
+        widget.onEvolutionPressed, // Llama al callback
+      ),
     );
   }
 

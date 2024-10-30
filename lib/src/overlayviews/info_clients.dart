@@ -18,8 +18,8 @@ class _InfoClientsState extends State<InfoClients>
   late TabController _tabController;
   late PageController _pageController;
 
-  bool _showSubTabBio = false; // Para mostrar la subpestaña de bioimpedancia
-  bool _showSubTabEvolution = false; // Para mostrar la subpestaña de evolución
+  bool _showBioSubTab = false; // Para mostrar la subpestaña de bioimpedancia
+  bool _showEvolutionSubTab = false; // Para mostrar la subpestaña de evolución
   Map<String, String>? _subTabData;
 
   @override
@@ -30,8 +30,8 @@ class _InfoClientsState extends State<InfoClients>
     _tabController.addListener(() {
       _pageController.jumpToPage(_tabController.index);
       setState(() {
-        _showSubTabBio = false;
-        _showSubTabEvolution = false;
+        _showBioSubTab = false;
+        _showEvolutionSubTab = false; // Resetea la subpestaña de evolución
       });
     });
   }
@@ -46,16 +46,16 @@ class _InfoClientsState extends State<InfoClients>
   void onTapClient(Map<String, String> clientData) {
     print('Client tapped: $clientData');
     setState(() {
-      _showSubTabBio = true;
+      _showBioSubTab = true;
       _subTabData = clientData;
     });
   }
 
-  void onButtonTap(Map<String, String> buttonData) {
-    print('Button tapped: $buttonData');
+  void onEvolutionPressed() {
+    print("Botón de evolución pulsado");
     setState(() {
-      _showSubTabEvolution = true;
-      _subTabData = buttonData;
+      _showEvolutionSubTab = true; // Muestra la subpestaña de evolución
+      _showBioSubTab = false; // Esconde la subpestaña de bioimpedancia
     });
   }
 
@@ -136,13 +136,17 @@ class _InfoClientsState extends State<InfoClients>
         ),
         ClientsActivity(clientDataActivity: widget.clientData),
         ClientsBonos(clientDataBonos: widget.clientData),
-        _showSubTabBio || _showSubTabEvolution
-            ? _buildSubTabView() // Muestra la subpestaña si es necesario
-            : ClientsBio(
-                onClientTap: onTapClient,
-                onButtonTap: onButtonTap,
-                clientDataBio: widget.clientData,
-              ),
+        // Muestra la subpestaña de bioimpedancia o evolución según sea necesario
+        _showBioSubTab
+            ? _buildBioSubTabView()
+            : _showEvolutionSubTab
+                ? _buildEvolutionSubTabView()
+                : ClientsBio(
+                    onClientTap: onTapClient,
+                    clientDataBio: widget.clientData,
+                    onEvolutionPressed:
+                        onEvolutionPressed, // Callback para el botón
+                  ),
         _buildTabContent('Contenido de Opción 5'),
       ],
     );
@@ -154,23 +158,21 @@ class _InfoClientsState extends State<InfoClients>
     );
   }
 
-  Widget _buildSubTabView() {
-    if (_showSubTabBio) {
-      return Center(
-        child: Text(
-          'Subpestaña Bioimpedancia: ${_subTabData?['nombre'] ?? 'No disponible'}',
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
-    } else if (_showSubTabEvolution) {
-      return Center(
-        child: Text(
-          'Subpestaña Evolución: ${_subTabData?['nombre'] ?? 'No disponible'}',
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
-    }
-    return const SizedBox
-        .shrink(); // Devuelve un widget vacío si no hay subpestaña activa
+  Widget _buildBioSubTabView() {
+    return Center(
+      child: Text(
+        'Subpestaña Bioimpedancia: ${_subTabData?['nombre'] ?? 'No disponible'}',
+        style: const TextStyle(color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildEvolutionSubTabView() {
+    return Center(
+      child: Text(
+        'Subpestaña Evolución: ${_subTabData?['nombre'] ?? 'No disponible'}',
+        style: const TextStyle(color: Colors.white),
+      ),
+    );
   }
 }
