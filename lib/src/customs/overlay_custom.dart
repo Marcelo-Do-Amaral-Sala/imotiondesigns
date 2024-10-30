@@ -4,11 +4,12 @@ import '../overlayviews/create_clients.dart';
 import '../overlayviews/info_clients.dart';
 
 class OverlayContent extends StatefulWidget {
-  late String contentType;
-  late VoidCallback onClose;
-  late Map<String, String>? clientData;
+  String contentType;
+  final VoidCallback onClose;
+  Map<String, String>?
+      clientData; // Cambié 'final' a 'var' o 'Map<String, String>?'
 
-   OverlayContent({
+  OverlayContent({
     Key? key,
     required this.contentType,
     required this.onClose,
@@ -35,32 +36,28 @@ class _OverlayContentState extends State<OverlayContent> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    return Container(
-      height: screenHeight,
-      width: screenWidth,
-      decoration: BoxDecoration(
-        color: const Color(0xFF494949),
-        border: Border.all(color: const Color(0xFF2be4f3), width: 2),
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          _buildHeader(screenWidth),
-          Expanded(
-            child: _buildContent(),
-          ),
-        ],
+    return SizedBox.expand(
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF494949),
+          border: Border.all(color: const Color(0xFF2be4f3), width: 2),
+          borderRadius: BorderRadius.circular(7),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            _buildHeader(),
+            Expanded(
+              child: _buildContent(),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader(double screenWidth) {
+  Widget _buildHeader() {
     return Container(
-      width: screenWidth,
       height: MediaQuery.of(context).size.height * 0.08,
       alignment: Alignment.center,
       decoration: const BoxDecoration(
@@ -80,7 +77,7 @@ class _OverlayContentState extends State<OverlayContent> {
             ),
           ),
           Positioned(
-            right: screenWidth * 0.005,
+            right: 8,
             top: 0,
             bottom: 0,
             child: IconButton(
@@ -129,7 +126,9 @@ class _OverlayContentState extends State<OverlayContent> {
           });
         });
       case 'info':
-        return widget.clientData != null ? InfoClients(clientData: widget.clientData!) : SizedBox.shrink();
+        return widget.clientData != null
+            ? InfoClients(clientData: widget.clientData!)
+            : const SizedBox.shrink();
       case 'form':
         return CreateClients(onSave: (onSave) {
           setState(() {

@@ -102,9 +102,12 @@ class _ClientsDataState extends State<ClientsData> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+        padding: EdgeInsets.symmetric(
+            vertical: screenHeight * 0.01,
+            horizontal: screenWidth * 0.03), // Ajustar el padding
         child: Column(
           children: [
             Expanded(
@@ -118,7 +121,7 @@ class _ClientsDataState extends State<ClientsData> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Campos de ID y NOMBRE
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -130,17 +133,15 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _indexController,
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -151,7 +152,7 @@ class _ClientsDataState extends State<ClientsData> {
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.02),
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -163,17 +164,15 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _nameController,
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -184,7 +183,7 @@ class _ClientsDataState extends State<ClientsData> {
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.02),
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -196,9 +195,8 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: DropdownButton<String>(
                                   hint: const Text('Seleccione',
                                       style: TextStyle(
@@ -241,8 +239,7 @@ class _ClientsDataState extends State<ClientsData> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Campos de GÉNERO, FECHA DE NACIMIENTO y TELÉFONO
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -254,9 +251,8 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: DropdownButton<String>(
                                   hint: const Text('Seleccione',
                                       style: TextStyle(
@@ -297,16 +293,13 @@ class _ClientsDataState extends State<ClientsData> {
                                 child: Container(
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF313030),
-                                    borderRadius: BorderRadius.circular(7),
-                                  ),
+                                      color: const Color(0xFF313030),
+                                      borderRadius: BorderRadius.circular(7)),
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 15),
-                                  child: Text(
-                                    _birthDate ?? 'DD/MM/YYYY',
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 12),
-                                  ),
+                                  child: Text(_birthDate ?? 'DD/MM/YYYY',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 12)),
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -318,21 +311,19 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _phoneController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -343,7 +334,7 @@ class _ClientsDataState extends State<ClientsData> {
                           ),
                         ),
                         SizedBox(width: screenWidth * 0.1),
-                        Expanded(
+                        Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -355,21 +346,19 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _heightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -385,21 +374,19 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _weightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -415,22 +402,20 @@ class _ClientsDataState extends State<ClientsData> {
                               Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
+                                    color: const Color(0xFF313030),
+                                    borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s')),
+                                        RegExp(r'\s'))
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
+                                        borderRadius: BorderRadius.circular(7)),
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
@@ -446,7 +431,6 @@ class _ClientsDataState extends State<ClientsData> {
                 ],
               ),
             ),
-            const SizedBox(height: 5),
             SizedBox(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

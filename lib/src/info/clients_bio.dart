@@ -28,9 +28,8 @@ class _ClientsBioState extends State<ClientsBio> {
     {'date': '31/01/2024', 'hour': '11:20'},
   ];
 
-  bool _showSubTab = false; // Controla si se muestra una subpestaña
-  bool _showEvolutionTab =
-      false; // Controla si se muestra la subpestaña de evolución
+  bool _showSubTab = false;
+  bool _showEvolutionTab = false;
   Map<String, String>? _subTabData;
 
   @override
@@ -43,18 +42,17 @@ class _ClientsBioState extends State<ClientsBio> {
 
   void _showPrint(Map<String, String> clientData) {
     setState(() {
-      _showSubTab = true; // Mostrar subpestaña por fila de datos
-      _subTabData = clientData; // Asignar datos a mostrar
-      _showEvolutionTab = false; // Asegurarse que no se muestre la evolución
+      _showSubTab = true;
+      _subTabData = clientData;
+      _showEvolutionTab = false;
     });
-    widget
-        .onClientTap(clientData); // Llama a la función para mostrar subpestaña
+    widget.onClientTap(clientData);
   }
 
   void _showEvolution() {
     setState(() {
-      _showEvolutionTab = true; // Mostrar subpestaña de evolución
-      _showSubTab = false; // Asegurarse que no se muestre la otra subpestaña
+      _showEvolutionTab = true;
+      _showSubTab = false;
     });
   }
 
@@ -65,248 +63,179 @@ class _ClientsBioState extends State<ClientsBio> {
 
     return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+        padding: EdgeInsets.symmetric(
+            vertical: 10, horizontal: screenWidth * 0.05), // Padding dinámico
         child: Column(
           children: [
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'ID',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
-                                child: TextField(
-                                  controller: _indexController,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
-                                    filled: true,
-                                    fillColor: const Color(0xFF313030),
-                                    isDense: true,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'NOMBRE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
-                                child: TextField(
-                                  controller: _nameController,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
-                                    filled: true,
-                                    fillColor: const Color(0xFF313030),
-                                    isDense: true,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'ESTADO',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF313030),
-                                  borderRadius: BorderRadius.circular(7),
-                                ),
-                                child: DropdownButton<String>(
-                                  hint: const Text(
-                                    'Seleccione',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  value: selectedOption,
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'Activo',
-                                      child: Text(
-                                        'Activo',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'Inactivo',
-                                      child: Text(
-                                        'Inactivo',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedOption = value;
-                                    });
-                                  },
-                                  dropdownColor: const Color(0xFF313030),
-                                  icon: const Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Color(0xFF2be4f3),
-                                    size: 30,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        OutlinedButton(
-                          onPressed: () {},
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(10.0),
-                            side: const BorderSide(
-                              width: 1.0,
-                              color: Color(0xFF2be4f3),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            backgroundColor: Colors.transparent,
-                          ),
-                          child: const Text(
-                            'AÑADIR BONOS',
-                            style: TextStyle(
-                              color: Color(0xFF2be4f3),
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _buildInputRow(screenWidth),
                   SizedBox(height: screenHeight * 0.03),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          height: screenHeight * 0.32,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 46, 46, 46),
-                            borderRadius: BorderRadius.circular(7.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: SingleChildScrollView(
-                              child: BioimpedanciaTableWidget(
-                                dataRegister: allBio,
-                                onRowTap: _showPrint,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.02),
-                      Expanded(
-                        flex: 1,
-                        child: OutlinedButton(
-                          onPressed:
-                              _showEvolution, // Cambiar a la subpestaña de evolución
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(10.0),
-                            side: const BorderSide(
-                              width: 1.0,
-                              color: Color(0xFF2be4f3),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            backgroundColor: Colors.transparent,
-                          ),
-                          child: const Text(
-                            'EVOLUCIÓN',
-                            style: TextStyle(
-                              color: Color(0xFF2be4f3),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildBioRow(screenHeight, screenWidth),
                 ],
               ),
             ),
-            if (_showSubTab)
-              _buildSubTabView() // Mostrar subpestaña de datos
-            else if (_showEvolutionTab)
-              _buildEvolutionSubTab() // Mostrar subpestaña de evolución
+            if (_showSubTab) _buildSubTabView(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInputRow(double screenWidth) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildTextField('ID', _indexController),
+          SizedBox(width: screenWidth * 0.02),
+          _buildTextField('NOMBRE', _nameController),
+          SizedBox(width: screenWidth * 0.02),
+          _buildDropdownField('ESTADO', selectedOption, (value) {
+            setState(() {
+              selectedOption = value;
+            });
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBioRow(double screenHeight, double screenWidth) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildBioContainer(screenHeight),
+        SizedBox(width: screenWidth * 0.02),
+        _buildEvolutionButton(),
+      ],
+    );
+  }
+
+  Widget _buildBioContainer(double screenHeight) {
+    return Expanded(
+      flex: 2,
+      child: Container(
+        height: screenHeight * 0.32,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 46, 46, 46),
+          borderRadius: BorderRadius.circular(7.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: BioimpedanciaTableWidget(
+              dataRegister: allBio,
+              onRowTap: _showPrint,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEvolutionButton() {
+    return Expanded(
+      flex: 1,
+      child: _buildOutlinedButton('EVOLUCIÓN', _showEvolution),
+    );
+  }
+
+  Widget _buildOutlinedButton(String text, VoidCallback onPressed) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.all(10.0),
+        side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(7),
+        ),
+        backgroundColor: Colors.transparent,
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Color(0xFF2be4f3),
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: const Color(0xFF313030),
+                borderRadius: BorderRadius.circular(7)),
+            child: TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              decoration: InputDecoration(
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+                filled: true,
+                fillColor: const Color(0xFF313030),
+                isDense: true,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdownField(
+      String label, String? value, Function(String?) onChanged) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: const Color(0xFF313030),
+                borderRadius: BorderRadius.circular(7)),
+            child: DropdownButton<String>(
+              hint: const Text('Seleccione',
+                  style: TextStyle(color: Colors.white, fontSize: 12)),
+              value: value,
+              items: const [
+                DropdownMenuItem(
+                    value: 'Activo',
+                    child: Text('Activo',
+                        style: TextStyle(color: Colors.white, fontSize: 12))),
+                DropdownMenuItem(
+                    value: 'Inactivo',
+                    child: Text('Inactivo',
+                        style: TextStyle(color: Colors.white, fontSize: 12))),
+              ],
+              onChanged: onChanged,
+              dropdownColor: const Color(0xFF313030),
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: Color(0xFF2be4f3), size: 30),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -314,17 +243,8 @@ class _ClientsBioState extends State<ClientsBio> {
   Widget _buildSubTabView() {
     return Center(
       child: Text(
-        'Subpestaña de Datos: ${_subTabData?['date'] ?? 'No disponible'}', // Ejemplo de datos
+        'Subpestaña de Datos: ${_subTabData?['date'] ?? 'No disponible'}',
         style: const TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
-  Widget _buildEvolutionSubTab() {
-    return Center(
-      child: const Text(
-        'Subpestaña de Evolución', // Contenido de la subpestaña de evolución
-        style: TextStyle(color: Colors.white),
       ),
     );
   }

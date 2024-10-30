@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
 import '../forms/clients_form.dart';
 
 class CreateClients extends StatefulWidget {
   final Function(Map<String, String>) onSave;
 
-  CreateClients({Key? key, required this.onSave}) : super(key: key);
+  const CreateClients({Key? key, required this.onSave}) : super(key: key);
 
   @override
   _CreateClientsState createState() => _CreateClientsState();
@@ -15,19 +14,6 @@ class _CreateClientsState extends State<CreateClients>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late PageController _pageController;
-
-  double scaleFactorTick = 1.0;
-
-  // Mapa para almacenar datos del formulario
-  Map<String, dynamic> clientData = {
-    'name': '',
-    'email': '',
-    'gender': '',
-    'dateBirth': '',
-    'height': 0,
-    'weight': 0,
-    'phone': 0,
-  };
 
   @override
   void initState() {
@@ -48,34 +34,39 @@ class _CreateClientsState extends State<CreateClients>
   }
 
   void _onDataChanged(Map<String, dynamic> data) {
-    setState(() {
-      clientData = data; // Almacena todos los datos en un mapa
-    });
+    // Convierte los valores a String
+    Map<String, String> stringData = {
+      'name': data['name']?.toString() ?? '',
+      'email': data['email']?.toString() ?? '',
+      'gender': data['gender']?.toString() ?? '',
+      'dateBirth': data['dateBirth']?.toString() ?? '',
+      'height': data['height']?.toString() ?? '',
+      'weight': data['weight']?.toString() ?? '',
+      'phone': data['phone']?.toString() ?? '',
+    };
 
-    // Imprime los datos en la consola
-    print('Nombre: ${data['name']}, Email: ${data['email']}, '
-        'Género: ${data['gender']}, Fecha de Nacimiento: ${data['dateBirth']}, '
-        'Altura: ${data['height']}, Peso: ${data['weight']}, Teléfono: ${data['phone']}');
+    // Llama al callback onSave con el mapa convertido
+    widget.onSave(stringData);
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         _buildTabBar(),
-        _buildTabBarView(),
+        SizedBox(height: screenHeight * 0.01), // Espaciado adicional
+        Expanded(
+          child: _buildTabBarView(),
+        ),
       ],
     );
   }
 
   Widget _buildTabBar() {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      height: screenHeight * 0.1,
-      width: screenWidth,
+      height: MediaQuery.of(context).size.height * 0.1,
       color: Colors.black,
       child: TabBar(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -91,7 +82,7 @@ class _CreateClientsState extends State<CreateClients>
         ),
         labelColor: const Color(0xFF2be4f3),
         labelStyle: const TextStyle(
-          fontSize: 13,
+          fontSize: 16, // Ajusta el tamaño para mejorar la legibilidad
           fontWeight: FontWeight.bold,
         ),
         unselectedLabelColor: Colors.white,
@@ -101,34 +92,27 @@ class _CreateClientsState extends State<CreateClients>
 
   Widget _buildTab(String text, int index) {
     return Tab(
-      child: SizedBox(
-        width: 200,
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            decoration: _tabController.index == index
-                ? TextDecoration.underline
-                : TextDecoration.none,
-          ),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          decoration: _tabController.index == index
+              ? TextDecoration.underline
+              : TextDecoration.none,
         ),
       ),
     );
   }
 
   Widget _buildTabBarView() {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: screenHeight * 0.5,
-      width: screenWidth,
+      height: MediaQuery.of(context).size.height * 0.5,
       child: PageView(
         controller: _pageController,
         physics:
             const NeverScrollableScrollPhysics(), // Deshabilita el deslizamiento
         children: [
-          PersonalDataForm(
-              onDataChanged: _onDataChanged), // Integrando PersonalDataForm
+          PersonalDataForm(onDataChanged: _onDataChanged),
           _buildTabContent('Contenido de Opción 2'),
           _buildTabContent('Contenido de Opción 3'),
         ],

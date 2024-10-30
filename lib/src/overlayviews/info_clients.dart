@@ -18,9 +18,6 @@ class _InfoClientsState extends State<InfoClients>
   late TabController _tabController;
   late PageController _pageController;
 
-  double scaleFactorTick = 1.0;
-  double scaleFactorRemove = 1.0;
-
   bool _showSubTab = false;
   Map<String, String>? _subTabData;
 
@@ -53,12 +50,15 @@ class _InfoClientsState extends State<InfoClients>
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         _buildTabBar(),
-        _buildTabBarView(),
+        SizedBox(height: screenHeight * 0.01), // Espaciado adicional
+        Expanded(
+          child: _buildTabBarView(),
+        ),
       ],
     );
   }
@@ -66,6 +66,7 @@ class _InfoClientsState extends State<InfoClients>
   Widget _buildTabBar() {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
       height: screenHeight * 0.1,
       width: screenWidth,
@@ -112,36 +113,26 @@ class _InfoClientsState extends State<InfoClients>
   }
 
   Widget _buildTabBarView() {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    return SizedBox(
-      height: screenHeight * 0.55,
-      width: screenWidth,
-      child: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          ClientsData(
-            clientData: widget.clientData,
-            onDataChanged: (data) {
-              print(data);
-            },
-          ),
-          ClientsActivity(
-            clientDataActivity: widget.clientData,
-          ),
-          ClientsBonos(
-            clientDataBonos: widget.clientData,
-          ),
-          _showSubTab
-              ? _buildSubTabView() // Mostrar subpestaña
-              : ClientsBio(
-                  onClientTap: onTapClient,
-                  clientDataBio: widget.clientData,
-                ),
-          _buildTabContent('Contenido de Opción 5'),
-        ],
-      ),
+    return PageView(
+      controller: _pageController,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        ClientsData(
+          clientData: widget.clientData,
+          onDataChanged: (data) {
+            print(data);
+          },
+        ),
+        ClientsActivity(clientDataActivity: widget.clientData),
+        ClientsBonos(clientDataBonos: widget.clientData),
+        _showSubTab
+            ? _buildSubTabView()
+            : ClientsBio(
+                onClientTap: onTapClient,
+                clientDataBio: widget.clientData,
+              ),
+        _buildTabContent('Contenido de Opción 5'),
+      ],
     );
   }
 

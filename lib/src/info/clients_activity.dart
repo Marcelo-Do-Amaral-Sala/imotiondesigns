@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/customs/activity_table_custom.dart';
 
 class ClientsActivity extends StatefulWidget {
-  final Map<String, dynamic> clientDataActivity; // Agregar clientData
+  final Map<String, dynamic> clientDataActivity;
 
   const ClientsActivity({
     super.key,
-    required this.clientDataActivity, // Recibir clientData
+    required this.clientDataActivity,
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _ClientsActivityState createState() => _ClientsActivityState();
 }
 
@@ -21,44 +20,45 @@ class _ClientsActivityState extends State<ClientsActivity> {
 
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
-// Lista completa de clientes
+
   List<Map<String, String>> allSesions = [
     {
       'date': '12/09/2024',
       'hour': '10:00',
       'bonos': '30',
       'points': '450',
-      'ekal': '1230',
+      'ekal': '1230'
     },
     {
       'date': '12/02/2024',
       'hour': '11:00',
       'bonos': '40',
       'points': '460',
-      'ekal': '1270',
+      'ekal': '1270'
     },
     {
       'date': '02/09/2023',
       'hour': '13:00',
       'bonos': '35',
       'points': '450',
-      'ekal': '1200',
+      'ekal': '1200'
     },
     {
       'date': '01/09/2023',
       'hour': '08:00',
       'bonos': '40',
       'points': '550',
-      'ekal': '1030',
+      'ekal': '1030'
     },
     {
       'date': '18/12/2023',
       'hour': '06:30',
       'bonos': '50',
       'points': '500',
-      'ekal': '1250',
+      'ekal': '1250'
     },
   ];
+
   @override
   void initState() {
     super.initState();
@@ -78,132 +78,40 @@ class _ClientsActivityState extends State<ClientsActivity> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return SizedBox(
       child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+        padding: EdgeInsets.symmetric(
+            vertical: 10, horizontal: screenWidth * 0.05), // Padding dinámico
         child: Column(
           children: [
-            // Primer contenedor para el primer row de inputs
+            // Contenedor para los campos de entrada
             Container(
               padding: const EdgeInsets.symmetric(vertical: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Campos de ID y NOMBRE
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('ID',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF313030),
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          child: TextField(
-                            controller: _indexController,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                              filled: true,
-                              fillColor: const Color(0xFF313030),
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  // Campos de ID, NOMBRE y ESTADO
+                  Flexible(
+                    child: _buildTextField('ID', _indexController),
                   ),
                   SizedBox(width: screenWidth * 0.02),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('NOMBRE',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF313030),
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          child: TextField(
-                            controller: _nameController,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                              filled: true,
-                              fillColor: const Color(0xFF313030),
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  Flexible(
+                    child: _buildTextField('NOMBRE', _nameController),
                   ),
                   SizedBox(width: screenWidth * 0.02),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('ESTADO',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold)),
-                        Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF313030),
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          child: DropdownButton<String>(
-                            hint: const Text('Seleccione',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 12)),
-                            value: selectedOption,
-                            items: const [
-                              DropdownMenuItem(
-                                  value: 'Activo',
-                                  child: Text('Activo',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
-                              DropdownMenuItem(
-                                  value: 'Inactivo',
-                                  child: Text('Inactivo',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12))),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                selectedOption = value;
-                              });
-                            },
-                            dropdownColor: const Color(0xFF313030),
-                            icon: const Icon(Icons.arrow_drop_down,
-                                color: Color(0xFF2be4f3), size: 30),
-                          ),
-                        ),
-                      ],
-                    ),
+                  Flexible(
+                    child:
+                        _buildDropdownField('ESTADO', selectedOption, (value) {
+                      setState(() {
+                        selectedOption = value;
+                      });
+                    }),
                   ),
                 ],
               ),
             ),
+            // Contenedor para la tabla de actividades
             Container(
               height: screenHeight * 0.35,
               width: screenWidth,
@@ -214,65 +122,84 @@ class _ClientsActivityState extends State<ClientsActivity> {
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: SingleChildScrollView(
-                  child: ActivityTableWidget(
-                    activityData: allSesions,
-                  ),
+                  child: ActivityTableWidget(activityData: allSesions),
                 ),
               ),
             ),
             const SizedBox(height: 5),
-            /*  SizedBox(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
-                    onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-                    onTap: () {
-                      print("PAPELARA PULSADA");
-                    },
-                    child: AnimatedScale(
-                      scale: scaleFactorRemove,
-                      duration: const Duration(milliseconds: 100),
-                      child: SizedBox(
-                        width: screenWidth * 0.08,
-                        height: screenHeight * 0.08,
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/papelera.png',
-                            fit: BoxFit.scaleDown,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                    onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    onTap: () {
-                      print("TICK PULSADA");
-                    },
-                    child: AnimatedScale(
-                      scale: scaleFactorTick,
-                      duration: const Duration(milliseconds: 100),
-                      child: SizedBox(
-                        width: screenWidth * 0.08,
-                        height: screenHeight * 0.08,
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/tick.png',
-                            fit: BoxFit.scaleDown,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ), */
+            // Aquí puedes reintroducir los botones de acción si lo necesitas
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold)),
+        Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: const Color(0xFF313030),
+              borderRadius: BorderRadius.circular(7)),
+          child: TextField(
+            controller: controller,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+            decoration: InputDecoration(
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+              filled: true,
+              fillColor: const Color(0xFF313030),
+              isDense: true,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdownField(
+      String label, String? value, Function(String?) onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold)),
+        Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: const Color(0xFF313030),
+              borderRadius: BorderRadius.circular(7)),
+          child: DropdownButton<String>(
+            hint: const Text('Seleccione',
+                style: TextStyle(color: Colors.white, fontSize: 12)),
+            value: value,
+            items: const [
+              DropdownMenuItem(
+                  value: 'Activo',
+                  child: Text('Activo',
+                      style: TextStyle(color: Colors.white, fontSize: 12))),
+              DropdownMenuItem(
+                  value: 'Inactivo',
+                  child: Text('Inactivo',
+                      style: TextStyle(color: Colors.white, fontSize: 12))),
+            ],
+            onChanged: onChanged,
+            dropdownColor: const Color(0xFF313030),
+            icon: const Icon(Icons.arrow_drop_down,
+                color: Color(0xFF2be4f3), size: 30),
+          ),
+        ),
+      ],
     );
   }
 }
