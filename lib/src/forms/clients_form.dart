@@ -27,6 +27,11 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
   double scaleFactorTick = 1.0;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();

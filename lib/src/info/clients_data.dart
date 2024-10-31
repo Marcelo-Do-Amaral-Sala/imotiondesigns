@@ -40,7 +40,6 @@ class _ClientsDataState extends State<ClientsData> {
     _refreshControllers(); // Load initial data from the database
   }
 
-
   @override
   void dispose() {
     _indexController.dispose();
@@ -151,6 +150,83 @@ class _ClientsDataState extends State<ClientsData> {
         _birthDate = updatedClientData['birthdate'];
       });
     }
+  }
+
+  Future<void> _deleteClients(BuildContext context, int clientId) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF494949),
+          // Color de fondo del diálogo
+          title: const Text(
+            'Confirmar Borrado',
+            style: TextStyle(
+                color: Color(0xFF2be4f3),
+                fontSize: 28,
+                fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center, // Color del texto
+          ),
+          content: const Text(
+            '¿Estás seguro de que quieres borrar este cliente?',
+            style: TextStyle(color: Colors.white, fontSize: 20),
+            textAlign: TextAlign.center, // Color del texto
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(); // Cierra el diálogo sin hacer nada
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                        color: Color(0xFF2be4f3)), // Color del borde
+                  ),
+                  child: const Text(
+                    'CANCELAR',
+                    style:
+                        TextStyle(color: Color(0xFF2be4f3)), // Color del texto
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () async {
+                    DatabaseHelper dbHelper = DatabaseHelper();
+                    await dbHelper.deleteClient(clientId); // Borrar cliente
+
+                    // Mostrar Snackbar de éxito
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Cliente borrado correctamente",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 4),
+                      ),
+                    );
+
+                    // Cierra el diálogo después de confirmar el borrado
+                    Navigator.of(context).pop();
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side:
+                        const BorderSide(color: Colors.red), // Color del borde
+                  ),
+                  child: const Text(
+                    '¡SÍ, ESTOY SEGURO!',
+                    style: TextStyle(color: Colors.red), // Color del texto
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -495,7 +571,7 @@ class _ClientsDataState extends State<ClientsData> {
                     onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
                     onTap: () {
-                      print("PAPELARA PULSADA");
+                      _deleteClients(context, clientId!);
                     },
                     child: AnimatedScale(
                       scale: scaleFactorRemove,
@@ -517,7 +593,6 @@ class _ClientsDataState extends State<ClientsData> {
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () {
                       _updateData(); // Llama a la función pasando el ID
-                      print("TICK PULSADA");
                     },
                     child: AnimatedScale(
                       scale: scaleFactorTick,
