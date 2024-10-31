@@ -85,12 +85,15 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
       'weight': _weightController.text,
       'gender': selectedGender,
       'status': selectedOption,
-      'birthDate': _birthDate,
+      'birthdate': _birthDate,
     };
 
     // Insertar en la base de datos
     DatabaseHelper dbHelper = DatabaseHelper();
     await dbHelper.insertClient(clientData);
+
+    // Imprimir los datos que se están insertando
+    print('Datos del cliente insertados: $clientData');
 
     // Mostrar Snackbar de éxito
     ScaffoldMessenger.of(context).showSnackBar(
@@ -107,6 +110,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

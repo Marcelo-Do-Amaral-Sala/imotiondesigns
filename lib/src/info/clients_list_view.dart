@@ -14,16 +14,15 @@ class ClientListView extends StatefulWidget {
 class _ClientListViewState extends State<ClientListView> {
   final TextEditingController _clientIndexController = TextEditingController();
   final TextEditingController _clientNameController = TextEditingController();
-  String? selectedOption;
+  String selectedOption = 'Todos'; // Valor predeterminado
 
-  // Lista que se muestra filtrada
-  List<Map<String, dynamic>> filteredClients = [];
+  List<Map<String, dynamic>> allClients = []; // Lista original de clientes
+  List<Map<String, dynamic>> filteredClients = []; // Lista filtrada
 
   @override
   void initState() {
     super.initState();
-    _fetchClients(); // Cargar los clientes al iniciar
-    // Agrega listener para los campos de nombre e índice
+    _fetchClients();
     _clientNameController.addListener(_filterClients);
     _clientIndexController.addListener(_filterClients);
   }
@@ -33,8 +32,10 @@ class _ClientListViewState extends State<ClientListView> {
     try {
       final clientData = await dbHelper.getClients();
       setState(() {
-        filteredClients = clientData; // Asignar a la lista filtrada
+        allClients = clientData; // Asigna a la lista original
+        filteredClients = allClients; // Inicializa la lista filtrada
       });
+      _filterClients(); // Filtra para mostrar todos los clientes
     } catch (e) {
       print('Error fetching clients: $e');
     }
@@ -45,10 +46,13 @@ class _ClientListViewState extends State<ClientListView> {
       String searchText = _clientNameController.text.toLowerCase();
       String indexText = _clientIndexController.text;
 
-      filteredClients = filteredClients.where((client) {
+      filteredClients = allClients.where((client) {
         final matchesName = client['name']!.toLowerCase().contains(searchText);
         final matchesIndex = indexText.isEmpty || client['id'].toString() == indexText;
-        final matchesStatus = selectedOption == null || client['status'] == selectedOption;
+
+        // Filtra por estado basado en la selección del dropdown
+        final matchesStatus = selectedOption == 'Todos' || client['status'] == selectedOption;
+
         return matchesName && matchesIndex && matchesStatus;
       }).toList();
     });
@@ -56,7 +60,8 @@ class _ClientListViewState extends State<ClientListView> {
 
   void _showPrint(Map<String, dynamic> clientData) {
     _updateClientFields(clientData);
-    widget.onClientTap(clientData.map((key, value) => MapEntry(key, value.toString()))); // Asegura que todos los valores sean cadenas
+    widget.onClientTap(clientData.map((key, value) => MapEntry(
+        key, value.toString()))); // Asegura que todos los valores sean cadenas
     debugPrint('Client Data: $clientData');
   }
 
@@ -64,7 +69,7 @@ class _ClientListViewState extends State<ClientListView> {
     setState(() {
       _clientIndexController.text = clientData['id'].toString();
       _clientNameController.text = clientData['name'] ?? '';
-      selectedOption = clientData['status'];
+      selectedOption = clientData['status'] ?? 'Todos'; // Cambiar a 'Todos' si es nulo
     });
   }
 
@@ -147,10 +152,12 @@ class _ClientListViewState extends State<ClientListView> {
               borderRadius: BorderRadius.circular(7),
             ),
             child: DropdownButton<String>(
-              hint: const Text('Seleccione',
-                  style: TextStyle(color: Colors.white, fontSize: 12)),
               value: selectedOption,
               items: const [
+                DropdownMenuItem(
+                    value: 'Todos',
+                    child: Text('Todos',
+                        style: TextStyle(color: Colors.white, fontSize: 12))),
                 DropdownMenuItem(
                     value: 'Activo',
                     child: Text('Activo',
@@ -162,7 +169,7 @@ class _ClientListViewState extends State<ClientListView> {
               ],
               onChanged: (value) {
                 setState(() {
-                  selectedOption = value;
+                  selectedOption = value!;
                   _filterClients(); // Filtrar después de seleccionar
                 });
               },

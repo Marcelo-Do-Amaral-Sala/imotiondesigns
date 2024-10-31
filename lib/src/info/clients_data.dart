@@ -40,7 +40,7 @@ class _ClientsDataState extends State<ClientsData> {
     _weightController.text = widget.clientData['weight']?.toString() ?? '';
     selectedOption = widget.clientData['status'];
     selectedGender = widget.clientData['gender'];
-    _birthDate = widget.clientData['birthDate'];
+    _birthDate = widget.clientData['birthdate'];
   }
 
   @override
@@ -66,36 +66,6 @@ class _ClientsDataState extends State<ClientsData> {
         _birthDate = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
-  }
-
-  void _collectData() {
-    final clientData = {
-      'name': _nameController.text,
-      'email': _emailController.text,
-      'phone': _phoneController.text,
-      'height': _heightController.text,
-      'weight': _weightController.text,
-      'gender': selectedGender,
-      'status': selectedOption,
-      'birthDate': _birthDate,
-    };
-
-    widget.onDataChanged(clientData);
-    String dataString = 'Nombre: ${clientData['name']}\n'
-        'Email: ${clientData['email']}\n'
-        'Teléfono: ${clientData['phone']}\n'
-        'Altura: ${clientData['height']} cm\n'
-        'Peso: ${clientData['weight']} kg\n'
-        'Género: ${clientData['gender']}\n'
-        'Fecha de Nacimiento: ${clientData['birthDate']}\n'
-        'Estado: ${clientData['status']}';
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(dataString),
-        duration: const Duration(seconds: 14),
-      ),
-    );
   }
 
   @override
