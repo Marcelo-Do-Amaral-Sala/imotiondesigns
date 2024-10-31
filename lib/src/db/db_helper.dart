@@ -27,7 +27,7 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute(''' 
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -83,13 +83,44 @@ class DatabaseHelper {
 
   Future<void> updateClient(int id, Map<String, dynamic> client) async {
     final db = await database;
-    await db.update(
+
+    // Verifica que el cliente existe
+    final existingClient = await db.query(
       'clientes',
-      client,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (existingClient.isNotEmpty) {
+      try {
+        await db.update(
+          'clientes',
+          client,
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      } catch (e) {
+        print('Error updating client: $e');
+      }
+    } else {
+      print('Client with id $id not found');
+    }
   }
+
+  Future<Map<String, dynamic>?> getClientById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'clientes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null; // Return null if no client found
+  }
+
 
   Future<void> deleteClient(int id) async {
     final db = await database;

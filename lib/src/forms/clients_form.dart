@@ -111,7 +111,6 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -473,6 +472,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () {
                       _collectData();
+
                       print("TICK PULSADA");
                     },
                     child: AnimatedScale(

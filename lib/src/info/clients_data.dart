@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../db/db_helper.dart';
+
 class ClientsData extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
   final Map<String, dynamic> clientData;
@@ -28,20 +30,16 @@ class _ClientsDataState extends State<ClientsData> {
   String? _birthDate;
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
+  int? clientId; // Declare a variable to store the client ID
 
   @override
   void initState() {
     super.initState();
-    _indexController.text = widget.clientData['id'] ?? '';
-    _nameController.text = widget.clientData['name'] ?? '';
-    _emailController.text = widget.clientData['email'] ?? '';
-    _phoneController.text = widget.clientData['phone'] ?? '';
-    _heightController.text = widget.clientData['height']?.toString() ?? '';
-    _weightController.text = widget.clientData['weight']?.toString() ?? '';
-    selectedOption = widget.clientData['status'];
-    selectedGender = widget.clientData['gender'];
-    _birthDate = widget.clientData['birthdate'];
+    clientId = int.tryParse(widget.clientData['id'].toString());
+    _indexController.text = clientId.toString(); // Set controller text
+    _refreshControllers(); // Load initial data from the database
   }
+
 
   @override
   void dispose() {
@@ -64,6 +62,93 @@ class _ClientsDataState extends State<ClientsData> {
     if (picked != null) {
       setState(() {
         _birthDate = DateFormat('dd/MM/yyyy').format(picked);
+      });
+    }
+  }
+
+  void _updateData() async {
+    // Ensure all required fields are filled
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _heightController.text.isEmpty ||
+        _weightController.text.isEmpty ||
+        selectedGender == null ||
+        selectedOption == null ||
+        _birthDate == null ||
+        clientId == null) {
+      // Show error Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Por favor, complete todos los campos.",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return; // Exit method if there are empty fields
+    }
+
+    final clientData = {
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'phone': int.tryParse(_phoneController.text),
+      'height': int.tryParse(_heightController.text), // Convert to int
+      'weight': int.tryParse(_weightController.text), // Convert to int
+      'gender': selectedGender,
+      'status': selectedOption,
+      'birthdate': _birthDate,
+    };
+
+    // Update in the database
+    DatabaseHelper dbHelper = DatabaseHelper();
+    await dbHelper.updateClient(
+        clientId!, clientData); // Pass the ID and client data
+
+    // Print updated data
+    print('Datos del cliente actualizados: $clientData');
+
+    // Refresh the text controllers with the updated data
+    await _refreshControllers();
+
+    // Show success Snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Cliente actualizado correctamente",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Color(0xFF2be4f3),
+        duration: Duration(seconds: 4),
+      ),
+    );
+  }
+
+  Future<void> _refreshControllers() async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+
+    // Fetch the updated client data from the database
+    Map<String, dynamic>? updatedClientData = await dbHelper
+        .getClientById(clientId!); // Create this method in your DatabaseHelper
+
+    if (updatedClientData != null) {
+      setState(() {
+        _nameController.text = updatedClientData['name'] ?? '';
+        _emailController.text = updatedClientData['email'] ?? '';
+        _phoneController.text = updatedClientData['phone'].toString() ?? '';
+        _heightController.text = updatedClientData['height']?.toString() ?? '';
+        _weightController.text = updatedClientData['weight']?.toString() ?? '';
+        selectedGender = updatedClientData['gender'];
+        selectedOption = updatedClientData['status'];
+        _birthDate = updatedClientData['birthdate'];
       });
     }
   }
@@ -115,6 +200,7 @@ class _ClientsDataState extends State<ClientsData> {
                                     filled: true,
                                     fillColor: const Color(0xFF313030),
                                     isDense: true,
+                                    enabled: false,
                                   ),
                                 ),
                               ),
@@ -430,6 +516,7 @@ class _ClientsDataState extends State<ClientsData> {
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () {
+                      _updateData(); // Llama a la función pasando el ID
                       print("TICK PULSADA");
                     },
                     child: AnimatedScale(
