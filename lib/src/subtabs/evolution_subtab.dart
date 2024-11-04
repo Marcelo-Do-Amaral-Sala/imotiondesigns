@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class EvolutionSubTab extends StatefulWidget {
@@ -5,10 +6,10 @@ class EvolutionSubTab extends StatefulWidget {
   final Map<String, dynamic>? selectedClientData;
 
   const EvolutionSubTab({
-    Key? key,
+    super.key,
     required this.onClientTap,
     this.selectedClientData,
-  }) : super(key: key);
+  });
 
   @override
   _EvolutionSubTabState createState() => _EvolutionSubTabState();
@@ -17,6 +18,8 @@ class EvolutionSubTab extends StatefulWidget {
 class _EvolutionSubTabState extends State<EvolutionSubTab>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _showBioSubTab = false;
+  bool _showEvolutionSubTab = false;
 
   @override
   void initState() {
@@ -32,20 +35,60 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      child: Row(
-        children: [
-          _buildTabBar(),
-          Expanded(child: _buildTabBarView()),
-        ],
-      ),
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (widget.selectedClientData != null) {
+                  // Convertir Map<String, dynamic> a Map<String, String>
+                  Map<String, String> clientData = widget.selectedClientData!
+                      .map((key, value) => MapEntry(key, value.toString()));
+                  widget.onClientTap(clientData);
+                  setState(() {
+                    _showBioSubTab = true;
+                    _showEvolutionSubTab = false;
+                  });
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 5.0),
+                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                height: screenHeight * 0.05,
+                width: screenWidth * 0.05,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/back.png'),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          // Aquí se añade el Expanded
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            child: Row(
+              children: [
+                _buildTabBar(),
+                Expanded(child: _buildTabBarView()),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildTabBar() {
     return Container(
-      width: 250, // Ajustar según lo necesario
+      width: 220,
       color: Colors.black,
       child: Column(
         children: [
@@ -76,15 +119,15 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
         });
       },
       child: Padding(
-        padding: const EdgeInsets.only(left: 20.0, top: 10.0, bottom: 10.0),
+        padding: const EdgeInsets.only(left: 20.0, top: 2.0, bottom: 2.0),
         child: Container(
           height: 50,
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          // Padding vertical para uniformidad
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFF494949) : Colors.transparent,
-            borderRadius: BorderRadius.horizontal(left: Radius.circular(7.0)),
+            borderRadius:
+                const BorderRadius.horizontal(left: Radius.circular(7.0)),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -107,19 +150,220 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
     return IndexedStack(
       index: _tabController.index,
       children: [
-        _buildTabContent('Contenido de HIDRATACIÓN SIN GRASA'),
-        _buildTabContent('Contenido de EQUILIBRIO HÍDRICO'),
-        _buildTabContent('Contenido de ÍNDICE DE MASA CORPORAL (IMC)'),
-        _buildTabContent('Contenido de MASA GRASA'),
-        _buildTabContent('Contenido de MÚSCULO'),
-        _buildTabContent('Contenido de SALUD ÓSEA'),
+        _buildTabContent('Contenido de HIDRATACIÓN SIN GRASA',
+            _generateSampleDataHidratacion()),
+        _buildTabContent(
+            'Contenido de EQUILIBRIO HÍDRICO', _generateSampleDataEquilibrio()),
+        _buildTabContent('Contenido de IMC', _generateSampleDataIMC()),
+        _buildTabContent(
+            'Contenido de MASA GRASA', _generateSampleDataMasaGrasa()),
+        _buildTabContent('Contenido de MÚSCULO', _generateSampleDataMusculo()),
+        _buildTabContent(
+            'Contenido de SALUD ÓSEA', _generateSampleDataSaludOsea()),
       ],
     );
   }
 
-  Widget _buildTabContent(String content) {
-    return Center(
-      child: Container(color: Colors.yellow, padding: const EdgeInsets.all(20.0)),
+  Widget _buildTabContent(String content, List<FlSpot> spots) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      child: SizedBox(
+        height: screenHeight,
+        width: screenWidth,
+        child: LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: true),
+            titlesData: FlTitlesData(
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 38,
+                  getTitlesWidget: (value, meta) {
+                    switch (value.toInt()) {
+                      case 0:
+                        return const Text('Ene');
+                      case 1:
+                        return const Text('Feb');
+                      case 2:
+                        return const Text('Mar');
+                      case 3:
+                        return const Text('Abr');
+                      case 4:
+                        return const Text('May');
+                      case 5:
+                        return const Text('Jun');
+                    }
+                    return const Text('');
+                  },
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 40,
+                  getTitlesWidget: (value, meta) {
+                    switch (value.toInt()) {
+                      case 0:
+                        return const Text('Excelente',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ));
+                      case 20:
+                        return const Text('Muy bien',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ));
+                      case 40:
+                        return const Text('Normal',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ));
+                      case 60:
+                        return const Text('Cerca de la norma',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ));
+                      case 80:
+                        return const Text('A vigilar',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ));
+                      case 100:
+                        return const Text('A tratar',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ));
+                    }
+                    return const Text('');
+                  },
+                ),
+              ),
+              topTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: Colors.white, width: 1),
+            ),
+            minX: 0,
+            maxX: 5,
+            minY: 0,
+            maxY: 100,
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: const Color(0xFF2be4f3),
+                belowBarData: BarAreaData(
+                  show: true,
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF2be4f3),
+                      Colors.transparent,
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                aboveBarData: BarAreaData(show: false),
+              ),
+              LineChartBarData(
+                spots: [
+                  FlSpot(0, 50),
+                  FlSpot(5, 50), // Dibuja una línea horizontal a 50
+                ],
+                isCurved: false,
+                color: Colors.white,
+                dotData: FlDotData(show: false),
+                belowBarData: BarAreaData(show: false),
+                aboveBarData: BarAreaData(show: false),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
+  }
+
+  List<FlSpot> _generateSampleDataHidratacion() {
+    return [
+      FlSpot(0, 10),
+      FlSpot(1, 30),
+      FlSpot(2, 60),
+      FlSpot(3, 90),
+      FlSpot(4, 40),
+      FlSpot(5, 80),
+    ];
+  }
+
+  List<FlSpot> _generateSampleDataEquilibrio() {
+    return [
+      FlSpot(0, 20),
+      FlSpot(1, 40),
+      FlSpot(2, 80),
+      FlSpot(3, 60),
+      FlSpot(4, 30),
+      FlSpot(5, 70),
+    ];
+  }
+
+  List<FlSpot> _generateSampleDataIMC() {
+    return [
+      FlSpot(0, 30),
+      FlSpot(1, 50),
+      FlSpot(2, 90),
+      FlSpot(3, 30),
+      FlSpot(4, 20),
+      FlSpot(5, 40),
+    ];
+  }
+
+  List<FlSpot> _generateSampleDataMasaGrasa() {
+    return [
+      FlSpot(0, 40),
+      FlSpot(1, 60),
+      FlSpot(2, 20),
+      FlSpot(3, 80),
+      FlSpot(4, 50),
+      FlSpot(5, 10),
+    ];
+  }
+
+  List<FlSpot> _generateSampleDataMusculo() {
+    return [
+      FlSpot(0, 50),
+      FlSpot(1, 20),
+      FlSpot(2, 40),
+      FlSpot(3, 70),
+      FlSpot(4, 90),
+      FlSpot(5, 60),
+    ];
+  }
+
+  List<FlSpot> _generateSampleDataSaludOsea() {
+    return [
+      FlSpot(0, 60),
+      FlSpot(1, 30),
+      FlSpot(2, 70),
+      FlSpot(3, 20),
+      FlSpot(4, 10),
+      FlSpot(5, 50),
+    ];
   }
 }

@@ -10,6 +10,7 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+
   String currentView = 'mainMenu';
 
   void navigateTo(String view) {

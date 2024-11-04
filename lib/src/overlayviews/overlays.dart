@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/info/clients_groups.dart';
 import 'package:imotion_designs/src/subtabs/clients_bio_sessions.dart';
 
 import '../forms/clients_form.dart';
@@ -158,7 +159,13 @@ class _OverlayInfoState extends State<OverlayInfo>
                       });
                     },
                   ),
-        _buildTabContent('Contenido de Opción 5'),
+        ClientsGroups(
+          clientData: selectedClientData!,
+          onDataChanged: (data) {
+            print(data);
+          },
+          onClose: widget.onClose,
+        ),
       ],
     );
   }
