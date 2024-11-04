@@ -7,11 +7,13 @@ import '../db/db_helper.dart';
 class ClientsData extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
   final Map<String, dynamic> clientData;
+  final VoidCallback onClose;
 
   const ClientsData({
     Key? key,
     required this.onDataChanged,
     required this.clientData,
+    required this.onClose,
   }) : super(key: key);
 
   @override
@@ -208,9 +210,9 @@ class _ClientsDataState extends State<ClientsData> {
                         duration: Duration(seconds: 4),
                       ),
                     );
-
                     // Cierra el diálogo después de confirmar el borrado
                     Navigator.of(context).pop();
+                    widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
                     side:

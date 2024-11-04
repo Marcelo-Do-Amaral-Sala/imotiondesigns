@@ -1,0 +1,304 @@
+import 'package:flutter/material.dart';
+import '../forms/clients_form.dart';
+import '../info/clients_activity.dart';
+import '../info/clients_bio.dart';
+import '../info/clients_bonos.dart';
+import '../info/clients_data.dart';
+import '../info/clients_list_view.dart';
+import '../subtabs/evolution_subtab.dart';
+import 'main_overlay.dart';
+
+class OverlayInfo extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayInfo({Key? key, required this.onClose}) : super(key: key);
+
+  @override
+  _OverlayInfoState createState() => _OverlayInfoState();
+}
+
+class _OverlayInfoState extends State<OverlayInfo>
+    with SingleTickerProviderStateMixin {
+  Map<String, dynamic>? selectedClientData;
+  bool isInfoVisible = false;
+  late TabController _tabController;
+  bool _showBioSubTab = false;
+  bool _showEvolutionSubTab = false;
+  Map<String, String>? _subTabData;
+
+  void selectClient(Map<String, dynamic> clientData) {
+    setState(() {
+      selectedClientData = clientData;
+      isInfoVisible = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainOverlay(
+      title: const Text(
+        "LISTADO DE CLIENTES",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: isInfoVisible && selectedClientData != null
+          ? Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTabBar(),
+          Expanded(child: _buildTabBarView()),
+        ],
+      )
+          : ClientListView(
+        onClientTap: (clientData) {
+          selectClient(clientData);
+        },
+      ),
+      onClose: widget.onClose,
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      height: 60, // Ajusta la altura según lo necesites
+      color: Colors.black,
+      child: TabBar(
+        controller: _tabController,
+        onTap: (index) {
+          setState(() {
+            _showBioSubTab = false;
+            _showEvolutionSubTab = false;
+          });
+        },
+        tabs: [
+          _buildTab('DATOS PERSONALES', 0),
+          _buildTab('ACTIVIDAD', 1),
+          _buildTab('BONOS', 2),
+          _buildTab('BIOIMPEDANCIA', 3),
+          _buildTab('GRUPOS ACTIVOS', 4),
+        ],
+        indicator: const BoxDecoration(
+          color: Color(0xFF494949),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
+        ),
+        labelColor: const Color(0xFF2be4f3),
+        labelStyle: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelColor: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildTab(String text, int index) {
+    return Tab(
+      child: SizedBox(
+        width: 200,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            decoration: _tabController.index == index
+                ? TextDecoration.underline
+                : TextDecoration.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabBarView() {
+    return IndexedStack(
+      index: _tabController.index,
+      children: [
+        ClientsData(
+          clientData: selectedClientData!,
+          onDataChanged: (data) {
+            print(data);
+          },
+          onClose: widget.onClose,
+        ),
+        ClientsActivity(clientDataActivity: selectedClientData!),
+        ClientsBonos(clientDataBonos: selectedClientData!),
+        _showBioSubTab
+            ? _buildBioSubTabView()
+            : _showEvolutionSubTab
+            ? _buildEvolutionSubTabView()
+            : ClientsBio(
+          onClientTap: (clientData) {
+            setState(() {
+              _showBioSubTab = true;
+              _subTabData = clientData;
+            });
+          },
+          clientDataBio: selectedClientData!,
+          onEvolutionPressed: () {
+            setState(() {
+              _showEvolutionSubTab = true;
+              _showBioSubTab = false;
+            });
+          },
+        ),
+        _buildTabContent('Contenido de Opción 5'),
+      ],
+    );
+  }
+
+  Widget _buildTabContent(String content) {
+    return Center(
+      child: Text(content, style: const TextStyle(color: Colors.white)),
+    );
+  }
+
+  Widget _buildBioSubTabView() {
+    return Center(
+      child: Text(
+        'Subpestaña Bioimpedancia: ${_subTabData?['nombre'] ?? 'No disponible'}',
+        style: const TextStyle(color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildEvolutionSubTabView() {
+    return EvolutionSubTab();
+  }
+}
+
+class OverlayCrear extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayCrear({Key? key, required this.onClose}) : super(key: key);
+
+  @override
+  _OverlayCrearState createState() => _OverlayCrearState();
+}
+
+class _OverlayCrearState extends State<OverlayCrear>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  // Declara el GlobalKey con el tipo correcto
+  final GlobalKey<PersonalDataFormState> _personalDataFormKey =
+  GlobalKey<PersonalDataFormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return MainOverlay(
+      title: const Text(
+        "CREAR CLIENTE",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTabBar(),
+          SizedBox(height: screenHeight * 0.01),
+          Expanded(
+            child: _buildTabBarView(),
+          ),
+        ],
+      ),
+      onClose: widget.onClose,
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      height: 60,
+      color: Colors.black,
+      child: TabBar(
+        controller: _tabController,
+        onTap: (index) {
+          setState(() {}); // Actualiza el estado para que se refleje el cambio
+        },
+        tabs: [
+          _buildTab('DATOS PERSONALES', 0),
+          _buildTab('BONOS', 1),
+          _buildTab('GRUPOS ACTIVOS', 2),
+        ],
+        indicator: const BoxDecoration(
+          color: Color(0xFF494949),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
+        ),
+        labelColor: const Color(0xFF2be4f3),
+        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        unselectedLabelColor: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildTab(String text, int index) {
+    return Tab(
+      child: SizedBox(
+        width: 200,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            decoration: _tabController.index == index
+                ? TextDecoration.underline
+                : TextDecoration.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabBarView() {
+    return IndexedStack(
+      index: _tabController.index,
+      children: [
+        PersonalDataForm(
+          key: _personalDataFormKey, // Asigna la clave global aquí
+          onDataChanged: (data) {
+            print(data); // Manejar datos cambiados
+          },
+        ),
+        _buildTabContent('Contenido de Opción 2'),
+        _buildTabContent('Contenido de Opción 3'),
+      ],
+    );
+  }
+
+  Widget _buildTabContent(String content) {
+    return Center(
+      child: Text(content, style: const TextStyle(color: Colors.white)),
+    );
+  }
+}

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/customs/clients_table_custom.dart';
-import '../db/db_helper.dart'; // Asegúrate de importar tu DatabaseHelper
+import '../db/db_helper.dart';
 
 class ClientListView extends StatefulWidget {
-  final Function(Map<String, String>) onClientTap;
+  final Function(Map<String, dynamic>) onClientTap; // Cambia el tipo a dynamic para incluir int
 
   const ClientListView({Key? key, required this.onClientTap}) : super(key: key);
 
@@ -60,10 +60,11 @@ class _ClientListViewState extends State<ClientListView> {
 
   void _showPrint(Map<String, dynamic> clientData) {
     _updateClientFields(clientData);
-    widget.onClientTap(clientData.map((key, value) => MapEntry(
-        key, value.toString()))); // Asegura que todos los valores sean cadenas
-    debugPrint('Client Data: $clientData');
+    // Asegúrate de que los datos se pasen correctamente como Map<String, String>
+    widget.onClientTap(clientData.map((key, value) => MapEntry(key, value.toString())));
+    debugPrint('Client Data: ${clientData.toString()}'); // Imprime todos los datos del cliente
   }
+
 
   void _updateClientFields(Map<String, dynamic> clientData) {
     setState(() {
@@ -195,7 +196,9 @@ class _ClientListViewState extends State<ClientListView> {
         padding: const EdgeInsets.all(20.0),
         child: DataTableWidget(
           data: filteredClients,
-          onRowTap: _showPrint,
+          onRowTap: (clientData) {
+            _showPrint(clientData); // Asegúrate de que se pase el cliente correcto
+          },
         ),
       ),
     );

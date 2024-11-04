@@ -74,7 +74,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
 }
 
 class DataRowWidget extends StatefulWidget {
-  final int id; // Cambiar a int
+  final int? id; // Cambiar a int
   final String name;
   final int phone; // Cambiar a int
   final String status;

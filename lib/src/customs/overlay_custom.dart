@@ -115,7 +115,7 @@ class _OverlayContentState extends State<OverlayContent> {
       case 'listado':
         return ClientListView(onClientTap: (clientData) {
           setState(() {
-            widget.clientData = clientData;
+            //widget.clientData = clientData;
             widget.contentType = 'info';
           });
         });

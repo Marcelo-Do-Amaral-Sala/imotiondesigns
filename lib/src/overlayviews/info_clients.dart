@@ -129,12 +129,12 @@ class _InfoClientsState extends State<InfoClients>
       controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),
       children: [
-        ClientsData(
+        /*ClientsData(
           clientData: widget.clientData,
           onDataChanged: (data) {
             print(data);
           },
-        ),
+        ),*/
         ClientsActivity(clientDataActivity: widget.clientData),
         ClientsBonos(clientDataBonos: widget.clientData),
         // Muestra la subpestaña de bioimpedancia o evolución según sea necesario

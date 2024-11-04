@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-
 import '../db/db_helper.dart';
 
 class PersonalDataForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
 
-  const PersonalDataForm({Key? key, required this.onDataChanged})
-      : super(key: key);
+  const PersonalDataForm({super.key, required this.onDataChanged});
 
   @override
-  _PersonalDataFormState createState() => _PersonalDataFormState();
+  PersonalDataFormState createState() => PersonalDataFormState();
 }
 
-class _PersonalDataFormState extends State<PersonalDataForm> {
+class PersonalDataFormState extends State<PersonalDataForm> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -24,6 +22,7 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
   String? selectedOption;
   String? selectedGender;
   String? _birthDate;
+
   double scaleFactorTick = 1.0;
 
   @override
@@ -33,11 +32,12 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _heightController.dispose();
-    _weightController.dispose();
+    // Mantén los controladores abiertos para preservar su estado
+    // _nameController.dispose();
+    // _emailController.dispose();
+    // _phoneController.dispose();
+    // _heightController.dispose();
+    // _weightController.dispose();
     super.dispose();
   }
 
@@ -56,7 +56,6 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
   }
 
   void _collectData() async {
-    // Verificar que todos los campos estén rellenos
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _phoneController.text.isEmpty ||
@@ -65,21 +64,17 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
         selectedGender == null ||
         selectedOption == null ||
         _birthDate == null) {
-      // Mostrar Snackbar de error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             "Por favor, complete todos los campos.",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 20),
           ),
-          backgroundColor: Colors.red, // Cambia el color del fondo del snackbar
+          backgroundColor: Colors.red,
           duration: Duration(seconds: 4),
         ),
       );
-      return; // Salir del método si hay campos vacíos
+      return;
     }
 
     final clientData = {
@@ -93,27 +88,24 @@ class _PersonalDataFormState extends State<PersonalDataForm> {
       'birthdate': _birthDate,
     };
 
-    // Insertar en la base de datos
     DatabaseHelper dbHelper = DatabaseHelper();
     await dbHelper.insertClient(clientData);
 
-    // Imprimir los datos que se están insertando
     print('Datos del cliente insertados: $clientData');
 
-    // Mostrar Snackbar de éxito
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
           "Cliente añadido correctamente",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         backgroundColor: Color(0xFF2be4f3),
         duration: Duration(seconds: 4),
       ),
     );
+
+    // Llama a la función onDataChanged para informar de los datos
+    widget.onDataChanged(clientData);
   }
 
   @override

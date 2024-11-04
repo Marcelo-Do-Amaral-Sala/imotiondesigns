@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../customs/overlay_custom.dart';
-import '../db/db_helper.dart';
+
+import '../overlayviews/overlays.dart';
 
 class ClientsView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
@@ -16,8 +16,14 @@ class _ClientsViewState extends State<ClientsView> {
   double scaleFactorCrear = 1.0;
 
   bool isOverlayVisible = false;
-  String overlayContentType = '';
-  Map<String, String>? clientData;
+  int overlayIndex = -1; // -1 indica que no hay overlay visible
+
+  void toggleOverlay(int index) {
+    setState(() {
+      isOverlayVisible = !isOverlayVisible;
+      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,25 +75,19 @@ class _ClientsViewState extends State<ClientsView> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          // Contenedor para el ícono
                                           Container(
                                             padding: const EdgeInsets.all(10.0),
                                             width: screenWidth * 0.05,
-                                            // Ajusta el tamaño del ícono aquí
                                             height: screenHeight * 0.1,
-                                            // Ajusta la altura del ícono aquí
                                             child: Image.asset(
                                               'assets/images/cliente.png',
-                                              fit: BoxFit
-                                                  .contain, // Ajuste para llenar el contenedor
+                                              fit: BoxFit.contain,
                                             ),
                                           ),
-
-                                          // Contenedor para el texto
                                           const Expanded(
                                             child: Text(
                                               "CLIENTES",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Color(0xFF28E2F5),
                                                 fontSize: 30,
                                                 fontWeight: FontWeight.w600,
@@ -106,13 +106,8 @@ class _ClientsViewState extends State<ClientsView> {
                                 context,
                                 'Listado de clientes',
                                 scaleFactorListado,
-                                () {
-                                  setState(() {
-                                    scaleFactorListado = 1.0;
-                                    isOverlayVisible = true;
-                                    overlayContentType = 'listado';
-                                  });
-                                },
+                                () => toggleOverlay(0),
+                                // Index 0 para OverlayInfo
                                 () {
                                   setState(() => scaleFactorListado = 0.95);
                                 },
@@ -122,13 +117,8 @@ class _ClientsViewState extends State<ClientsView> {
                                 context,
                                 'Crear clientes',
                                 scaleFactorCrear,
-                                () {
-                                  setState(() {
-                                    scaleFactorCrear = 1.0;
-                                    isOverlayVisible = true;
-                                    overlayContentType = 'crear';
-                                  });
-                                },
+                                () => toggleOverlay(1),
+                                // Index 1 para OverlayCrear
                                 () {
                                   setState(() => scaleFactorCrear = 0.95);
                                 },
@@ -144,7 +134,7 @@ class _ClientsViewState extends State<ClientsView> {
                           children: [
                             Center(
                               child: AspectRatio(
-                                aspectRatio: 1, // Mantiene la proporción
+                                aspectRatio: 1,
                                 child: Image.asset(
                                   'assets/images/logo.png',
                                   fit: BoxFit.contain,
@@ -181,18 +171,15 @@ class _ClientsViewState extends State<ClientsView> {
                             ),
                             if (isOverlayVisible)
                               Positioned.fill(
-                                top: screenHeight * 0.12,
-                                child: OverlayContent(
-                                  contentType: overlayContentType,
-                                  onClose: () {
-                                    setState(() {
-                                      isOverlayVisible = false;
-                                      clientData = null;
-                                    });
-                                  },
-                                  clientData: clientData,
-                                ),
-                              ),
+                                top: screenHeight*0.12,
+                                child: overlayIndex == 0
+                                    ? OverlayInfo(
+                                        onClose: () => toggleOverlay(0),
+                                      )
+                                    : OverlayCrear(
+                                        onClose: () => toggleOverlay(1),
+                                      ),
+                              )
                           ],
                         ),
                       ),
