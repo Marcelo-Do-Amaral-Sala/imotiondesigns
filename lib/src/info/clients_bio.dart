@@ -47,10 +47,6 @@ class _ClientsBioState extends State<ClientsBio> {
     widget.onClientTap(clientData);
   }
 
-  void _showEvolution() {
-    print("BOTON PULSADO");
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;

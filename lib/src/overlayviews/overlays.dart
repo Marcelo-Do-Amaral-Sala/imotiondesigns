@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/subtabs/clients_bio_sessions.dart';
+
 import '../forms/clients_form.dart';
 import '../info/clients_activity.dart';
 import '../info/clients_bio.dart';
@@ -59,17 +61,17 @@ class _OverlayInfoState extends State<OverlayInfo>
       ),
       content: isInfoVisible && selectedClientData != null
           ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTabBar(),
-          Expanded(child: _buildTabBarView()),
-        ],
-      )
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTabBar(),
+                Expanded(child: _buildTabBarView()),
+              ],
+            )
           : ClientListView(
-        onClientTap: (clientData) {
-          selectClient(clientData);
-        },
-      ),
+              onClientTap: (clientData) {
+                selectClient(clientData);
+              },
+            ),
       onClose: widget.onClose,
     );
   }
@@ -140,22 +142,22 @@ class _OverlayInfoState extends State<OverlayInfo>
         _showBioSubTab
             ? _buildBioSubTabView()
             : _showEvolutionSubTab
-            ? _buildEvolutionSubTabView()
-            : ClientsBio(
-          onClientTap: (clientData) {
-            setState(() {
-              _showBioSubTab = true;
-              _subTabData = clientData;
-            });
-          },
-          clientDataBio: selectedClientData!,
-          onEvolutionPressed: () {
-            setState(() {
-              _showEvolutionSubTab = true;
-              _showBioSubTab = false;
-            });
-          },
-        ),
+                ? _buildEvolutionSubTabView()
+                : ClientsBio(
+                    onClientTap: (clientData) {
+                      setState(() {
+                        _showBioSubTab = true;
+                        _subTabData = clientData;
+                      });
+                    },
+                    clientDataBio: selectedClientData!,
+                    onEvolutionPressed: () {
+                      setState(() {
+                        _showEvolutionSubTab = true;
+                        _showBioSubTab = false;
+                      });
+                    },
+                  ),
         _buildTabContent('Contenido de Opción 5'),
       ],
     );
@@ -168,16 +170,68 @@ class _OverlayInfoState extends State<OverlayInfo>
   }
 
   Widget _buildBioSubTabView() {
-    return Center(
-      child: Text(
-        'Subpestaña Bioimpedancia: ${_subTabData?['nombre'] ?? 'No disponible'}',
-        style: const TextStyle(color: Colors.white),
-      ),
+    final List<Map<String, String>> bioimpedanceData = [
+      {
+        'feature': 'HIDRATACIÓN SIN GRASA',
+        'value': '54645',
+        'ref': '65456',
+        'result': '3432',
+      },
+      {
+        'feature': 'EQUILIBRIO HÍDRICO',
+        'value': '54645',
+        'ref': '65456',
+        'result': '3432',
+      },
+      {
+        'feature': 'IMC',
+        'value': '54645',
+        'ref': '65456',
+        'result': '3432',
+      },
+      {
+        'feature': 'MASA GRASA',
+        'value': '54645',
+        'ref': '65456',
+        'result': '3432',
+      },
+      {
+        'feature': 'MÚSCULO',
+        'value': '54645',
+        'ref': '65456',
+        'result': '3432',
+      },
+      {
+        'feature': 'ESQUELETO',
+        'value': '54645',
+        'ref': '65456',
+        'result': '3432',
+      },
+      // Agrega más datos según sea necesario
+    ];
+
+    return BioSessionSubTab(
+      bioimpedanceData: bioimpedanceData,
+      onClientTap: (clientData) {
+        setState(() {
+          _showBioSubTab = false;
+          _subTabData = clientData;
+        });
+      },
+      selectedClientData: selectedClientData!,
     );
   }
 
   Widget _buildEvolutionSubTabView() {
-    return EvolutionSubTab();
+    return EvolutionSubTab(
+      onClientTap: (clientData) {
+        setState(() {
+          _showEvolutionSubTab = false;
+          _subTabData = clientData;
+        });
+      },
+      selectedClientData: selectedClientData!,
+    );
   }
 }
 
@@ -196,7 +250,7 @@ class _OverlayCrearState extends State<OverlayCrear>
 
   // Declara el GlobalKey con el tipo correcto
   final GlobalKey<PersonalDataFormState> _personalDataFormKey =
-  GlobalKey<PersonalDataFormState>();
+      GlobalKey<PersonalDataFormState>();
 
   @override
   void initState() {
