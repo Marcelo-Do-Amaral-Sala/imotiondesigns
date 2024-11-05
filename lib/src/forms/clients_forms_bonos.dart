@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../customs/bonos_table_custom.dart';
+import '../db/db_helper.dart';
 
 class ClientsFormBonos extends StatefulWidget {
+  final Map<String, dynamic> clientDataBonos;
 
-
-  const ClientsFormBonos({super.key});
+  const ClientsFormBonos({super.key, required this.clientDataBonos});
 
   @override
   _ClientsFormBonosState createState() => _ClientsFormBonosState();
@@ -14,7 +16,8 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
   final _indexController = TextEditingController();
   final _nameController = TextEditingController();
   String? selectedOption;
-  int? clientId; // Declare a variable to store the client ID
+   Map<String, dynamic>? selectedClient;
+
 
   List<Map<String, String>> availableBonos = [
     {'date': '12/12/2024', 'quantity': '5'},
@@ -43,9 +46,24 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
   @override
   void initState() {
     super.initState();
-    clientId.toString();
-    _indexController.text = clientId.toString(); // Set controller text
+    _loadMostRecentClient();
   }
+
+  // Cargar el cliente más reciente desde la base de datos
+  Future<void> _loadMostRecentClient() async {
+    final dbHelper = DatabaseHelper();
+    final client = await dbHelper.getMostRecentClient();
+
+    if (client != null) {
+      setState(() {
+        selectedClient = client;
+        _indexController.text = client['id'].toString();
+        _nameController.text = client['name'] ?? '';
+        selectedOption = client['status'];
+      });
+    }
+  }
+
 
   @override
   void dispose() {
@@ -239,7 +257,8 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, bool enabled) {
+  Widget _buildTextField(
+      String label, TextEditingController controller, bool enabled) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +278,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
               style: const TextStyle(color: Colors.white, fontSize: 12),
               decoration: InputDecoration(
                 border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
                 filled: true,
                 fillColor: const Color(0xFF313030),
                 isDense: true,
@@ -304,7 +323,8 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
                       child: Text('Inactivo',
                           style: TextStyle(color: Colors.white, fontSize: 12))),
                 ],
-                onChanged: enabled ? onChanged : null, // Si no está habilitado, no permite cambiar
+                onChanged: enabled ? onChanged : null,
+                // Si no está habilitado, no permite cambiar
                 dropdownColor: const Color(0xFF313030),
                 icon: const Icon(Icons.arrow_drop_down,
                     color: Color(0xFF2be4f3), size: 30),

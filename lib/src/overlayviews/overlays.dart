@@ -172,12 +172,6 @@ class _OverlayInfoState extends State<OverlayInfo>
     );
   }
 
-  Widget _buildTabContent(String content) {
-    return Center(
-      child: Text(content, style: const TextStyle(color: Colors.white)),
-    );
-  }
-
   Widget _buildBioSubTabView() {
     final List<Map<String, String>> bioimpedanceData = [
       {
@@ -256,9 +250,10 @@ class OverlayCrear extends StatefulWidget {
 class _OverlayCrearState extends State<OverlayCrear>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Map<String, dynamic>? selectedClientData;
+  bool isClientSaved = false; // Variable to check if the client has been saved
+  Map<String, dynamic>?
+      selectedClientData; // Nullable Map, no late initialization required
 
-  // Declara el GlobalKey con el tipo correcto
   final GlobalKey<PersonalDataFormState> _personalDataFormKey =
       GlobalKey<PersonalDataFormState>();
 
@@ -302,27 +297,86 @@ class _OverlayCrearState extends State<OverlayCrear>
     );
   }
 
+  Future<void> _showAlert(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF494949),
+          title: const Text(
+            '¡ALERTA!',
+            style: TextStyle(
+                color: Colors.red, fontSize: 28, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          content: const Text(
+            'Debes completar el formulario para continuar',
+            style: TextStyle(color: Colors.white, fontSize: 20),
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF2be4f3)),
+                  ),
+                  child: const Text(
+                    '¡Entendido!',
+                    style: TextStyle(color: Color(0xFF2be4f3)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildTabBar() {
     return Container(
       height: 60,
       color: Colors.black,
-      child: TabBar(
-        controller: _tabController,
-        onTap: (index) {
-          setState(() {}); // Actualiza el estado para que se refleje el cambio
+      child: GestureDetector(
+        onTap: () {
+          if (!isClientSaved) {
+            _showAlert(context);
+          }
         },
-        tabs: [
-          _buildTab('DATOS PERSONALES', 0),
-          _buildTab('BONOS', 1),
-          _buildTab('GRUPOS ACTIVOS', 2),
-        ],
-        indicator: const BoxDecoration(
-          color: Color(0xFF494949),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
+        child: AbsorbPointer(
+          absorbing: !isClientSaved,
+          child: TabBar(
+            controller: _tabController,
+            onTap: (index) {
+              if (index != 0 && !isClientSaved) {
+                return; // Don't switch tabs if not saved
+              } else {
+                setState(() {
+                  _tabController.index = index;
+                });
+              }
+            },
+            tabs: [
+              _buildTab('DATOS PERSONALES', 0),
+              _buildTab('BONOS', 1),
+              _buildTab('GRUPOS ACTIVOS', 2),
+            ],
+            indicator: const BoxDecoration(
+              color: Color(0xFF494949),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
+            ),
+            labelColor: const Color(0xFF2be4f3),
+            labelStyle:
+                const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            unselectedLabelColor: Colors.white,
+          ),
         ),
-        labelColor: const Color(0xFF2be4f3),
-        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-        unselectedLabelColor: Colors.white,
       ),
     );
   }
@@ -349,25 +403,29 @@ class _OverlayCrearState extends State<OverlayCrear>
       index: _tabController.index,
       children: [
         PersonalDataForm(
-          key: _personalDataFormKey, // Asigna la clave global aquí
+          key: _personalDataFormKey,
           onDataChanged: (data) {
-            print(data); // Manejar datos cambiados
+            print(data); // Verify that the data is arriving correctly
+            setState(() {
+              isClientSaved = true; // Client has been saved
+              selectedClientData = data; // Save the client data
+            });
           },
         ),
-        ClientsFormBonos(
-        ),
-        ClientsFormGroups(
-            onDataChanged: (data) {
-              print(data); // Manejar datos cambiados
-            },
-            onClose: widget.onClose),
+        // Check if selectedClientData is not null before passing it to ClientsFormBonos
+        selectedClientData != null
+            ? ClientsFormBonos(clientDataBonos: selectedClientData!)
+            : Center(child: Text("No client data available.")),
+        selectedClientData != null
+            ? ClientsFormGroups(
+                onDataChanged: (data) {
+                  print(data); // Handle changed data
+                },
+                onClose: widget.onClose,
+                clientDataGroups: selectedClientData!,
+              )
+            : Center(child: Text("No client data available.")),
       ],
-    );
-  }
-
-  Widget _buildTabContent(String content) {
-    return Center(
-      child: Text(content, style: const TextStyle(color: Colors.white)),
     );
   }
 }

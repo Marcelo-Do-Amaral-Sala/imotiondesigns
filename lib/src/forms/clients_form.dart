@@ -23,7 +23,6 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   String? selectedOption;
   String? selectedGender;
   String? _birthDate;
-
   double scaleFactorTick = 1.0;
 
   @override
@@ -106,19 +105,14 @@ class PersonalDataFormState extends State<PersonalDataForm> {
     );
 
     // Llama a la función onDataChanged para informar de los datos
-    widget.onDataChanged(clientData);
+    widget.onDataChanged(
+        clientData); // Aquí notificamos que los datos fueron guardados
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox(
       child: Padding(
@@ -164,7 +158,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                     enabled: false,
                                     hintText: 'Automático',
                                     hintStyle:
-                                    const TextStyle(color: Colors.grey),
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -198,7 +192,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                     isDense: true,
                                     hintText: 'Introducir nombre',
                                     hintStyle:
-                                    const TextStyle(color: Colors.grey),
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -319,7 +313,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                       color: const Color(0xFF313030),
                                       borderRadius: BorderRadius.circular(7)),
                                   padding:
-                                  const EdgeInsets.symmetric(vertical: 15),
+                                      const EdgeInsets.symmetric(vertical: 15),
                                   child: Text(_birthDate ?? 'DD/MM/YYYY',
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 12)),
@@ -352,7 +346,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                     isDense: true,
                                     hintText: 'Introducir teléfono',
                                     hintStyle:
-                                    const TextStyle(color: Colors.grey),
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -390,7 +384,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                     isDense: true,
                                     hintText: 'Introducir altura',
                                     hintStyle:
-                                    const TextStyle(color: Colors.grey),
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -421,7 +415,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                     isDense: true,
                                     hintText: 'Introducir peso',
                                     hintStyle:
-                                    const TextStyle(color: Colors.grey),
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -453,7 +447,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                     isDense: true,
                                     hintText: 'Introducir e-mail',
                                     hintStyle:
-                                    const TextStyle(color: Colors.grey),
+                                        const TextStyle(color: Colors.grey),
                                   ),
                                 ),
                               ),

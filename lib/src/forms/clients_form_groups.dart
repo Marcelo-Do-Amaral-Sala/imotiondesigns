@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart'; // Asegúrate de importar el paquete sqflite
+import 'package:sqflite/sqflite.dart';
+
+import '../db/db_helper.dart'; // Asegúrate de importar el paquete sqflite
 
 class ClientsFormGroups extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
+  final Map<String, dynamic> clientDataGroups;
   final VoidCallback onClose;
 
   const ClientsFormGroups({
     Key? key,
     required this.onDataChanged,
-    required this.onClose,
+    required this.onClose, required this.clientDataGroups,
   }) : super(key: key);
 
   @override
@@ -21,7 +24,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
   String? selectedOption;
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
-  int? clientId; // Declare a variable to store the client ID
+  Map<String, dynamic>? selectedClient;
 
   Map<String, bool> selectedGroups = {};
   Map<String, Color> hintColors = {};
@@ -43,9 +46,22 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
   @override
   void initState() {
     super.initState();
-    clientId.toString();
-    _indexController.text = clientId.toString(); // Set controller text
-    loadMuscleGroups(); // Llamar al método para cargar los grupos musculares
+    _loadMostRecentClient();
+  }
+
+  // Cargar el cliente más reciente desde la base de datos
+  Future<void> _loadMostRecentClient() async {
+    final dbHelper = DatabaseHelper();
+    final client = await dbHelper.getMostRecentClient();
+
+    if (client != null) {
+      setState(() {
+        selectedClient = client;
+        _indexController.text = client['id'].toString();
+        _nameController.text = client['name'] ?? '';
+        selectedOption = client['status'];
+      });
+    }
   }
 
   @override
@@ -61,9 +77,10 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
       onTap: () {
         setState(() {
           // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
-          selectedGroups[option] = !(selectedGroups[option] ?? false); // Si es null, toma false
+          selectedGroups[option] =
+              !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
-          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+              selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
       },
       child: Container(

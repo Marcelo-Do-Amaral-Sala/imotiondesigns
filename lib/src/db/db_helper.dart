@@ -144,6 +144,23 @@ class DatabaseHelper {
     return null;
   }
 
+  // Obtener el cliente más reciente (con el id más alto)
+  Future<Map<String, dynamic>?> getMostRecentClient() async {
+    final db = await database;
+    // Realizamos una consulta que ordene por el id de forma descendente (del más grande al más pequeño)
+    final List<Map<String, dynamic>> result = await db.query(
+      'clientes',
+      orderBy: 'id DESC', // Ordenamos por id de manera descendente
+      limit: 1, // Solo nos interesa el primer resultado (el más reciente)
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null; // Si no hay clientes en la base de datos
+  }
+
+
   // Eliminar un cliente por ID
   Future<void> deleteClient(int id) async {
     final db = await database;

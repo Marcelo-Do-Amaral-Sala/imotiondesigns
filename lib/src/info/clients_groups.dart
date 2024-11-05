@@ -55,12 +55,13 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     super.dispose();
   }
 
-  // Crear el checkbox redondo personalizado
+  /// Crear el checkbox redondo personalizado
   Widget customCheckbox(String option) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedGroups[option] = !selectedGroups[option]!;
+          // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
+          selectedGroups[option] = !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
           selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
@@ -71,11 +72,11 @@ class _ClientsGroupsState extends State<ClientsGroups> {
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: selectedGroups[option]!
+          color: selectedGroups[option] == true
               ? const Color(0xFF2be4f3)
               : Colors.transparent,
           border: Border.all(
-            color: selectedGroups[option]!
+            color: selectedGroups[option] == true
                 ? const Color(0xFF2be4f3)
                 : Colors.white,
             width: 1.0,
