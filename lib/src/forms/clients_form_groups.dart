@@ -29,6 +29,9 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
 
   Map<String, bool> selectedGroups = {};
   Map<String, Color> hintColors = {};
+  Map<String, int> groupIds = {};
+
+  final DatabaseHelper dbHelper = DatabaseHelper();
 
   @override
   void initState() {
@@ -48,6 +51,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     setState(() {
       selectedGroups = {for (var row in result) row['nombre']: false};
       hintColors = {for (var row in result) row['nombre']: Colors.white};
+      groupIds = {for (var row in result) row['nombre']: row['id']};
     });
   }
 
@@ -65,6 +69,26 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
       });
     }
   }
+  // Función para insertar la relación entre cliente y grupo muscular
+  Future<void> insertClientGroup(int clienteId, int grupoMuscularId) async {
+    // Imprimir los datos antes de intentar insertar la relación
+    print("Intentando insertar relación: Cliente ID: $clienteId, Grupo Muscular ID: $grupoMuscularId");
+
+    bool success = await dbHelper.insertClientGroup(clienteId, grupoMuscularId);
+
+    // Si la inserción fue exitosa, muestra el mensaje correspondiente
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Relación insertada exitosamente'),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Hubo un error al insertar la relación'),
+      ));
+    }
+  }
+
+
 
   @override
   void dispose() {
@@ -512,7 +536,18 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                   GestureDetector(
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    //onTap: _updateData,
+                    onTap: () async {
+                      // Recoger los grupos seleccionados
+                      for (var groupName in selectedGroups.keys) {
+                        if (selectedGroups[groupName] == true) {
+                          int grupoMuscularId = groupIds[groupName]!;
+                          int clienteId = selectedClient!['id'];
+
+                          // Llamar a la función para insertar la relación
+                          await insertClientGroup(clienteId, grupoMuscularId);
+                        }
+                      }
+                    },
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),

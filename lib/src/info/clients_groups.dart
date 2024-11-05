@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../db/db_helper.dart';
+
 class ClientsGroups extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
   final Map<String, dynamic> clientData;
@@ -23,29 +25,23 @@ class _ClientsGroupsState extends State<ClientsGroups> {
   String? selectedOption;
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
-  int? clientId; // Declare a variable to store the client ID
+  Map<String, dynamic>? selectedClient;
 
   Map<String, bool> selectedGroups = {};
   Map<String, Color> hintColors = {};
+  Map<String, int> groupIds = {};
 
-  // Método para obtener los grupos musculares desde la base de datos
-  Future<void> loadMuscleGroups() async {
-    final db = await openDatabase('my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
-    final List<Map<String, dynamic>> result = await db.query('grupos_musculares');
+  int? clientId; // Declare a variable to store the client ID
 
-    // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
-    setState(() {
-      selectedGroups = {for (var row in result) row['nombre']: false};
-      hintColors = {for (var row in result) row['nombre']: Colors.white};
-    });
-  }
+  final DatabaseHelper dbHelper = DatabaseHelper();
 
   @override
   void initState() {
     super.initState();
-    clientId.toString();
+    clientId = int.tryParse(widget.clientData['id'].toString());
     _indexController.text = clientId.toString(); // Set controller text
-    loadMuscleGroups(); // Llamar al método para cargar los grupos musculares
+    loadMuscleGroups();
+    _loadClientById();// Llamar al método para cargar los grupos musculares
   }
 
   @override
@@ -55,13 +51,93 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     super.dispose();
   }
 
+
+  // Método para obtener los grupos musculares desde la base de datos
+  Future<void> loadMuscleGroups() async {
+    final db = await openDatabase(
+        'my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
+    final List<Map<String, dynamic>> result =
+    await db.query('grupos_musculares');
+
+    // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
+    setState(() {
+      selectedGroups = {for (var row in result) row['nombre']: false};
+      hintColors = {for (var row in result) row['nombre']: Colors.white};
+      groupIds = {for (var row in result) row['nombre']: row['id']};
+    });
+  }
+
+// Método para cargar un cliente por ID desde la base de datos
+  Future<void> _loadClientById() async {
+    // Primero, obtenemos el clientId desde el _indexController
+    final clientIdText = _indexController.text;
+
+    if (clientIdText.isEmpty) {
+      // Si el campo está vacío, mostramos un mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Por favor ingresa un ID de cliente'),
+      ));
+      return;
+    }
+
+    // Convertir el texto del TextEditingController en un entero (clientId)
+    final int? clientId = int.tryParse(clientIdText);
+
+    if (clientId == null) {
+      // Si el clientId no es un número válido, mostramos un mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('ID de cliente no válido'),
+      ));
+      return;
+    }
+
+    // Buscar el cliente con el clientId
+    final client = await dbHelper.getClientById(clientId);
+
+    if (client != null) {
+      setState(() {
+        selectedClient = client;
+        _indexController.text = client['id'].toString();
+        _nameController.text = client['name'] ?? '';
+        selectedOption = client['status'];
+      });
+    } else {
+      // Si no se encuentra el cliente en la base de datos, mostrar mensaje
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Cliente no encontrado'),
+      ));
+    }
+  }
+  /*// Función para insertar la relación entre cliente y grupo muscular
+  Future<void> insertClientGroup(int clienteId, int grupoMuscularId) async {
+    // Imprimir los datos antes de intentar insertar la relación
+    print("Intentando insertar relación: Cliente ID: $clienteId, Grupo Muscular ID: $grupoMuscularId");
+
+    bool success = await dbHelper.insertClientGroup(clienteId, grupoMuscularId);
+
+    // Si la inserción fue exitosa, muestra el mensaje correspondiente
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Relación insertada exitosamente'),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Hubo un error al insertar la relación'),
+      ));
+    }
+  }*/
+
+
+
+
   /// Crear el checkbox redondo personalizado
   Widget customCheckbox(String option) {
     return GestureDetector(
       onTap: () {
         setState(() {
           // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
-          selectedGroups[option] = !(selectedGroups[option] ?? false); // Si es null, toma false
+          selectedGroups[option] =
+          !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
           selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
@@ -493,7 +569,18 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                   GestureDetector(
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    //onTap: _updateData,
+                    /*onTap: () async {
+                      // Recoger los grupos seleccionados
+                      for (var groupName in selectedGroups.keys) {
+                        if (selectedGroups[groupName] == true) {
+                          int grupoMuscularId = groupIds[groupName]!;
+                          int clienteId = selectedClient!['id'];
+
+                          // Llamar a la función para insertar la relación
+                          await insertClientGroup(clienteId, grupoMuscularId);
+                        }
+                      }
+                    },*/
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),

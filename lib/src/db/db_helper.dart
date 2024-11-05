@@ -26,31 +26,36 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
-      // Incrementamos la versión para permitir la creación de nuevas tablas.
-      onCreate: _onCreate,
-      // Método que se ejecuta al crear la base de datos
-      onUpgrade:
-          _onUpgrade, // Para manejar la actualización de la base de datos si es necesario
+      version: 2, // Incrementamos la versión a 2
+      onCreate: _onCreate, // Método que se ejecuta solo al crear la base de datos
+      onUpgrade: _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
   }
 
-  // Crear las tablas cuando la base de datos se inicializa
   Future<void> _onCreate(Database db, int version) async {
     // Crear la tabla clientes
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS clientes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        status TEXT NOT NULL,
-        gender TEXT NOT NULL,
-        height INTEGER NOT NULL,
-        weight INTEGER NOT NULL,
-        birthdate TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        email TEXT NOT NULL
-      )
-    ''');
+    CREATE TABLE IF NOT EXISTS clientes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      status TEXT NOT NULL,
+      gender TEXT NOT NULL,
+      height INTEGER NOT NULL,
+      weight INTEGER NOT NULL,
+      birthdate TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      email TEXT NOT NULL
+    )
+  ''');
+
+    // Crear la tabla grupos_musculares
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS grupos_musculares (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT NOT NULL
+    )
+  ''');
+
     // Crear la tabla de relación N:M entre clientes y grupos musculares
     await db.execute('''
     CREATE TABLE IF NOT EXISTS clientes_grupos_musculares (
@@ -61,14 +66,6 @@ class DatabaseHelper {
       FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares(id) ON DELETE CASCADE
     )
   ''');
-
-    // Crear la tabla grupos_musculares
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS grupos_musculares (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL
-      )
-    ''');
 
     // Insertar valores predeterminados en la tabla grupos_musculares
     await db.insert('grupos_musculares', {'nombre': 'Pectorales'});
@@ -83,10 +80,19 @@ class DatabaseHelper {
     await db.insert('grupos_musculares', {'nombre': 'Gemelos'});
   }
 
-  // Método para manejar actualizaciones de la base de datos (si cambian las tablas)
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Aquí puedes agregar lógica de actualización si fuera necesario en el futuro
+      // Este bloque se ejecuta solo si la base de datos está en una versión anterior (1)
+      // Es necesario crear la nueva tabla 'clientes_grupos_musculares'
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS clientes_grupos_musculares (
+        cliente_id INTEGER,
+        grupo_muscular_id INTEGER,
+        PRIMARY KEY (cliente_id, grupo_muscular_id),
+        FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+        FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares(id) ON DELETE CASCADE
+      )
+    ''');
     }
   }
 
@@ -195,7 +201,7 @@ class DatabaseHelper {
   }
 
   // Insertar relación entre un cliente y un grupo muscular
-  Future<void> insertClientGroup(int clienteId, int grupoMuscularId) async {
+  Future<bool> insertClientGroup(int clienteId, int grupoMuscularId) async {
     final db = await database;
 
     try {
@@ -205,13 +211,15 @@ class DatabaseHelper {
           'cliente_id': clienteId,
           'grupo_muscular_id': grupoMuscularId,
         },
-        conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        conflictAlgorithm: ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
+      return true; // Si la inserción fue exitosa, retorna true
     } catch (e) {
       print('Error inserting client-group relationship: $e');
+      return false; // Si ocurrió un error, retorna false
     }
   }
+
 
   Future<List<Map<String, dynamic>>> getGruposDeCliente(int clienteId) async {
     final db = await database;
@@ -226,4 +234,23 @@ class DatabaseHelper {
 
     return result;
   }
+
+  // Método para eliminar la base de datos
+  Future<void> deleteDatabaseFile() async {
+    try {
+      String path = join(await getDatabasesPath(), 'my_database.db');
+      await deleteDatabase(path);  // Eliminar la base de datos físicamente
+      print("Base de datos eliminada correctamente.");
+    } catch (e) {
+      print("Error al eliminar la base de datos: $e");
+    }
+  }
+ /* // Método para llamar al deleteDatabaseFile
+  Future<void> _deleteDatabase() async {
+    final dbHelper = DatabaseHelper();
+    await dbHelper.deleteDatabaseFile();  // Elimina la base de datos
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Base de datos eliminada con éxito.'),
+    ));
+  }*/
 }
