@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite/sqflite.dart'; // Asegúrate de importar el paquete sqflite
 
-class ClientsGroups extends StatefulWidget {
+class ClientsFormGroups extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
-  final Map<String, dynamic> clientData;
   final VoidCallback onClose;
 
-  const ClientsGroups({
+  const ClientsFormGroups({
     Key? key,
     required this.onDataChanged,
-    required this.clientData,
     required this.onClose,
   }) : super(key: key);
 
   @override
-  _ClientsGroupsState createState() => _ClientsGroupsState();
+  _ClientsFormGroupsState createState() => _ClientsFormGroupsState();
 }
 
-class _ClientsGroupsState extends State<ClientsGroups> {
+class _ClientsFormGroupsState extends State<ClientsFormGroups> {
   final _indexController = TextEditingController();
   final _nameController = TextEditingController();
   String? selectedOption;
@@ -30,8 +28,10 @@ class _ClientsGroupsState extends State<ClientsGroups> {
 
   // Método para obtener los grupos musculares desde la base de datos
   Future<void> loadMuscleGroups() async {
-    final db = await openDatabase('my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
-    final List<Map<String, dynamic>> result = await db.query('grupos_musculares');
+    final db = await openDatabase(
+        'my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
+    final List<Map<String, dynamic>> result =
+        await db.query('grupos_musculares');
 
     // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
     setState(() {
@@ -55,12 +55,13 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     super.dispose();
   }
 
-  // Crear el checkbox redondo personalizado
+  /// Crear el checkbox redondo personalizado
   Widget customCheckbox(String option) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedGroups[option] = !selectedGroups[option]!;
+          // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
+          selectedGroups[option] = !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
           selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
@@ -71,11 +72,11 @@ class _ClientsGroupsState extends State<ClientsGroups> {
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: selectedGroups[option]!
+          color: selectedGroups[option] == true
               ? const Color(0xFF2be4f3)
               : Colors.transparent,
           border: Border.all(
-            color: selectedGroups[option]!
+            color: selectedGroups[option] == true
                 ? const Color(0xFF2be4f3)
                 : Colors.white,
             width: 1.0,
@@ -90,7 +91,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     setState(() {
       selectedGroups[option] = !selectedGroups[option]!;
       hintColors[option] =
-      selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
     });
   }
 
@@ -274,14 +275,14 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
                                                 borderRadius:
-                                                BorderRadius.circular(7),
+                                                    BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -297,12 +298,12 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        7),
+                                                        BorderRadius.circular(
+                                                            7),
                                                   ),
                                                   filled: true,
                                                   fillColor:
-                                                  const Color(0xFF313030),
+                                                      const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -337,16 +338,16 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                              [
-                                'Trapecios',
-                                'Dorsales',
-                                'Lumbares',
-                                'Glúteos',
-                                'Isquios',
-                                'Gemelos'
-                              ].contains(entry.key) &&
-                                  entry
-                                      .value) // Filtra solo los grupos seleccionados
+                                      [
+                                        'Trapecios',
+                                        'Dorsales',
+                                        'Lumbares',
+                                        'Glúteos',
+                                        'Isquios',
+                                        'Gemelos'
+                                      ].contains(entry.key) &&
+                                      entry
+                                          .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String imagePath =
@@ -385,14 +386,14 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                              [
-                                'Pectorales',
-                                'Abdominales',
-                                'Cuádriceps',
-                                'Bíceps'
-                              ].contains(entry.key) &&
-                                  entry
-                                      .value) // Filtra solo los grupos seleccionados
+                                      [
+                                        'Pectorales',
+                                        'Abdominales',
+                                        'Cuádriceps',
+                                        'Bíceps'
+                                      ].contains(entry.key) &&
+                                      entry
+                                          .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String imagePath =
@@ -434,14 +435,14 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
                                                 borderRadius:
-                                                BorderRadius.circular(7),
+                                                    BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -457,12 +458,12 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        7),
+                                                        BorderRadius.circular(
+                                                            7),
                                                   ),
                                                   filled: true,
                                                   fillColor:
-                                                  const Color(0xFF313030),
+                                                      const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),

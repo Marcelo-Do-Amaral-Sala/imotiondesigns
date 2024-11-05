@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../db/db_helper.dart';
 import '../overlayviews/overlays.dart';
 
 class ClientsView extends StatefulWidget {
@@ -17,6 +18,22 @@ class _ClientsViewState extends State<ClientsView> {
 
   bool isOverlayVisible = false;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDatabase();
+  }
+
+  Future<void> _initializeDatabase() async {
+    try {
+      await DatabaseHelper()
+          .initializeDatabase(); // Inicializa la base de datos
+      debugPrint("Base de datos inicializada correctamente.");
+    } catch (e) {
+      debugPrint("Error al inicializar la base de datos: $e");
+    }
+  }
 
   void toggleOverlay(int index) {
     setState(() {
@@ -171,7 +188,7 @@ class _ClientsViewState extends State<ClientsView> {
                             ),
                             if (isOverlayVisible)
                               Positioned.fill(
-                                top: screenHeight*0.12,
+                                top: screenHeight * 0.12,
                                 child: overlayIndex == 0
                                     ? OverlayInfo(
                                         onClose: () => toggleOverlay(0),
@@ -179,7 +196,7 @@ class _ClientsViewState extends State<ClientsView> {
                                     : OverlayCrear(
                                         onClose: () => toggleOverlay(1),
                                       ),
-                              )
+                              ),
                           ],
                         ),
                       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/forms/clients_form_groups.dart';
+import 'package:imotion_designs/src/forms/clients_forms_bonos.dart';
 import 'package:imotion_designs/src/info/clients_groups.dart';
 import 'package:imotion_designs/src/subtabs/clients_bio_sessions.dart';
 
@@ -254,6 +256,7 @@ class OverlayCrear extends StatefulWidget {
 class _OverlayCrearState extends State<OverlayCrear>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  Map<String, dynamic>? selectedClientData;
 
   // Declara el GlobalKey con el tipo correcto
   final GlobalKey<PersonalDataFormState> _personalDataFormKey =
@@ -351,8 +354,13 @@ class _OverlayCrearState extends State<OverlayCrear>
             print(data); // Manejar datos cambiados
           },
         ),
-        _buildTabContent('Contenido de Opción 2'),
-        _buildTabContent('Contenido de Opción 3'),
+        ClientsFormBonos(
+        ),
+        ClientsFormGroups(
+            onDataChanged: (data) {
+              print(data); // Manejar datos cambiados
+            },
+            onClose: widget.onClose),
       ],
     );
   }
