@@ -25,30 +25,32 @@ class _ClientsGroupsState extends State<ClientsGroups> {
   int? clientId; // Declare a variable to store the client ID
 
   Map<String, bool> selectedGroups = {
-    'option1': false,
-    'option2': false,
-    'option3': false,
-    'option4': false,
-    'option5': false,
-    'option6': false,
-    'option7': false,
-    'option8': false,
-    'option9': false,
-    'option10': false,
+    'trapecios': false,
+    'dorsales': false,
+    'lumbares': false,
+    'gluteos': false,
+    'isquios': false,
+    'pectorales': false,
+    'abdomen': false,
+    'cuadriceps': false,
+    'biceps': false,
+    'gemelos': false,
   };
 
   Map<String, Color> hintColors = {
-    'option1': Colors.white,
-    'option2': Colors.white,
-    'option3': Colors.white,
-    'option4': Colors.white,
-    'option5': Colors.white,
-    'option6': Colors.white,
-    'option7': Colors.white,
-    'option8': Colors.white,
-    'option9': Colors.white,
-    'option10': Colors.white,
+    'trapecios': Colors.white,
+    'dorsales': Colors.white,
+    'lumbares': Colors.white,
+    'gluteos': Colors.white,
+    'isquios': Colors.white,
+    'pectorales': Colors.white,
+    'abdomen': Colors.white,
+    'cuadriceps': Colors.white,
+    'biceps': Colors.white,
+    'gemelos': Colors.white,
   };
+
+
 
   // Crear el checkbox redondo personalizado
   Widget customCheckbox(String option) {
@@ -268,11 +270,11 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Primer Checkbox con TextField
                               Row(
                                 children: [
-                                  customCheckbox('option1'),
+                                  customCheckbox('trapecios'),
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option1'),
+                                          handleTextFieldTap('trapecios'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -293,7 +295,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Trapecios',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option1'],
+                                                  color: hintColors['trapecios'],
                                                   fontSize: 13,
                                                 ),
                                                 border: OutlineInputBorder(
@@ -318,11 +320,11 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Segundo Checkbox con TextField
                               Row(
                                 children: [
-                                  customCheckbox('option2'),
+                                  customCheckbox('dorsales'),
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option2'),
+                                          handleTextFieldTap('dorsales'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -343,7 +345,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Dorsales',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option2'],
+                                                  color: hintColors['dorsales'],
                                                   fontSize: 13,
                                                 ),
                                                 border: OutlineInputBorder(
@@ -368,11 +370,11 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Tercer Checkbox con TextField
                               Row(
                                 children: [
-                                  customCheckbox('option3'),
+                                  customCheckbox('lumbares'),
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option3'),
+                                          handleTextFieldTap('lumbares'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -393,7 +395,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Lumbares',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option3'],
+                                                  color: hintColors['lumbares'],
                                                   fontSize: 13,
                                                 ),
                                                 border: OutlineInputBorder(
@@ -418,11 +420,11 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Cuarto Checkbox con TextField
                               Row(
                                 children: [
-                                  customCheckbox('option4'),
+                                  customCheckbox('gluteos'),
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option4'),
+                                          handleTextFieldTap('gluteos'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -443,7 +445,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Glúteos',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option4'],
+                                                  color: hintColors['gluteos'],
                                                   fontSize: 13,
                                                 ),
                                                 border: OutlineInputBorder(
@@ -468,11 +470,11 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Quinto Checkbox con TextField
                               Row(
                                 children: [
-                                  customCheckbox('option5'),
+                                  customCheckbox('isquios'),
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option5'),
+                                          handleTextFieldTap('isquios'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -493,7 +495,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Isquios',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option5'],
+                                                  color: hintColors['isquios'],
                                                   fontSize: 13,
                                                 ),
                                                 border: OutlineInputBorder(
@@ -532,6 +534,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                     ),
                                   ),
                                 ),
+                                if (selectedGroups['trapecios']!)
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
@@ -543,6 +546,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                     ),
                                   ),
                                 ),
+                                if (selectedGroups['dorsales']!)
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
@@ -554,6 +558,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                     ),
                                   ),
                                 ),
+                                if (selectedGroups['lumbares']!)
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
@@ -565,6 +570,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                     ),
                                   ),
                                 ),
+                                if (selectedGroups['gluteos']!)
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
@@ -576,6 +582,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                     ),
                                   ),
                                 ),
+                                if (selectedGroups['isquios']!)
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
@@ -587,6 +594,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                     ),
                                   ),
                                 ),
+                                if (selectedGroups['gemelos']!)
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
@@ -616,6 +624,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   ),
                                 ),
                               ),
+                              if (selectedGroups['pectorales']!)
                               Positioned.fill(
                                 child: Container(
                                   decoration: const BoxDecoration(
@@ -627,7 +636,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   ),
                                 ),
                               ),
-                              // Imagen 10
+                              if (selectedGroups['abdomen']!)
                               Positioned.fill(
                                 child: Container(
                                   decoration: const BoxDecoration(
@@ -639,7 +648,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   ),
                                 ),
                               ),
-                              // Imagen 11
+                              if (selectedGroups['cuadriceps']!)
                               Positioned.fill(
                                 child: Container(
                                   decoration: const BoxDecoration(
@@ -651,7 +660,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   ),
                                 ),
                               ),
-                              // Imagen 12
+                              if (selectedGroups['biceps']!)
                               Positioned.fill(
                                 child: Container(
                                   decoration: const BoxDecoration(
@@ -675,7 +684,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option6'),
+                                          handleTextFieldTap('pectorales'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -696,7 +705,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Pectorales',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option6'],
+                                                  color: hintColors['pectorales'],
                                                   // Usar el color dinámico
                                                   fontSize: 13,
                                                 ),
@@ -716,7 +725,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       ),
                                     ),
                                   ),
-                                  customCheckbox('option6'),
+                                  customCheckbox('pectorales'),
                                 ],
                               ),
                               const SizedBox(height: 2.0),
@@ -726,7 +735,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option7'),
+                                          handleTextFieldTap('abdomen'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -747,7 +756,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Abdominales',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option7'],
+                                                  color: hintColors['abdomen'],
                                                   // Usar el color dinámico
                                                   fontSize: 13,
                                                 ),
@@ -767,7 +776,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       ),
                                     ),
                                   ),
-                                  customCheckbox('option7'),
+                                  customCheckbox('abdomen'),
                                 ],
                               ),
                               const SizedBox(height: 2.0),
@@ -777,7 +786,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option8'),
+                                          handleTextFieldTap('cuadriceps'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -798,7 +807,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Cuádriceps',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option8'],
+                                                  color: hintColors['cuadriceps'],
                                                   // Usar el color dinámico
                                                   fontSize: 13,
                                                 ),
@@ -818,7 +827,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       ),
                                     ),
                                   ),
-                                  customCheckbox('option8'),
+                                  customCheckbox('cuadriceps'),
                                 ],
                               ),
                               const SizedBox(height: 2.0),
@@ -828,7 +837,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option9'),
+                                          handleTextFieldTap('biceps'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -849,7 +858,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Bíceps',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option9'],
+                                                  color: hintColors['biceps'],
                                                   // Usar el color dinámico
                                                   fontSize: 13,
                                                 ),
@@ -869,7 +878,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       ),
                                     ),
                                   ),
-                                  customCheckbox('option9'),
+                                  customCheckbox('biceps'),
                                 ],
                               ),
                               const SizedBox(height: 2.0),
@@ -879,7 +888,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   Flexible(
                                     child: GestureDetector(
                                       onTap: () =>
-                                          handleTextFieldTap('option10'),
+                                          handleTextFieldTap('gemelos'),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -900,7 +909,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                               decoration: InputDecoration(
                                                 hintText: 'Gemelos',
                                                 hintStyle: TextStyle(
-                                                  color: hintColors['option10'],
+                                                  color: hintColors['gemelos'],
                                                   // Usar el color dinámico
                                                   fontSize: 13,
                                                 ),
@@ -920,7 +929,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       ),
                                     ),
                                   ),
-                                  customCheckbox('option10'),
+                                  customCheckbox('gemelos'),
                                 ],
                               ),
                             ],
