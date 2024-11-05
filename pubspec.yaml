@@ -80,6 +80,16 @@ flutter:
     - assets/images/tutoriales.png
     - assets/images/avatar_back.png
     - assets/images/avatar_front.png
+    - assets/images/abdomen.png
+    - assets/images/isquios.png
+    - assets/images/biceps.png
+    - assets/images/cuadriceps.png
+    - assets/images/dorsales.png
+    - assets/images/gemelos.png
+    - assets/images/gluteos.png
+    - assets/images/lumbar.png
+    - assets/images/pectorales.png
+    - assets/images/trapecios.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

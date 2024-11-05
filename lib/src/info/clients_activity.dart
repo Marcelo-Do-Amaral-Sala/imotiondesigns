@@ -94,20 +94,19 @@ class _ClientsActivityState extends State<ClientsActivity> {
                 children: [
                   // Campos de ID, NOMBRE y ESTADO
                   Flexible(
-                    child: _buildTextField('ID', _indexController),
+                    child: _buildTextField('ID', _indexController, false),
                   ),
                   SizedBox(width: screenWidth * 0.02),
                   Flexible(
-                    child: _buildTextField('NOMBRE', _nameController),
+                    child: _buildTextField('NOMBRE', _nameController, false),
                   ),
                   SizedBox(width: screenWidth * 0.02),
                   Flexible(
-                    child:
-                        _buildDropdownField('ESTADO', selectedOption, (value) {
+                    child: _buildDropdownField('ESTADO', selectedOption, (value) {
                       setState(() {
                         selectedOption = value;
                       });
-                    }),
+                    }, false), // Deshabilitar Dropdown
                   ),
                 ],
               ),
@@ -133,7 +132,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget _buildTextField(String label, TextEditingController controller, bool enabled) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,10 +151,11 @@ class _ClientsActivityState extends State<ClientsActivity> {
             style: const TextStyle(color: Colors.white, fontSize: 12),
             decoration: InputDecoration(
               border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
               filled: true,
               fillColor: const Color(0xFF313030),
               isDense: true,
+              enabled: enabled, // Deshabilitar o habilitar el campo
             ),
           ),
         ),
@@ -164,7 +164,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
   }
 
   Widget _buildDropdownField(
-      String label, String? value, Function(String?) onChanged) {
+      String label, String? value, Function(String?) onChanged, bool enabled) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,24 +178,27 @@ class _ClientsActivityState extends State<ClientsActivity> {
           decoration: BoxDecoration(
               color: const Color(0xFF313030),
               borderRadius: BorderRadius.circular(7)),
-          child: DropdownButton<String>(
-            hint: const Text('Seleccione',
-                style: TextStyle(color: Colors.white, fontSize: 12)),
-            value: value,
-            items: const [
-              DropdownMenuItem(
-                  value: 'Activo',
-                  child: Text('Activo',
-                      style: TextStyle(color: Colors.white, fontSize: 12))),
-              DropdownMenuItem(
-                  value: 'Inactivo',
-                  child: Text('Inactivo',
-                      style: TextStyle(color: Colors.white, fontSize: 12))),
-            ],
-            onChanged: onChanged,
-            dropdownColor: const Color(0xFF313030),
-            icon: const Icon(Icons.arrow_drop_down,
-                color: Color(0xFF2be4f3), size: 30),
+          child: AbsorbPointer( // Deshabilitar la interacción con el dropdown
+            absorbing: !enabled,
+            child: DropdownButton<String>(
+              hint: const Text('Seleccione',
+                  style: TextStyle(color: Colors.white, fontSize: 12)),
+              value: value,
+              items: const [
+                DropdownMenuItem(
+                    value: 'Activo',
+                    child: Text('Activo',
+                        style: TextStyle(color: Colors.white, fontSize: 12))),
+                DropdownMenuItem(
+                    value: 'Inactivo',
+                    child: Text('Inactivo',
+                        style: TextStyle(color: Colors.white, fontSize: 12))),
+              ],
+              onChanged: enabled ? onChanged : null, // Permitir cambio si está habilitado
+              dropdownColor: const Color(0xFF313030),
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: Color(0xFF2be4f3), size: 30),
+            ),
           ),
         ),
       ],

@@ -18,13 +18,13 @@ class _ClientsBonosState extends State<ClientsBonos> {
   List<Map<String, String>> availableBonos = [
     {'date': '12/12/2024', 'quantity': '5'},
     {'date': '12/02/2024', 'quantity': '15'},
-     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/12/2024', 'quantity': '5'},
     {'date': '12/02/2024', 'quantity': '15'},
-     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/12/2024', 'quantity': '5'},
     {'date': '12/02/2024', 'quantity': '15'},
-     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/12/2024', 'quantity': '5'},
     {'date': '12/02/2024', 'quantity': '15'},
-     {'date': '12/12/2024', 'quantity': '5'},
+    {'date': '12/12/2024', 'quantity': '5'},
     {'date': '12/02/2024', 'quantity': '15'},
   ];
 
@@ -94,15 +94,15 @@ class _ClientsBonosState extends State<ClientsBonos> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildTextField('ID', _indexController),
+          _buildTextField('ID', _indexController, false), // Deshabilitar
           SizedBox(width: screenWidth * 0.02),
-          _buildTextField('NOMBRE', _nameController),
+          _buildTextField('NOMBRE', _nameController, false), // Deshabilitar
           SizedBox(width: screenWidth * 0.02),
           _buildDropdownField('ESTADO', selectedOption, (value) {
             setState(() {
               selectedOption = value;
             });
-          }),
+          }, false), // Deshabilitar dropdown
           SizedBox(width: screenWidth * 0.02),
           OutlinedButton(
             onPressed: () {}, // Mantener vacío para que InkWell funcione
@@ -239,7 +239,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget _buildTextField(String label, TextEditingController controller, bool enabled) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,11 +259,12 @@ class _ClientsBonosState extends State<ClientsBonos> {
               style: const TextStyle(color: Colors.white, fontSize: 12),
               decoration: InputDecoration(
                 border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+                OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
                 filled: true,
                 fillColor: const Color(0xFF313030),
                 isDense: true,
               ),
+              enabled: enabled, // Controlar si está habilitado
             ),
           ),
         ],
@@ -272,7 +273,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
   }
 
   Widget _buildDropdownField(
-      String label, String? value, Function(String?) onChanged) {
+      String label, String? value, Function(String?) onChanged, bool enabled) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,24 +288,27 @@ class _ClientsBonosState extends State<ClientsBonos> {
             decoration: BoxDecoration(
                 color: const Color(0xFF313030),
                 borderRadius: BorderRadius.circular(7)),
-            child: DropdownButton<String>(
-              hint: const Text('Seleccione',
-                  style: TextStyle(color: Colors.white, fontSize: 12)),
-              value: value,
-              items: const [
-                DropdownMenuItem(
-                    value: 'Activo',
-                    child: Text('Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 12))),
-                DropdownMenuItem(
-                    value: 'Inactivo',
-                    child: Text('Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 12))),
-              ],
-              onChanged: onChanged,
-              dropdownColor: const Color(0xFF313030),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF2be4f3), size: 30),
+            child: AbsorbPointer(
+              absorbing: !enabled, // Si es 'false' no se puede interactuar
+              child: DropdownButton<String>(
+                hint: const Text('Seleccione',
+                    style: TextStyle(color: Colors.white, fontSize: 12)),
+                value: value,
+                items: const [
+                  DropdownMenuItem(
+                      value: 'Activo',
+                      child: Text('Activo',
+                          style: TextStyle(color: Colors.white, fontSize: 12))),
+                  DropdownMenuItem(
+                      value: 'Inactivo',
+                      child: Text('Inactivo',
+                          style: TextStyle(color: Colors.white, fontSize: 12))),
+                ],
+                onChanged: enabled ? onChanged : null, // Si no está habilitado, no permite cambiar
+                dropdownColor: const Color(0xFF313030),
+                icon: const Icon(Icons.arrow_drop_down,
+                    color: Color(0xFF2be4f3), size: 30),
+              ),
             ),
           ),
         ],
