@@ -13,27 +13,32 @@ class DatabaseHelper {
 
   // Asegúrate de que la base de datos esté inicializada
   Future<Database> get database async {
-    if (_database != null) return _database!; // Si la base de datos ya está abierta, devuélvela.
+    if (_database != null)
+      return _database!; // Si la base de datos ya está abierta, devuélvela.
     _database = await _initDatabase(); // Si no, la inicializa.
     return _database!;
   }
 
   // Inicializar la base de datos
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'my_database.db'); // Ruta de la base de datos
+    String path = join(
+        await getDatabasesPath(), 'my_database.db'); // Ruta de la base de datos
 
     return await openDatabase(
       path,
-      version: 2, // Incrementamos la versión para permitir la creación de nuevas tablas.
-      onCreate: _onCreate, // Método que se ejecuta al crear la base de datos
-      onUpgrade: _onUpgrade, // Para manejar la actualización de la base de datos si es necesario
+      version: 2,
+      // Incrementamos la versión para permitir la creación de nuevas tablas.
+      onCreate: _onCreate,
+      // Método que se ejecuta al crear la base de datos
+      onUpgrade:
+          _onUpgrade, // Para manejar la actualización de la base de datos si es necesario
     );
   }
 
   // Crear las tablas cuando la base de datos se inicializa
   Future<void> _onCreate(Database db, int version) async {
     // Crear la tabla clientes
-    await db.execute(''' 
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -46,9 +51,19 @@ class DatabaseHelper {
         email TEXT NOT NULL
       )
     ''');
+    // Crear la tabla de relación N:M entre clientes y grupos musculares
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS clientes_grupos_musculares (
+      cliente_id INTEGER,
+      grupo_muscular_id INTEGER,
+      PRIMARY KEY (cliente_id, grupo_muscular_id),
+      FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+      FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares(id) ON DELETE CASCADE
+    )
+  ''');
 
     // Crear la tabla grupos_musculares
-    await db.execute(''' 
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS grupos_musculares (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL
@@ -88,7 +103,8 @@ class DatabaseHelper {
       await db.insert(
         'clientes',
         client,
-        conflictAlgorithm: ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        conflictAlgorithm:
+            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
     } catch (e) {
       print('Error inserting client: $e');
@@ -160,7 +176,6 @@ class DatabaseHelper {
     return null; // Si no hay clientes en la base de datos
   }
 
-
   // Eliminar un cliente por ID
   Future<void> deleteClient(int id) async {
     final db = await database;
@@ -174,7 +189,41 @@ class DatabaseHelper {
   // Obtener los datos de la tabla grupos_musculares
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;
-    final List<Map<String, dynamic>> result = await db.query('grupos_musculares');
+    final List<Map<String, dynamic>> result =
+        await db.query('grupos_musculares');
+    return result;
+  }
+
+  // Insertar relación entre un cliente y un grupo muscular
+  Future<void> insertClientGroup(int clienteId, int grupoMuscularId) async {
+    final db = await database;
+
+    try {
+      await db.insert(
+        'clientes_grupos_musculares',
+        {
+          'cliente_id': clienteId,
+          'grupo_muscular_id': grupoMuscularId,
+        },
+        conflictAlgorithm:
+            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+      );
+    } catch (e) {
+      print('Error inserting client-group relationship: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getGruposDeCliente(int clienteId) async {
+    final db = await database;
+
+    // Realizar la consulta con un INNER JOIN
+    final result = await db.rawQuery('''
+    SELECT g.*
+    FROM grupos_musculares g
+    INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
+    WHERE cg.cliente_id = ?
+  ''', [clienteId]);
+
     return result;
   }
 }

@@ -11,7 +11,8 @@ class ClientsFormGroups extends StatefulWidget {
   const ClientsFormGroups({
     Key? key,
     required this.onDataChanged,
-    required this.onClose, required this.clientDataGroups,
+    required this.onClose,
+    required this.clientDataGroups,
   }) : super(key: key);
 
   @override
@@ -29,6 +30,13 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
   Map<String, bool> selectedGroups = {};
   Map<String, Color> hintColors = {};
 
+  @override
+  void initState() {
+    super.initState();
+    loadMuscleGroups();
+    _loadMostRecentClient();// Llamar al método para cargar los grupos musculares
+  }
+
   // Método para obtener los grupos musculares desde la base de datos
   Future<void> loadMuscleGroups() async {
     final db = await openDatabase(
@@ -41,12 +49,6 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
       selectedGroups = {for (var row in result) row['nombre']: false};
       hintColors = {for (var row in result) row['nombre']: Colors.white};
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMostRecentClient();
   }
 
   // Cargar el cliente más reciente desde la base de datos
