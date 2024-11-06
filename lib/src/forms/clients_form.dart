@@ -42,20 +42,30 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    // Obtener la fecha actual
+    DateTime today = DateTime.now();
+
+    // Restar 18 años a la fecha actual para obtener la fecha límite
+    DateTime eighteenYearsAgo = DateTime(today.year - 18, today.month, today.day);
+
     final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+        context: context,
+        initialDate: eighteenYearsAgo,  // Puedes poner cualquier fecha válida aquí, por ejemplo, hoy.
+        firstDate: DateTime(1900),  // Establecemos un límite inferior para la selección (por ejemplo, 1900).
+        lastDate: eighteenYearsAgo // La última fecha seleccionable debe ser hace 18 años.
     );
+
     if (picked != null) {
+      // Aquí procesas la fecha seleccionada
       setState(() {
+        // Formateamos la fecha seleccionada en el formato dd/MM/yyyy
         _birthDate = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
 
   void _collectData() async {
+    // Verificar que los campos no estén vacíos
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _phoneController.text.isEmpty ||
@@ -63,11 +73,12 @@ class PersonalDataFormState extends State<PersonalDataForm> {
         _weightController.text.isEmpty ||
         selectedGender == null ||
         selectedOption == null ||
-        _birthDate == null) {
+        _birthDate == null ||
+        !_emailController.text.contains('@')) { // Verificación de '@' en el correo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            "Por favor, complete todos los campos.",
+            "Por favor, complete todos los campos correctamente.",
             style: TextStyle(color: Colors.white, fontSize: 17),
           ),
           backgroundColor: Colors.red,
@@ -77,8 +88,14 @@ class PersonalDataFormState extends State<PersonalDataForm> {
       return;
     }
 
+    // Convertir la primera letra del nombre a mayúscula
+    String name = _nameController.text.trim();
+    if (name.isNotEmpty) {
+      name = name[0].toUpperCase() + name.substring(1).toLowerCase();
+    }
+
     final clientData = {
-      'name': _nameController.text,
+      'name': name, // Nombre con la primera letra en mayúscula
       'email': _emailController.text,
       'phone': _phoneController.text,
       'height': _heightController.text,
@@ -105,9 +122,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
     );
 
     // Llama a la función onDataChanged para informar de los datos
-    widget.onDataChanged(
-        clientData); // Aquí notificamos que los datos fueron guardados
+    widget.onDataChanged(clientData); // Aquí notificamos que los datos fueron guardados
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -372,7 +390,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   controller: _heightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(3),
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
@@ -403,7 +422,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   controller: _weightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(3),
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),

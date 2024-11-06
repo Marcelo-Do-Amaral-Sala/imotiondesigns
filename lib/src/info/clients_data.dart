@@ -54,14 +54,23 @@ class _ClientsDataState extends State<ClientsData> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    // Obtener la fecha actual
+    DateTime today = DateTime.now();
+
+    // Restar 18 años a la fecha actual para obtener la fecha límite
+    DateTime eighteenYearsAgo = DateTime(today.year - 18, today.month, today.day);
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      initialDate: eighteenYearsAgo,  // Puedes poner cualquier fecha válida aquí, por ejemplo, hoy.
+      firstDate: DateTime(1900),  // Establecemos un límite inferior para la selección (por ejemplo, 1900).
+      lastDate: eighteenYearsAgo // La última fecha seleccionable debe ser hace 18 años.
     );
+
     if (picked != null) {
+      // Aquí procesas la fecha seleccionada
       setState(() {
+        // Formateamos la fecha seleccionada en el formato dd/MM/yyyy
         _birthDate = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
@@ -77,7 +86,8 @@ class _ClientsDataState extends State<ClientsData> {
         selectedGender == null ||
         selectedOption == null ||
         _birthDate == null ||
-        clientId == null) {
+        clientId == null ||
+        !_emailController.text.contains('@')) {
       // Show error Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -94,9 +104,14 @@ class _ClientsDataState extends State<ClientsData> {
       );
       return; // Exit method if there are empty fields
     }
+    // Convertir la primera letra del nombre a mayúscula
+    String name = _nameController.text.trim();
+    if (name.isNotEmpty) {
+      name = name[0].toUpperCase() + name.substring(1).toLowerCase();
+    }
 
     final clientData = {
-      'name': _nameController.text,
+      'name': name, // Nombre con la primera letra en mayúscula
       'email': _emailController.text,
       'phone': int.tryParse(_phoneController.text),
       'height': int.tryParse(_heightController.text), // Convert to int
@@ -191,7 +206,7 @@ class _ClientsDataState extends State<ClientsData> {
                   child: const Text(
                     'CANCELAR',
                     style:
-                    TextStyle(color: Color(0xFF2be4f3)), // Color del texto
+                        TextStyle(color: Color(0xFF2be4f3)), // Color del texto
                   ),
                 ),
                 OutlinedButton(
@@ -216,7 +231,7 @@ class _ClientsDataState extends State<ClientsData> {
                   },
                   style: OutlinedButton.styleFrom(
                     side:
-                    const BorderSide(color: Colors.red), // Color del borde
+                        const BorderSide(color: Colors.red), // Color del borde
                   ),
                   child: const Text(
                     '¡SÍ, ESTOY SEGURO!',
@@ -233,14 +248,8 @@ class _ClientsDataState extends State<ClientsData> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox(
       child: Padding(
@@ -436,7 +445,7 @@ class _ClientsDataState extends State<ClientsData> {
                                       color: const Color(0xFF313030),
                                       borderRadius: BorderRadius.circular(7)),
                                   padding:
-                                  const EdgeInsets.symmetric(vertical: 15),
+                                      const EdgeInsets.symmetric(vertical: 15),
                                   child: Text(_birthDate ?? 'DD/MM/YYYY',
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 12)),
@@ -492,7 +501,8 @@ class _ClientsDataState extends State<ClientsData> {
                                   controller: _heightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(3),
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
@@ -520,7 +530,8 @@ class _ClientsDataState extends State<ClientsData> {
                                   controller: _weightController,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(3),
                                   ],
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 12),
