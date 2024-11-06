@@ -317,9 +317,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                   ),
 
                   // Segundo contenedor para el segundo row de inputs
-                  SizedBox(
-                    width: screenWidth,
-                    height: screenHeight * 0.33,
+                  Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
