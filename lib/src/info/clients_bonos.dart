@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import '../customs/bonos_table_custom.dart';
 
 class ClientsBonos extends StatefulWidget {
@@ -13,7 +15,9 @@ class ClientsBonos extends StatefulWidget {
 class _ClientsBonosState extends State<ClientsBonos> {
   final _indexController = TextEditingController();
   final _nameController = TextEditingController();
+  final _bonosController = TextEditingController();
   String? selectedOption;
+  int? clientId; // Declare a variable to store the client ID
 
   List<Map<String, String>> availableBonos = [
     {'date': '12/12/2024', 'quantity': '5'},
@@ -42,6 +46,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
   @override
   void initState() {
     super.initState();
+    clientId = int.tryParse(widget.clientDataBonos['id'].toString());
     _indexController.text = widget.clientDataBonos['id'] ?? '';
     _nameController.text = widget.clientDataBonos['name'] ?? '';
     selectedOption = widget.clientDataBonos['status'];
@@ -105,7 +110,9 @@ class _ClientsBonosState extends State<ClientsBonos> {
           }, false), // Deshabilitar dropdown
           SizedBox(width: screenWidth * 0.02),
           OutlinedButton(
-            onPressed: () {}, // Mantener vacío para que InkWell funcione
+            onPressed: () {
+              _addBonos(context);
+            }, // Mantener vacío para que InkWell funcione
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.all(10.0),
               side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
@@ -239,7 +246,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, bool enabled) {
+  Widget _buildTextField(
+      String label, TextEditingController controller, bool enabled) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +267,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
               style: const TextStyle(color: Colors.white, fontSize: 12),
               decoration: InputDecoration(
                 border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
                 filled: true,
                 fillColor: const Color(0xFF313030),
                 isDense: true,
@@ -304,7 +312,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
                       child: Text('Inactivo',
                           style: TextStyle(color: Colors.white, fontSize: 12))),
                 ],
-                onChanged: enabled ? onChanged : null, // Si no está habilitado, no permite cambiar
+                onChanged: enabled ? onChanged : null,
+                // Si no está habilitado, no permite cambiar
                 dropdownColor: const Color(0xFF313030),
                 icon: const Icon(Icons.arrow_drop_down,
                     color: Color(0xFF2be4f3), size: 30),
@@ -313,6 +322,146 @@ class _ClientsBonosState extends State<ClientsBonos> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _addBonos(BuildContext context) async {
+    // Obtener el tamaño de la pantalla
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: const Color(0xFF494949), // Fondo del Dialog
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: const Color(0xFF2be4f3), width: 2),
+            borderRadius: BorderRadius.circular(7), // Bordes redondeados
+          ),
+          child: SizedBox(
+            height: screenHeight * 0.4,
+            // Ajusta el alto del dialog a un tercio de la pantalla
+            width: screenWidth * 0.4,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: screenWidth,
+                  height: screenHeight * 0.1,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(7),
+                    border:
+                        Border(bottom: BorderSide(color: Color(0xFF2be4f3))),
+                  ),
+                  child: Stack(
+                    children: [
+                      const Center(
+                        child: Text(
+                          "COMPRAR BONOS",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2be4f3),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(
+                            Icons.close_sharp,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5.0, vertical: 5.0),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF313030),
+                              borderRadius: BorderRadius.circular(7),
+                              border: Border.all(
+                                  color: Colors.white,
+                                  width: 1), // Borde blanco
+                            ),
+                            child: TextField(
+                              controller: _bonosController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 20),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                filled: true,
+                                fillColor: const Color(0xFF313030),
+                                hintText: 'Introduzca los bonos',
+                                hintStyle:
+                                    TextStyle(color: Colors.grey, fontSize: 20),
+                                isDense: true,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.green),
+                              // Fondo verde
+                              foregroundColor:
+                                  MaterialStateProperty.all(Colors.white),
+                              // Texto blanco
+                              padding: MaterialStateProperty.all(
+                                const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                    horizontal: 20), // Ajusta el tamaño aquí
+                              ),
+                            ),
+                            child: const Text(
+                              'AÑADIR',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20), // Color del texto (blanco)
+                            ),
+                          ),
+                        ],
+                      )),
+                )
+
+                // El TextField para ingresar los bonos
+                // Botón de acción
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
