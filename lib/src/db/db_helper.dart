@@ -220,20 +220,54 @@ class DatabaseHelper {
     }
   }
 
+  // Método para actualizar los grupos musculares asociados a un cliente
+  Future<void> updateClientGroups(int clientId, List<int> groupIds) async {
+    final db = await openDatabase('my_database.db'); // Asegúrate de usar la ruta correcta
 
-  Future<List<Map<String, dynamic>>> getGruposDeCliente(int clienteId) async {
-    final db = await database;
+    // Primero, eliminamos todos los registros existentes de esta relación para este cliente
+    await db.delete(
+      'clientes_grupos_musculares',
+      where: 'cliente_id = ?',
+      whereArgs: [clientId],
+    );
 
-    // Realizar la consulta con un INNER JOIN
-    final result = await db.rawQuery('''
-    SELECT g.*
-    FROM grupos_musculares g
-    INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
-    WHERE cg.cliente_id = ?
-  ''', [clienteId]);
-
-    return result;
+    // Luego, insertamos los nuevos registros de relación
+    for (int groupId in groupIds) {
+      await db.insert(
+        'clientes_grupos_musculares',
+        {
+          'cliente_id': clientId,
+          'grupo_muscular_id': groupId,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace, // Si existe un conflicto (mismo cliente y grupo), se reemplaza el registro
+      );
+    }
   }
+  Future<List<Map<String, dynamic>>> getGruposDeCliente(int clienteId) async {
+    try {
+      final db = await database;
+
+      // Realizar la consulta con un INNER JOIN
+      final result = await db.rawQuery('''
+      SELECT g.*
+      FROM grupos_musculares g
+      INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
+      WHERE cg.cliente_id = ?
+    ''', [clienteId]);
+
+      // Si no hay resultados, retornar una lista vacía
+      if (result.isEmpty) {
+        return [];
+      }
+
+      return result;
+    } catch (e) {
+      // Manejo de errores: en caso de que ocurra algún problema con la base de datos
+      print("Error al obtener grupos musculares: $e");
+      return [];  // Retorna una lista vacía en caso de error
+    }
+  }
+
 
   // Método para eliminar la base de datos
   Future<void> deleteDatabaseFile() async {

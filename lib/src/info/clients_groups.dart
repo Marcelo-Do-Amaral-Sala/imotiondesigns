@@ -41,7 +41,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     clientId = int.tryParse(widget.clientData['id'].toString());
     _indexController.text = clientId.toString(); // Set controller text
     loadMuscleGroups();
-    _loadClientById();// Llamar al método para cargar los grupos musculares
+    _loadClientById(); // Llamar al método para cargar los grupos musculares
   }
 
   @override
@@ -51,19 +51,76 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     super.dispose();
   }
 
+// Obtener los IDs de los grupos seleccionados
+  List<int> getSelectedGroupIds() {
+    List<int> selectedGroupIds = [];
+    selectedGroups.forEach((groupName, isSelected) {
+      if (isSelected) {
+        selectedGroupIds.add(groupIds[
+            groupName]!); // Añadir el ID del grupo si está seleccionado
+      }
+    });
+    return selectedGroupIds;
+  }
 
-  // Método para obtener los grupos musculares desde la base de datos
+  // Función para actualizar los grupos musculares del cliente
+  Future<void> updateClientGroups() async {
+    List<int> selectedGroupIds =
+        getSelectedGroupIds(); // Obtener los IDs de los grupos seleccionados
+
+    // Llamar al método en DatabaseHelper para actualizar la relación en la tabla
+    await dbHelper.updateClientGroups(clientId!, selectedGroupIds);
+
+    // Imprimir los grupos actualizados
+    print("Grupos musculares actualizados para el cliente $clientId:");
+    selectedGroupIds.forEach((groupId) {
+      final groupName =
+          groupIds.keys.firstWhere((key) => groupIds[key] == groupId);
+      print("- $groupName (ID: $groupId)");
+    });
+
+    // Mostrar un mensaje de éxito
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Grupos musculares actualizados correctamente.'),
+    ));
+  }
+
   Future<void> loadMuscleGroups() async {
-    final db = await openDatabase(
-        'my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
-    final List<Map<String, dynamic>> result =
-    await db.query('grupos_musculares');
+    final db = await openDatabase('my_database.db');
 
-    // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
+    // 1. Obtener todos los grupos musculares disponibles
+    final List<Map<String, dynamic>> result =
+        await db.query('grupos_musculares');
+
+    // 2. Obtener los grupos musculares asociados a este cliente
+    final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery('''
+    SELECT g.id, g.nombre
+    FROM grupos_musculares g
+    INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
+    WHERE cg.cliente_id = ?
+  ''', [clientId]);
+
+    // Actualizar el estado de los grupos y sus colores
     setState(() {
       selectedGroups = {for (var row in result) row['nombre']: false};
       hintColors = {for (var row in result) row['nombre']: Colors.white};
       groupIds = {for (var row in result) row['nombre']: row['id']};
+
+      // Marcar los grupos asociados al cliente como seleccionados
+      for (var group in clientGroupsResult) {
+        final groupName = group['nombre'];
+        if (groupName != null) {
+          selectedGroups[groupName] = true;
+          hintColors[groupName] =
+              const Color(0xFF2be4f3); // Color para los grupos seleccionados
+        }
+      }
+    });
+
+    // Imprimir los grupos asociados al cliente (clientGroupsResult)
+    print("Grupos musculares asociados al cliente $clientId:");
+    clientGroupsResult.forEach((group) {
+      print("- ${group['nombre']} (ID: ${group['id']})");
     });
   }
 
@@ -108,27 +165,6 @@ class _ClientsGroupsState extends State<ClientsGroups> {
       ));
     }
   }
-  /*// Función para insertar la relación entre cliente y grupo muscular
-  Future<void> insertClientGroup(int clienteId, int grupoMuscularId) async {
-    // Imprimir los datos antes de intentar insertar la relación
-    print("Intentando insertar relación: Cliente ID: $clienteId, Grupo Muscular ID: $grupoMuscularId");
-
-    bool success = await dbHelper.insertClientGroup(clienteId, grupoMuscularId);
-
-    // Si la inserción fue exitosa, muestra el mensaje correspondiente
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Relación insertada exitosamente'),
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Hubo un error al insertar la relación'),
-      ));
-    }
-  }*/
-
-
-
 
   /// Crear el checkbox redondo personalizado
   Widget customCheckbox(String option) {
@@ -137,9 +173,9 @@ class _ClientsGroupsState extends State<ClientsGroups> {
         setState(() {
           // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
           selectedGroups[option] =
-          !(selectedGroups[option] ?? false); // Si es null, toma false
+              !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
-          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+              selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
       },
       child: Container(
@@ -167,7 +203,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     setState(() {
       selectedGroups[option] = !selectedGroups[option]!;
       hintColors[option] =
-      selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
     });
   }
 
@@ -351,14 +387,14 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
                                                 borderRadius:
-                                                BorderRadius.circular(7),
+                                                    BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -374,12 +410,12 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        7),
+                                                        BorderRadius.circular(
+                                                            7),
                                                   ),
                                                   filled: true,
                                                   fillColor:
-                                                  const Color(0xFF313030),
+                                                      const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -414,16 +450,16 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                              [
-                                'Trapecios',
-                                'Dorsales',
-                                'Lumbares',
-                                'Glúteos',
-                                'Isquios',
-                                'Gemelos'
-                              ].contains(entry.key) &&
-                                  entry
-                                      .value) // Filtra solo los grupos seleccionados
+                                      [
+                                        'Trapecios',
+                                        'Dorsales',
+                                        'Lumbares',
+                                        'Glúteos',
+                                        'Isquios',
+                                        'Gemelos'
+                                      ].contains(entry.key) &&
+                                      entry
+                                          .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String imagePath =
@@ -462,14 +498,14 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                              [
-                                'Pectorales',
-                                'Abdominales',
-                                'Cuádriceps',
-                                'Bíceps'
-                              ].contains(entry.key) &&
-                                  entry
-                                      .value) // Filtra solo los grupos seleccionados
+                                      [
+                                        'Pectorales',
+                                        'Abdominales',
+                                        'Cuádriceps',
+                                        'Bíceps'
+                                      ].contains(entry.key) &&
+                                      entry
+                                          .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String imagePath =
@@ -511,14 +547,14 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
                                                 borderRadius:
-                                                BorderRadius.circular(7),
+                                                    BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -534,12 +570,12 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        7),
+                                                        BorderRadius.circular(
+                                                            7),
                                                   ),
                                                   filled: true,
                                                   fillColor:
-                                                  const Color(0xFF313030),
+                                                      const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -569,18 +605,9 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                   GestureDetector(
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    /*onTap: () async {
-                      // Recoger los grupos seleccionados
-                      for (var groupName in selectedGroups.keys) {
-                        if (selectedGroups[groupName] == true) {
-                          int grupoMuscularId = groupIds[groupName]!;
-                          int clienteId = selectedClient!['id'];
-
-                          // Llamar a la función para insertar la relación
-                          await insertClientGroup(clienteId, grupoMuscularId);
-                        }
-                      }
-                    },*/
+                    onTap: () async {
+                      updateClientGroups();
+                    },
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),
