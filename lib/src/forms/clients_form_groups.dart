@@ -37,7 +37,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
   void initState() {
     super.initState();
     loadMuscleGroups();
-    _loadMostRecentClient();// Llamar al método para cargar los grupos musculares
+    _loadMostRecentClient(); // Llamar al método para cargar los grupos musculares
   }
 
   // Método para obtener los grupos musculares desde la base de datos
@@ -69,26 +69,53 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
       });
     }
   }
-  // Función para insertar la relación entre cliente y grupo muscular
-  Future<void> insertClientGroup(int clienteId, int grupoMuscularId) async {
-    // Imprimir los datos antes de intentar insertar la relación
-    print("Intentando insertar relación: Cliente ID: $clienteId, Grupo Muscular ID: $grupoMuscularId");
 
-    bool success = await dbHelper.insertClientGroup(clienteId, grupoMuscularId);
+// Función para insertar la relación entre cliente y grupos musculares
+  Future<void> insertClientGroups(
+      int clienteId, List<int> grupoMuscularIds) async {
+    // Variable para acumular el éxito de las inserciones
+    bool allSuccess = true;
 
-    // Si la inserción fue exitosa, muestra el mensaje correspondiente
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Relación insertada exitosamente'),
-      ));
+    // Imprimir los datos antes de intentar insertar las relaciones
+    print(
+        "Intentando insertar relaciones: Cliente ID: $clienteId, Grupos Musculares IDs: $grupoMuscularIds");
+
+    // Recorrer la lista de grupos musculares e insertar cada uno
+    for (int grupoMuscularId in grupoMuscularIds) {
+      bool success =
+          await dbHelper.insertClientGroup(clienteId, grupoMuscularId);
+
+      if (!success) {
+        allSuccess = false; // Si alguna inserción falla, cambiamos el estado
+        break; // Salimos del bucle si alguna inserción falla
+      }
+    }
+
+    // Mostrar el SnackBar solo una vez, dependiendo del resultado final
+    if (allSuccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Grupos añadidos correctamente",
+            style: TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Hubo un error al insertar la relación'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "No se han podido añadir todos los grupos",
+            style: TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
-
-
 
   @override
   void dispose() {
@@ -537,15 +564,36 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
+                      // Crear una lista para los IDs de los grupos seleccionados
+                      List<int> selectedGroupIds = [];
+
                       // Recoger los grupos seleccionados
                       for (var groupName in selectedGroups.keys) {
                         if (selectedGroups[groupName] == true) {
                           int grupoMuscularId = groupIds[groupName]!;
-                          int clienteId = selectedClient!['id'];
-
-                          // Llamar a la función para insertar la relación
-                          await insertClientGroup(clienteId, grupoMuscularId);
+                          selectedGroupIds.add(grupoMuscularId);
                         }
+                      }
+
+                      // Verificar si hay grupos seleccionados antes de intentar la inserción
+                      if (selectedGroupIds.isNotEmpty) {
+                        int clienteId =
+                            selectedClient!['id']; // Obtener el ID del cliente
+                        await insertClientGroups(clienteId, selectedGroupIds);
+                        widget.onClose();
+                      } else {
+                        // Si no hay grupos seleccionados, mostrar un mensaje informativo
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "No se han seleccionado grupos musculares",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 17),
+                            ),
+                            backgroundColor: Colors.orange,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
                       }
                     },
                     child: AnimatedScale(

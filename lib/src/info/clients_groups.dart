@@ -79,10 +79,19 @@ class _ClientsGroupsState extends State<ClientsGroups> {
       print("- $groupName (ID: $groupId)");
     });
 
-    // Mostrar un mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Grupos musculares actualizados correctamente.'),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Grupos actualizados correctamente",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+          ),
+        ),
+        backgroundColor: Color(0xFF2be4f3),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   Future<void> loadMuscleGroups() async {

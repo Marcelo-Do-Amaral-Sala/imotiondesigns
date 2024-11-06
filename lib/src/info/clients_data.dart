@@ -89,7 +89,7 @@ class _ClientsDataState extends State<ClientsData> {
             ),
           ),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 4),
+          duration: Duration(seconds: 2),
         ),
       );
       return; // Exit method if there are empty fields
@@ -124,11 +124,11 @@ class _ClientsDataState extends State<ClientsData> {
           "Cliente actualizado correctamente",
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 17,
           ),
         ),
         backgroundColor: Color(0xFF2be4f3),
-        duration: Duration(seconds: 4),
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -191,7 +191,7 @@ class _ClientsDataState extends State<ClientsData> {
                   child: const Text(
                     'CANCELAR',
                     style:
-                        TextStyle(color: Color(0xFF2be4f3)), // Color del texto
+                    TextStyle(color: Color(0xFF2be4f3)), // Color del texto
                   ),
                 ),
                 OutlinedButton(
@@ -204,10 +204,10 @@ class _ClientsDataState extends State<ClientsData> {
                       const SnackBar(
                         content: Text(
                           "Cliente borrado correctamente",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          style: TextStyle(color: Colors.white, fontSize: 17),
                         ),
-                        backgroundColor: Colors.green,
-                        duration: Duration(seconds: 4),
+                        backgroundColor: Colors.orange,
+                        duration: Duration(seconds: 2),
                       ),
                     );
                     // Cierra el diálogo después de confirmar el borrado
@@ -216,7 +216,7 @@ class _ClientsDataState extends State<ClientsData> {
                   },
                   style: OutlinedButton.styleFrom(
                     side:
-                        const BorderSide(color: Colors.red), // Color del borde
+                    const BorderSide(color: Colors.red), // Color del borde
                   ),
                   child: const Text(
                     '¡SÍ, ESTOY SEGURO!',
@@ -233,8 +233,14 @@ class _ClientsDataState extends State<ClientsData> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return SizedBox(
       child: Padding(
@@ -430,7 +436,7 @@ class _ClientsDataState extends State<ClientsData> {
                                       color: const Color(0xFF313030),
                                       borderRadius: BorderRadius.circular(7)),
                                   padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
+                                  const EdgeInsets.symmetric(vertical: 15),
                                   child: Text(_birthDate ?? 'DD/MM/YYYY',
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 12)),

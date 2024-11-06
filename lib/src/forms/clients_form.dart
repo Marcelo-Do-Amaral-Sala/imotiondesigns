@@ -68,10 +68,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
         const SnackBar(
           content: Text(
             "Por favor, complete todos los campos.",
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            style: TextStyle(color: Colors.white, fontSize: 17),
           ),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 4),
+          duration: Duration(seconds: 2),
         ),
       );
       return;
@@ -97,10 +97,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
       const SnackBar(
         content: Text(
           "Cliente añadido correctamente",
-          style: TextStyle(color: Colors.white, fontSize: 20),
+          style: TextStyle(color: Colors.white, fontSize: 17),
         ),
-        backgroundColor: Color(0xFF2be4f3),
-        duration: Duration(seconds: 4),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
       ),
     );
 
