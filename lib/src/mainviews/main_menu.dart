@@ -68,7 +68,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                   });
                                 },
                                 () {
-                                  setState(() => scaleFactorPanel = 0.95);
+                                  setState(() => scaleFactorPanel = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -82,7 +82,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                   widget.onNavigateToClients();
                                 },
                                 () {
-                                  setState(() => scaleFactorClient = 0.95);
+                                  setState(() => scaleFactorClient = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -97,7 +97,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                   });
                                 },
                                 () {
-                                  setState(() => scaleFactorProgram = 0.95);
+                                  setState(() => scaleFactorProgram = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -112,7 +112,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                   });
                                 },
                                 () {
-                                  setState(() => scaleFactorBio = 0.95);
+                                  setState(() => scaleFactorBio = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -127,7 +127,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                   });
                                 },
                                 () {
-                                  setState(() => scaleFactorTuto = 0.95);
+                                  setState(() => scaleFactorTuto = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -142,7 +142,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                   });
                                 },
                                 () {
-                                  setState(() => scaleFactorAjustes = 0.95);
+                                  setState(() => scaleFactorAjustes = 0.90);
                                 },
                               ),
                             ],

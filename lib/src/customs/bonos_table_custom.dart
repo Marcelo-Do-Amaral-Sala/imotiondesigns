@@ -26,7 +26,7 @@ class _BonosTableWidgetState extends State<BonosTableWidget> {
                     DataRowWidget(
                       date: row['date'] ?? '',
                       hour: widget.showHour ? (row['hour'] ?? '') : '',
-                      quantity: row['quantity'] ?? '',
+                      quantity: row['quantity']?? '',
                       showHour: widget.showHour, // Pasar el estado de showHour
                     ),
                     const SizedBox(height: 2),

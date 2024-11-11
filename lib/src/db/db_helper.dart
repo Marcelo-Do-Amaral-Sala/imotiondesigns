@@ -26,7 +26,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2, // Incrementamos la versión a 2
+      version: 5, // Incrementamos la versión a 3
       onCreate: _onCreate, // Método que se ejecuta solo al crear la base de datos
       onUpgrade: _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
@@ -67,6 +67,17 @@ class DatabaseHelper {
     )
   ''');
 
+// Crear la tabla bonos
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS bonos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cliente_id INTEGER,
+      cantidad INTEGER NOT NULL,
+      fecha TEXT NOT NULL,
+      estado TEXT NOT NULL,
+      FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+    )
+  ''');
     // Insertar valores predeterminados en la tabla grupos_musculares
     await db.insert('grupos_musculares', {'nombre': 'Pectorales'});
     await db.insert('grupos_musculares', {'nombre': 'Trapecios'});
@@ -81,16 +92,17 @@ class DatabaseHelper {
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      // Este bloque se ejecuta solo si la base de datos está en una versión anterior (1)
-      // Es necesario crear la nueva tabla 'clientes_grupos_musculares'
+    if (oldVersion < 5) {
+      // Este bloque se ejecuta solo si la base de datos está en una versión anterior (1 o 2)
+      // Añadir la nueva tabla 'bonos'
       await db.execute('''
-      CREATE TABLE IF NOT EXISTS clientes_grupos_musculares (
+      CREATE TABLE IF NOT EXISTS bonos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         cliente_id INTEGER,
-        grupo_muscular_id INTEGER,
-        PRIMARY KEY (cliente_id, grupo_muscular_id),
-        FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
-        FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares(id) ON DELETE CASCADE
+        cantidad INTEGER NOT NULL,
+        fecha TEXT NOT NULL,
+        estado TEXT NOT NULL,
+        FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
       )
     ''');
     }
@@ -192,6 +204,50 @@ class DatabaseHelper {
     );
   }
 
+  // Insertar un bono
+  Future<void> insertBono(Map<String, dynamic> bono) async {
+    final db = await database;
+
+    try {
+      await db.insert(
+        'bonos',
+        bono,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      print('Error inserting bono: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAvailableBonosByClientId(int clientId) async {
+    final db = await database;
+    final result = await db.query(
+      'bonos', // Nombre de la tabla de bonos
+      where: 'cliente_id = ? AND estado = ?',
+      whereArgs: [clientId, 'Disponible'], // Filtra por cliente y estado "Disponible"
+    );
+    return result;
+  }
+
+
+  // Obtener todos los bonos
+  Future<List<Map<String, dynamic>>> getAllBonos() async {
+    final db = await database;
+
+    final result = await db.query('bonos');
+    return result;
+  }
+
+  // Eliminar un bono por ID
+  Future<void> deleteBono(int id) async {
+    final db = await database;
+
+    await db.delete(
+      'bonos',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
   // Obtener los datos de la tabla grupos_musculares
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;

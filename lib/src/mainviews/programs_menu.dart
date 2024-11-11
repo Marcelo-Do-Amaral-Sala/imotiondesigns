@@ -2,25 +2,25 @@ import 'dart:io'; // Importante para detectar la plataforma (Android/iOS vs PC)
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import '../db/db_helper.dart';
-import '../db/db_helper_pc.dart';
-import '../db/db_helper_web.dart';
+
+
 import '../overlayviews/overlays.dart';
 
-class ClientsView extends StatefulWidget {
+class ProgramsMenu extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
-  const ClientsView({super.key, required this.onBack});
+  const ProgramsMenu({super.key, required this.onBack});
 
   @override
-  State<ClientsView> createState() => _ClientsViewState();
+  State<ProgramsMenu> createState() => _ProgramsMenuState();
 }
 
-class _ClientsViewState extends State<ClientsView> {
+class _ProgramsMenuState extends State<ProgramsMenu> {
   double scaleFactorBack = 1.0;
-  double scaleFactorListado = 1.0;
-  double scaleFactorCrear = 1.0;
+  double scaleFactorIndividuales = 1.0;
+  double scaleFactorAuto = 1.0;
+  double scaleFactorRecovery = 1.0;
+  double scaleFactorCrearP = 1.0;
 
   bool isOverlayVisible = false;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
@@ -28,40 +28,6 @@ class _ClientsViewState extends State<ClientsView> {
   @override
   void initState() {
     super.initState();
-    _initializeDatabase();
-  }
-
-  Future<void> _initializeDatabase() async {
-    try {
-      if (kIsWeb) {
-        // Para la plataforma web, usamos sqflite_common_ffi_web
-        debugPrint("Inicializando base de datos para Web...");
-        databaseFactory = databaseFactoryFfi;
-        // Aquí no es necesario asignar `databaseFactory` para la web ya que sqflite_common_ffi_web lo maneja automáticamente
-        await DatabaseHelperWeb().initializeDatabase(); // Inicializamos la base de datos con el helper de Web
-      } else if (Platform.isAndroid || Platform.isIOS) {
-        // Para plataformas móviles (Android/iOS)
-        debugPrint("Inicializando base de datos para Móviles...");
-
-        // Usamos el factory de sqflite para dispositivos móviles
-        await DatabaseHelper().initializeDatabase(); // Inicializamos la base de datos con el helper de móviles
-      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-        // Para plataformas de escritorio (Windows, macOS, Linux)
-        debugPrint("Inicializando base de datos para Desktop...");
-
-        // En plataformas de escritorio, se usa `databaseFactoryFfi`
-        databaseFactory = databaseFactoryFfi; // Usamos el backend FFI para escritorio
-
-        await DatabaseHelperPC().initializeDatabase(); // Inicializamos la base de datos con el helper de PC
-      } else {
-        // Caso para plataformas no soportadas (como WebAssembly, otros casos)
-        throw UnsupportedError('Plataforma no soportada para la base de datos.');
-      }
-
-      debugPrint("Base de datos inicializada correctamente.");
-    } catch (e) {
-      debugPrint("Error al inicializar la base de datos: $e");
-    }
   }
 
   void toggleOverlay(int index) {
@@ -119,20 +85,20 @@ class _ClientsViewState extends State<ClientsView> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(10.0),
                                             width: screenWidth * 0.05,
                                             height: screenHeight * 0.1,
                                             child: Image.asset(
-                                              'assets/images/cliente.png',
+                                              'assets/images/programas.png',
                                               fit: BoxFit.contain,
                                             ),
                                           ),
                                           const Expanded(
                                             child: Text(
-                                              "CLIENTES",
+                                              "PROGRAMAS",
                                               style: TextStyle(
                                                 color: Color(0xFF28E2F5),
                                                 fontSize: 30,
@@ -150,32 +116,45 @@ class _ClientsViewState extends State<ClientsView> {
                               SizedBox(height: screenHeight * 0.05),
                               buildButton(
                                 context,
-                                'Listado de clientes',
-                                scaleFactorListado,
-                                    () {
-                                  setState(() {
-                                    scaleFactorListado = 1;
-                                    toggleOverlay(0);
-                                  });
-                                },
+                                'Individuales',
+                                scaleFactorIndividuales,
+                                    () => toggleOverlay(0),
                                 // Index 0 para OverlayInfo
-                                () {
-                                  setState(() => scaleFactorListado = 0.90);
+                                    () {
+                                  setState(() => scaleFactorIndividuales = 0.95);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Crear clientes',
-                                scaleFactorCrear,
+                                'Automáticos',
+                                scaleFactorAuto,
+                                    () => toggleOverlay(1),
+                                // Index 1 para OverlayCrear
                                     () {
-                                  setState(() {
-                                    scaleFactorCrear = 1;
-                                    toggleOverlay(1);
-                                  });
+                                  setState(() => scaleFactorAuto = 0.95);
                                 },
-                                () {
-                                  setState(() => scaleFactorCrear = 0.90);
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+                              buildButton(
+                                context,
+                                'Recovery',
+                                scaleFactorRecovery,
+                                    () => toggleOverlay(2),
+                                // Index 1 para OverlayCrear
+                                    () {
+                                  setState(() => scaleFactorRecovery = 0.95);
+                                },
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+                              buildButton(
+                                context,
+                                'Crear programa',
+                                scaleFactorCrearP,
+                                    () => toggleOverlay(3),
+                                // Index 1 para OverlayCrear
+                                    () {
+                                  setState(() => scaleFactorCrearP = 0.95);
                                 },
                               ),
                             ],
@@ -201,7 +180,7 @@ class _ClientsViewState extends State<ClientsView> {
                               right: 0,
                               child: GestureDetector(
                                 onTapDown: (_) =>
-                                    setState(() => scaleFactorBack = 0.90),
+                                    setState(() => scaleFactorBack = 0.95),
                                 onTapUp: (_) =>
                                     setState(() => scaleFactorBack = 1.0),
                                 onTap: () {
@@ -224,17 +203,17 @@ class _ClientsViewState extends State<ClientsView> {
                                 ),
                               ),
                             ),
-                            if (isOverlayVisible)
+                            /*if (isOverlayVisible)
                               Positioned.fill(
                                 top: screenHeight * 0.12,
                                 child: overlayIndex == 0
                                     ? OverlayInfo(
-                                        onClose: () => toggleOverlay(0),
-                                      )
+                                  onClose: () => toggleOverlay(0),
+                                )
                                     : OverlayCrear(
-                                        onClose: () => toggleOverlay(1),
-                                      ),
-                              ),
+                                  onClose: () => toggleOverlay(1),
+                                ),
+                              ),*/
                           ],
                         ),
                       ),

@@ -73,14 +73,14 @@ class _ClientListViewState extends State<ClientListView> {
       selectedOption = clientData['status'] ?? 'Todos'; // Cambiar a 'Todos' si es nulo
     });
   }
-  // Método para llamar al deleteDatabaseFile
+/*  // Método para llamar al deleteDatabaseFile
   Future<void> _deleteDatabase() async {
     final dbHelper = DatabaseHelper();
     await dbHelper.deleteDatabaseFile();  // Elimina la base de datos
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Base de datos eliminada con éxito.'),
     ));
-  }
+  }*/
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -93,7 +93,7 @@ class _ClientListViewState extends State<ClientListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              /*ElevatedButton(
+             /* ElevatedButton(
                 onPressed: _deleteDatabase,  // Llama al método que elimina la base de datos
                 child: Text('Eliminar Base de Datos'),
               ),*/
