@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
+import 'package:imotion_designs/src/mainviews/programs_menu.dart';
 import 'mainviews/clients_main_view.dart';
 
 class App extends StatefulWidget {
@@ -30,10 +31,18 @@ class _AppState extends State<App> {
               navigateTo('mainMenu'), // Callback para volver a MainMenuView
         );
         break;
+
+      case 'programs':
+        viewToDisplay = ProgramsMenuView(
+          onBack: () =>
+              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+        );
+        break;
       case 'mainMenu':
       default:
         viewToDisplay = MainMenuView(
           onNavigateToClients: () => navigateTo('clients'),
+          onNavigateToPrograms: () => navigateTo('programs'),
         );
         break;
     }

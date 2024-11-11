@@ -1,9 +1,18 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../db/db_helper.dart';
+import '../db/db_helper_pc.dart';
+import '../db/db_helper_web.dart';
 
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToClients;
+  final Function() onNavigateToPrograms;
 
-  const MainMenuView({Key? key, required this.onNavigateToClients})
+  const MainMenuView({Key? key, required this.onNavigateToClients, required this.onNavigateToPrograms})
       : super(key: key);
 
   @override
@@ -21,6 +30,50 @@ class _MainMenuViewState extends State<MainMenuView> {
   bool isOverlayVisible = false;
   String overlayContentType = '';
   Map<String, String>? clientData;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDatabase();
+  }
+
+  Future<void> _initializeDatabase() async {
+    try {
+      if (kIsWeb) {
+        // Para la plataforma web, usamos sqflite_common_ffi_web
+        debugPrint("Inicializando base de datos para Web...");
+        databaseFactory = databaseFactoryFfi;
+        // Aquí no es necesario asignar `databaseFactory` para la web ya que sqflite_common_ffi_web lo maneja automáticamente
+        await DatabaseHelperWeb()
+            .initializeDatabase(); // Inicializamos la base de datos con el helper de Web
+      } else if (Platform.isAndroid || Platform.isIOS) {
+        // Para plataformas móviles (Android/iOS)
+        debugPrint("Inicializando base de datos para Móviles...");
+
+        // Usamos el factory de sqflite para dispositivos móviles
+        await DatabaseHelper()
+            .initializeDatabase(); // Inicializamos la base de datos con el helper de móviles
+      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        // Para plataformas de escritorio (Windows, macOS, Linux)
+        debugPrint("Inicializando base de datos para Desktop...");
+
+        // En plataformas de escritorio, se usa `databaseFactoryFfi`
+        databaseFactory =
+            databaseFactoryFfi; // Usamos el backend FFI para escritorio
+
+        await DatabaseHelperPC()
+            .initializeDatabase(); // Inicializamos la base de datos con el helper de PC
+      } else {
+        // Caso para plataformas no soportadas (como WebAssembly, otros casos)
+        throw UnsupportedError(
+            'Plataforma no soportada para la base de datos.');
+      }
+
+      debugPrint("Base de datos inicializada correctamente.");
+    } catch (e) {
+      debugPrint("Error al inicializar la base de datos: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +147,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 () {
                                   setState(() {
                                     scaleFactorProgram = 1;
+                                    widget.onNavigateToPrograms();
                                   });
                                 },
                                 () {

@@ -2,22 +2,24 @@ import 'dart:io'; // Importante para detectar la plataforma (Android/iOS vs PC)
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-
-
+import '../db/db_helper.dart';
+import '../db/db_helper_pc.dart';
+import '../db/db_helper_web.dart';
 import '../overlayviews/overlays.dart';
 
-class ProgramsMenu extends StatefulWidget {
+class ProgramsMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
-  const ProgramsMenu({super.key, required this.onBack});
+  const ProgramsMenuView({super.key, required this.onBack});
 
   @override
-  State<ProgramsMenu> createState() => _ProgramsMenuState();
+  State<ProgramsMenuView> createState() => _ProgramsMenuViewState();
 }
 
-class _ProgramsMenuState extends State<ProgramsMenu> {
+class _ProgramsMenuViewState extends State<ProgramsMenuView> {
   double scaleFactorBack = 1.0;
-  double scaleFactorIndividuales = 1.0;
+  double scaleFactorIndiv = 1.0;
   double scaleFactorAuto = 1.0;
   double scaleFactorRecovery = 1.0;
   double scaleFactorCrearP = 1.0;
@@ -117,11 +119,16 @@ class _ProgramsMenuState extends State<ProgramsMenu> {
                               buildButton(
                                 context,
                                 'Individuales',
-                                scaleFactorIndividuales,
-                                    () => toggleOverlay(0),
+                                scaleFactorIndiv,
+                                    () {
+                                  setState(() {
+                                    scaleFactorIndiv = 1;
+                                    //toggleOverlay(0);
+                                  });
+                                },
                                 // Index 0 para OverlayInfo
                                     () {
-                                  setState(() => scaleFactorIndividuales = 0.95);
+                                  setState(() => scaleFactorIndiv = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -129,10 +136,14 @@ class _ProgramsMenuState extends State<ProgramsMenu> {
                                 context,
                                 'Automáticos',
                                 scaleFactorAuto,
-                                    () => toggleOverlay(1),
-                                // Index 1 para OverlayCrear
                                     () {
-                                  setState(() => scaleFactorAuto = 0.95);
+                                  setState(() {
+                                    scaleFactorAuto = 1;
+                                    //toggleOverlay(1);
+                                  });
+                                },
+                                    () {
+                                  setState(() => scaleFactorAuto = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -140,10 +151,14 @@ class _ProgramsMenuState extends State<ProgramsMenu> {
                                 context,
                                 'Recovery',
                                 scaleFactorRecovery,
-                                    () => toggleOverlay(2),
-                                // Index 1 para OverlayCrear
                                     () {
-                                  setState(() => scaleFactorRecovery = 0.95);
+                                  setState(() {
+                                    scaleFactorRecovery = 1;
+                                    //toggleOverlay(2);
+                                  });
+                                },
+                                    () {
+                                  setState(() => scaleFactorRecovery = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
@@ -151,10 +166,14 @@ class _ProgramsMenuState extends State<ProgramsMenu> {
                                 context,
                                 'Crear programa',
                                 scaleFactorCrearP,
-                                    () => toggleOverlay(3),
-                                // Index 1 para OverlayCrear
                                     () {
-                                  setState(() => scaleFactorCrearP = 0.95);
+                                  setState(() {
+                                    scaleFactorCrearP = 1;
+                                    //toggleOverlay(3);
+                                  });
+                                },
+                                    () {
+                                  setState(() => scaleFactorCrearP = 0.90);
                                 },
                               ),
                             ],
@@ -180,7 +199,7 @@ class _ProgramsMenuState extends State<ProgramsMenu> {
                               right: 0,
                               child: GestureDetector(
                                 onTapDown: (_) =>
-                                    setState(() => scaleFactorBack = 0.95),
+                                    setState(() => scaleFactorBack = 0.90),
                                 onTapUp: (_) =>
                                     setState(() => scaleFactorBack = 1.0),
                                 onTap: () {
@@ -203,7 +222,7 @@ class _ProgramsMenuState extends State<ProgramsMenu> {
                                 ),
                               ),
                             ),
-                            /*if (isOverlayVisible)
+                           /* if (isOverlayVisible)
                               Positioned.fill(
                                 top: screenHeight * 0.12,
                                 child: overlayIndex == 0
