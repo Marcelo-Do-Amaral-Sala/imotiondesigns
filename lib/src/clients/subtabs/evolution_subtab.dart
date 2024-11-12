@@ -138,7 +138,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
             text,
             style: TextStyle(
               color: isSelected ? const Color(0xFF2be4f3) : Colors.white,
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               decoration:
                   isSelected ? TextDecoration.underline : TextDecoration.none,
@@ -215,42 +215,42 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 12,
                             ));
                       case 20:
                         return const Text('Muy bien',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 12,
                             ));
                       case 40:
                         return const Text('Normal',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 12,
                             ));
                       case 60:
                         return const Text('Cerca de la norma',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 12,
                             ));
                       case 80:
                         return const Text('A vigilar',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 12,
                             ));
                       case 100:
                         return const Text('A tratar',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 12,
                             ));
                     }
                     return const Text('');

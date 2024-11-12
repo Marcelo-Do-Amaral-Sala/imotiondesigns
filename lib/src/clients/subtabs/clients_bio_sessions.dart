@@ -127,7 +127,7 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
                                 (text) => Text(
                                   text,
                                   style: const TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 14,
                                       color: Colors.white,
                                       fontStyle: FontStyle.italic),
                                 ),

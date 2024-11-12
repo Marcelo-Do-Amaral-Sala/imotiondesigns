@@ -11,8 +11,11 @@ class BioSessionTableWidget extends StatefulWidget {
 }
 
 class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
+
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Column(
       children: [
         buildHeaderRow(), // Encabezado de columnas
@@ -66,7 +69,7 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 12,
+            fontSize: 14,
           ),
         ),
       ),
@@ -123,7 +126,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
           style: const TextStyle(
             color: Colors.white, // Cambia el color según tu diseño
             fontWeight: FontWeight.bold,
-            fontSize: 12, // Tamaño de fuente personalizado
+            fontSize: 14, // Tamaño de fuente personalizado
           ),
         ),
       ),
@@ -139,7 +142,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 12,
+            fontSize: 14,
           ),
         ),
       ),
