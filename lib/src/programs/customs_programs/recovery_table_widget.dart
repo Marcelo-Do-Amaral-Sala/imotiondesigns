@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-class IndividualTableWidget extends StatefulWidget {
+class RecoveryTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> programData; // Mantener el tipo como dynamic
 
-  const IndividualTableWidget({super.key, required this.programData});
+  const RecoveryTableWidget({super.key, required this.programData});
 
   @override
-  _IndividualTableWidgetState createState() => _IndividualTableWidgetState();
+  _RecoveryTableWidgetState createState() => _RecoveryTableWidgetState();
 }
 
-class _IndividualTableWidgetState extends State<IndividualTableWidget> {
+class _RecoveryTableWidgetState extends State<RecoveryTableWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -81,7 +81,7 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
             style: TextStyle(
               color: isNameColumn
                   ? const Color.fromARGB(255, 3, 236,
-                      244) // Color específico para la columna de nombre
+                  244) // Color específico para la columna de nombre
                   : Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 15, // Ajuste del tamaño de la fuente

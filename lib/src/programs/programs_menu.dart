@@ -83,7 +83,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(10.0),
@@ -116,13 +116,13 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                 context,
                                 'Individuales',
                                 scaleFactorIndiv,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorIndiv = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorIndiv = 0.90);
                                 },
                               ),
@@ -131,12 +131,13 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                 context,
                                 'Automáticos',
                                 scaleFactorAuto,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorAuto = 1;
+                                    toggleOverlay(1);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorAuto = 0.90);
                                 },
                               ),
@@ -145,12 +146,13 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                 context,
                                 'Recovery',
                                 scaleFactorRecovery,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorRecovery = 1;
+                                    toggleOverlay(2);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorRecovery = 0.90);
                                 },
                               ),
@@ -159,12 +161,12 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                 context,
                                 'Crear programa',
                                 scaleFactorCrearP,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorCrearP = 1;
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorCrearP = 0.90);
                                 },
                               ),
@@ -229,16 +231,36 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
             Positioned.fill(
               child: Align(
                 alignment: Alignment.center,
-                child: overlayIndex == 0
-                    ? OverlayIndividuales(
-                  onClose: () => toggleOverlay(0),
-                )
-                    : Container(),
+                child: _getOverlayWidget(overlayIndex),
               ),
             ),
         ],
       ),
     );
+  }
+
+  Widget _getOverlayWidget(int overlayIndex) {
+    switch (overlayIndex) {
+      case 0:
+        return OverlayIndividuales(
+          onClose: () => toggleOverlay(0),
+        );
+
+      case 1:
+        return OverlayAuto(
+          onClose: () => toggleOverlay(1),
+        );
+      case 2:
+        return OverlayRecovery(
+          onClose: () => toggleOverlay(2),
+        );
+      /* case 3:
+        return OverlayCuarto(
+          onClose: () => toggleOverlay(3),
+        );*/
+      default:
+        return Container(); // Si no coincide con ninguno de los índices, no muestra nada
+    }
   }
 
   Widget buildButton(BuildContext context, String text, double scale,

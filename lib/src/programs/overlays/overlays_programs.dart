@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:imotion_designs/src/programs/info_programs/programs_list_view.dart';
+import 'package:imotion_designs/src/programs/info_programs/programs_indiv_list_view.dart';
+import 'package:imotion_designs/src/programs/info_programs/programs_reco_list_view.dart';
 
 import '../../clients/overlays/main_overlay.dart';
+import '../info_programs/programs_auto_list_view.dart';
 
 class OverlayIndividuales extends StatefulWidget {
   final VoidCallback onClose;
@@ -49,11 +51,181 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
       ),
       content: isInfoVisible && selectedProgram != null
           ? Column()
-          : ProgramsListView(
-              onProgramTap: (programData) {
-                selectProgram(programData);
-              },
-            ),
+          : ProgramsIndividualesListView(),
+      onClose: widget.onClose,
+    );
+  }
+}
+
+class OverlayAuto extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayAuto({Key? key, required this.onClose}) : super(key: key);
+
+  @override
+  _OverlayAutoState createState() => _OverlayAutoState();
+}
+
+class _OverlayAutoState extends State<OverlayAuto> {
+  Map<String, dynamic>? selectedProgram; // To store the selected program
+  bool isInfoVisible = false; // To track if the program info is being displayed
+
+  // Function to handle program selection
+  void selectProgram(Map<String, dynamic> programData) {
+    setState(() {
+      selectedProgram = programData;
+      isInfoVisible = true; // Show the program info view
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainOverlay(
+      title: const Text(
+        "AUTOMÁTICOS",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: isInfoVisible && selectedProgram != null
+          ? _buildProgramInfoView() // Show detailed view of the program
+          : ProgramsAutoListView(),
+      onClose:
+          widget.onClose, // Close the overlay when the close button is clicked
+    );
+  }
+
+  // This function displays the selected program's details
+  Widget _buildProgramInfoView() {
+    var program = selectedProgram!; // Get the selected program data
+
+    // Debug print to check the program structure
+    debugPrint('Selected Program: ${program.toString()}');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Nombre del Programa: ${program['name']}',
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        SizedBox(height: 10),
+        Image.asset(
+          program['image'], // Show the image of the selected program
+          width: 200,
+          height: 200,
+          fit: BoxFit.contain,
+        ),
+        SizedBox(height: 10),
+        Text(
+          'Descripción: ${program['descripcion'] ?? 'No disponible'}',
+          style: TextStyle(fontSize: 16, color: Colors.white),
+        ),
+        SizedBox(height: 20),
+
+        // Check if 'subprogramas' exists and is not empty
+        if (program.containsKey('subprogramas') &&
+            program['subprogramas'] != null &&
+            program['subprogramas'].isNotEmpty)
+          ...program['subprogramas'].map<Widget>((subprograma) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Subprograma: ${subprograma['nombre_individual'] ?? 'N/A'}',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Text(
+                    'Ajuste: ${subprograma['ajuste'] ?? 'N/A'}',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Text(
+                    'Duración: ${subprograma['duracion_individual'] ?? 'N/A'} mins',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  SizedBox(height: 10),
+                  if (subprograma['programa_recovery_id'] != null)
+                    Text(
+                      'Programa Recovery: ${subprograma['nombre_recovery'] ?? 'N/A'}',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                ],
+              ),
+            );
+          }).toList()
+        else
+          Text(
+            'No hay subprogramas disponibles.',
+            style: TextStyle(fontSize: 16, color: Colors.white),
+          ),
+
+        // Button to return to the program list
+        SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              isInfoVisible = false; // Switch back to the program list view
+            });
+          },
+          child: Text('Volver a la lista'),
+        ),
+      ],
+    );
+  }
+}
+
+class OverlayRecovery extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayRecovery({Key? key, required this.onClose}) : super(key: key);
+
+  @override
+  _OverlayRecoveryState createState() => _OverlayRecoveryState();
+}
+
+class _OverlayRecoveryState extends State<OverlayRecovery>
+    with SingleTickerProviderStateMixin {
+  Map<String, dynamic>? selectedProgram;
+  bool isInfoVisible = false;
+
+  void selectProgram(Map<String, dynamic> programData) {
+    setState(() {
+      selectedProgram = programData;
+      isInfoVisible = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainOverlay(
+      title: const Text(
+        "RECOVERY",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: isInfoVisible && selectedProgram != null
+          ? Column()
+          : ProgramsRecoveryListView(),
       onClose: widget.onClose,
     );
   }

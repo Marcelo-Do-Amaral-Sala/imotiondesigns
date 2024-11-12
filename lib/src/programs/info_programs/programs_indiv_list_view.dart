@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
-
 import '../../db/db_helper.dart';
 import '../customs_programs/individual_table_custom.dart';
 
-class ProgramsListView extends StatefulWidget {
-  final Function(Map<String, dynamic>)
-      onProgramTap; // Cambia el tipo a dynamic para incluir int
+class ProgramsIndividualesListView extends StatefulWidget {
 
-  const ProgramsListView({Key? key, required this.onProgramTap})
+
+  const ProgramsIndividualesListView({Key? key})
       : super(key: key);
 
   @override
-  _ProgramsListViewState createState() => _ProgramsListViewState();
+  _ProgramsIndividualesListViewState createState() => _ProgramsIndividualesListViewState();
 }
 
-class _ProgramsListViewState extends State<ProgramsListView> {
+class _ProgramsIndividualesListViewState extends State<ProgramsIndividualesListView> {
   List<Map<String, dynamic>> allPrograms = []; // Lista de programas
 
   @override
@@ -27,6 +24,12 @@ class _ProgramsListViewState extends State<ProgramsListView> {
   Future<void> _fetchPrograms() async {
     final dbHelper = DatabaseHelper();
     try {
+      // Primero obtenemos el número total de programas individuales
+      int numProgramas = await dbHelper.getNumeroDeProgramasIndividuales();
+
+      // Imprime el número total de programas
+      print('Número total de programas individuales: $numProgramas');
+
       // Llamamos a la función que obtiene los programas de la base de datos
       final programData = await dbHelper.getProgramasIndividuales();
 
@@ -43,13 +46,7 @@ class _ProgramsListViewState extends State<ProgramsListView> {
   }
 
 
-  void _showPrint(Map<String, dynamic> programData) {
-    // Asegúrate de que los datos se pasen correctamente como Map<String, String>
-    widget.onProgramTap(
-        programData.map((key, value) => MapEntry(key, value.toString())));
-    debugPrint(
-        'Client Data: ${programData.toString()}'); // Imprime todos los datos del cliente
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +54,7 @@ class _ProgramsListViewState extends State<ProgramsListView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
       child: Column(children: [
         _buildDataTable(screenHeight, screenWidth),
       ]),
@@ -74,12 +71,9 @@ class _ProgramsListViewState extends State<ProgramsListView> {
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(20.0),
           child: IndividualTableWidget(
             programData: allPrograms,
-            onRowTap: (programData) {
-              _showPrint(programData); // Asegúrate de que se pase el cliente correcto
-            },
           ),
         ),
       ),
