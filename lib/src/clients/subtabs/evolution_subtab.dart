@@ -37,6 +37,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return Column(
       children: [
         Row(
@@ -57,9 +58,8 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 5.0),
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                height: screenHeight * 0.05,
-                width: screenWidth * 0.05,
+                height: screenHeight * 0.08,
+                width: screenWidth * 0.08,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/images/back.png'),
@@ -71,15 +71,20 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
           ],
         ),
         Expanded(
-          // Aquí se añade el Expanded
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-            child: Row(
-              children: [
-                _buildTabBar(),
-                Expanded(child: _buildTabBarView()),
-              ],
-            ),
+          child: Row(
+            children: [
+              Flexible(
+                flex: 2, // Esto asigna un 20% del ancho disponible al TabBar
+                child: _buildTabBar(),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.03,
+              ),
+              Flexible(
+                flex: 8, // El contenido ocupa el 80% del ancho
+                child: _buildTabBarView(),
+              ),
+            ],
           ),
         ),
       ],
@@ -87,26 +92,26 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
   }
 
   Widget _buildTabBar() {
-    return Container(
-      width: 220,
-      color: Colors.black,
-      child: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              children: [
-                _buildTab('HIDRATACIÓN SIN GRASA', 0),
-                _buildTab('EQUILIBRIO HÍDRICO', 1),
-                _buildTab('IMC', 2),
-                _buildTab('MASA GRASA', 3),
-                _buildTab('MÚSCULO', 4),
-                _buildTab('SALUD ÓSEA', 5),
-              ],
-            ),
+    return Padding(
+        padding: const EdgeInsets.only(
+          left: 20.0,
+          bottom: 10.0,
+        ),
+        child: Container(
+          color: Colors.black, // Fondo negro para la barra
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // Distribuir uniformemente las pestañas
+            children: [
+              _buildTab('HIDRATACIÓN SIN GRASA', 0),
+              _buildTab('EQUILIBRIO HÍDRICO', 1),
+              _buildTab('IMC', 2),
+              _buildTab('MASA GRASA', 3),
+              _buildTab('MÚSCULO', 4),
+              _buildTab('SALUD ÓSEA', 5),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildTab(String text, int index) {
@@ -119,11 +124,10 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
         });
       },
       child: Padding(
-        padding: const EdgeInsets.only(left: 20.0, top: 2.0, bottom: 2.0),
+        padding: const EdgeInsets.only(left: 20.0),
         child: Container(
-          height: 50,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          height: MediaQuery.of(context).size.height * 0.1,
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFF494949) : Colors.transparent,
             borderRadius:
@@ -167,6 +171,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
   Widget _buildTabContent(String content, List<FlSpot> spots) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
       padding: const EdgeInsets.all(20.0),
       child: SizedBox(

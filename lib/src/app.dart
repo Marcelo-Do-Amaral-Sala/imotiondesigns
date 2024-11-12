@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
-import 'package:imotion_designs/src/mainviews/programs_menu.dart';
-import 'mainviews/clients_main_view.dart';
+import 'package:imotion_designs/src/programs/programs_menu.dart';
+import 'clients/clients_main_view.dart';
 
 class App extends StatefulWidget {
   App({Key? key}) : super(key: key);

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:imotion_designs/src/forms/clients_form_groups.dart';
-import 'package:imotion_designs/src/forms/clients_forms_bonos.dart';
-import 'package:imotion_designs/src/info/clients_groups.dart';
-import 'package:imotion_designs/src/subtabs/clients_bio_sessions.dart';
-
 import '../forms/clients_form.dart';
+import '../forms/clients_form_groups.dart';
+import '../forms/clients_forms_bonos.dart';
 import '../info/clients_activity.dart';
 import '../info/clients_bio.dart';
 import '../info/clients_bonos.dart';
 import '../info/clients_data.dart';
+import '../info/clients_groups.dart';
 import '../info/clients_list_view.dart';
+import '../subtabs/clients_bio_sessions.dart';
 import '../subtabs/evolution_subtab.dart';
 import 'main_overlay.dart';
 

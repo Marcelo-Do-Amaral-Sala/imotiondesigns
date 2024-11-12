@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
-import 'package:imotion_designs/src/customs/bio_session_table.dart';
+import 'package:imotion_designs/src/clients/custom_clients/bio_session_table.dart';
 
 class BioSessionSubTab extends StatefulWidget {
   final List<Map<String, String>> bioimpedanceData;
   final Function(Map<String, String>) onClientTap;
-  final Map<String, dynamic>? selectedClientData; // Mantén como Map<String, dynamic>
+  final Map<String, dynamic>? selectedClientData;
 
   const BioSessionSubTab({
     Key? key,
@@ -51,6 +51,7 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
 
     return Column(
       children: [
+        // Fila con el botón de retroceso
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -69,9 +70,9 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 5.0),
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                height: screenHeight * 0.05,
-                width: screenWidth * 0.05,
+
+                height: screenHeight * 0.08,
+                width: screenWidth * 0.08,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/images/back.png'),
@@ -82,72 +83,65 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
             ),
           ],
         ),
-        const SizedBox(height: 5),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        height: screenHeight * 0.5,
-                        padding: const EdgeInsets.all(10.0),
-                        child: BioSessionTableWidget(
-                            bioimpedanceData: widget.bioimpedanceData),
+        SizedBox(height: screenHeight * 0.02),
+
+        // Expansión de la interfaz
+        Expanded(
+          child: Container(
+            padding:
+                const EdgeInsets.only(bottom: 20.0, left: 20.0, right: 20.0),
+            child: Row(
+              children: [
+                // BioSessionTableWidget ocupará un 50% del espacio disponible
+                Expanded(
+                  flex: 5,
+                  child: BioSessionTableWidget(
+                    bioimpedanceData: widget.bioimpedanceData,
+                  ),
+                ),
+                // RadarChart ocupará el 50% del espacio disponible
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        flex: 1, // Este contenedor se expande verticalmente
+                        child: RadarChart.dark(
+                          ticks: ticks,
+                          features: features,
+                          data: data,
+                          reverseAxis: true,
+                          useSides: true,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        padding: EdgeInsets.all(10.0),
-                        height: screenHeight * 0.5,
+                      Container(
+                        padding: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          color: const Color.fromARGB(255, 46, 46, 46),
+                        ),
                         child: Column(
-                          children: [
-                            Expanded(
-                              child: RadarChart.dark(
-                                ticks: ticks,
-                                features: features,
-                                data: data,
-                                reverseAxis: true,
-                                useSides: true,
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.all(10.0),
-                              width: screenWidth,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                                color: const Color.fromARGB(255, 46, 46, 46),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: legend
-                                    .map((text) => Text(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: legend
+                              .map(
+                                (text) => Text(
                                   text,
                                   style: const TextStyle(
                                       fontSize: 11,
                                       color: Colors.white,
                                       fontStyle: FontStyle.italic),
-                                ))
-                                    .toList(),
-                              ),
-                            ),
-                          ],
+                                ),
+                              )
+                              .toList(),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        )
+        ),
       ],
     );
   }

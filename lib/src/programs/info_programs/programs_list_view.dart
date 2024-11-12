@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
+
+import '../../db/db_helper.dart';
+import '../customs_programs/individual_table_custom.dart';
+
+class ProgramsListView extends StatefulWidget {
+  final Function(Map<String, dynamic>)
+      onProgramTap; // Cambia el tipo a dynamic para incluir int
+
+  const ProgramsListView({Key? key, required this.onProgramTap})
+      : super(key: key);
+
+  @override
+  _ProgramsListViewState createState() => _ProgramsListViewState();
+}
+
+class _ProgramsListViewState extends State<ProgramsListView> {
+  List<Map<String, dynamic>> allPrograms = []; // Lista de programas
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPrograms(); // Cargar los programas al iniciar el estado
+  }
+
+  Future<void> _fetchPrograms() async {
+    final dbHelper = DatabaseHelper();
+    try {
+      // Llamamos a la función que obtiene los programas de la base de datos
+      final programData = await dbHelper.getProgramasIndividuales();
+
+      // Verifica el contenido de los datos obtenidos
+      print('Programas obtenidos: $programData');
+
+      setState(() {
+        allPrograms = programData; // Asigna los programas obtenidos a la lista
+      });
+
+    } catch (e) {
+      print('Error fetching programs: $e');
+    }
+  }
+
+
+  void _showPrint(Map<String, dynamic> programData) {
+    // Asegúrate de que los datos se pasen correctamente como Map<String, String>
+    widget.onProgramTap(
+        programData.map((key, value) => MapEntry(key, value.toString())));
+    debugPrint(
+        'Client Data: ${programData.toString()}'); // Imprime todos los datos del cliente
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+      child: Column(children: [
+        _buildDataTable(screenHeight, screenWidth),
+      ]),
+    );
+  }
+
+  Widget _buildDataTable(double screenHeight, double screenWidth) {
+    return Flexible( // Flexible permite que el Container ocupe una fracción del espacio disponible
+      flex: 1, // Este valor define cuánta parte del espacio disponible debe ocupar el widget
+      child: Container(
+        width: screenWidth, // Mantiene el ancho completo de la pantalla
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 46, 46, 46),
+          borderRadius: BorderRadius.circular(7.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: IndividualTableWidget(
+            programData: allPrograms,
+            onRowTap: (programData) {
+              _showPrint(programData); // Asegúrate de que se pase el cliente correcto
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+}

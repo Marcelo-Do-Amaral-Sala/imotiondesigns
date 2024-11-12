@@ -26,9 +26,12 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5, // Incrementamos la versión a 3
-      onCreate: _onCreate, // Método que se ejecuta solo al crear la base de datos
-      onUpgrade: _onUpgrade, // Método que se ejecuta al actualizar la base de datos
+      version: 12,
+      // Incrementamos la versión a 3
+      onCreate: _onCreate,
+      // Método que se ejecuta solo al crear la base de datos
+      onUpgrade:
+      _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
   }
 
@@ -89,23 +92,474 @@ class DatabaseHelper {
     await db.insert('grupos_musculares', {'nombre': 'Cuádriceps'});
     await db.insert('grupos_musculares', {'nombre': 'Bíceps'});
     await db.insert('grupos_musculares', {'nombre': 'Gemelos'});
+
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS programas_individuales (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      image TEXT,           
+      name TEXT NOT NULL,    
+      frequency INTEGER,     
+      pulse INTEGER,           
+      rampa INTEGER,           
+      contraction INTEGER,     
+      pause INTEGER         
+    )
+  ''');
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/CALIBRACION.png',
+      'name': 'CALIBRACIÓN',
+      'frequency': 80,
+      'pulse': 350,
+      'rampa': 10,
+      'contraction': 4,
+      'pause': 1,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/STRENGTH1.png',
+      'name': 'STRENGTH 1',
+      'frequency': 85,
+      'pulse': 350,
+      'rampa': 8,
+      'contraction': 4,
+      'pause': 2,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/STRENGTH2.png',
+      'name': 'STRENGTH 2',
+      'frequency': 85,
+      'pulse': 400,
+      'rampa': 10,
+      'contraction': 5,
+      'pause': 3,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/GLUTEOS.png',
+      'name': 'GLÚTEOS',
+      'frequency': 85,
+      'pulse': 0,
+      'rampa': 10,
+      'contraction': 6,
+      'pause': 4,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/ABDOMINAL.png',
+      'name': 'ABDOMINAL',
+      'frequency': 43,
+      'pulse': 450,
+      'rampa': 8,
+      'contraction': 6,
+      'pause': 3,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/SLIM.png',
+      'name': 'SLIM',
+      'frequency': 66,
+      'pulse': 350,
+      'rampa': 5,
+      'contraction': 6,
+      'pause': 3,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/BODYBUILDING.png',
+      'name': 'BODY BUILDING 1',
+      'frequency': 75,
+      'pulse': 300,
+      'rampa': 5,
+      'contraction': 4,
+      'pause': 2,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/BODYBUILDING2.png',
+      'name': 'BODY BUILDING 2',
+      'frequency': 75,
+      'pulse': 450,
+      'rampa': 5,
+      'contraction': 4,
+      'pause': 2,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/FITNESS.png',
+      'name': 'FITNESS',
+      'frequency': 90,
+      'pulse': 350,
+      'rampa': 5,
+      'contraction': 5,
+      'pause': 4,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/WARMUP.png',
+      'name': 'WARM UP',
+      'frequency': 7,
+      'pulse': 250,
+      'rampa': 2,
+      'contraction': 1,
+      'pause': 0,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/CARDIO.png',
+      'name': 'CARDIO',
+      'frequency': 10,
+      'pulse': 350,
+      'rampa': 2,
+      'contraction': 1,
+      'pause': 0,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/CELULITIS.png',
+      'name': 'CELULITIS',
+      'frequency': 10,
+      'pulse': 450,
+      'rampa': 5,
+      'contraction': 1,
+      'pause': 0,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/RESISTENCIA.png',
+      'name': 'SLIM',
+      'frequency': 43,
+      'pulse': 350,
+      'rampa': 5,
+      'contraction': 10,
+      'pause': 4,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/DEFINICION.png',
+      'name': 'DEFINICIÓN',
+      'frequency': 33,
+      'pulse': 350,
+      'rampa': 5,
+      'contraction': 6,
+      'pause': 2,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/BASIC.png',
+      'name': 'BASIC',
+      'frequency': 70,
+      'pulse': 250,
+      'rampa': 5,
+      'contraction': 4,
+      'pause': 4,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/METABOLIC.png',
+      'name': 'METABOLIC',
+      'frequency': 7,
+      'pulse': 350,
+      'rampa': 2,
+      'contraction': 1,
+      'pause': 0,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/SUELOPELV.png',
+      'name': 'SUELO PÉLVICO',
+      'frequency': 85,
+      'pulse': 450,
+      'rampa': 10,
+      'contraction': 4,
+      'pause': 4,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/CAPILLARY.png',
+      'name': 'CAPILLARY',
+      'frequency': 9,
+      'pulse': 150,
+      'rampa': 2,
+      'contraction': 1,
+      'pause': 0,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/DRENAJE.png',
+      'name': 'DRENAJE',
+      'frequency': 21,
+      'pulse': 350,
+      'rampa': 5,
+      'contraction': 5,
+      'pause': 3,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/CONTRACTURAS.png',
+      'name': 'CONTRACTURAS',
+      'frequency': 120,
+      'pulse': 0,
+      'rampa': 10,
+      'contraction': 4,
+      'pause': 3,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/RELAX.png',
+      'name': 'RELAX',
+      'frequency': 100,
+      'pulse': 150,
+      'rampa': 2,
+      'contraction': 3,
+      'pause': 2,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/DOLORNEU.png',
+      'name': 'DOLOR NEURÁLGICO',
+      'frequency': 150,
+      'pulse': 100,
+      'rampa': 5,
+      'contraction': 10,
+      'pause': 1,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/DOLORQUIM.png',
+      'name': 'DOLOR QUÍMICO',
+      'frequency': 110,
+      'pulse': 250,
+      'rampa': 5,
+      'contraction': 5,
+      'pause': 1,
+    });
+    await db.insert('programas_individuales', {
+      'image': 'assets/images/DOLORMECANICO.png',
+      'name': 'DOLOR MECÁNICO',
+      'frequency': 5,
+      'pulse': 150,
+      'rampa': 5,
+      'contraction': 6,
+      'pause': 3,
+    });
   }
 
+  // Función para manejar la actualización de la base de datos
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 5) {
-      // Este bloque se ejecuta solo si la base de datos está en una versión anterior (1 o 2)
-      // Añadir la nueva tabla 'bonos'
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS bonos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cliente_id INTEGER,
-        cantidad INTEGER NOT NULL,
-        fecha TEXT NOT NULL,
-        estado TEXT NOT NULL,
-        FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
-      )
-    ''');
+    if (oldVersion < 12) {
+      // Inserción de un programa de ejemplo
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/CALIBRACION.png',
+        'name': 'CALIBRACIÓN',
+        'frequency': 80,
+        'pulse': 350,
+        'rampa': 10,
+        'contraction': 4,
+        'pause': 1,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/STRENGTH1.png',
+        'name': 'STRENGTH 1',
+        'frequency': 85,
+        'pulse': 350,
+        'rampa': 8,
+        'contraction': 4,
+        'pause': 2,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/STRENGTH2.png',
+        'name': 'STRENGTH 2',
+        'frequency': 85,
+        'pulse': 400,
+        'rampa': 10,
+        'contraction': 5,
+        'pause': 3,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/GLUTEOS.png',
+        'name': 'GLÚTEOS',
+        'frequency': 85,
+        'pulse': 0,
+        'rampa': 10,
+        'contraction': 6,
+        'pause': 4,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/ABDOMINAL.png',
+        'name': 'ABDOMINAL',
+        'frequency': 43,
+        'pulse': 450,
+        'rampa': 8,
+        'contraction': 6,
+        'pause': 3,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/SLIM.png',
+        'name': 'SLIM',
+        'frequency': 66,
+        'pulse': 350,
+        'rampa': 5,
+        'contraction': 6,
+        'pause': 3,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/BODYBUILDING.png',
+        'name': 'BODY BUILDING 1',
+        'frequency': 75,
+        'pulse': 300,
+        'rampa': 5,
+        'contraction': 4,
+        'pause': 2,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/BODYBUILDING2.png',
+        'name': 'BODY BUILDING 2',
+        'frequency': 75,
+        'pulse': 450,
+        'rampa': 5,
+        'contraction': 4,
+        'pause': 2,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/FITNESS.png',
+        'name': 'FITNESS',
+        'frequency': 90,
+        'pulse': 350,
+        'rampa': 5,
+        'contraction': 5,
+        'pause': 4,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/WARMUP.png',
+        'name': 'WARM UP',
+        'frequency': 7,
+        'pulse': 250,
+        'rampa': 2,
+        'contraction': 1,
+        'pause': 0,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/CARDIO.png',
+        'name': 'CARDIO',
+        'frequency': 10,
+        'pulse': 350,
+        'rampa': 2,
+        'contraction': 1,
+        'pause': 0,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/CELULITIS.png',
+        'name': 'CELULITIS',
+        'frequency': 10,
+        'pulse': 450,
+        'rampa': 5,
+        'contraction': 1,
+        'pause': 0,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/RESISTENCIA.png',
+        'name': 'SLIM',
+        'frequency': 43,
+        'pulse': 350,
+        'rampa': 5,
+        'contraction': 10,
+        'pause': 4,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/DEFINICION.png',
+        'name': 'DEFINICIÓN',
+        'frequency': 33,
+        'pulse': 350,
+        'rampa': 5,
+        'contraction': 6,
+        'pause': 2,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/BASIC.png',
+        'name': 'BASIC',
+        'frequency': 70,
+        'pulse': 250,
+        'rampa': 5,
+        'contraction': 4,
+        'pause': 4,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/METABOLIC.png',
+        'name': 'METABOLIC',
+        'frequency': 7,
+        'pulse': 350,
+        'rampa': 2,
+        'contraction': 1,
+        'pause': 0,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/SUELOPELV.png',
+        'name': 'SUELO PÉLVICO',
+        'frequency': 85,
+        'pulse': 450,
+        'rampa': 10,
+        'contraction': 4,
+        'pause': 4,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/CAPILLARY.png',
+        'name': 'CAPILLARY',
+        'frequency': 9,
+        'pulse': 150,
+        'rampa': 2,
+        'contraction': 1,
+        'pause': 0,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/DRENAJE.png',
+        'name': 'DRENAJE',
+        'frequency': 21,
+        'pulse': 350,
+        'rampa': 5,
+        'contraction': 5,
+        'pause': 3,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/CONTRACTURAS.png',
+        'name': 'CONTRACTURAS',
+        'frequency': 120,
+        'pulse': 0,
+        'rampa': 10,
+        'contraction': 4,
+        'pause': 3,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/RELAX.png',
+        'name': 'RELAX',
+        'frequency': 100,
+        'pulse': 150,
+        'rampa': 2,
+        'contraction': 3,
+        'pause': 2,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/DOLORNEU.png',
+        'name': 'DOLOR NEURÁLGICO',
+        'frequency': 150,
+        'pulse': 100,
+        'rampa': 5,
+        'contraction': 10,
+        'pause': 1,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/DOLORQUIM.png',
+        'name': 'DOLOR QUÍMICO',
+        'frequency': 110,
+        'pulse': 250,
+        'rampa': 5,
+        'contraction': 5,
+        'pause': 1,
+      });
+      await db.insert('programas_individuales', {
+        'image': 'assets/images/DOLORMECANICO.png',
+        'name': 'DOLOR MECÁNICO',
+        'frequency': 5,
+        'pulse': 150,
+        'rampa': 5,
+        'contraction': 6,
+        'pause': 3,
+      });
+      print("Programa insertado correctamente"); // Agregado para depuración
     }
+  }
+
+  // Método para verificar los datos en programas_individuales (para depuración)
+  Future<void> checkProgramas() async {
+    final db = await database;
+    final result = await db.query('programas_individuales');
+    print("Programas en la base de datos: $result");
+  }
+
+  // Método para obtener todos los programas individuales
+  Future<List<Map<String, dynamic>>> getProgramasIndividuales() async {
+    final db = await database;
+    final result = await db.query('programas_individuales');
+    print('Programas obtenidos: $result'); // Verifica los datos obtenidos
+    return result;
   }
 
   // Inicializar la base de datos al inicio de la app
@@ -122,7 +576,7 @@ class DatabaseHelper {
         'clientes',
         client,
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
     } catch (e) {
       print('Error inserting client: $e');
@@ -219,16 +673,19 @@ class DatabaseHelper {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getAvailableBonosByClientId(int clientId) async {
+  Future<List<Map<String, dynamic>>> getAvailableBonosByClientId(
+      int clientId) async {
     final db = await database;
     final result = await db.query(
       'bonos', // Nombre de la tabla de bonos
       where: 'cliente_id = ? AND estado = ?',
-      whereArgs: [clientId, 'Disponible'], // Filtra por cliente y estado "Disponible"
+      whereArgs: [
+        clientId,
+        'Disponible'
+      ], // Filtra por cliente y estado "Disponible"
     );
     return result;
   }
-
 
   // Obtener todos los bonos
   Future<List<Map<String, dynamic>>> getAllBonos() async {
@@ -248,11 +705,12 @@ class DatabaseHelper {
       whereArgs: [id],
     );
   }
+
   // Obtener los datos de la tabla grupos_musculares
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+    await db.query('grupos_musculares');
     return result;
   }
 
@@ -267,7 +725,8 @@ class DatabaseHelper {
           'cliente_id': clienteId,
           'grupo_muscular_id': grupoMuscularId,
         },
-        conflictAlgorithm: ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        conflictAlgorithm:
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
       return true; // Si la inserción fue exitosa, retorna true
     } catch (e) {
@@ -278,7 +737,8 @@ class DatabaseHelper {
 
   // Método para actualizar los grupos musculares asociados a un cliente
   Future<void> updateClientGroups(int clientId, List<int> groupIds) async {
-    final db = await openDatabase('my_database.db'); // Asegúrate de usar la ruta correcta
+    final db = await openDatabase(
+        'my_database.db'); // Asegúrate de usar la ruta correcta
 
     // Primero, eliminamos todos los registros existentes de esta relación para este cliente
     await db.delete(
@@ -295,10 +755,12 @@ class DatabaseHelper {
           'cliente_id': clientId,
           'grupo_muscular_id': groupId,
         },
-        conflictAlgorithm: ConflictAlgorithm.replace, // Si existe un conflicto (mismo cliente y grupo), se reemplaza el registro
+        conflictAlgorithm: ConflictAlgorithm
+            .replace, // Si existe un conflicto (mismo cliente y grupo), se reemplaza el registro
       );
     }
   }
+
   Future<List<Map<String, dynamic>>> getGruposDeCliente(int clienteId) async {
     try {
       final db = await database;
@@ -320,7 +782,7 @@ class DatabaseHelper {
     } catch (e) {
       // Manejo de errores: en caso de que ocurra algún problema con la base de datos
       print("Error al obtener grupos musculares: $e");
-      return [];  // Retorna una lista vacía en caso de error
+      return []; // Retorna una lista vacía en caso de error
     }
   }
 
@@ -329,13 +791,13 @@ class DatabaseHelper {
   Future<void> deleteDatabaseFile() async {
     try {
       String path = join(await getDatabasesPath(), 'my_database.db');
-      await deleteDatabase(path);  // Eliminar la base de datos físicamente
+      await deleteDatabase(path); // Eliminar la base de datos físicamente
       print("Base de datos eliminada correctamente.");
     } catch (e) {
       print("Error al eliminar la base de datos: $e");
     }
   }
- /* // Método para llamar al deleteDatabaseFile
+/* // Método para llamar al deleteDatabaseFile
   Future<void> _deleteDatabase() async {
     final dbHelper = DatabaseHelper();
     await dbHelper.deleteDatabaseFile();  // Elimina la base de datos

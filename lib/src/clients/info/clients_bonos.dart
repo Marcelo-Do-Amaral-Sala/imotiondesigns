@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import '../customs/bonos_table_custom.dart';
-import '../db/db_helper.dart';
+
+import '../../db/db_helper.dart';
+import '../custom_clients/bonos_table_custom.dart';
 
 class ClientsBonos extends StatefulWidget {
   final Map<String, dynamic> clientDataBonos;
@@ -50,11 +51,12 @@ class _ClientsBonosState extends State<ClientsBonos> {
         return bono['estado'] == 'Disponible';
       }).map((bono) {
         return {
-          'date': bono['fecha']?.toString() ?? '',  // Aseguramos que 'fecha' sea String
-          'quantity': bono['cantidad']?.toString() ?? '',  // Aseguramos que 'cantidad' sea String
+          'date': bono['fecha']?.toString() ?? '',
+          // Aseguramos que 'fecha' sea String
+          'quantity': bono['cantidad']?.toString() ?? '',
+          // Aseguramos que 'cantidad' sea String
         };
       }).toList();
-
     });
     // Recalcular el total de bonos
     totalBonosAvailables = _calculateTotalBonos(availableBonos);
@@ -62,7 +64,9 @@ class _ClientsBonosState extends State<ClientsBonos> {
 
   int _calculateTotalBonos(List<Map<String, dynamic>> bonos) {
     return bonos.fold(0, (sum, bono) {
-      return sum + (int.tryParse(bono['quantity']) ?? 0); // Garantizar que la cantidad sea int
+      return sum +
+          (int.tryParse(bono['quantity']) ??
+              0); // Garantizar que la cantidad sea int
     });
   }
 
@@ -95,19 +99,23 @@ class _ClientsBonosState extends State<ClientsBonos> {
     return SizedBox(
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.01,
-            horizontal: screenWidth * 0.03),
+          vertical: screenHeight * 0.03,
+          horizontal: screenWidth * 0.03,
+        ),
         child: Column(
           children: [
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  // Contenedor para el primer row de inputs y el botón
                   _buildInputRow(screenWidth),
-                  const SizedBox(height: 2),
+                  SizedBox(height: screenHeight * 0.05),
+                  // Fila con dos contenedores centrados
                   _buildHeaderRow(screenWidth),
                   _buildBonosContainers(screenHeight, screenWidth),
-                  const SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
+                  // Fila con dos contenedores centrados para totales
                   _buildTotalRow(screenHeight, screenWidth),
                 ],
               ),
@@ -119,45 +127,42 @@ class _ClientsBonosState extends State<ClientsBonos> {
   }
 
   Widget _buildInputRow(double screenWidth) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildTextField('ID', _indexController, false),
-          SizedBox(width: screenWidth * 0.02),
-          _buildTextField('NOMBRE', _nameController, false),
-          SizedBox(width: screenWidth * 0.02),
-          _buildDropdownField('ESTADO', selectedOption, (value) {
-            setState(() {
-              selectedOption = value;
-            });
-          }, false),
-          SizedBox(width: screenWidth * 0.02),
-          OutlinedButton(
-            onPressed: () {
-              _addBonos(context);
-            },
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.all(10.0),
-              side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(7),
-              ),
-              backgroundColor: Colors.transparent,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildTextField('ID', _indexController, enabled: false), // Deshabilitar
+        SizedBox(width: screenWidth * 0.02),
+        _buildTextField('NOMBRE', _nameController, enabled: false),
+        SizedBox(width: screenWidth * 0.02),
+        _buildDropdownField('ESTADO', selectedOption, (value) {
+          setState(() {
+            selectedOption = value;
+          });
+        }, enabled: false), // Deshabilitar dropdown
+        SizedBox(width: screenWidth * 0.02),
+        OutlinedButton(
+          onPressed: () {
+            _addBonos(context);
+          },
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.all(10.0),
+            side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(7),
             ),
-            child: const Text(
-              'AÑADIR BONOS',
-              style: TextStyle(
-                color: Color(0xFF2be4f3),
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            backgroundColor: Colors.transparent,
           ),
-        ],
-      ),
+          child: const Text(
+            'AÑADIR BONOS',
+            style: TextStyle(
+              color: Color(0xFF2be4f3),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
     );
   }
 
@@ -165,30 +170,24 @@ class _ClientsBonosState extends State<ClientsBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        const Expanded(
-          child: Center(
-            child: Text(
-              "BONOS DISPONIBLES",
-              style: TextStyle(
-                  color: Color(0xFF2be4f3),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
+        _buildHeaderText("BONOS DISPONIBLES"),
         SizedBox(width: screenWidth * 0.02),
-        const Expanded(
-          child: Center(
-            child: Text(
-              "BONOS CONSUMIDOS",
-              style: TextStyle(
-                  color: Color(0xFF2be4f3),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
+        _buildHeaderText("BONOS CONSUMIDOS"),
       ],
+    );
+  }
+
+  Widget _buildHeaderText(String text) {
+    return Expanded(
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(
+              color: Color(0xFF2be4f3),
+              fontSize: 17,
+              fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 
@@ -203,10 +202,11 @@ class _ClientsBonosState extends State<ClientsBonos> {
     );
   }
 
-  Widget _buildBonosContainer(double screenHeight, List<Map<String, String>> bonosData, bool showHour) {
+  Widget _buildBonosContainer(
+      double screenHeight, List<Map<String, String>> bonosData, bool showHour) {
     return Expanded(
       child: Container(
-        height: screenHeight * 0.25,
+        height: screenHeight * 0.3,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 46, 46, 46),
           borderRadius: BorderRadius.circular(7.0),
@@ -233,10 +233,11 @@ class _ClientsBonosState extends State<ClientsBonos> {
     );
   }
 
-  Widget _buildTotalContainer(double screenHeight, String label, String total, Color totalColor) {
+  Widget _buildTotalContainer(
+      double screenHeight, String label, String total, Color totalColor) {
     return Expanded(
       child: Container(
-        height: screenHeight * 0.08,
+        height: screenHeight * 0.1,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 46, 46, 46),
           borderRadius: BorderRadius.circular(7.0),
@@ -250,7 +251,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                 label,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -258,7 +259,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                 total,
                 style: TextStyle(
                   color: totalColor,
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -269,7 +270,9 @@ class _ClientsBonosState extends State<ClientsBonos> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, bool enabled) {
+// Reutilizando la creación de campos de texto
+  Widget _buildTextField(
+      String label, TextEditingController controller, {bool enabled = true}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,22 +280,15 @@ class _ClientsBonosState extends State<ClientsBonos> {
           Text(label,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: const Color(0xFF313030),
-                borderRadius: BorderRadius.circular(7)),
+            decoration: _inputDecoration(),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
-                filled: true,
-                fillColor: const Color(0xFF313030),
-                isDense: true,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              decoration: _inputDecorationStyle(enabled: enabled),
               enabled: enabled,
             ),
           ),
@@ -301,7 +297,9 @@ class _ClientsBonosState extends State<ClientsBonos> {
     );
   }
 
-  Widget _buildDropdownField(String label, String? value, Function(String?) onChanged, bool enabled) {
+// Reutilizando la creación de dropdown
+  Widget _buildDropdownField(
+      String label, String? value, Function(String?) onChanged, {bool enabled = true}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,28 +307,26 @@ class _ClientsBonosState extends State<ClientsBonos> {
           Text(label,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: const Color(0xFF313030),
-                borderRadius: BorderRadius.circular(7)),
+            decoration: _inputDecoration(),
             child: AbsorbPointer(
               absorbing: !enabled,
               child: DropdownButton<String>(
                 hint: const Text('Seleccione',
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
+                    style: TextStyle(color: Colors.white, fontSize: 14)),
                 value: value,
                 items: const [
                   DropdownMenuItem(
                       value: 'Activo',
                       child: Text('Activo',
-                          style: TextStyle(color: Colors.white, fontSize: 12))),
+                          style: TextStyle(color: Colors.white, fontSize: 14))),
                   DropdownMenuItem(
                       value: 'Inactivo',
                       child: Text('Inactivo',
-                          style: TextStyle(color: Colors.white, fontSize: 12))),
+                          style: TextStyle(color: Colors.white, fontSize: 14))),
                 ],
                 onChanged: enabled ? onChanged : null,
                 dropdownColor: const Color(0xFF313030),
@@ -341,6 +337,23 @@ class _ClientsBonosState extends State<ClientsBonos> {
           ),
         ],
       ),
+    );
+  }
+
+// Métodos de estilo reutilizados
+  BoxDecoration _inputDecoration() {
+    return BoxDecoration(color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+  }
+
+  InputDecoration _inputDecorationStyle({bool enabled = true}) {
+    return InputDecoration(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+      filled: true,
+      fillColor: const Color(0xFF313030),
+      isDense: true,
+      hintText: enabled ? 'Introducir dato' : '',
+      hintStyle: const TextStyle(color: Colors.grey),
+      enabled: enabled,
     );
   }
 
@@ -355,7 +368,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color:  Color(0xFF2be4f3), width: 2),
+            side: const BorderSide(color: Color(0xFF2be4f3), width: 2),
             borderRadius: BorderRadius.circular(7),
           ),
           child: SizedBox(
@@ -369,7 +382,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(7),
-                    border: const Border(bottom:  BorderSide(color: Color(0xFF2be4f3))),
+                    border: const Border(
+                        bottom: BorderSide(color: Color(0xFF2be4f3))),
                   ),
                   child: Stack(
                     children: [
@@ -406,7 +420,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 5.0, vertical: 5.0),
                     child: Column(
                       children: [
                         Container(
@@ -423,13 +438,15 @@ class _ClientsBonosState extends State<ClientsBonos> {
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly
                             ],
-                            style: const TextStyle(color: Colors.white, fontSize: 20),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 20),
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               filled: true,
                               fillColor: Color(0xFF313030),
                               hintText: 'Introduzca los bonos',
-                              hintStyle: TextStyle(color: Colors.grey, fontSize: 20),
+                              hintStyle:
+                                  TextStyle(color: Colors.grey, fontSize: 20),
                               isDense: true,
                             ),
                           ),
@@ -437,7 +454,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
                         const SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () async {
-                            final cantidadBonos = int.tryParse(_bonosController.text);
+                            final cantidadBonos =
+                                int.tryParse(_bonosController.text);
                             if (cantidadBonos == null || cantidadBonos <= 0) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -473,10 +491,13 @@ class _ClientsBonosState extends State<ClientsBonos> {
                             );
                           },
                           style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(Colors.green),
-                            foregroundColor: WidgetStateProperty.all(Colors.white),
+                            backgroundColor:
+                                WidgetStateProperty.all(Colors.green),
+                            foregroundColor:
+                                WidgetStateProperty.all(Colors.white),
                             padding: WidgetStateProperty.all(
-                              const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                              const EdgeInsets.symmetric(
+                                  vertical: 20, horizontal: 20),
                             ),
                           ),
                           child: const Text(

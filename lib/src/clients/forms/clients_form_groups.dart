@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../db/db_helper.dart'; // Asegúrate de importar el paquete sqflite
+import '../../db/db_helper.dart';
 
 class ClientsFormGroups extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
@@ -173,7 +173,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     return SizedBox(
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.01,
+            vertical: screenHeight * 0.03,
             horizontal: screenWidth * 0.03), // Ajustar el padding
         child: Column(
           children: [
@@ -183,7 +183,6 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                 children: [
                   // Primer contenedor para el primer row de inputs
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -205,7 +204,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 child: TextField(
                                   controller: _indexController,
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
+                                      color: Colors.white, fontSize: 14),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(7)),
@@ -237,7 +236,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 child: TextField(
                                   controller: _nameController,
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
+                                      color: Colors.white, fontSize: 14),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(7)),
@@ -275,7 +274,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                     hint: const Text(
                                       'Seleccione',
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 12),
+                                          color: Colors.white, fontSize: 14),
                                     ),
                                     value: selectedOption,
                                     items: const [
@@ -285,7 +284,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                           'Activo',
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 12),
+                                              fontSize: 14),
                                         ),
                                       ),
                                       DropdownMenuItem(
@@ -294,7 +293,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                           'Inactivo',
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 12),
+                                              fontSize: 14),
                                         ),
                                       ),
                                     ],
@@ -315,7 +314,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                       ],
                     ),
                   ),
-
+                  SizedBox(height: screenHeight * 0.05),
                   // Segundo contenedor para el segundo row de inputs
                   Expanded(
                     child: Row(
@@ -334,7 +333,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 2.0),
+                                padding:  EdgeInsets.only(bottom: screenHeight*0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -355,14 +354,14 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                               child: TextField(
                                                 style: const TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 12,
+                                                    fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
@@ -494,7 +493,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 2.0),
+                                padding:  EdgeInsets.only(bottom: screenHeight*0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -515,14 +514,14 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                               child: TextField(
                                                 style: const TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 12,
+                                                    fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:

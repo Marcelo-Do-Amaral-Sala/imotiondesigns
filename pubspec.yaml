@@ -93,6 +93,30 @@ flutter:
     - assets/images/Lumbares.png
     - assets/images/Bíceps.png
     - assets/images/Trapecios.png
+    - assets/images/ABDOMINAL.png
+    - assets/images/BASIC.png
+    - assets/images/BODYBUILDING.png
+    - assets/images/BODYBUILDING2.png
+    - assets/images/CALIBRACION.png
+    - assets/images/CAPILLARY.png
+    - assets/images/CARDIO.png
+    - assets/images/CELULITIS.png
+    - assets/images/CONTRACTURAS.png
+    - assets/images/DEFINICION.png
+    - assets/images/DOLORMECANICO.png
+    - assets/images/DOLORNEU.png
+    - assets/images/DOLORQUIM.png
+    - assets/images/DRENAJE.png
+    - assets/images/FITNESS.png
+    - assets/images/GLUTEOS.png
+    - assets/images/METABOLIC.png
+    - assets/images/RELAX.png
+    - assets/images/RESISTENCIA.png
+    - assets/images/SLIM.png
+    - assets/images/STRENGTH1.png
+    - assets/images/STRENGTH2.png
+    - assets/images/SUELOPELV.png
+    - assets/images/WARMUP.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

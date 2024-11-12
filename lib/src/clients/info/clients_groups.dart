@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../db/db_helper.dart';
+import '../../db/db_helper.dart';
+
 
 class ClientsGroups extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
@@ -57,7 +58,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     selectedGroups.forEach((groupName, isSelected) {
       if (isSelected) {
         selectedGroupIds.add(groupIds[
-            groupName]!); // Añadir el ID del grupo si está seleccionado
+        groupName]!); // Añadir el ID del grupo si está seleccionado
       }
     });
     return selectedGroupIds;
@@ -66,7 +67,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
   // Función para actualizar los grupos musculares del cliente
   Future<void> updateClientGroups() async {
     List<int> selectedGroupIds =
-        getSelectedGroupIds(); // Obtener los IDs de los grupos seleccionados
+    getSelectedGroupIds(); // Obtener los IDs de los grupos seleccionados
 
     // Llamar al método en DatabaseHelper para actualizar la relación en la tabla
     await dbHelper.updateClientGroups(clientId!, selectedGroupIds);
@@ -75,7 +76,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     print("Grupos musculares actualizados para el cliente $clientId:");
     selectedGroupIds.forEach((groupId) {
       final groupName =
-          groupIds.keys.firstWhere((key) => groupIds[key] == groupId);
+      groupIds.keys.firstWhere((key) => groupIds[key] == groupId);
       print("- $groupName (ID: $groupId)");
     });
 
@@ -99,7 +100,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
 
     // 1. Obtener todos los grupos musculares disponibles
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+    await db.query('grupos_musculares');
 
     // 2. Obtener los grupos musculares asociados a este cliente
     final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery('''
@@ -121,7 +122,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
         if (groupName != null) {
           selectedGroups[groupName] = true;
           hintColors[groupName] =
-              const Color(0xFF2be4f3); // Color para los grupos seleccionados
+          const Color(0xFF2be4f3); // Color para los grupos seleccionados
         }
       }
     });
@@ -182,9 +183,9 @@ class _ClientsGroupsState extends State<ClientsGroups> {
         setState(() {
           // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
           selectedGroups[option] =
-              !(selectedGroups[option] ?? false); // Si es null, toma false
+          !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
-              selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
       },
       child: Container(
@@ -212,19 +213,25 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     setState(() {
       selectedGroups[option] = !selectedGroups[option]!;
       hintColors[option] =
-          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+      selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return SizedBox(
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.01,
+            vertical: screenHeight * 0.03,
             horizontal: screenWidth * 0.03), // Ajustar el padding
         child: Column(
           children: [
@@ -234,7 +241,6 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                 children: [
                   // Primer contenedor para el primer row de inputs
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -256,7 +262,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                 child: TextField(
                                   controller: _indexController,
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
+                                      color: Colors.white, fontSize: 14),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(7)),
@@ -288,7 +294,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                 child: TextField(
                                   controller: _nameController,
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
+                                      color: Colors.white, fontSize: 14),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(7)),
@@ -326,7 +332,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                     hint: const Text(
                                       'Seleccione',
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 12),
+                                          color: Colors.white, fontSize: 14),
                                     ),
                                     value: selectedOption,
                                     items: const [
@@ -336,7 +342,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                           'Activo',
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 12),
+                                              fontSize: 14),
                                         ),
                                       ),
                                       DropdownMenuItem(
@@ -345,7 +351,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                           'Inactivo',
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 12),
+                                              fontSize: 14),
                                         ),
                                       ),
                                     ],
@@ -366,7 +372,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                       ],
                     ),
                   ),
-
+                  SizedBox(height: screenHeight * 0.05),
                   // Segundo contenedor para el segundo row de inputs
                   Expanded(
                     child: Row(
@@ -385,7 +391,8 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 2.0),
+                                padding: EdgeInsets.only(
+                                    bottom: screenHeight * 0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -394,35 +401,35 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
                                                 borderRadius:
-                                                    BorderRadius.circular(7),
+                                                BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 12,
+                                                    fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            7),
+                                                    BorderRadius.circular(
+                                                        7),
                                                   ),
                                                   filled: true,
                                                   fillColor:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -457,16 +464,16 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Trapecios',
-                                        'Dorsales',
-                                        'Lumbares',
-                                        'Glúteos',
-                                        'Isquios',
-                                        'Gemelos'
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Filtra solo los grupos seleccionados
+                              [
+                                'Trapecios',
+                                'Dorsales',
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquios',
+                                'Gemelos'
+                              ].contains(entry.key) &&
+                                  entry
+                                      .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String imagePath =
@@ -505,14 +512,14 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Pectorales',
-                                        'Abdominales',
-                                        'Cuádriceps',
-                                        'Bíceps'
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Filtra solo los grupos seleccionados
+                              [
+                                'Pectorales',
+                                'Abdominales',
+                                'Cuádriceps',
+                                'Bíceps'
+                              ].contains(entry.key) &&
+                                  entry
+                                      .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String imagePath =
@@ -545,7 +552,8 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 2.0),
+                                padding: EdgeInsets.only(
+                                    bottom: screenHeight * 0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -554,35 +562,35 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
                                                 borderRadius:
-                                                    BorderRadius.circular(7),
+                                                BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 12,
+                                                    fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            7),
+                                                    BorderRadius.circular(
+                                                        7),
                                                   ),
                                                   filled: true,
                                                   fillColor:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),

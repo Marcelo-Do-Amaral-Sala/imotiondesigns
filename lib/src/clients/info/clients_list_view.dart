@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:imotion_designs/src/customs/clients_table_custom.dart';
-import '../db/db_helper.dart';
+import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
+
+import '../../db/db_helper.dart';
 
 class ClientListView extends StatefulWidget {
-  final Function(Map<String, dynamic>) onClientTap; // Cambia el tipo a dynamic para incluir int
+  final Function(Map<String, dynamic>)
+      onClientTap; // Cambia el tipo a dynamic para incluir int
 
   const ClientListView({Key? key, required this.onClientTap}) : super(key: key);
 
@@ -48,10 +50,12 @@ class _ClientListViewState extends State<ClientListView> {
 
       filteredClients = allClients.where((client) {
         final matchesName = client['name']!.toLowerCase().contains(searchText);
-        final matchesIndex = indexText.isEmpty || client['id'].toString() == indexText;
+        final matchesIndex =
+            indexText.isEmpty || client['id'].toString() == indexText;
 
         // Filtra por estado basado en la selección del dropdown
-        final matchesStatus = selectedOption == 'Todos' || client['status'] == selectedOption;
+        final matchesStatus =
+            selectedOption == 'Todos' || client['status'] == selectedOption;
 
         return matchesName && matchesIndex && matchesStatus;
       }).toList();
@@ -61,26 +65,30 @@ class _ClientListViewState extends State<ClientListView> {
   void _showPrint(Map<String, dynamic> clientData) {
     _updateClientFields(clientData);
     // Asegúrate de que los datos se pasen correctamente como Map<String, String>
-    widget.onClientTap(clientData.map((key, value) => MapEntry(key, value.toString())));
-    debugPrint('Client Data: ${clientData.toString()}'); // Imprime todos los datos del cliente
+    widget.onClientTap(
+        clientData.map((key, value) => MapEntry(key, value.toString())));
+    debugPrint(
+        'Client Data: ${clientData.toString()}'); // Imprime todos los datos del cliente
   }
-
 
   void _updateClientFields(Map<String, dynamic> clientData) {
     setState(() {
       _clientIndexController.text = clientData['id'].toString();
       _clientNameController.text = clientData['name'] ?? '';
-      selectedOption = clientData['status'] ?? 'Todos'; // Cambiar a 'Todos' si es nulo
+      selectedOption =
+          clientData['status'] ?? 'Todos'; // Cambiar a 'Todos' si es nulo
     });
   }
-/*  // Método para llamar al deleteDatabaseFile
+
+  // Método para llamar al deleteDatabaseFile
   Future<void> _deleteDatabase() async {
     final dbHelper = DatabaseHelper();
-    await dbHelper.deleteDatabaseFile();  // Elimina la base de datos
+    await dbHelper.deleteDatabaseFile(); // Elimina la base de datos
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Base de datos eliminada con éxito.'),
     ));
-  }*/
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -93,13 +101,15 @@ class _ClientListViewState extends State<ClientListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             /* ElevatedButton(
-                onPressed: _deleteDatabase,  // Llama al método que elimina la base de datos
+              ElevatedButton(
+                onPressed: _deleteDatabase,
+                // Llama al método que elimina la base de datos
                 child: Text('Eliminar Base de Datos'),
-              ),*/
+              ),
               _buildTextField('ID', _clientIndexController, 'Ingrese ID'),
               SizedBox(width: screenWidth * 0.02),
-              _buildTextField('NOMBRE', _clientNameController, 'Ingrese nombre'),
+              _buildTextField(
+                  'NOMBRE', _clientNameController, 'Ingrese nombre'),
               SizedBox(width: screenWidth * 0.02),
               _buildDropdown(),
             ],
@@ -111,7 +121,8 @@ class _ClientListViewState extends State<ClientListView> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint) {
+  Widget _buildTextField(
+      String label, TextEditingController controller, String hint) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +130,7 @@ class _ClientListViewState extends State<ClientListView> {
           Text(label,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -138,7 +149,7 @@ class _ClientListViewState extends State<ClientListView> {
                 fillColor: const Color(0xFF313030),
                 isDense: true,
                 hintText: hint,
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
               ),
             ),
           ),
@@ -155,7 +166,7 @@ class _ClientListViewState extends State<ClientListView> {
           const Text('ESTADO',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -169,15 +180,15 @@ class _ClientListViewState extends State<ClientListView> {
                 DropdownMenuItem(
                     value: 'Todos',
                     child: Text('Todos',
-                        style: TextStyle(color: Colors.white, fontSize: 12))),
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
                 DropdownMenuItem(
                     value: 'Activo',
                     child: Text('Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 12))),
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
                 DropdownMenuItem(
                     value: 'Inactivo',
                     child: Text('Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 12))),
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
               ],
               onChanged: (value) {
                 setState(() {
@@ -196,20 +207,25 @@ class _ClientListViewState extends State<ClientListView> {
   }
 
   Widget _buildDataTable(double screenHeight, double screenWidth) {
-    return Container(
-      height: screenHeight * 0.45,
-      width: screenWidth,
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 46, 46, 46),
-        borderRadius: BorderRadius.circular(7.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: DataTableWidget(
-          data: filteredClients,
-          onRowTap: (clientData) {
-            _showPrint(clientData); // Asegúrate de que se pase el cliente correcto
-          },
+    return Flexible(
+      // Flexible permite que el Container ocupe una fracción del espacio disponible
+      flex: 1,
+      // Este valor define cuánta parte del espacio disponible debe ocupar el widget
+      child: Container(
+        width: screenWidth, // Mantiene el ancho completo de la pantalla
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 46, 46, 46),
+          borderRadius: BorderRadius.circular(7.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: DataTableWidget(
+            data: filteredClients,
+            onRowTap: (clientData) {
+              _showPrint(
+                  clientData); // Asegúrate de que se pase el cliente correcto
+            },
+          ),
         ),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../customs/bonos_table_custom.dart';
-import '../db/db_helper.dart';
+import '../../db/db_helper.dart';
+import '../custom_clients/bonos_table_custom.dart';
 
 class ClientsFormBonos extends StatefulWidget {
   final Map<String, dynamic> clientDataBonos;
@@ -16,8 +16,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
   final _indexController = TextEditingController();
   final _nameController = TextEditingController();
   String? selectedOption;
-   Map<String, dynamic>? selectedClient;
-
+  Map<String, dynamic>? selectedClient;
 
   List<Map<String, String>> availableBonos = [
     {'date': '12/12/2024', 'quantity': '5'},
@@ -64,7 +63,6 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     }
   }
 
-
   @override
   void dispose() {
     _indexController.dispose();
@@ -80,8 +78,9 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     return SizedBox(
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.01,
-            horizontal: screenWidth * 0.03), // Ajustar el padding
+          vertical: screenHeight * 0.03,
+          horizontal: screenWidth * 0.03,
+        ),
         child: Column(
           children: [
             Expanded(
@@ -90,11 +89,11 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
                 children: [
                   // Contenedor para el primer row de inputs y el botón
                   _buildInputRow(screenWidth),
-                  const SizedBox(height: 2),
+                  SizedBox(height: screenHeight * 0.05),
                   // Fila con dos contenedores centrados
                   _buildHeaderRow(screenWidth),
                   _buildBonosContainers(screenHeight, screenWidth),
-                  const SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
                   // Fila con dos contenedores centrados para totales
                   _buildTotalRow(screenHeight, screenWidth),
                 ],
@@ -108,19 +107,18 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
 
   Widget _buildInputRow(double screenWidth) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildTextField('ID', _indexController, false), // Deshabilitar
+          _buildTextField('ID', _indexController, enabled: false), // Deshabilitar
           SizedBox(width: screenWidth * 0.02),
-          _buildTextField('NOMBRE', _nameController, false), // Deshabilitar
+          _buildTextField('NOMBRE', _nameController, enabled: false),
           SizedBox(width: screenWidth * 0.02),
           _buildDropdownField('ESTADO', selectedOption, (value) {
             setState(() {
               selectedOption = value;
             });
-          }, false), // Deshabilitar dropdown
+          }, enabled: false), // Deshabilitar dropdown
           SizedBox(width: screenWidth * 0.02),
           OutlinedButton(
             onPressed: () {}, // Mantener vacío para que InkWell funcione
@@ -136,7 +134,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
               'AÑADIR BONOS',
               style: TextStyle(
                 color: Color(0xFF2be4f3),
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
@@ -151,30 +149,24 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        const Expanded(
-          child: Center(
-            child: Text(
-              "BONOS DISPONIBLES",
-              style: TextStyle(
-                  color: Color(0xFF2be4f3),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
+        _buildHeaderText("BONOS DISPONIBLES"),
         SizedBox(width: screenWidth * 0.02),
-        const Expanded(
-          child: Center(
-            child: Text(
-              "BONOS CONSUMIDOS",
-              style: TextStyle(
-                  color: Color(0xFF2be4f3),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
+        _buildHeaderText("BONOS CONSUMIDOS"),
       ],
+    );
+  }
+
+  Widget _buildHeaderText(String text) {
+    return Expanded(
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(
+              color: Color(0xFF2be4f3),
+              fontSize: 17,
+              fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 
@@ -193,7 +185,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
       double screenHeight, List<Map<String, String>> bonosData, bool showHour) {
     return Expanded(
       child: Container(
-        height: screenHeight * 0.25,
+        height: screenHeight * 0.3,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 46, 46, 46),
           borderRadius: BorderRadius.circular(7.0),
@@ -224,7 +216,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
       double screenHeight, String label, String total, Color totalColor) {
     return Expanded(
       child: Container(
-        height: screenHeight * 0.08,
+        height: screenHeight * 0.1,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 46, 46, 46),
           borderRadius: BorderRadius.circular(7.0),
@@ -238,7 +230,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
                 label,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -246,7 +238,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
                 total,
                 style: TextStyle(
                   color: totalColor,
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -257,8 +249,9 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     );
   }
 
+// Reutilizando la creación de campos de texto
   Widget _buildTextField(
-      String label, TextEditingController controller, bool enabled) {
+      String label, TextEditingController controller, {bool enabled = true}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,24 +259,16 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
           Text(label,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: const Color(0xFF313030),
-                borderRadius: BorderRadius.circular(7)),
+            decoration: _inputDecoration(),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-              decoration: InputDecoration(
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
-                filled: true,
-                fillColor: const Color(0xFF313030),
-                isDense: true,
-              ),
-              enabled: enabled, // Controlar si está habilitado
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              decoration: _inputDecorationStyle(enabled: enabled),
+              enabled: enabled,
             ),
           ),
         ],
@@ -291,8 +276,9 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     );
   }
 
+// Reutilizando la creación de dropdown
   Widget _buildDropdownField(
-      String label, String? value, Function(String?) onChanged, bool enabled) {
+      String label, String? value, Function(String?) onChanged, {bool enabled = true}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,31 +286,28 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
           Text(label,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: const Color(0xFF313030),
-                borderRadius: BorderRadius.circular(7)),
+            decoration: _inputDecoration(),
             child: AbsorbPointer(
-              absorbing: !enabled, // Si es 'false' no se puede interactuar
+              absorbing: !enabled,
               child: DropdownButton<String>(
                 hint: const Text('Seleccione',
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
+                    style: TextStyle(color: Colors.white, fontSize: 14)),
                 value: value,
                 items: const [
                   DropdownMenuItem(
                       value: 'Activo',
                       child: Text('Activo',
-                          style: TextStyle(color: Colors.white, fontSize: 12))),
+                          style: TextStyle(color: Colors.white, fontSize: 14))),
                   DropdownMenuItem(
                       value: 'Inactivo',
                       child: Text('Inactivo',
-                          style: TextStyle(color: Colors.white, fontSize: 12))),
+                          style: TextStyle(color: Colors.white, fontSize: 14))),
                 ],
                 onChanged: enabled ? onChanged : null,
-                // Si no está habilitado, no permite cambiar
                 dropdownColor: const Color(0xFF313030),
                 icon: const Icon(Icons.arrow_drop_down,
                     color: Color(0xFF2be4f3), size: 30),
@@ -335,4 +318,23 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
       ),
     );
   }
+
+// Métodos de estilo reutilizados
+  BoxDecoration _inputDecoration() {
+    return BoxDecoration(color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+  }
+
+  InputDecoration _inputDecorationStyle({bool enabled = true}) {
+    return InputDecoration(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+      filled: true,
+      fillColor: const Color(0xFF313030),
+      isDense: true,
+      hintText: enabled ? 'Introducir dato' : '',
+      hintStyle: const TextStyle(color: Colors.grey),
+      enabled: enabled,
+    );
+  }
+
+
 }

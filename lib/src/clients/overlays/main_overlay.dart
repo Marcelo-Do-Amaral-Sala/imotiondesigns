@@ -29,12 +29,17 @@ class _MainOverlayState extends State<MainOverlay> {
   @override
   Widget build(BuildContext context) {
     return isVisible
-        ? SizedBox.expand(
+        ? Center( // Esto asegura que el overlay se coloque en el centro
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF494949),
           border: Border.all(color: const Color(0xFF2be4f3), width: 2),
           borderRadius: BorderRadius.circular(7),
+        ),
+        // Ajusta el tamaño del contenedor con un width y height
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.9, // 80% del ancho de la pantalla
+          maxHeight: MediaQuery.of(context).size.height * 0.9, // 60% de la altura de la pantalla
         ),
         child: Column(
           mainAxisSize: MainAxisSize.max,

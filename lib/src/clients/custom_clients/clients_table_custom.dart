@@ -66,6 +66,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
+            fontSize: 15,
           ),
         ),
       ),
@@ -148,7 +149,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white, fontSize: 15),
         ),
       ),
     );
