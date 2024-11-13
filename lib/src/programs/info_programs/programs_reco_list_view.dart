@@ -15,14 +15,14 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
   @override
   void initState() {
     super.initState();
-    _fetchPrograms(); // Cargar los programas al iniciar el estado
+    _fetchProgramsRecovery(); // Cargar los programas al iniciar el estado
   }
 
-  Future<void> _fetchPrograms() async {
-    final dbHelper = DatabaseHelper();
+  Future<void> _fetchProgramsRecovery() async {
+    var db = await DatabaseHelper().database; // Obtenemos la instancia de la base de datos
     try {
-      // Llamamos a la función que obtiene los programas de la base de datos
-      final programData = await dbHelper.getProgramasRecovery();
+      // Crear la instancia de DatabaseHelper y llamar al método de instancia obtenerProgramasRecovery
+      final programData = await DatabaseHelper().obtenerProgramasRecovery(db);
 
       // Verifica el contenido de los datos obtenidos
       print('Programas obtenidos: $programData');
@@ -35,6 +35,7 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
       print('Error fetching programs: $e');
     }
   }
+
 
 
 

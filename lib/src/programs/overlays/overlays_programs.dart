@@ -57,8 +57,9 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
   }
 }
 
+
 class OverlayAuto extends StatefulWidget {
-  final VoidCallback onClose;
+  final VoidCallback onClose; // Callback para cerrar el overlay
 
   const OverlayAuto({Key? key, required this.onClose}) : super(key: key);
 
@@ -70,7 +71,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
   Map<String, dynamic>? selectedProgram; // To store the selected program
   bool isInfoVisible = false; // To track if the program info is being displayed
 
-  // Function to handle program selection
+  // Function to handle program selection from ProgramsAutoListView
   void selectProgram(Map<String, dynamic> programData) {
     setState(() {
       selectedProgram = programData;
@@ -94,7 +95,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
           ? _buildProgramInfoView() // Show detailed view of the program
           : ProgramsAutoListView(),
       onClose:
-          widget.onClose, // Close the overlay when the close button is clicked
+      widget.onClose, // Close the overlay when the close button is clicked
     );
   }
 
@@ -105,77 +106,84 @@ class _OverlayAutoState extends State<OverlayAuto> {
     // Debug print to check the program structure
     debugPrint('Selected Program: ${program.toString()}');
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Nombre del Programa: ${program['name']}',
-          style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        SizedBox(height: 10),
-        Image.asset(
-          program['image'], // Show the image of the selected program
-          width: 200,
-          height: 200,
-          fit: BoxFit.contain,
-        ),
-        SizedBox(height: 10),
-        Text(
-          'Descripción: ${program['descripcion'] ?? 'No disponible'}',
-          style: TextStyle(fontSize: 16, color: Colors.white),
-        ),
-        SizedBox(height: 20),
-
-        // Check if 'subprogramas' exists and is not empty
-        if (program.containsKey('subprogramas') &&
-            program['subprogramas'] != null &&
-            program['subprogramas'].isNotEmpty)
-          ...program['subprogramas'].map<Widget>((subprograma) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Subprograma: ${subprograma['nombre_individual'] ?? 'N/A'}',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  Text(
-                    'Ajuste: ${subprograma['ajuste'] ?? 'N/A'}',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  Text(
-                    'Duración: ${subprograma['duracion_individual'] ?? 'N/A'} mins',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  SizedBox(height: 10),
-                  if (subprograma['programa_recovery_id'] != null)
-                    Text(
-                      'Programa Recovery: ${subprograma['nombre_recovery'] ?? 'N/A'}',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                ],
-              ),
-            );
-          }).toList()
-        else
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Program name and image
           Text(
-            'No hay subprogramas disponibles.',
+            'Nombre del Programa: ${program['name']}',
+            style: const TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          SizedBox(height: 10),
+          Image.asset(
+            program['image'], // Show the image of the selected program
+            width: 200,
+            height: 200,
+            fit: BoxFit.contain,
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Descripción: ${program['descripcion'] ?? 'No disponible'}',
             style: TextStyle(fontSize: 16, color: Colors.white),
           ),
+          SizedBox(height: 20),
 
-        // Button to return to the program list
-        SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              isInfoVisible = false; // Switch back to the program list view
-            });
-          },
-          child: Text('Volver a la lista'),
-        ),
-      ],
+          // Display subprograms if available
+          if (program.containsKey('subprogramas') &&
+              program['subprogramas'] != null &&
+              program['subprogramas'].isNotEmpty)
+            ...program['subprogramas'].map<Widget>((subprograma) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Subprograma: ${subprograma['nombre_individual'] ??
+                          'N/A'}',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                    Text(
+                      'Ajuste: ${subprograma['ajuste'] ?? 'N/A'}',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                    Text(
+                      'Duración: ${subprograma['duracion_individual'] ??
+                          'N/A'} mins',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                    SizedBox(height: 10),
+                    if (subprograma['programa_recovery_id'] != null)
+                      Text(
+                        'Programa Recovery: ${subprograma['nombre_recovery'] ??
+                            'N/A'}',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                  ],
+                ),
+              );
+            }).toList()
+          else
+            Text(
+              'No hay subprogramas disponibles.',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+
+          // Button to return to the program list
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                isInfoVisible = false; // Switch back to the program list view
+              });
+            },
+            child: Text('Volver a la lista'),
+          ),
+        ],
+      ),
     );
   }
 }

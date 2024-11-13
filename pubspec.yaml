@@ -39,6 +39,8 @@ dependencies:
   spider_chart_extended: ^0.0.2
   flutter_radar_chart: ^0.2.1
   fl_chart: ^0.69.0
+  wakelock_plus: ^1.2.8
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -113,6 +115,7 @@ flutter:
     - assets/images/RELAX.png
     - assets/images/RESISTENCIA.png
     - assets/images/SLIM.png
+    - assets/images/STRENGTH.png
     - assets/images/STRENGTH1.png
     - assets/images/STRENGTH2.png
     - assets/images/SUELOPELV.png

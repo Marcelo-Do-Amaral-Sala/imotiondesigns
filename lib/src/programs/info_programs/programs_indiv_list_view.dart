@@ -1,52 +1,43 @@
 import 'package:flutter/material.dart';
-import '../../db/db_helper.dart';
-import '../customs_programs/individual_table_custom.dart';
+import '../../db/db_helper.dart'; // Asegúrate de que estás importando correctamente tu clase DatabaseHelper
+import '../customs_programs/individual_table_custom.dart'; // Tu widget personalizado para mostrar los programas
 
 class ProgramsIndividualesListView extends StatefulWidget {
-
-
-  const ProgramsIndividualesListView({Key? key})
-      : super(key: key);
+  const ProgramsIndividualesListView({Key? key}) : super(key: key);
 
   @override
-  _ProgramsIndividualesListViewState createState() => _ProgramsIndividualesListViewState();
+  _ProgramsIndividualesListViewState createState() =>
+      _ProgramsIndividualesListViewState();
 }
 
-class _ProgramsIndividualesListViewState extends State<ProgramsIndividualesListView> {
-  List<Map<String, dynamic>> allPrograms = []; // Lista de programas
+class _ProgramsIndividualesListViewState
+    extends State<ProgramsIndividualesListView> {
+  List<Map<String, dynamic>> allPrograms = []; // Lista para almacenar los programas
 
   @override
   void initState() {
     super.initState();
-    _fetchPrograms(); // Cargar los programas al iniciar el estado
+    _fetchPrograms(); // Llamamos a la función para obtener los programas al iniciar
   }
 
+  // Función para obtener los programas de tipo 'Individual'
   Future<void> _fetchPrograms() async {
-    final dbHelper = DatabaseHelper();
+    var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
     try {
-      // Primero obtenemos el número total de programas individuales
-      int numProgramas = await dbHelper.getNumeroDeProgramasIndividuales();
-
-      // Imprime el número total de programas
-      print('Número total de programas individuales: $numProgramas');
-
       // Llamamos a la función que obtiene los programas de la base de datos
-      final programData = await dbHelper.getProgramasIndividuales();
+      final programData = await DatabaseHelper().obtenerProgramasIndividual(db);
 
       // Verifica el contenido de los datos obtenidos
       print('Programas obtenidos: $programData');
 
+      // Actualizamos el estado con los programas obtenidos
       setState(() {
-        allPrograms = programData; // Asigna los programas obtenidos a la lista
+        allPrograms = programData; // Asignamos los programas obtenidos a la lista
       });
-
     } catch (e) {
       print('Error fetching programs: $e');
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -55,17 +46,19 @@ class _ProgramsIndividualesListViewState extends State<ProgramsIndividualesListV
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-      child: Column(children: [
-        _buildDataTable(screenHeight, screenWidth),
-      ]),
+      child: Column(
+        children: [
+          _buildDataTable(screenHeight, screenWidth), // Construimos la tabla
+        ],
+      ),
     );
   }
 
   Widget _buildDataTable(double screenHeight, double screenWidth) {
-    return Flexible( // Flexible permite que el Container ocupe una fracción del espacio disponible
-      flex: 1, // Este valor define cuánta parte del espacio disponible debe ocupar el widget
+    return Flexible(
+      flex: 1,
       child: Container(
-        width: screenWidth, // Mantiene el ancho completo de la pantalla
+        width: screenWidth,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 46, 46, 46),
           borderRadius: BorderRadius.circular(7.0),
@@ -73,11 +66,10 @@ class _ProgramsIndividualesListViewState extends State<ProgramsIndividualesListV
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: IndividualTableWidget(
-            programData: allPrograms,
+            programData: allPrograms, // Pasamos los programas a la tabla
           ),
         ),
       ),
     );
   }
-
 }

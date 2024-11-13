@@ -24,23 +24,23 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
                 return Column(
                   children: [
                     DataRowWidget(
-                      image: row['image'] ?? '',
-                      name: row['name'] ?? '',
-                      frequency: (row['frequency'] is int)
-                          ? row['frequency']
-                          : int.tryParse(row['frequency'].toString()) ?? 0,
-                      pulse: (row['pulse'] is int)
-                          ? row['pulse']
-                          : int.tryParse(row['pulse'].toString()) ?? 0,
+                      imagen: row['imagen'] ?? '',
+                      nombre: row['nombre'] ?? '',
+                      frecuencia: (row['frecuencia'] is int)
+                          ? row['frecuencia']
+                          : int.tryParse(row['frecuencia'].toString()) ?? 0,
+                      pulso: (row['pulso'] is int)
+                          ? row['pulso']
+                          : int.tryParse(row['pulso'].toString()) ?? 0,
                       rampa: (row['rampa'] is int)
                           ? row['rampa']
                           : int.tryParse(row['rampa'].toString()) ?? 0,
-                      contraction: (row['contraction'] is int)
-                          ? row['contraction']
-                          : int.tryParse(row['contraction'].toString()) ?? 0,
-                      pause: (row['pause'] is int)
-                          ? row['pause']
-                          : int.tryParse(row['pause'].toString()) ?? 0,
+                      contraccion: (row['contraccion'] is int)
+                          ? row['contraccion']
+                          : int.tryParse(row['contraccion'].toString()) ?? 0,
+                      pausa: (row['pausa'] is int)
+                          ? row['pausa']
+                          : int.tryParse(row['pausa'].toString()) ?? 0,
                     ),
                     const SizedBox(height: 10), // Espaciado entre filas
                   ],
@@ -94,23 +94,23 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
 }
 
 class DataRowWidget extends StatefulWidget {
-  final String? image; // Ruta de la imagen
-  final String name;
-  final int frequency;
-  final int pulse;
+  final String? imagen; // Ruta de la imagen
+  final String nombre;
+  final int frecuencia;
+  final int pulso;
   final int rampa;
-  final int contraction;
-  final int pause;
+  final int contraccion;
+  final int pausa;
 
   const DataRowWidget({
     super.key,
-    required this.image,
-    required this.name,
-    required this.frequency,
-    required this.pulse,
+    required this.imagen,
+    required this.nombre,
+    required this.frecuencia,
+    required this.pulso,
     required this.rampa,
-    required this.contraction,
-    required this.pause,
+    required this.contraccion,
+    required this.pausa,
   });
 
   @override
@@ -136,15 +136,15 @@ class _DataRowWidgetState extends State<DataRowWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildImageCell(widget.image),
+          buildImageCell(widget.imagen),
           // Mostrar la imagen si existe
-          buildCell(widget.name, isNameColumn: true),
+          buildCell(widget.nombre, isNameColumn: true),
           // Estilo especial solo para la columna de nombre
-          buildCell(widget.frequency.toString()),
-          buildCell(widget.pulse.toString()),
+          buildCell(widget.frecuencia.toString()),
+          buildCell(widget.pulso.toString()),
           buildCell(widget.rampa.toString()),
-          buildCell(widget.contraction.toString()),
-          buildCell(widget.pause.toString()),
+          buildCell(widget.contraccion.toString()),
+          buildCell(widget.pausa.toString()),
         ],
       ),
     );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../db/db_helper.dart';
 
 class ProgramsAutoListView extends StatefulWidget {
+
   const ProgramsAutoListView({Key? key}) : super(key: key);
 
   @override
@@ -10,34 +10,62 @@ class ProgramsAutoListView extends StatefulWidget {
 }
 
 class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
-  List<Map<String, dynamic>> allPrograms = []; // Lista de programas
+  List<Map<String, dynamic>> allPrograms = []; // Lista de programas automáticos con subprogramas
 
   @override
   void initState() {
     super.initState();
-    _fetchPrograms(); // Cargar los programas al iniciar el estado
+    _fetchPrograms(); // Cargar los programas automáticos al iniciar el estado
   }
 
-  // Método actualizado para obtener los programas automáticos
   Future<void> _fetchPrograms() async {
-    final dbHelper = DatabaseHelper();
+    var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
     try {
-      // Aquí obtenemos la instancia de la base de datos
-      final db = await dbHelper
-          .database; // Asegúrate de que esta propiedad sea correcta en tu helper
+      // Llamamos a la función que obtiene los programas automáticos y sus subprogramas
+      final programData = await DatabaseHelper().obtenerProgramasAutomaticosConSubprogramas(db);
 
-      // Llamamos a la función que obtiene los programas de la base de datos
-      final programData = await dbHelper.obtenerProgramasAutomaticos(db);
+      // Verifica si se obtuvieron datos correctamente
+      if (programData.isEmpty) {
+        print('No se encontraron programas automáticos.');
+      } else {
+        print('Programas obtenidos:');
+        print(programData); // Mostrar la estructura completa de los programas y subprogramas
+      }
 
-      // Verifica el contenido de los datos obtenidos
-      print('Programas obtenidos: $programData');
+      // Agrupamos los subprogramas por programa automático
+      List<Map<String, dynamic>> groupedPrograms = _groupProgramsWithSubprograms(programData);
+
+      // Verifica el contenido de los datos agrupados
+      print('Programas agrupados:');
+      print(groupedPrograms);
 
       setState(() {
-        allPrograms = programData; // Asigna los programas obtenidos a la lista
+        allPrograms = groupedPrograms; // Asigna los programas obtenidos a la lista
       });
     } catch (e) {
       print('Error fetching programs: $e');
     }
+  }
+
+  List<Map<String, dynamic>> _groupProgramsWithSubprograms(List<Map<String, dynamic>> programData) {
+    List<Map<String, dynamic>> groupedPrograms = [];
+
+    for (var program in programData) {
+      List<Map<String, dynamic>> subprogramas = program['subprogramas'] ?? [];
+
+      Map<String, dynamic> groupedProgram = {
+        'id_programa_automatico': program['id_programa_automatico'],
+        'nombre_programa_automatico': program['nombre'],
+        'imagen': program['imagen'],
+        'descripcion_programa_automatico': program['descripcion'],
+        'duracionTotal': program['duracionTotal'],
+        'subprogramas': subprogramas,
+      };
+
+      groupedPrograms.add(groupedProgram);
+    }
+
+    return groupedPrograms;
   }
 
   @override
@@ -46,100 +74,99 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-      child: Column(children: [
-        // Cambiamos la tabla por un GridView
-        _buildGridView(screenHeight, screenWidth),
-      ]),
+      padding: const EdgeInsets.all(30.0),
+      child: Flexible(
+        flex: 1,
+        child: Container(
+          width: screenWidth,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 46, 46, 46),
+            borderRadius: BorderRadius.circular(7.0),
+          ),
+          child: Column(
+            children: [
+              _buildRowView(screenHeight, screenWidth),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildGridView(double screenHeight, double screenWidth) {
-    return Expanded(
-      // Usamos Expanded para que el GridView ocupe el espacio disponible
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // Número de columnas en el Grid
-          crossAxisSpacing: 10, // Espaciado horizontal entre las celdas
-          mainAxisSpacing: 10, // Espaciado vertical entre las celdas
-          childAspectRatio:
-              1, // Relación de aspecto de las celdas (1 significa cuadradas)
-        ),
-        itemCount: allPrograms.length, // Número de elementos en el Grid
-        itemBuilder: (context, index) {
-          var program =
-              allPrograms[index]['programa']; // Acceder al programa individual
-          var subprogramas = allPrograms[index]
-              ['subprogramas']; // Obtener los subprogramas de cada programa
+  Widget _buildRowView(double screenHeight, double screenWidth) {
+    // Dividir la lista en chunks de 4 elementos por fila
+    List<List<Map<String, dynamic>>> rows = [];
+    for (int i = 0; i < allPrograms.length; i += 4) {
+      rows.add(allPrograms.sublist(i, i + 4 > allPrograms.length ? allPrograms.length : i + 4));
+    }
 
-          return GestureDetector(
-            onTap: () {
-              // Puedes agregar alguna lógica al hacer clic en un programa (por ejemplo, navegar a una pantalla de detalles)
-              print('Programa seleccionado: ${program['name']}');
-            },
-            child: Card(
-              color: const Color.fromARGB(255, 46, 46, 46),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: SingleChildScrollView(
-                // Hacemos que el contenido dentro del Card sea desplazable
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.asset(
-                        program['image'],
-                        // Usamos la ruta de la imagen del programa
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.contain,
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        program['name'], // Nombre del programa
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+    return Expanded(
+      child: ListView.builder(
+        itemCount: rows.length,
+        itemBuilder: (context, rowIndex) {
+          List<Map<String, dynamic>> row = rows[rowIndex];
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Cambiado a start para ajustar desde la izquierda
+              children: row.map((program) {
+                String imagen = program['imagen'] ?? 'assets/default_image.png';
+                String nombre = program['nombre_programa_automatico'] ?? 'Sin nombre';
+                String descripcion = program['descripcion_programa_automatico'] ?? 'Sin descripción';
+                List<Map<String, dynamic>> subprogramas = program['subprogramas'] ?? [];
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0), // Espacio entre los elementos
+                  child: GestureDetector(
+                    onTap: () {
+                      print('\n\n============================');
+                      print('Programa seleccionado: $nombre');
+                      print('Descripción: $descripcion');
+                      print('Duración Total: ${program['duracionTotal']} mins');
+                      print('============================');
+
+                      if (subprogramas.isNotEmpty) {
+                        print('Subprogramas asociados:');
+                        for (var subprograma in subprogramas) {
+                          String subNombre = subprograma['nombre'] ?? 'Sin nombre';
+                          double ajuste = subprograma['ajuste'] ?? 0.0;
+                          double duracion = subprograma['duracion'] ?? 0.0;
+
+                          print('\n--- Subprograma ---');
+                          print('Nombre: $subNombre');
+                          print('Ajuste: $ajuste');
+                          print('Duración: $duracion mins');
+                          print('--------------------');
+                        }
+                      } else {
+                        print('Este programa no tiene subprogramas asociados.');
+                      }
+
+                      print('============================\n\n');
+                    },
+                    child: Column(
+                      children: [
+                        Text(
+                          nombre,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFF2be4f3),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
                         ),
-                      ),
-                      // Mostrar los subprogramas
-                      if (subprogramas != null && subprogramas.isNotEmpty)
-                        ...subprogramas.map<Widget>((subprograma) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Aquí mostramos los nombres en lugar de los IDs
-                                Text(
-                                  'Programa Individual: ${subprograma['nombre_individual']}',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  'Programa Recovery: ${subprograma['nombre_recovery']}',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  'Ajuste: ${subprograma['ajuste']}',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  'Duración: ${subprograma['duracion_individual']} mins',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                    ],
+                        Image.asset(
+                          imagen,
+                          width: screenWidth * 0.15, // Ajuste dinámico para el tamaño de la imagen
+                          height: screenHeight * 0.15, // Ajuste dinámico para el tamaño de la imagen
+                          fit: BoxFit.contain,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              }).toList(),
             ),
           );
         },
