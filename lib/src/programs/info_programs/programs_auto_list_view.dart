@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../../db/db_helper.dart';
 
 class ProgramsAutoListView extends StatefulWidget {
+  final Function(Map<String, dynamic>) onProgramTap; // Callback para manejar el tap
 
-  const ProgramsAutoListView({Key? key}) : super(key: key);
+  const ProgramsAutoListView({Key? key, required this.onProgramTap}) : super(key: key);
 
   @override
   _ProgramsAutoListViewState createState() => _ProgramsAutoListViewState();
@@ -34,10 +35,6 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
 
       // Agrupamos los subprogramas por programa automático
       List<Map<String, dynamic>> groupedPrograms = _groupProgramsWithSubprograms(programData);
-
-      // Verifica el contenido de los datos agrupados
-      print('Programas agrupados:');
-      print(groupedPrograms);
 
       setState(() {
         allPrograms = groupedPrograms; // Asigna los programas obtenidos a la lista
@@ -120,30 +117,8 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
                   padding: const EdgeInsets.symmetric(horizontal: 30.0), // Espacio entre los elementos
                   child: GestureDetector(
                     onTap: () {
-                      print('\n\n============================');
-                      print('Programa seleccionado: $nombre');
-                      print('Descripción: $descripcion');
-                      print('Duración Total: ${program['duracionTotal']} mins');
-                      print('============================');
-
-                      if (subprogramas.isNotEmpty) {
-                        print('Subprogramas asociados:');
-                        for (var subprograma in subprogramas) {
-                          String subNombre = subprograma['nombre'] ?? 'Sin nombre';
-                          double ajuste = subprograma['ajuste'] ?? 0.0;
-                          double duracion = subprograma['duracion'] ?? 0.0;
-
-                          print('\n--- Subprograma ---');
-                          print('Nombre: $subNombre');
-                          print('Ajuste: $ajuste');
-                          print('Duración: $duracion mins');
-                          print('--------------------');
-                        }
-                      } else {
-                        print('Este programa no tiene subprogramas asociados.');
-                      }
-
-                      print('============================\n\n');
+                      // Llamamos a la función onProgramTap pasando los datos del programa
+                      widget.onProgramTap(program); // Ejecuatamos el callback
                     },
                     child: Column(
                       children: [

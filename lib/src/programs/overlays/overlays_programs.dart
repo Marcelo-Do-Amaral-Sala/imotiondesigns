@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/programs/customs_programs/automatic_table_widget.dart';
 import 'package:imotion_designs/src/programs/info_programs/programs_indiv_list_view.dart';
 import 'package:imotion_designs/src/programs/info_programs/programs_reco_list_view.dart';
 
@@ -57,7 +58,6 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
   }
 }
 
-
 class OverlayAuto extends StatefulWidget {
   final VoidCallback onClose; // Callback para cerrar el overlay
 
@@ -68,14 +68,16 @@ class OverlayAuto extends StatefulWidget {
 }
 
 class _OverlayAutoState extends State<OverlayAuto> {
-  Map<String, dynamic>? selectedProgram; // To store the selected program
-  bool isInfoVisible = false; // To track if the program info is being displayed
+  Map<String, dynamic>?
+      selectedProgram; // Para almacenar el programa seleccionado
+  bool isInfoVisible =
+      false; // Para controlar si se muestra la vista de detalles
 
-  // Function to handle program selection from ProgramsAutoListView
+  // Esta función se pasa al ProgramsAutoListView para manejar la selección de un programa
   void selectProgram(Map<String, dynamic> programData) {
     setState(() {
       selectedProgram = programData;
-      isInfoVisible = true; // Show the program info view
+      isInfoVisible = true; // Muestra la vista detallada del programa
     });
   }
 
@@ -92,95 +94,139 @@ class _OverlayAutoState extends State<OverlayAuto> {
         ),
       ),
       content: isInfoVisible && selectedProgram != null
-          ? _buildProgramInfoView() // Show detailed view of the program
-          : ProgramsAutoListView(),
-      onClose:
-      widget.onClose, // Close the overlay when the close button is clicked
+          ? _buildProgramInfoView() // Muestra la vista con los detalles del programa
+          : ProgramsAutoListView(onProgramTap: selectProgram),
+      // Pasamos la función selectProgram
+      onClose: widget.onClose, // Callback para cerrar el overlay
     );
   }
 
-  // This function displays the selected program's details
   Widget _buildProgramInfoView() {
-    var program = selectedProgram!; // Get the selected program data
+    var program =
+        selectedProgram!; // Obtenemos los datos del programa seleccionado
 
-    // Debug print to check the program structure
+    // Debug print para verificar la estructura de los datos
     debugPrint('Selected Program: ${program.toString()}');
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(20.0), // Añadir padding general
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Program name and image
-          Text(
-            'Nombre del Programa: ${program['name']}',
-            style: const TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          SizedBox(height: 10),
-          Image.asset(
-            program['image'], // Show the image of the selected program
-            width: 200,
-            height: 200,
-            fit: BoxFit.contain,
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Descripción: ${program['descripcion'] ?? 'No disponible'}',
-            style: TextStyle(fontSize: 16, color: Colors.white),
-          ),
-          SizedBox(height: 20),
-
-          // Display subprograms if available
-          if (program.containsKey('subprogramas') &&
-              program['subprogramas'] != null &&
-              program['subprogramas'].isNotEmpty)
-            ...program['subprogramas'].map<Widget>((subprograma) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.25,
+            color: Colors.red,
+            child: Stack(
+              children: [
+                // Imagen a la izquierda y texto principal
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      'Subprograma: ${subprograma['nombre_individual'] ??
-                          'N/A'}',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    Image.asset(
+                      program['imagen'], // Imagen del programa seleccionado
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      fit: BoxFit.contain,
                     ),
-                    Text(
-                      'Ajuste: ${subprograma['ajuste'] ?? 'N/A'}',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    'Nº${program['id_programa_automatico']}  ${program['nombre_programa_automatico']} - ',
+                                style: const TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(
+                                      0xFF2be4f3), // Color del nombre del programa
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${program['duracionTotal']} min',
+                                style: const TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white, // Duración en blanco
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.02),
+                        // Espacio entre el texto principal y el nuevo texto
+                        Expanded(
+                          child: Text(
+                            '${program['descripcion_programa_automatico'] ?? 'No disponible'}',
+                            // Este es el nuevo texto
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.white, // Color del nuevo texto
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      'Duración: ${subprograma['duracion_individual'] ??
-                          'N/A'} mins',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                    SizedBox(height: 10),
-                    if (subprograma['programa_recovery_id'] != null)
-                      Text(
-                        'Programa Recovery: ${subprograma['nombre_recovery'] ??
-                            'N/A'}',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
                   ],
                 ),
-              );
-            }).toList()
-          else
-            Text(
-              'No hay subprogramas disponibles.',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isInfoVisible = false;
+                        });
+                      },
+                      child:
+                          // Imagen de "back" a la derecha
+                          Positioned(
+                        right: 0, // Alineado a la derecha
+                        top:
+                            0, // Alineado desde la parte superior del contenedor
+                        child: Image.asset(
+                          'assets/images/back.png',
+                          // Imagen del botón de "back"
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          // Ajusta el tamaño según sea necesario
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-
-          // Button to return to the program list
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                isInfoVisible = false; // Switch back to the program list view
-              });
-            },
-            child: Text('Volver a la lista'),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          Flexible(
+            // Flexible permite que el Container ocupe una fracción del espacio disponible
+            flex: 1,
+            // Este valor define cuánta parte del espacio disponible debe ocupar el widget
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 46, 46, 46),
+                borderRadius: BorderRadius.circular(7.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SubprogramTableWidget(
+                  subprogramData: program['subprogramas'] ??
+                      [], // Aquí se pasa la lista de subprogramas
+                ),
+              ),
+            ),
           ),
         ],
       ),
