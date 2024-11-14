@@ -116,92 +116,95 @@ class _OverlayAutoState extends State<OverlayAuto> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.25,
-            color: Colors.red,
             child: Stack(
               children: [
-                // Imagen a la izquierda y texto principal
+                // Row para los elementos de la izquierda (imagen y texto)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    // Contenedor para la imagen
                     Image.asset(
                       program['imagen'], // Imagen del programa seleccionado
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: MediaQuery.of(context).size.height * 0.3,
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      height: MediaQuery.of(context).size.height * 0.2,
                       fit: BoxFit.contain,
                     ),
                     SizedBox(width: MediaQuery.of(context).size.width * 0.02),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text:
-                                    'Nº${program['id_programa_automatico']}  ${program['nombre_programa_automatico']} - ',
-                                style: const TextStyle(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(
-                                      0xFF2be4f3), // Color del nombre del programa
-                                ),
+
+                    // Contenedor para el texto
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          // La columna se ajustará al tamaño mínimo necesario
+                          children: [
+                            // Texto con el nombre del programa y duración
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text:
+                                        'Nº${program['id_programa_automatico']}  ${program['nombre_programa_automatico']} - ',
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(
+                                          0xFF2be4f3), // Color del nombre del programa
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${(program['duracionTotal'] as double).toInt()} min', // Convertir a entero
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white, // Duración en blanco
+                                    ),
+                                  ),
+
+                                ],
                               ),
-                              TextSpan(
-                                text: '${program['duracionTotal']} min',
-                                style: const TextStyle(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white, // Duración en blanco
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02),
-                        // Espacio entre el texto principal y el nuevo texto
-                        Expanded(
-                          child: Text(
-                            '${program['descripcion_programa_automatico'] ?? 'No disponible'}',
-                            // Este es el nuevo texto
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white, // Color del nuevo texto
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isInfoVisible = false;
-                        });
-                      },
-                      child:
-                          // Imagen de "back" a la derecha
-                          Positioned(
-                        right: 0, // Alineado a la derecha
-                        top:
-                            0, // Alineado desde la parte superior del contenedor
-                        child: Image.asset(
-                          'assets/images/back.png',
-                          // Imagen del botón de "back"
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          // Ajusta el tamaño según sea necesario
-                          fit: BoxFit.contain,
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01),
+
+                            // Texto adicional para la descripción del programa
+                            Text(
+                              '${program['descripcion_programa_automatico'] ?? 'No disponible'}',
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white, // Color del nuevo texto
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ],
+                ),
+
+                // Contenedor para el GestureDetector con la imagen de "back" anclada a la derecha
+                Positioned(
+                  top: 0, // Alineado a la parte superior del contenedor
+                  right: 0, // Alineado a la derecha del contenedor
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isInfoVisible = false;
+                      });
+                    },
+                    child: Image.asset(
+                      scale: 0.5,
+                      'assets/images/back.png',
+                      height: MediaQuery.of(context).size.height * 0.1,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ],
             ),
