@@ -4,16 +4,16 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../db/db_helper.dart';
 
-class IndividualProgramForm extends StatefulWidget {
+class RecoveryProgramForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
 
-  const IndividualProgramForm({super.key, required this.onDataChanged});
+  const RecoveryProgramForm({super.key, required this.onDataChanged});
 
   @override
-  IndividualProgramFormState createState() => IndividualProgramFormState();
+  RecoveryProgramFormState createState() => RecoveryProgramFormState();
 }
 
-class IndividualProgramFormState extends State<IndividualProgramForm>
+class RecoveryProgramFormState extends State<RecoveryProgramForm>
     with SingleTickerProviderStateMixin {
   final _nameController = TextEditingController();
   final _frequencyController = TextEditingController();
@@ -102,7 +102,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     final db = await openDatabase(
         'my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_traje');
+    await db.query('grupos_musculares_traje');
 
     // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
     setState(() {
@@ -121,7 +121,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
     // Obtener los grupos musculares y las imágenes asociadas
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_pantalon');
+    await db.query('grupos_musculares_pantalon');
 
     // Inicializar selectedGroups, hintColors, groupIds y imagePaths con los datos obtenidos
     setState(() {
@@ -330,7 +330,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
                               hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -421,7 +421,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('RAMPA (sx10)', style: _labelStyle),
                                       Container(
@@ -457,7 +457,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('CONTRACCIÓN (s.)',
                                           style: _labelStyle),
@@ -475,7 +475,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                               hintText:
-                                                  'Introducir contracción'),
+                                              'Introducir contracción'),
                                         ),
                                       ),
                                     ],
@@ -496,7 +496,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('PAUSA (s.)', style: _labelStyle),
                                       Container(
@@ -626,7 +626,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
                               hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -1085,7 +1085,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
                               hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(

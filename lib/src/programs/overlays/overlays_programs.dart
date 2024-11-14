@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/programs/customs_programs/automatic_table_widget.dart';
 import 'package:imotion_designs/src/programs/form_programs/individual_program_form.dart';
+import 'package:imotion_designs/src/programs/form_programs/recovery_program_form.dart';
 import 'package:imotion_designs/src/programs/info_programs/programs_indiv_list_view.dart';
 import 'package:imotion_designs/src/programs/info_programs/programs_reco_list_view.dart';
 
 import '../../clients/overlays/main_overlay.dart';
+import '../form_programs/automatic_program_form.dart';
 import '../info_programs/programs_auto_list_view.dart';
 
 class OverlayIndividuales extends StatefulWidget {
@@ -401,7 +403,19 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
             print(data); // Verify that the data is arriving correctly
             setState(() {});
           },
-        )
+        ),
+        AutomaticProgramForm(
+          onDataChanged: (data) {
+            print(data); // Verify that the data is arriving correctly
+            setState(() {});
+          },
+        ),
+        RecoveryProgramForm(
+          onDataChanged: (data) {
+            print(data); // Verify that the data is arriving correctly
+            setState(() {});
+          },
+        ),
       ],
     );
   }
