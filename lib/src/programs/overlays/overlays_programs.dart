@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/programs/customs_programs/automatic_table_widget.dart';
+import 'package:imotion_designs/src/programs/form_programs/individual_program_form.dart';
 import 'package:imotion_designs/src/programs/info_programs/programs_indiv_list_view.dart';
 import 'package:imotion_designs/src/programs/info_programs/programs_reco_list_view.dart';
 
@@ -155,14 +156,14 @@ class _OverlayAutoState extends State<OverlayAuto> {
                                     ),
                                   ),
                                   TextSpan(
-                                    text: '${(program['duracionTotal'] as double).toInt()} min', // Convertir a entero
+                                    text:
+                                        '${(program['duracionTotal'] as double).toInt()} min', // Convertir a entero
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white, // Duración en blanco
                                     ),
                                   ),
-
                                 ],
                               ),
                             ),
@@ -287,25 +288,22 @@ class _OverlayRecoveryState extends State<OverlayRecovery>
     );
   }
 }
-/*
-class OverlayCrear extends StatefulWidget {
+
+class OverlayCrearPrograma extends StatefulWidget {
   final VoidCallback onClose;
 
-  const OverlayCrear({Key? key, required this.onClose}) : super(key: key);
+  const OverlayCrearPrograma({Key? key, required this.onClose})
+      : super(key: key);
 
   @override
-  _OverlayCrearState createState() => _OverlayCrearState();
+  _OverlayCrearProgramaState createState() => _OverlayCrearProgramaState();
 }
 
-class _OverlayCrearState extends State<OverlayCrear>
+class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool isClientSaved = false; // Variable to check if the client has been saved
   Map<String, dynamic>?
       selectedClientData; // Nullable Map, no late initialization required
-
-  final GlobalKey<PersonalDataFormState> _personalDataFormKey =
-      GlobalKey<PersonalDataFormState>();
 
   @override
   void initState() {
@@ -325,7 +323,7 @@ class _OverlayCrearState extends State<OverlayCrear>
 
     return MainOverlay(
       title: const Text(
-        "CREAR CLIENTE",
+        "CREAR PROGRAMA",
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 30,
@@ -347,86 +345,32 @@ class _OverlayCrearState extends State<OverlayCrear>
     );
   }
 
-  Future<void> _showAlert(BuildContext context) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF494949),
-          title: const Text(
-            '¡ALERTA!',
-            style: TextStyle(
-                color: Colors.red, fontSize: 28, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          content: const Text(
-            'Debes completar el formulario para continuar',
-            style: TextStyle(color: Colors.white, fontSize: 20),
-            textAlign: TextAlign.center,
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF2be4f3)),
-                  ),
-                  child: const Text(
-                    '¡Entendido!',
-                    style: TextStyle(color: Color(0xFF2be4f3)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Widget _buildTabBar() {
     return Container(
-      height: 60,
+      height: MediaQuery.of(context).size.height *
+          0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
-      child: GestureDetector(
-        onTap: () {
-          if (!isClientSaved) {
-            _showAlert(context);
-          }
+      child: TabBar(
+        controller: _tabController,
+        onTap: (index) {
+          setState(() {});
         },
-        child: AbsorbPointer(
-          absorbing: !isClientSaved,
-          child: TabBar(
-            controller: _tabController,
-            onTap: (index) {
-              if (index != 0 && !isClientSaved) {
-                return; // Don't switch tabs if not saved
-              } else {
-                setState(() {
-                  _tabController.index = index;
-                });
-              }
-            },
-            tabs: [
-              _buildTab('DATOS PERSONALES', 0),
-              _buildTab('BONOS', 1),
-              _buildTab('GRUPOS ACTIVOS', 2),
-            ],
-            indicator: const BoxDecoration(
-              color: Color(0xFF494949),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
-            ),
-            labelColor: const Color(0xFF2be4f3),
-            labelStyle:
-                const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-            unselectedLabelColor: Colors.white,
-          ),
+        tabs: [
+          _buildTab('INDIVIDUAL', 0),
+          _buildTab('AUTOMÁTICO', 1),
+          _buildTab('RECOVERY', 2),
+        ],
+        indicator: const BoxDecoration(
+          color: Color(0xFF494949),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
         ),
+        dividerColor: Colors.black,
+        labelColor: const Color(0xFF2be4f3),
+        labelStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelColor: Colors.white,
       ),
     );
   }
@@ -452,30 +396,13 @@ class _OverlayCrearState extends State<OverlayCrear>
     return IndexedStack(
       index: _tabController.index,
       children: [
-        PersonalDataForm(
-          key: _personalDataFormKey,
+        IndividualProgramForm(
           onDataChanged: (data) {
             print(data); // Verify that the data is arriving correctly
-            setState(() {
-              isClientSaved = true; // Client has been saved
-              selectedClientData = data; // Save the client data
-            });
+            setState(() {});
           },
-        ),
-        // Check if selectedClientData is not null before passing it to ClientsFormBonos
-        selectedClientData != null
-            ? ClientsFormBonos(clientDataBonos: selectedClientData!)
-            : Center(child: Text("No client data available.")),
-        selectedClientData != null
-            ? ClientsFormGroups(
-                onDataChanged: (data) {
-                  print(data); // Handle changed data
-                },
-                onClose: widget.onClose,
-                clientDataGroups: selectedClientData!,
-              )
-            : Center(child: Text("No client data available.")),
+        )
       ],
     );
   }
-}*/
+}

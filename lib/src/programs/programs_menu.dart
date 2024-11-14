@@ -164,6 +164,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                 () {
                                   setState(() {
                                     scaleFactorCrearP = 1;
+                                    toggleOverlay(3);
                                   });
                                 },
                                 () {
@@ -254,10 +255,10 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
         return OverlayRecovery(
           onClose: () => toggleOverlay(2),
         );
-      /* case 3:
-        return OverlayCuarto(
+      case 3:
+        return OverlayCrearPrograma(
           onClose: () => toggleOverlay(3),
-        );*/
+        );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada
     }

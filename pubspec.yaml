@@ -126,6 +126,9 @@ flutter:
     - assets/images/RESISTENCIA(ENDURANCE).png
     - assets/images/RESISTENCIA2(ENDURANCE2).png
     - assets/images/TONING.png
+    - assets/images/PAUSA.png
+    - assets/images/RAMPA.png
+    - assets/images/CONTRACCION.png
 
   #   - images/a_dot_ham.jpeg
 

@@ -80,7 +80,7 @@ class _OverlayInfoState extends State<OverlayInfo>
 
   Widget _buildTabBar() {
     return Container(
-      height: 60, // Ajusta la altura según lo necesites
+      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
       child: TabBar(
         controller: _tabController,
@@ -101,9 +101,10 @@ class _OverlayInfoState extends State<OverlayInfo>
           color: Color(0xFF494949),
           borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
         ),
+        dividerColor: Colors.black,
         labelColor: const Color(0xFF2be4f3),
         labelStyle: const TextStyle(
-          fontSize: 13,
+          fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
         unselectedLabelColor: Colors.white,
@@ -340,7 +341,7 @@ class _OverlayCrearState extends State<OverlayCrear>
 
   Widget _buildTabBar() {
     return Container(
-      height: 60,
+      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
       child: GestureDetector(
         onTap: () {
@@ -370,9 +371,10 @@ class _OverlayCrearState extends State<OverlayCrear>
               color: Color(0xFF494949),
               borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
             ),
+            dividerColor: Colors.black,
             labelColor: const Color(0xFF2be4f3),
             labelStyle:
-                const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             unselectedLabelColor: Colors.white,
           ),
         ),
