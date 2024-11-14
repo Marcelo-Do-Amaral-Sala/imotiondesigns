@@ -30,6 +30,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
   Map<String, bool> selectedGroups = {};
   Map<String, Color> hintColors = {};
   Map<String, int> groupIds = {};
+  Map<String, String> imagePaths = {};
 
   final DatabaseHelper dbHelper = DatabaseHelper();
 
@@ -52,6 +53,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
       selectedGroups = {for (var row in result) row['nombre']: false};
       hintColors = {for (var row in result) row['nombre']: Colors.white};
       groupIds = {for (var row in result) row['nombre']: row['id']};
+      imagePaths = {for (var row in result) row['nombre']: row['imagen']};
     });
   }
 
@@ -330,10 +332,9 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               'Lumbares',
                               'Glúteos',
                               'Isquios',
-                              // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding:  EdgeInsets.only(bottom: screenHeight*0.02),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -341,15 +342,13 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                       child: GestureDetector(
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius:
-                                                    BorderRadius.circular(7),
+                                                borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -364,13 +363,10 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                                     fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            7),
+                                                    borderRadius: BorderRadius.circular(7),
                                                   ),
                                                   filled: true,
-                                                  fillColor:
-                                                      const Color(0xFF313030),
+                                                  fillColor: const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -395,8 +391,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/avatar_back.png'),
+                                      image: AssetImage('assets/images/avatar_back.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -405,26 +400,32 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Trapecios',
-                                        'Dorsales',
-                                        'Lumbares',
-                                        'Glúteos',
-                                        'Isquios',
-                                        'Gemelos'
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Filtra solo los grupos seleccionados
+                              [
+                                'Trapecios',
+                                'Dorsales',
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquios',
+                                'Gemelos'
+                              ].contains(entry.key) &&
+                                  entry.value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
-                                String imagePath =
-                                    'assets/images/$groupName.png'; // Ruta de la imagen correspondiente
 
+                                // Obtener la ruta de la imagen desde imagePaths (con la extensión)
+                                String? imagePath = imagePaths[groupName];
+
+                                // Si la ruta no está definida, asignamos una imagen predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                // Cargar la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath),
+                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -443,8 +444,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/avatar_front.png'),
+                                      image: AssetImage('assets/images/avatar_front.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -453,24 +453,30 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Pectorales',
-                                        'Abdominales',
-                                        'Cuádriceps',
-                                        'Bíceps'
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Filtra solo los grupos seleccionados
+                              [
+                                'Pectorales',
+                                'Abdominales',
+                                'Cuádriceps',
+                                'Bíceps'
+                              ].contains(entry.key) &&
+                                  entry.value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
-                                String imagePath =
-                                    'assets/images/$groupName.png'; // Ruta de la imagen correspondiente
 
+                                // Obtener la ruta de la imagen desde imagePaths (con la extensión)
+                                String? imagePath = imagePaths[groupName];
+
+                                // Si la ruta no está definida, asignamos una imagen predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                // Cargar la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath),
+                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -490,10 +496,9 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               'Cuádriceps',
                               'Bíceps',
                               'Gemelos',
-                              // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding:  EdgeInsets.only(bottom: screenHeight*0.02),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -501,15 +506,13 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                       child: GestureDetector(
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius:
-                                                    BorderRadius.circular(7),
+                                                borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -524,13 +527,10 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                                     fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            7),
+                                                    borderRadius: BorderRadius.circular(7),
                                                   ),
                                                   filled: true,
-                                                  fillColor:
-                                                      const Color(0xFF313030),
+                                                  fillColor: const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -549,6 +549,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                       ],
                     ),
                   ),
+
                 ],
               ),
             ),

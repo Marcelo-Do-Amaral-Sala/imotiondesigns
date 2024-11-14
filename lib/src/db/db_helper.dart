@@ -26,7 +26,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 33,
+      version: 40,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
@@ -56,14 +56,6 @@ class DatabaseHelper {
     )
   ''');
 
-    // Crear la tabla grupos_musculares
-    await db.execute('''
-    CREATE TABLE IF NOT EXISTS grupos_musculares (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nombre TEXT NOT NULL
-    )
-  ''');
-
     // Crear la tabla de relación N:M entre clientes y grupos musculares
     await db.execute('''
     CREATE TABLE IF NOT EXISTS clientes_grupos_musculares (
@@ -86,17 +78,7 @@ class DatabaseHelper {
       FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
     )
   ''');
-    // Insertar valores predeterminados en la tabla grupos_musculares
-    await db.insert('grupos_musculares', {'nombre': 'Pectorales'});
-    await db.insert('grupos_musculares', {'nombre': 'Trapecios'});
-    await db.insert('grupos_musculares', {'nombre': 'Dorsales'});
-    await db.insert('grupos_musculares', {'nombre': 'Glúteos'});
-    await db.insert('grupos_musculares', {'nombre': 'Isquios'});
-    await db.insert('grupos_musculares', {'nombre': 'Lumbares'});
-    await db.insert('grupos_musculares', {'nombre': 'Abdominales'});
-    await db.insert('grupos_musculares', {'nombre': 'Cuádriceps'});
-    await db.insert('grupos_musculares', {'nombre': 'Bíceps'});
-    await db.insert('grupos_musculares', {'nombre': 'Gemelos'});
+
 
     // Crear la tabla Programas
     await db.execute('''
@@ -580,16 +562,15 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query(
-              'Programas',
+          var result = await txn.query('Programas',
               columns: ['nombre'],
               where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']]
-          );
+              whereArgs: [subprograma['id_programa_relacionado']]);
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -619,7 +600,7 @@ class DatabaseHelper {
         List<Map<String, dynamic>> subprogramas = [
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 1,  // ID del programa individual 1
+            'id_programa_relacionado': 1, // ID del programa individual 1
             'ajuste': 0,
             'duracion': 0.5
           },
@@ -637,31 +618,31 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa individual 4
+            'id_programa_relacionado': 4, // ID del programa individual 4
             'ajuste': -4,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa individual 14
+            'id_programa_relacionado': 4, // ID del programa individual 14
             'ajuste': 2,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa recovery 1
+            'id_programa_relacionado': 4, // ID del programa recovery 1
             'ajuste': 2,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa recovery 2
+            'id_programa_relacionado': 4, // ID del programa recovery 2
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa recovery 3
+            'id_programa_relacionado': 4, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 1
           },
@@ -673,31 +654,31 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 3,  // ID del programa recovery 3
+            'id_programa_relacionado': 3, // ID del programa recovery 3
             'ajuste': -3,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 3,  // ID del programa recovery 3
+            'id_programa_relacionado': 3, // ID del programa recovery 3
             'ajuste': 1,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 3,  // ID del programa recovery 3
+            'id_programa_relacionado': 3, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 3,  // ID del programa recovery 3
+            'id_programa_relacionado': 3, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 3,  // ID del programa recovery 3
+            'id_programa_relacionado': 3, // ID del programa recovery 3
             'ajuste': 1,
             'duracion': 1
           },
@@ -709,19 +690,19 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa recovery 3
+            'id_programa_relacionado': 4, // ID del programa recovery 3
             'ajuste': -2,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa recovery 3
+            'id_programa_relacionado': 4, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico2,
-            'id_programa_relacionado': 4,  // ID del programa recovery 3
+            'id_programa_relacionado': 4, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 1
           },
@@ -749,16 +730,15 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query(
-              'Programas',
+          var result = await txn.query('Programas',
               columns: ['nombre'],
               where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']]
-          );
+              whereArgs: [subprograma['id_programa_relacionado']]);
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -788,7 +768,7 @@ class DatabaseHelper {
         List<Map<String, dynamic>> subprogramas = [
           {
             'id_programa_automatico': idProgramaAutomatico3,
-            'id_programa_relacionado': 1,  // ID del programa individual 1
+            'id_programa_relacionado': 1, // ID del programa individual 1
             'ajuste': 0,
             'duracion': 0.5
           },
@@ -921,7 +901,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -943,7 +924,8 @@ class DatabaseHelper {
         int idProgramaAutomatico4 = await txn.insert('Programas_Automaticos', {
           'nombre': 'FUERZA',
           'imagen': 'assets/images/STRENGTH.png',
-          'descripcion': 'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
+          'descripcion':
+              'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
           'duracionTotal': 25, // Duración total del programa en minutos
         });
 
@@ -951,7 +933,7 @@ class DatabaseHelper {
         List<Map<String, dynamic>> subprogramas = [
           {
             'id_programa_automatico': idProgramaAutomatico4,
-            'id_programa_relacionado': 1,  // ID del programa individual 1
+            'id_programa_relacionado': 1, // ID del programa individual 1
             'ajuste': 0,
             'duracion': 0.5
           },
@@ -969,19 +951,19 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico4,
-            'id_programa_relacionado': 2,  // ID del programa individual 4
+            'id_programa_relacionado': 2, // ID del programa individual 4
             'ajuste': 1,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico4,
-            'id_programa_relacionado': 2,  // ID del programa individual 14
+            'id_programa_relacionado': 2, // ID del programa individual 14
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico4,
-            'id_programa_relacionado': 2,  // ID del programa recovery 1
+            'id_programa_relacionado': 2, // ID del programa recovery 1
             'ajuste': 2,
             'duracion': 2
           },
@@ -1043,7 +1025,8 @@ class DatabaseHelper {
         // Verificamos los subprogramas insertados
         print('Programa Automático: FUERZA');
         print('ID: $idProgramaAutomatico4');
-        print('Descripción: Aumento de la fuerza trabajando la potencia del músculo y quema de grasa');
+        print(
+            'Descripción: Aumento de la fuerza trabajando la potencia del músculo y quema de grasa');
         print('Duración Total: 25.0');
         print('Subprogramas:');
         print('*****************************************************');
@@ -1060,7 +1043,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1082,7 +1066,8 @@ class DatabaseHelper {
         int idProgramaAutomatico5 = await txn.insert('Programas_Automaticos', {
           'nombre': 'HIPERTROFIA',
           'imagen': 'assets/images/HIPERTROFIA.png',
-          'descripcion': 'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
+          'descripcion':
+              'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
           'duracionTotal': 25, // Duración total del programa en minutos
         });
 
@@ -1090,7 +1075,7 @@ class DatabaseHelper {
         List<Map<String, dynamic>> subprogramas = [
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 1,  // ID del programa individual 1
+            'id_programa_relacionado': 1, // ID del programa individual 1
             'ajuste': 0,
             'duracion': 0.5
           },
@@ -1108,19 +1093,19 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 9,  // ID del programa individual 4
+            'id_programa_relacionado': 9, // ID del programa individual 4
             'ajuste': -3,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 9,  // ID del programa individual 14
+            'id_programa_relacionado': 9, // ID del programa individual 14
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 9,  // ID del programa recovery 1
+            'id_programa_relacionado': 9, // ID del programa recovery 1
             'ajuste': 2,
             'duracion': 1
           },
@@ -1132,25 +1117,25 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 8,  // ID del programa recovery 3
+            'id_programa_relacionado': 8, // ID del programa recovery 3
             'ajuste': -2,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 8,  // ID del programa recovery 3
+            'id_programa_relacionado': 8, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 8,  // ID del programa recovery 3
+            'id_programa_relacionado': 8, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 8,  // ID del programa recovery 3
+            'id_programa_relacionado': 8, // ID del programa recovery 3
             'ajuste': 1,
             'duracion': 2
           },
@@ -1162,13 +1147,13 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 3,  // ID del programa recovery 3
+            'id_programa_relacionado': 3, // ID del programa recovery 3
             'ajuste': -2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico5,
-            'id_programa_relacionado': 3,  // ID del programa recovery 3
+            'id_programa_relacionado': 3, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 2
           },
@@ -1188,7 +1173,8 @@ class DatabaseHelper {
         // Verificamos los subprogramas insertados
         print('Programa Automático: HIPERTROFIA');
         print('ID: $idProgramaAutomatico5');
-        print('Descripción: Incremento del número de fibras musculares y el tamaño de las mismas...');
+        print(
+            'Descripción: Incremento del número de fibras musculares y el tamaño de las mismas...');
         print('Duración Total: 25.0');
         print('Subprogramas:');
         print('*****************************************************');
@@ -1205,7 +1191,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1227,15 +1214,17 @@ class DatabaseHelper {
         int idProgramaAutomatico6 = await txn.insert('Programas_Automaticos', {
           'nombre': 'RESISTENCIA 1',
           'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
-          'descripcion': 'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
-          'duracionTotal': 25, // Duración total del programa automático en minutos
+          'descripcion':
+              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
+          'duracionTotal': 25,
+          // Duración total del programa automático en minutos
         });
 
         // Lista de subprogramas con sus detalles
         List<Map<String, dynamic>> subprogramas = [
           {
             'id_programa_automatico': idProgramaAutomatico6,
-            'id_programa_relacionado': 1,  // ID del programa individual 1
+            'id_programa_relacionado': 1, // ID del programa individual 1
             'ajuste': 0,
             'duracion': 0.5
           },
@@ -1283,19 +1272,19 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico6,
-            'id_programa_relacionado': 2,  // ID del programa recovery 3
+            'id_programa_relacionado': 2, // ID del programa recovery 3
             'ajuste': -4,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico6,
-            'id_programa_relacionado': 2,  // ID del programa recovery 3
+            'id_programa_relacionado': 2, // ID del programa recovery 3
             'ajuste': 1,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico6,
-            'id_programa_relacionado': 2,  // ID del programa recovery 3
+            'id_programa_relacionado': 2, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 1.5
           },
@@ -1333,7 +1322,8 @@ class DatabaseHelper {
         // Verificamos los subprogramas insertados
         print('Programa Automático: RESISTENCIA 1');
         print('ID: $idProgramaAutomatico6');
-        print('Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos');
+        print(
+            'Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos');
         print('Duración Total: 25.0');
         print('Subprogramas:');
         print('*****************************************************');
@@ -1350,7 +1340,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1372,15 +1363,17 @@ class DatabaseHelper {
         int idProgramaAutomatico7 = await txn.insert('Programas_Automaticos', {
           'nombre': 'RESISTENCIA 2',
           'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
-          'descripcion': 'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
-          'duracionTotal': 25, // Duración total del programa automático en minutos
+          'descripcion':
+              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
+          'duracionTotal': 25,
+          // Duración total del programa automático en minutos
         });
 
         // Lista de subprogramas con sus detalles
         List<Map<String, dynamic>> subprogramas = [
           {
             'id_programa_automatico': idProgramaAutomatico7,
-            'id_programa_relacionado': 1,  // ID del programa individual 1
+            'id_programa_relacionado': 1, // ID del programa individual 1
             'ajuste': 0,
             'duracion': 0.5
           },
@@ -1398,19 +1391,19 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico7,
-            'id_programa_relacionado': 6,  // ID del programa individual 4
+            'id_programa_relacionado': 6, // ID del programa individual 4
             'ajuste': -4,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico7,
-            'id_programa_relacionado': 6,  // ID del programa individual 14
+            'id_programa_relacionado': 6, // ID del programa individual 14
             'ajuste': 1,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico7,
-            'id_programa_relacionado': 6,  // ID del programa recovery 1
+            'id_programa_relacionado': 6, // ID del programa recovery 1
             'ajuste': 1,
             'duracion': 2
           },
@@ -1428,19 +1421,19 @@ class DatabaseHelper {
           },
           {
             'id_programa_automatico': idProgramaAutomatico7,
-            'id_programa_relacionado': 5,  // ID del programa recovery 3
+            'id_programa_relacionado': 5, // ID del programa recovery 3
             'ajuste': -2,
             'duracion': 1
           },
           {
             'id_programa_automatico': idProgramaAutomatico7,
-            'id_programa_relacionado': 5,  // ID del programa recovery 3
+            'id_programa_relacionado': 5, // ID del programa recovery 3
             'ajuste': 2,
             'duracion': 2
           },
           {
             'id_programa_automatico': idProgramaAutomatico7,
-            'id_programa_relacionado': 5,  // ID del programa recovery 3
+            'id_programa_relacionado': 5, // ID del programa recovery 3
             'ajuste': 1,
             'duracion': 2
           },
@@ -1490,7 +1483,8 @@ class DatabaseHelper {
         // Verificamos los subprogramas insertados
         print('Programa Automático: RESISTENCIA 2');
         print('ID: $idProgramaAutomatico7');
-        print('Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado');
+        print(
+            'Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado');
         print('Duración Total: 25.0');
         print('Subprogramas:');
         print('*****************************************************');
@@ -1507,7 +1501,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1529,15 +1524,17 @@ class DatabaseHelper {
         int idProgramaAutomatico8 = await txn.insert('Programas_Automaticos', {
           'nombre': 'CARDIO',
           'imagen': 'assets/images/CARDIO.png',
-          'descripcion': 'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
-          'duracionTotal': 25, // Duración total del programa automático en minutos
+          'descripcion':
+              'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
+          'duracionTotal': 25,
+          // Duración total del programa automático en minutos
         });
 
         // Lista de subprogramas con sus detalles
         List<Map<String, dynamic>> subprogramas = [
           {
             'id_programa_automatico': idProgramaAutomatico8,
-            'id_programa_relacionado': 1,  // ID del programa individual 1
+            'id_programa_relacionado': 1, // ID del programa individual 1
             'ajuste': 0,
             'duracion': 0.5
           },
@@ -1665,7 +1662,8 @@ class DatabaseHelper {
         // Verificamos los subprogramas insertados
         print('Programa Automático: CARDIO');
         print('ID: $idProgramaAutomatico8');
-        print('Descripción: Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo');
+        print(
+            'Descripción: Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo');
         print('Duración Total: 25.0');
         print('Subprogramas:');
         print('*****************************************************');
@@ -1682,7 +1680,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1704,8 +1703,10 @@ class DatabaseHelper {
         int idProgramaAutomatico9 = await txn.insert('Programas_Automaticos', {
           'nombre': 'CROSS MAX',
           'imagen': 'assets/images/CROSSMAX.png',
-          'descripcion': 'Programa experto. Entrenamiento para la mejora de la condición física.',
-          'duracionTotal': 25, // Duración total del programa automático en minutos
+          'descripcion':
+              'Programa experto. Entrenamiento para la mejora de la condición física.',
+          'duracionTotal': 25,
+          // Duración total del programa automático en minutos
         });
 
         // Lista de subprogramas con sus detalles
@@ -1822,7 +1823,8 @@ class DatabaseHelper {
         // Verificamos los subprogramas insertados
         print('Programa Automático: CROSS MAX');
         print('ID: $idProgramaAutomatico9');
-        print('Descripción: Programa experto. Entrenamiento para la mejora de la condición física.');
+        print(
+            'Descripción: Programa experto. Entrenamiento para la mejora de la condición física.');
         print('Duración Total: 25.0');
         print('Subprogramas:');
         print('*****************************************************');
@@ -1839,7 +1841,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1862,7 +1865,8 @@ class DatabaseHelper {
           'nombre': 'SLIM',
           'imagen': 'assets/images/SLIM.png',
           'descripcion': 'Quema de grasa y creación de nuevas células.',
-          'duracionTotal': 25, // Duración total del programa automático en minutos
+          'duracionTotal': 25,
+          // Duración total del programa automático en minutos
         });
 
         // Lista de subprogramas con sus detalles
@@ -1972,7 +1976,8 @@ class DatabaseHelper {
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
-              ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
+              ? result.first['nombre']
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1989,1552 +1994,406 @@ class DatabaseHelper {
       }
     });
 
+    // Crear la tabla grupos_musculares_pantalon
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS grupos_musculares_pantalon (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        imagen TEXT NOT NULL
+      )
+    ''');
+
+    // Crear la tabla grupos_musculares_traje
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS grupos_musculares_traje (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        imagen TEXT NOT NULL
+      )
+    ''');
+
+    // Crear la tabla grupos_musculares
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS grupos_musculares (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        imagen TEXT NOT NULL
+      )
+    ''');
+
+    // Insertar valores predeterminados en la tabla grupos_musculares
+    await db.insert('grupos_musculares', {
+      'nombre': 'Pectorales',
+      'imagen': 'assets/images/Pectorales.png'
+    });
+    print('Inserted into grupos_musculares: Pectorales');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Trapecios',
+      'imagen': 'assets/images/Trapecios.png'
+    });
+    print('Inserted into grupos_musculares: Trapecios');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Dorsales',
+      'imagen': 'assets/images/Dorsales.png'
+    });
+    print('Inserted into grupos_musculares: Dorsales');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Glúteos',
+      'imagen': 'assets/images/Glúteos.png'
+    });
+    print('Inserted into grupos_musculares: Glúteos');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Isquios',
+      'imagen': 'assets/images/Isquios.png'
+    });
+    print('Inserted into grupos_musculares: Isquios');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Lumbares',
+      'imagen': 'assets/images/Lumbares.png'
+    });
+    print('Inserted into grupos_musculares: Lumbares');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Abdominales',
+      'imagen': 'assets/images/Abdominales.png'
+    });
+    print('Inserted into grupos_musculares: Abdominales');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Cuádriceps',
+      'imagen': 'assets/images/Cuádriceps.png'
+    });
+    print('Inserted into grupos_musculares: Cuádriceps');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Bíceps',
+      'imagen': 'assets/images/Bíceps.png'
+    });
+    print('Inserted into grupos_musculares: Bíceps');
+
+    await db.insert('grupos_musculares', {
+      'nombre': 'Gemelos',
+      'imagen': 'assets/images/Gemelos.png'
+    });
+    print('Inserted into grupos_musculares: Gemelos');
+
+    // Insertar valores predeterminados en la tabla grupos_musculares_traje
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Pectorales',
+      'imagen': 'assets/images/Pectorales.png'
+    });
+    print('Inserted into grupos_musculares_traje: Pectorales');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Trapecios',
+      'imagen': 'assets/images/Trapecios.png'
+    });
+    print('Inserted into grupos_musculares_traje: Trapecios');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Dorsales',
+      'imagen': 'assets/images/Dorsales.png'
+    });
+    print('Inserted into grupos_musculares_traje: Dorsales');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Glúteos',
+      'imagen': 'assets/images/Glúteos.png'
+    });
+    print('Inserted into grupos_musculares_traje: Glúteos');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Isquios',
+      'imagen': 'assets/images/Isquios.png'
+    });
+    print('Inserted into grupos_musculares_traje: Isquios');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Lumbares',
+      'imagen': 'assets/images/Lumbares.png'
+    });
+    print('Inserted into grupos_musculares_traje: Lumbares');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Abdominales',
+      'imagen': 'assets/images/Abdominales.png'
+    });
+    print('Inserted into grupos_musculares_traje: Abdominales');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Cuádriceps',
+      'imagen': 'assets/images/Cuádriceps.png'
+    });
+    print('Inserted into grupos_musculares_traje: Cuádriceps');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Bíceps',
+      'imagen': 'assets/images/Bíceps.png'
+    });
+    print('Inserted into grupos_musculares_traje: Bíceps');
+
+    await db.insert('grupos_musculares_traje', {
+      'nombre': 'Gemelos',
+      'imagen': 'assets/images/Gemelos.png'
+    });
+    print('Inserted into grupos_musculares_traje: Gemelos');
+
+    // Insertar valores predeterminados en la tabla grupos_musculares_pantalon
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Lumbares',
+      'imagen': 'assets/images/lumbares_pantalon.png'
+    });
+    print('Inserted into grupos_musculares_pantalon: Lumbares');
+
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Glúteo superior',
+      'imagen': 'assets/images/gluteosup_pantalon.png'
+    });
+    print('Inserted into grupos_musculares_pantalon: Glúteo superior');
+
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Glúteo inferior',
+      'imagen': 'assets/images/gluteoinf_pantalon.png'
+    });
+    print('Inserted into grupos_musculares_pantalon: Glúteo inferior');
+
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Isquiotibiales',
+      'imagen': 'assets/images/isquios_pantalon.png'
+    });
+    print('Inserted into grupos_musculares_pantalon: Isquiotibiales');
+
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Abdominales',
+      'imagen': 'assets/images/abdomen_pantalon.png'
+    });
+    print('Inserted into grupos_musculares_pantalon: Abdominales');
+
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Cuádriceps',
+      'imagen': 'assets/images/cuadriceps_pantalon.png'
+    });
+    print('Inserted into grupos_musculares_pantalon: Cuádriceps');
+
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Bíceps',
+      'imagen': 'assets/images/biceps_pantalon.png'
+    });
+    print('Inserted into grupos_musculares_pantalon: Bíceps');
+
+    await db.insert('grupos_musculares_pantalon', {
+      'nombre': 'Gemelos',
+      'imagen': 'assets/images/gemelos_pantalon.png'
+    });
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 33) {
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "TONIFICACIÓN"
-          int idProgramaAutomatico = await txn.insert('Programas_Automaticos', {
-            'nombre': 'TONIFICACIÓN',
-            'imagen': 'assets/images/TONING.png',
-            'descripcion': 'Aumento de la resistencia y retraso de la fatiga.',
-            'duracionTotal': 25,
-          });
+    if (oldVersion < 40) {
+      // Crear la tabla grupos_musculares_pantalon
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS grupos_musculares_pantalon (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        imagen TEXT NOT NULL
+      )
+    ''');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 1,
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 10,
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 23,
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 23,
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 2,
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 2,
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 2,
-              'ajuste': 1,
-              'duracion': 1.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 20,
-              'ajuste': -5,
-              'duracion': 5
-            },
-          ];
+      // Crear la tabla grupos_musculares_traje
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS grupos_musculares_traje (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        imagen TEXT NOT NULL
+      )
+    ''');
 
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
+      // Crear la tabla grupos_musculares
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS grupos_musculares (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        imagen TEXT NOT NULL
+      )
+    ''');
 
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: TONIFICACIÓN');
-          print('ID: $idProgramaAutomatico');
-          print('Descripción: Aumento de la resistencia y retraso de la fatiga.');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-                'Programas',
-                columns: ['nombre'],
-                where: 'id_programa = ?',
-                whereArgs: [subprograma['id_programa_relacionado']]
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      // Insertar valores predeterminados en la tabla grupos_musculares
+      await db.insert('grupos_musculares', {
+        'nombre': 'Pectorales',
+        'imagen': 'assets/images/Pectorales.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "GLÚTEOS"
-          int idProgramaAutomatico2 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'GLÚTEOS',
-            'imagen': 'assets/images/GLUTEOS.png',
-            'descripcion': 'Fortalece los músculos del suelo pélvico',
-            'duracionTotal': 25, // Duración total del programa en minutos
-          });
+      print('Inserted into grupos_musculares: Pectorales');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 1,  // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa recovery 2
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3,  // ID del programa recovery 3
-              'ajuste': -3,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3,  // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3,  // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -7,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: GLÚTEOS');
-          print('ID: $idProgramaAutomatico2');
-          print('Descripción: Fortalece los músculos del suelo pélvico');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-                'Programas',
-                columns: ['nombre'],
-                where: 'id_programa = ?',
-                whereArgs: [subprograma['id_programa_relacionado']]
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Trapecios',
+        'imagen': 'assets/images/Trapecios.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "SUELO PÉLVICO"
-          int idProgramaAutomatico3 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'SUELO PÉLVICO',
-            'imagen': 'assets/images/SUELOPELV.png',
-            'descripcion': 'Fortalece los músculos del suelo pélvico',
-            'duracionTotal': 25, // Duración total del programa en minutos
-          });
+      print('Inserted into grupos_musculares: Trapecios');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 1,  // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa individual 14
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 2
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: SUELO PÉLVICO');
-          print('ID: $idProgramaAutomatico3');
-          print('Descripción: Fortalece los músculos del suelo pélvico');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Dorsales',
+        'imagen': 'assets/images/Dorsales.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "FUERZA"
-          int idProgramaAutomatico4 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'FUERZA',
-            'imagen': 'assets/images/STRENGTH.png',
-            'descripcion': 'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
-            'duracionTotal': 25, // Duración total del programa en minutos
-          });
+      print('Inserted into grupos_musculares: Dorsales');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 1,  // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 2,  // ID del programa individual 4
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 2,  // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 2,  // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 23, // ID del programa recovery 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 3
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: FUERZA');
-          print('ID: $idProgramaAutomatico4');
-          print('Descripción: Aumento de la fuerza trabajando la potencia del músculo y quema de grasa');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Glúteos',
+        'imagen': 'assets/images/Glúteos.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "HIPERTROFIA"
-          int idProgramaAutomatico5 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'HIPERTROFIA',
-            'imagen': 'assets/images/HIPERTROFIA.png',
-            'descripcion': 'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
-            'duracionTotal': 25, // Duración total del programa en minutos
-          });
+      print('Inserted into grupos_musculares: Glúteos');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 1,  // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 9,  // ID del programa individual 4
-              'ajuste': -3,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 9,  // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 9,  // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 23, // ID del programa recovery 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8,  // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8,  // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 3,  // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 3,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: HIPERTROFIA');
-          print('ID: $idProgramaAutomatico5');
-          print('Descripción: Incremento del número de fibras musculares y el tamaño de las mismas...');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Isquios',
+        'imagen': 'assets/images/Isquios.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "RESISTENCIA 1"
-          int idProgramaAutomatico6 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'RESISTENCIA 1',
-            'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
-            'descripcion': 'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
-            'duracionTotal': 25, // Duración total del programa automático en minutos
-          });
+      print('Inserted into grupos_musculares: Isquios');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 1,  // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 14, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 14, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 14, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 23, // ID del programa recovery 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 2,  // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 2,  // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 2,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 21, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: RESISTENCIA 1');
-          print('ID: $idProgramaAutomatico6');
-          print('Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Lumbares',
+        'imagen': 'assets/images/Lumbares.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "RESISTENCIA 2"
-          int idProgramaAutomatico7 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'RESISTENCIA 2',
-            'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
-            'descripcion': 'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
-            'duracionTotal': 25, // Duración total del programa automático en minutos
-          });
+      print('Inserted into grupos_musculares: Lumbares');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 1,  // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 6,  // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 6,  // ID del programa individual 14
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 6,  // ID del programa recovery 1
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 5,  // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 5,  // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 5,  // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 20, // ID del programa recovery 3
-              'ajuste': -5,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: RESISTENCIA 2');
-          print('ID: $idProgramaAutomatico7');
-          print('Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Abdominales',
+        'imagen': 'assets/images/Abdominales.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "CARDIO"
-          int idProgramaAutomatico8 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'CARDIO',
-            'imagen': 'assets/images/CARDIO.png',
-            'descripcion': 'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
-            'duracionTotal': 25, // Duración total del programa automático en minutos
-          });
+      print('Inserted into grupos_musculares: Abdominales');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 1,  // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 11, // ID del programa individual 4
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 11, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 11, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -7,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: CARDIO');
-          print('ID: $idProgramaAutomatico8');
-          print('Descripción: Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Cuádriceps',
+        'imagen': 'assets/images/Cuádriceps.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "CROSS MAX"
-          int idProgramaAutomatico9 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'CROSS MAX',
-            'imagen': 'assets/images/CROSSMAX.png',
-            'descripcion': 'Programa experto. Entrenamiento para la mejora de la condición física.',
-            'duracionTotal': 25, // Duración total del programa automático en minutos
-          });
+      print('Inserted into grupos_musculares: Cuádriceps');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 9, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 9, // ID del programa individual 14
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 9, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 12, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 6, // ID del programa individual 2
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 0
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 20, // ID del programa recovery 3
-              'ajuste': -5,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: CROSS MAX');
-          print('ID: $idProgramaAutomatico9');
-          print('Descripción: Programa experto. Entrenamiento para la mejora de la condición física.');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Bíceps',
+        'imagen': 'assets/images/Bíceps.png'
       });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "SLIM"
-          int idProgramaAutomatico10 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'SLIM',
-            'imagen': 'assets/images/SLIM.png',
-            'descripcion': 'Quema de grasa y creación de nuevas células.',
-            'duracionTotal': 25, // Duración total del programa automático en minutos
-          });
+      print('Inserted into grupos_musculares: Bíceps');
 
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 3, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 3, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 3, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 6, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 21, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 5
-            },
-          ];
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: SLIM');
-          print('ID: $idProgramaAutomatico10');
-          print('Descripción: Quema de grasa y creación de nuevas células.');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'Programas',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre'] as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
+      await db.insert('grupos_musculares', {
+        'nombre': 'Gemelos',
+        'imagen': 'assets/images/Gemelos.png'
       });
+      print('Inserted into grupos_musculares: Gemelos');
+
+      // Insertar valores predeterminados en la tabla grupos_musculares_traje
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Pectorales',
+        'imagen': 'assets/images/Pectorales.png'
+      });
+      print('Inserted into grupos_musculares_traje: Pectorales');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Trapecios',
+        'imagen': 'assets/images/Trapecios.png'
+      });
+      print('Inserted into grupos_musculares_traje: Trapecios');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Dorsales',
+        'imagen': 'assets/images/Dorsales.png'
+      });
+      print('Inserted into grupos_musculares_traje: Dorsales');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Glúteos',
+        'imagen': 'assets/images/Glúteos.png'
+      });
+      print('Inserted into grupos_musculares_traje: Glúteos');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Isquios',
+        'imagen': 'assets/images/Isquios.png'
+      });
+      print('Inserted into grupos_musculares_traje: Isquios');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Lumbares',
+        'imagen': 'assets/images/Lumbares.png'
+      });
+      print('Inserted into grupos_musculares_traje: Lumbares');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Abdominales',
+        'imagen': 'assets/images/Abdominales.png'
+      });
+      print('Inserted into grupos_musculares_traje: Abdominales');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Cuádriceps',
+        'imagen': 'assets/images/Cuádriceps.png'
+      });
+      print('Inserted into grupos_musculares_traje: Cuádriceps');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Bíceps',
+        'imagen': 'assets/images/Bíceps.png'
+      });
+      print('Inserted into grupos_musculares_traje: Bíceps');
+
+      await db.insert('grupos_musculares_traje', {
+        'nombre': 'Gemelos',
+        'imagen': 'assets/images/Gemelos.png'
+      });
+      print('Inserted into grupos_musculares_traje: Gemelos');
+
+      // Insertar valores predeterminados en la tabla grupos_musculares_pantalon
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Lumbares',
+        'imagen': 'assets/images/lumbares_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Lumbares');
+
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Glúteo superior',
+        'imagen': 'assets/images/gluteosup_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Glúteo superior');
+
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Glúteo inferior',
+        'imagen': 'assets/images/gluteoinf_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Glúteo inferior');
+
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Isquiotibiales',
+        'imagen': 'assets/images/isquios_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Isquiotibiales');
+
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Abdominales',
+        'imagen': 'assets/images/abdomen_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Abdominales');
+
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Cuádriceps',
+        'imagen': 'assets/images/cuadriceps_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Cuádriceps');
+
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Bíceps',
+        'imagen': 'assets/images/biceps_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Bíceps');
+
+      await db.insert('grupos_musculares_pantalon', {
+        'nombre': 'Gemelos',
+        'imagen': 'assets/images/gemelos_pantalon.png'
+      });
+      print('Inserted into grupos_musculares_pantalon: Gemelos');
+    }
   }
-  }
+
 
   /*METODOS DE INSERCION BBDD*/
 
@@ -3705,6 +2564,21 @@ class DatabaseHelper {
         await db.query('grupos_musculares');
     return result;
   }
+  // Obtener los datos de la tabla grupos_musculares
+  Future<List<Map<String, dynamic>>> getGruposMuscularesTraje() async {
+    final db = await database;
+    final List<Map<String, dynamic>> result =
+        await db.query('grupos_musculares_traje');
+    return result;
+  }
+
+  // Obtener los datos de la tabla grupos_musculares
+  Future<List<Map<String, dynamic>>> getGruposMuscularesPantalon() async {
+    final db = await database;
+    final List<Map<String, dynamic>> result =
+        await db.query('grupos_musculares_pantalon');
+    return result;
+  }
 
   Future<List<Map<String, dynamic>>> getAvailableBonosByClientId(
       int clientId) async {
@@ -3763,7 +2637,8 @@ class DatabaseHelper {
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(Database db) async {
+  Future<List<Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(
+      Database db) async {
     try {
       // Consulta los programas automáticos
       final List<Map<String, dynamic>> programas = await db.rawQuery('''
@@ -3801,7 +2676,6 @@ class DatabaseHelper {
       return []; // Retorna una lista vacía si hay un error
     }
   }
-
 
   /*METODOS DE BORRADO DE BBD*/
 

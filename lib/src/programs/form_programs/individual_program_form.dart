@@ -26,9 +26,17 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   String? selectedEquipOption;
   double scaleFactorTick = 1.0;
 
-  Map<String, bool> selectedGroups = {};
-  Map<String, Color> hintColors = {};
-  Map<String, int> groupIds = {};
+  Map<String, bool> selectedJacketGroups = {};
+  Map<String, bool> selectedShapeGroups = {};
+
+  Map<String, Color> hintJacketColors = {};
+  Map<String, Color> hintShapeColors = {};
+
+  Map<String, int> groupJacketIds = {};
+  Map<String, int> groupShapeIds = {};
+
+  Map<String, String> imageJacketPaths = {};
+  Map<String, String> imageShapePaths = {};
 
   final DatabaseHelper dbHelper = DatabaseHelper();
 
@@ -36,7 +44,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    loadMuscleGroups();
+    loadMuscleTrajeGroups();
+    loadMusclePantalonGroups();
   }
 
   @override
@@ -52,30 +61,55 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   }
 
   // Método para obtener los grupos musculares desde la base de datos
-  Future<void> loadMuscleGroups() async {
+  Future<void> loadMuscleTrajeGroups() async {
     final db = await openDatabase(
         'my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+        await db.query('grupos_musculares_traje');
 
     // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
     setState(() {
-      selectedGroups = {for (var row in result) row['nombre']: false};
-      hintColors = {for (var row in result) row['nombre']: Colors.white};
-      groupIds = {for (var row in result) row['nombre']: row['id']};
+      selectedJacketGroups = {for (var row in result) row['nombre']: false};
+      hintJacketColors = {for (var row in result) row['nombre']: Colors.white};
+      groupJacketIds = {for (var row in result) row['nombre']: row['id']};
+      imageJacketPaths = {for (var row in result) row['nombre']: row['imagen']};
     });
   }
 
-  /// Crear el checkbox redondo personalizado
-  Widget customCheckbox(String option) {
+// Método para obtener los grupos musculares desde la base de datos
+  Future<void> loadMusclePantalonGroups() async {
+    final db = await openDatabase(
+      'my_database.db', // Asegúrate de tener la ruta correcta de la base de datos
+    );
+
+    // Obtener los grupos musculares y las imágenes asociadas
+    final List<Map<String, dynamic>> result =
+        await db.query('grupos_musculares_pantalon');
+
+    // Inicializar selectedGroups, hintColors, groupIds y imagePaths con los datos obtenidos
+    setState(() {
+      selectedShapeGroups = {for (var row in result) row['nombre']: false};
+
+      hintShapeColors = {for (var row in result) row['nombre']: Colors.white};
+
+      groupShapeIds = {for (var row in result) row['nombre']: row['id']};
+
+      // Suponiendo que la columna 'imagen' contiene la ruta de la imagen en la base de datos
+      imageShapePaths = {for (var row in result) row['nombre']: row['imagen']};
+    });
+  }
+
+  Widget customCheckbox(String option, String groupType) {
+    // Según el tipo de grupo, actualizamos el mapa adecuado.
+    Map<String, bool> selectedGroups = groupType == 'traje' ? selectedJacketGroups : selectedShapeGroups;
+    Map<String, Color> hintColors = groupType == 'traje' ? hintJacketColors : hintShapeColors;
+
     return GestureDetector(
       onTap: () {
         setState(() {
           // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
-          selectedGroups[option] =
-              !(selectedGroups[option] ?? false); // Si es null, toma false
-          hintColors[option] =
-              selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+          selectedGroups[option] = !(selectedGroups[option] ?? false); // Si es null, toma false
+          hintColors[option] = selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
       },
       child: Container(
@@ -98,12 +132,16 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     );
   }
 
+
   // Función para manejar clic en TextField
-  void handleTextFieldTap(String option) {
+  void handleTextFieldTap(String option, String groupType) {
+    // Según el tipo de grupo, actualizamos el mapa adecuado.
+    Map<String, bool> selectedGroups = groupType == 'traje' ? selectedJacketGroups : selectedShapeGroups;
+    Map<String, Color> hintColors = groupType == 'traje' ? hintJacketColors : hintShapeColors;
+
     setState(() {
-      selectedGroups[option] = !selectedGroups[option]!;
-      hintColors[option] =
-          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+      selectedGroups[option] = !selectedGroups[option]!; // Cambiar el estado de selección
+      hintColors[option] = selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white; // Cambiar color del hint
     });
   }
 
@@ -1053,33 +1091,29 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                         Expanded(
                           child: ListView(
                             children: [
-                              // Crear una lista con los grupos que quieres mostrar explícitamente
+                              // Crear una lista con los grupos de tipo jacket que quieres mostrar
                               'Trapecios',
                               'Dorsales',
                               'Lumbares',
                               'Glúteos',
                               'Isquios',
-                              // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: screenHeight * 0.01),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
                                 child: Row(
                                   children: [
-                                    customCheckbox(group),
+                                    customCheckbox(group, 'traje'), // Se pasa el tipo 'traje' aquí
                                     Flexible(
                                       child: GestureDetector(
-                                        onTap: () => handleTextFieldTap(group),
+                                        onTap: () => handleTextFieldTap(group, 'traje'), // Pasamos 'traje'
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius:
-                                                    BorderRadius.circular(7),
+                                                borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -1090,17 +1124,14 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
-                                                    color: hintColors[group],
+                                                    color: hintJacketColors[group],
                                                     fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            7),
+                                                    borderRadius: BorderRadius.circular(7),
                                                   ),
                                                   filled: true,
-                                                  fillColor:
-                                                      const Color(0xFF313030),
+                                                  fillColor: const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -1117,6 +1148,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                           ),
                         ),
 
+                        // Mostrar las imágenes para la parte superior del cuerpo (jacket)
                         Expanded(
                           flex: 1,
                           child: Stack(
@@ -1125,36 +1157,41 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/avatar_back.png'),
+                                      image: AssetImage('assets/images/avatar_back.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
                               ),
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
-                              ...selectedGroups.entries
+                              ...selectedJacketGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Trapecios',
-                                        'Dorsales',
-                                        'Lumbares',
-                                        'Glúteos',
-                                        'Isquios',
-                                        'Gemelos'
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Filtra solo los grupos seleccionados
+                              [
+                                'Trapecios',
+                                'Dorsales',
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquios',
+                                'Gemelos'
+                              ].contains(entry.key) &&
+                                  entry.value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
-                                String imagePath =
-                                    'assets/images/$groupName.png'; // Ruta de la imagen correspondiente
 
+                                // Obtener la ruta de la imagen desde imageJacketPaths (ya con la extensión incluida)
+                                String? imagePath = imageJacketPaths[groupName];
+
+                                // Si la ruta no está definida, asignamos una imagen predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                // Aquí se carga la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath),
+                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -1165,6 +1202,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                           ),
                         ),
 
+                        // Mostrar las imágenes para la parte inferior del cuerpo (pantalón)
                         Expanded(
                           flex: 1,
                           child: Stack(
@@ -1173,34 +1211,39 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/avatar_front.png'),
+                                      image: AssetImage('assets/images/avatar_front.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
                               ),
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
-                              ...selectedGroups.entries
+                              ...selectedJacketGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Pectorales',
-                                        'Abdominales',
-                                        'Cuádriceps',
-                                        'Bíceps'
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Filtra solo los grupos seleccionados
+                              [
+                                'Pectorales',
+                                'Abdominales',
+                                'Cuádriceps',
+                                'Bíceps'
+                              ].contains(entry.key) &&
+                                  entry.value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
-                                String imagePath =
-                                    'assets/images/$groupName.png'; // Ruta de la imagen correspondiente
 
+                                // Obtener la ruta de la imagen desde imageShapePaths (ya con la extensión incluida)
+                                String? imagePath = imageJacketPaths[groupName];
+
+                                // Si la ruta no está definida, asignamos una imagen predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                // Aquí se carga la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath),
+                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -1211,36 +1254,33 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                           ),
                         ),
 
+                        // Lista para la parte inferior del cuerpo (pantalón)
                         Expanded(
                           child: ListView(
                             children: [
-                              // Crear una lista con los grupos que quieres mostrar explícitamente
+                              // Crear una lista con los grupos de tipo pantalón que quieres mostrar
                               'Pectorales',
                               'Abdominales',
                               'Cuádriceps',
                               'Bíceps',
                               'Gemelos',
-                              // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: screenHeight * 0.01),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
                                 child: Row(
                                   children: [
-                                    customCheckbox(group),
+                                    customCheckbox(group, 'traje'), // Se pasa el tipo 'pantalon' aquí
                                     Flexible(
                                       child: GestureDetector(
-                                        onTap: () => handleTextFieldTap(group),
+                                        onTap: () => handleTextFieldTap(group, 'traje'), // Pasamos 'pantalon'
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius:
-                                                    BorderRadius.circular(7),
+                                                borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -1251,17 +1291,14 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
-                                                    color: hintColors[group],
+                                                    color: hintJacketColors[group],
                                                     fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            7),
+                                                    borderRadius: BorderRadius.circular(7),
                                                   ),
                                                   filled: true,
-                                                  fillColor:
-                                                      const Color(0xFF313030),
+                                                  fillColor: const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -1280,9 +1317,236 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       ],
                     ),
                   ),
-                ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
+                ]
+                else if (selectedEquipOption == 'BIO-SHAPE') ...[
                   // Campos específicos para BIO-SHAPE
-                ],
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Sección vacía
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              // Crear una lista con los grupos específicos para BIO-SHAPE
+                              'Lumbares',
+                              'Glúteo superior',
+                              'Glúteo inferior',
+                              'Isquiotibiales',
+                            ].map((group) {
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                                child: Row(
+                                  children: [
+                                    customCheckbox(group, "pantalon"), // Checkbox de selección
+                                    Flexible(
+                                      child: GestureDetector(
+                                        onTap: () => handleTextFieldTap(group, "pantalon"), // Al hacer clic en el texto
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFF313030),
+                                                borderRadius: BorderRadius.circular(7),
+                                              ),
+                                              child: TextField(
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                decoration: InputDecoration(
+                                                  hintText: group,
+                                                  hintStyle: TextStyle(
+                                                    color: hintShapeColors[group],
+                                                    fontSize: 14,
+                                                  ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(7),
+                                                  ),
+                                                  filled: true,
+                                                  fillColor: const Color(0xFF313030),
+                                                  isDense: true,
+                                                  enabled: false,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+
+                        // Mostrar las imágenes de la parte posterior para BIO-SHAPE
+                        Expanded(
+                          flex: 1,
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage('assets/images/pantalon_post.png'),
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
+                              ...selectedShapeGroups.entries
+                                  .where((entry) =>
+                              [
+                                'Lumbares',
+                                'Glúteo superior',
+                                'Glúteo inferior',
+                                'Isquiotibiales',
+                                'Gemelos'
+                              ].contains(entry.key) && entry.value) // Filtra solo los grupos seleccionados
+                                  .map((entry) {
+                                String groupName = entry.key;
+
+                                // Obtener la ruta de la imagen desde imagePaths
+                                String? imagePath = imageShapePaths[groupName];
+
+                                // Si la ruta no está definida, se asigna una ruta predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                return Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(imagePath), // Usar la ruta de la imagen desde la base de datos
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        ),
+
+                        // Mostrar las imágenes de la parte frontal para BIO-SHAPE
+                        Expanded(
+                          flex: 1,
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage('assets/images/pantalon_front.png'),
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
+                              ...selectedShapeGroups.entries
+                                  .where((entry) =>
+                              [
+                                'Abdominales',
+                                'Cuádriceps',
+                                'Bíceps'
+                              ].contains(entry.key) && entry.value) // Filtra solo los grupos seleccionados
+                                  .map((entry) {
+                                String groupName = entry.key;
+
+                                // Obtener la ruta de la imagen desde imagePaths
+                                String? imagePath = imageShapePaths[groupName];
+
+                                // Si la ruta no está definida, se asigna una ruta predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                return Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(imagePath), // Usar la ruta de la imagen desde la base de datos
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        ),
+
+                        // Lista de grupos musculares para la parte frontal
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              // Crear una lista con los grupos musculares de la parte frontal para BIO-SHAPE
+                              'Abdominales',
+                              'Cuádriceps',
+                              'Bíceps',
+                              'Gemelos',
+                            ].map((group) {
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                                child: Row(
+                                  children: [
+                                    customCheckbox(group, "pantalon"), // Checkbox de selección
+                                    Flexible(
+                                      child: GestureDetector(
+                                        onTap: () => handleTextFieldTap(group, "pantalon"), // Al hacer clic en el texto
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFF313030),
+                                                borderRadius: BorderRadius.circular(7),
+                                              ),
+                                              child: TextField(
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                decoration: InputDecoration(
+                                                  hintText: group,
+                                                  hintStyle: TextStyle(
+                                                    color: hintShapeColors[group],
+                                                    fontSize: 14,
+                                                  ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(7),
+                                                  ),
+                                                  filled: true,
+                                                  fillColor: const Color(0xFF313030),
+                                                  isDense: true,
+                                                  enabled: false,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]
               ],
             ),
           ),

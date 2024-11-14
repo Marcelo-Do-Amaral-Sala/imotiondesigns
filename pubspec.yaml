@@ -129,6 +129,16 @@ flutter:
     - assets/images/PAUSA.png
     - assets/images/RAMPA.png
     - assets/images/CONTRACCION.png
+    - assets/images/pantalon_front.png
+    - assets/images/pantalon_post.png
+    - assets/images/lumbares_pantalon.png
+    - assets/images/isquios_pantalon.png
+    - assets/images/gluteosup_pantalon.png
+    - assets/images/gluteoinf_pantalon.png
+    - assets/images/gemelos_pantalon.png
+    - assets/images/cuadriceps_pantalon.png
+    - assets/images/abdomen_pantalon.png
+    - assets/images/biceps_pantalon.png
 
   #   - images/a_dot_ham.jpeg
 

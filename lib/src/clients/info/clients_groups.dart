@@ -31,6 +31,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
   Map<String, bool> selectedGroups = {};
   Map<String, Color> hintColors = {};
   Map<String, int> groupIds = {};
+  Map<String, String> imagePaths = {};
 
   int? clientId; // Declare a variable to store the client ID
 
@@ -115,6 +116,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
       selectedGroups = {for (var row in result) row['nombre']: false};
       hintColors = {for (var row in result) row['nombre']: Colors.white};
       groupIds = {for (var row in result) row['nombre']: row['id']};
+      imagePaths = {for (var row in result) row['nombre']: row['imagen']};
 
       // Marcar los grupos asociados al cliente como seleccionados
       for (var group in clientGroupsResult) {
@@ -388,11 +390,9 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               'Lumbares',
                               'Glúteos',
                               'Isquios',
-                              // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: screenHeight * 0.02),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -400,15 +400,13 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       child: GestureDetector(
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius:
-                                                BorderRadius.circular(7),
+                                                borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -423,13 +421,10 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                     fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                        7),
+                                                    borderRadius: BorderRadius.circular(7),
                                                   ),
                                                   filled: true,
-                                                  fillColor:
-                                                  const Color(0xFF313030),
+                                                  fillColor: const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -454,8 +449,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/avatar_back.png'),
+                                      image: AssetImage('assets/images/avatar_back.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -472,18 +466,24 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                 'Isquios',
                                 'Gemelos'
                               ].contains(entry.key) &&
-                                  entry
-                                      .value) // Filtra solo los grupos seleccionados
+                                  entry.value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
-                                String imagePath =
-                                    'assets/images/$groupName.png'; // Ruta de la imagen correspondiente
 
+                                // Obtener la ruta de la imagen desde imagePaths (con la extensión)
+                                String? imagePath = imagePaths[groupName];
+
+                                // Si la ruta no está definida, asignamos una imagen predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                // Cargar la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath),
+                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -502,8 +502,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/avatar_front.png'),
+                                      image: AssetImage('assets/images/avatar_front.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -518,18 +517,24 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                 'Cuádriceps',
                                 'Bíceps'
                               ].contains(entry.key) &&
-                                  entry
-                                      .value) // Filtra solo los grupos seleccionados
+                                  entry.value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
-                                String imagePath =
-                                    'assets/images/$groupName.png'; // Ruta de la imagen correspondiente
 
+                                // Obtener la ruta de la imagen desde imagePaths (con la extensión)
+                                String? imagePath = imagePaths[groupName];
+
+                                // Si la ruta no está definida, asignamos una imagen predeterminada
+                                if (imagePath == null) {
+                                  imagePath = 'assets/images/default_image.png';
+                                }
+
+                                // Cargar la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath),
+                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -549,11 +554,9 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               'Cuádriceps',
                               'Bíceps',
                               'Gemelos',
-                              // Añadir aquí solo los grupos que deseas mostrar
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: screenHeight * 0.02),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -561,15 +564,13 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       child: GestureDetector(
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius:
-                                                BorderRadius.circular(7),
+                                                borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
                                                 style: const TextStyle(
@@ -584,13 +585,10 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                     fontSize: 14,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                        7),
+                                                    borderRadius: BorderRadius.circular(7),
                                                   ),
                                                   filled: true,
-                                                  fillColor:
-                                                  const Color(0xFF313030),
+                                                  fillColor: const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
