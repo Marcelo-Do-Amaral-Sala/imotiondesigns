@@ -19,6 +19,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
   final _ordenController = TextEditingController();
 
   String? selectedEquipOption;
+  String? selectedProgramOption;
   double scaleFactorTick = 1.0;
 
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -254,16 +255,20 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
+        // Limpia los controladores cuando el diálogo se cierra
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
             side: const BorderSide(color: Color(0xFF2be4f3), width: 2),
             borderRadius: BorderRadius.circular(7),
           ),
-          child: SizedBox(
-            height: screenHeight * 0.6,
-            width: screenWidth * 0.6,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: screenHeight * 0.6,
+              maxWidth: screenWidth * 0.6,
+            ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
                   width: screenWidth,
@@ -294,6 +299,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                         bottom: 0,
                         child: IconButton(
                           onPressed: () {
+                            // Limpia los controladores cuando se cierra el diálogo
+                            _ordenController.clear();
+                            _durationController.clear();
+                            _ajusteController.clear();
                             Navigator.of(context).pop();
                           },
                           icon: const Icon(
@@ -307,117 +316,134 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.01),
-                // Column inside a Container to avoid Expanded problems
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('SELECCIÓN PROGRAMA', style: _labelStyle),
-                      SizedBox(height: screenHeight * 0.01),  // Espaciado entre el texto y el dropdown
-                      // Usamos un Row para alinear horizontalmente el texto y el dropdown
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,  // Alineación a la izquierda
-                        children: [
-                          // Colocamos el DropdownButton en la parte izquierda
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 30.0),
-                            width: screenWidth * 0.3,
-                            alignment: Alignment.centerLeft,
-                            decoration: _inputDecoration(),
-                            child: DropdownButton<String>(
-                              hint: Text('Seleccione', style: _dropdownHintStyle),
-                              value: selectedEquipOption,
-                              items: [
-                                DropdownMenuItem(
-                                  value: 'BIO-JACKET',
-                                  child: Text('BIO-JACKET', style: _dropdownItemStyle),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'BIO-SHAPE',
-                                  child: Text('BIO-SHAPE', style: _dropdownItemStyle),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedEquipOption = value;
-                                });
-                              },
-                              dropdownColor: const Color(0xFF313030),
-                              icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('SELECCIÓN PROGRAMA', style: _labelStyle),
+                        SizedBox(height: screenHeight * 0.01),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                              width: screenWidth * 0.3,
+                              alignment: Alignment.centerLeft,
+                              decoration: _inputDecoration(),
+                              child: DropdownButton<String>(
+                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                value: selectedProgramOption,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'BIO-JACKET',
+                                    child: Text('BIO-JACKET', style: _dropdownItemStyle),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'BIO-SHAPE',
+                                    child: Text('BIO-SHAPE', style: _dropdownItemStyle),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedProgramOption = value;
+                                  });
+                                },
+                                dropdownColor: const Color(0xFF313030),
+                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: screenHeight*0.05),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(width: screenWidth * 0.02),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('ORDEN', style: _labelStyle),
-                                Container(
-                                  alignment: Alignment.center,
-                                  decoration: _inputDecoration(),
-                                  child: TextField(
-                                    controller: _ordenController,
-                                    style: _inputTextStyle,
-                                    decoration: _inputDecorationStyle(
-                                      hintText: '',
+                          ],
+                        ),
+                        SizedBox(height: screenHeight * 0.05),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(width: screenWidth * 0.02),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('ORDEN', style: _labelStyle),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    decoration: _inputDecoration(),
+                                    child: TextField(
+                                      controller: _ordenController,
+                                      style: _inputTextStyle,
+                                      decoration: _inputDecorationStyle(hintText: ''),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.02),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('DURACIÓN (s)', style: _labelStyle),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    decoration: _inputDecoration(),
+                                    child: TextField(
+                                      controller: _durationController,
+                                      style: _inputTextStyle,
+                                      decoration: _inputDecorationStyle(hintText: '', enabled: true),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.02),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('AJUSTE', style: _labelStyle),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    decoration: _inputDecoration(),
+                                    child: TextField(
+                                      controller: _ajusteController,
+                                      style: _inputTextStyle,
+                                      decoration: _inputDecorationStyle(hintText: '', enabled: true),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: screenHeight * 0.05),
+                        Spacer(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                              onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                              onTap: () async {},
+                              child: AnimatedScale(
+                                scale: scaleFactorTick,
+                                duration: const Duration(milliseconds: 100),
+                                child: SizedBox(
+                                  width: screenWidth * 0.1,
+                                  height: screenHeight * 0.1,
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      'assets/images/tick.png',
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                          SizedBox(width: screenWidth * 0.02),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('DURACIÓN (s)', style: _labelStyle),
-                                Container(
-                                  alignment: Alignment.center,
-                                  decoration: _inputDecoration(),
-                                  child: TextField(
-                                    controller: _durationController,
-                                    style: _inputTextStyle,
-                                    decoration: _inputDecorationStyle(
-                                      hintText: '',
-                                      enabled: true,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.02),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('AJUSTE', style: _labelStyle),
-                                Container(
-                                  alignment: Alignment.center,
-                                  decoration: _inputDecoration(),
-                                  child: TextField(
-                                    controller: _ajusteController,
-                                    style: _inputTextStyle,
-                                    decoration: _inputDecorationStyle(
-                                      hintText: '',
-                                      enabled: true,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -427,6 +453,11 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       },
     );
   }
+
+
+
+
+
 
 
   TextStyle get _labelStyle => const TextStyle(
