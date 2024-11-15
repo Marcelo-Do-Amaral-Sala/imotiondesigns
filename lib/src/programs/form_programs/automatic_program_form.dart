@@ -178,7 +178,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               borderRadius: BorderRadius.circular(7.0),
                             ),
                             child: const Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding:  EdgeInsets.all(10.0),
                             ),
                           ),
                         ),
@@ -318,7 +318,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                 SizedBox(height: screenHeight * 0.01),
                 Flexible(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 20.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -328,21 +329,25 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 30.0),
                               width: screenWidth * 0.3,
                               alignment: Alignment.centerLeft,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedProgramOption,
                                 items: [
                                   DropdownMenuItem(
                                     value: 'BIO-JACKET',
-                                    child: Text('BIO-JACKET', style: _dropdownItemStyle),
+                                    child: Text('BIO-JACKET',
+                                        style: _dropdownItemStyle),
                                   ),
                                   DropdownMenuItem(
                                     value: 'BIO-SHAPE',
-                                    child: Text('BIO-SHAPE', style: _dropdownItemStyle),
+                                    child: Text('BIO-SHAPE',
+                                        style: _dropdownItemStyle),
                                   ),
                                 ],
                                 onChanged: (value) {
@@ -351,7 +356,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
                           ],
@@ -372,7 +378,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     child: TextField(
                                       controller: _ordenController,
                                       style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(hintText: ''),
+                                      decoration:
+                                          _inputDecorationStyle(hintText: ''),
                                     ),
                                   ),
                                 ],
@@ -390,7 +397,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     child: TextField(
                                       controller: _durationController,
                                       style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(hintText: '', enabled: true),
+                                      decoration: _inputDecorationStyle(
+                                          hintText: '', enabled: true),
                                     ),
                                   ),
                                 ],
@@ -408,7 +416,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     child: TextField(
                                       controller: _ajusteController,
                                       style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(hintText: '', enabled: true),
+                                      decoration: _inputDecorationStyle(
+                                          hintText: '', enabled: true),
                                     ),
                                   ),
                                 ],
@@ -417,13 +426,15 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                           ],
                         ),
                         SizedBox(height: screenHeight * 0.05),
-                        Spacer(),
+                        const Spacer(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             GestureDetector(
-                              onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                              onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                              onTapDown: (_) =>
+                                  setState(() => scaleFactorTick = 0.95),
+                              onTapUp: (_) =>
+                                  setState(() => scaleFactorTick = 1.0),
                               onTap: () async {},
                               child: AnimatedScale(
                                 scale: scaleFactorTick,
@@ -453,12 +464,6 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       },
     );
   }
-
-
-
-
-
-
 
   TextStyle get _labelStyle => const TextStyle(
       color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);

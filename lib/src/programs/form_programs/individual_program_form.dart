@@ -55,12 +55,14 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
   final DatabaseHelper dbHelper = DatabaseHelper();
 
+  List<Map<String, dynamic>> gruposBioJacket = [];
+  List<Map<String, dynamic>> gruposBioShape = [];
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    loadMuscleTrajeGroups();
-    loadMusclePantalonGroups();
+    fetchGruposMusculares();
   }
 
   @override
@@ -96,57 +98,64 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     super.dispose();
   }
 
+  Future<void> fetchGruposMusculares() async {
+    try {
+      Database db = await DatabaseHelper().database;
 
-  // Método para obtener los grupos musculares desde la base de datos
-  Future<void> loadMuscleTrajeGroups() async {
-    final db = await openDatabase(
-        'my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
-    final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_traje');
+      // Obtener grupos musculares para BIO-JACKET
+      var gruposJacket = await DatabaseHelper()
+          .obtenerGruposMuscularesPorEquipamiento(db, 'BIO-JACKET');
 
-    // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
-    setState(() {
-      selectedJacketGroups = {for (var row in result) row['nombre']: false};
-      hintJacketColors = {for (var row in result) row['nombre']: Colors.white};
-      groupJacketIds = {for (var row in result) row['nombre']: row['id']};
-      imageJacketPaths = {for (var row in result) row['nombre']: row['imagen']};
-    });
+      // Asignar datos para BIO-JACKET
+      setState(() {
+        gruposBioJacket = gruposJacket;
+        selectedJacketGroups =
+        {for (var row in gruposJacket) row['nombre']: false};
+        hintJacketColors =
+        {for (var row in gruposJacket) row['nombre']: Colors.white};
+        groupJacketIds =
+        {for (var row in gruposJacket) row['nombre']: row['id']};
+        imageJacketPaths =
+        {for (var row in gruposJacket) row['nombre']: row['imagen']};
+      });
+
+      // Obtener grupos musculares para BIO-SHAPE
+      var gruposShape = await DatabaseHelper()
+          .obtenerGruposMuscularesPorEquipamiento(db, 'BIO-SHAPE');
+
+      // Asignar datos para BIO-SHAPE
+      setState(() {
+        gruposBioShape = gruposShape;
+        selectedShapeGroups =
+        {for (var row in gruposShape) row['nombre']: false};
+        hintShapeColors =
+        {for (var row in gruposShape) row['nombre']: Colors.white};
+        groupShapeIds = {for (var row in gruposShape) row['nombre']: row['id']};
+        imageShapePaths =
+        {for (var row in gruposShape) row['nombre']: row['imagen']};
+      });
+    } catch (e) {
+      print('Error al obtener los grupos musculares: $e');
+    }
   }
 
-// Método para obtener los grupos musculares desde la base de datos
-  Future<void> loadMusclePantalonGroups() async {
-    final db = await openDatabase(
-      'my_database.db', // Asegúrate de tener la ruta correcta de la base de datos
-    );
 
-    // Obtener los grupos musculares y las imágenes asociadas
-    final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_pantalon');
-
-    // Inicializar selectedGroups, hintColors, groupIds y imagePaths con los datos obtenidos
-    setState(() {
-      selectedShapeGroups = {for (var row in result) row['nombre']: false};
-
-      hintShapeColors = {for (var row in result) row['nombre']: Colors.white};
-
-      groupShapeIds = {for (var row in result) row['nombre']: row['id']};
-
-      // Suponiendo que la columna 'imagen' contiene la ruta de la imagen en la base de datos
-      imageShapePaths = {for (var row in result) row['nombre']: row['imagen']};
-    });
-  }
-
+// Función para crear el checkbox personalizado
   Widget customCheckbox(String option, String groupType) {
-    // Según el tipo de grupo, actualizamos el mapa adecuado.
-    Map<String, bool> selectedGroups = groupType == 'traje' ? selectedJacketGroups : selectedShapeGroups;
-    Map<String, Color> hintColors = groupType == 'traje' ? hintJacketColors : hintShapeColors;
+    // Según el tipo de grupo, actualizamos el mapa adecuado
+    Map<String, bool> selectedGroups =
+    groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+    Map<String, Color> hintColors =
+    groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          // Asegurarte de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
-          selectedGroups[option] = !(selectedGroups[option] ?? false); // Si es null, toma false
-          hintColors[option] = selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+          // Asegurarse de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
+          selectedGroups[option] =
+          !(selectedGroups[option] ?? false); // Si es null, toma false
+          hintColors[option] =
+          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
       },
       child: Container(
@@ -170,22 +179,36 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   }
 
 
-  // Función para manejar clic en TextField
+// Función para manejar clic en el TextField
   void handleTextFieldTap(String option, String groupType) {
-    // Según el tipo de grupo, actualizamos el mapa adecuado.
-    Map<String, bool> selectedGroups = groupType == 'traje' ? selectedJacketGroups : selectedShapeGroups;
-    Map<String, Color> hintColors = groupType == 'traje' ? hintJacketColors : hintShapeColors;
+    // Según el tipo de grupo, actualizamos el mapa adecuado
+    Map<String, bool> selectedGroups =
+    groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+    Map<String, Color> hintColors =
+    groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
 
     setState(() {
-      selectedGroups[option] = !selectedGroups[option]!; // Cambiar el estado de selección
-      hintColors[option] = selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white; // Cambiar color del hint
+      // Cambiar el estado de selección
+      selectedGroups[option] = !(selectedGroups[option] ?? false);
+
+      // Cambiar color del hint según la selección
+      hintColors[option] = selectedGroups[option]!
+          ? const Color(0xFF2be4f3) // Color cuando está seleccionado
+          : Colors.white; // Color cuando no está seleccionado
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return SizedBox.expand(
       child: Padding(
@@ -200,7 +223,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _buildConfigurationTab(screenWidth, screenHeight),
                   _buildCronaxiaTab(screenWidth, screenHeight),
@@ -217,13 +240,19 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   // Función modularizada para construir el TabBar
   Widget _buildTabBar() {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5,
-      height: MediaQuery.of(context).size.height *
+      width: MediaQuery
+          .of(context)
+          .size
+          .width * 0.5,
+      height: MediaQuery
+          .of(context)
+          .size
+          .height *
           0.05, // Ajusta la altura si es necesario
       child: TabBar(
         controller: _tabController,
         isScrollable: false,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         onTap: (index) {
           setState(() {});
         },
@@ -330,7 +359,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
                               hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -421,7 +450,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('RAMPA (sx10)', style: _labelStyle),
                                       Container(
@@ -457,7 +486,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('CONTRACCIÓN (s.)',
                                           style: _labelStyle),
@@ -475,7 +504,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                               hintText:
-                                                  'Introducir contracción'),
+                                              'Introducir contracción'),
                                         ),
                                       ),
                                     ],
@@ -496,7 +525,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('PAUSA (s.)', style: _labelStyle),
                                       Container(
@@ -562,6 +591,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       ),
     );
   }
+
   Widget _buildCronaxiaTab(double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -626,7 +656,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
                               hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -834,157 +864,158 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       ),
                     ],
                   ),
-                ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
-                  // Campos específicos para BIO-SHAPE
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('LUMBARES (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _lumbController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                ] else
+                  if (selectedEquipOption == 'BIO-SHAPE') ...[
+                    // Campos específicos para BIO-SHAPE
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('LUMBARES (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _lumbController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            Text('GLÚTEO SUPERIOR (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _glutSupController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                              SizedBox(height: screenHeight * 0.01),
+                              Text('GLÚTEO SUPERIOR (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _glutSupController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                            Text('GLÚTEO INFERIOR (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _glutInfController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                              Text('GLÚTEO INFERIOR (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _glutInfController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(width: screenWidth * 0.04),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('ISQUIOTIBIALES (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _isquioController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                        SizedBox(width: screenWidth * 0.04),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('ISQUIOTIBIALES (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _isquioController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            Text('ABDOMEN SUPERIOR (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _abdoSupController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                              SizedBox(height: screenHeight * 0.01),
+                              Text('ABDOMEN SUPERIOR (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _abdoSupController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                            Text('ABDOMEN INFERIOR (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _abdoInfController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                              Text('ABDOMEN INFERIOR (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _abdoInfController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(width: screenWidth * 0.04),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('CUÁDRICEPS (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _cuadriController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                        SizedBox(width: screenWidth * 0.04),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('CUÁDRICEPS (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _cuadriController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            Text('BÍCEPS (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _bicepsController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                              SizedBox(height: screenHeight * 0.01),
+                              Text('BÍCEPS (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _bicepsController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                            Text('GEMELOS (ms)', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _gemeloController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
+                              Text('GEMELOS (ms)', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _gemeloController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
               ],
             ),
           ),
@@ -1021,6 +1052,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       ),
     );
   }
+
   Widget _buildGroupsTab(double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -1085,7 +1117,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
                               hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -1122,68 +1154,77 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Sección vacía
+                        // Primera lista de grupos: Trapecios, Dorsales, Lumbares, Glúteos, Isquios
                         Expanded(
                           child: ListView(
                             children: [
-                              // Crear una lista con los grupos de tipo jacket que quieres mostrar
-                              'Trapecios',
-                              'Dorsales',
-                              'Lumbares',
-                              'Glúteos',
-                              'Isquios',
-                            ].map((group) {
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-                                child: Row(
-                                  children: [
-                                    customCheckbox(group, 'traje'), // Se pasa el tipo 'traje' aquí
-                                    Flexible(
-                                      child: GestureDetector(
-                                        onTap: () => handleTextFieldTap(group, 'traje'), // Pasamos 'traje'
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF313030),
-                                                borderRadius: BorderRadius.circular(7),
-                                              ),
-                                              child: TextField(
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
+                              ...[
+                                'Trapecios',
+                                'Dorsales',
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquios'
+                              ]
+                                  .map((groupName) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: screenHeight * 0.01),
+                                  child: Row(
+                                    children: [
+                                      customCheckbox(groupName, 'BIO-JACKET'),
+                                      Flexible(
+                                        child: GestureDetector(
+                                          onTap: () =>
+                                              handleTextFieldTap(
+                                                  groupName, 'BIO-JACKET'),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
+                                            children: [
+                                              Container(
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                      0xFF313030),
+                                                  borderRadius: BorderRadius
+                                                      .circular(7),
                                                 ),
-                                                textAlign: TextAlign.center,
-                                                decoration: InputDecoration(
-                                                  hintText: group,
-                                                  hintStyle: TextStyle(
-                                                    color: hintJacketColors[group],
-                                                    fontSize: 14,
+                                                child: TextField(
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14),
+                                                  textAlign: TextAlign.center,
+                                                  decoration: InputDecoration(
+                                                    hintText: groupName,
+                                                    hintStyle: TextStyle(
+                                                      color: hintJacketColors[groupName],
+                                                      fontSize: 14,
+                                                    ),
+                                                    border: OutlineInputBorder(
+                                                      borderRadius: BorderRadius
+                                                          .circular(7),
+                                                    ),
+                                                    filled: true,
+                                                    fillColor: const Color(
+                                                        0xFF313030),
+                                                    isDense: true,
+                                                    enabled: false,
                                                   ),
-                                                  border: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.circular(7),
-                                                  ),
-                                                  filled: true,
-                                                  fillColor: const Color(0xFF313030),
-                                                  isDense: true,
-                                                  enabled: false,
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ],
                           ),
                         ),
 
-                        // Mostrar las imágenes para la parte superior del cuerpo (jacket)
+                        // Imágenes para la parte superior del cuerpo (jacket)
                         Expanded(
                           flex: 1,
                           child: Stack(
@@ -1192,13 +1233,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage('assets/images/avatar_back.png'),
+                                      image: AssetImage(
+                                          'assets/images/avatar_back.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
                               ),
-                              // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedJacketGroups.entries
                                   .where((entry) =>
                               [
@@ -1208,36 +1249,28 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 'Glúteos',
                                 'Isquios',
                                 'Gemelos'
-                              ].contains(entry.key) &&
-                                  entry.value) // Filtra solo los grupos seleccionados
+                              ].contains(entry.key) && entry.value)
                                   .map((entry) {
                                 String groupName = entry.key;
-
-                                // Obtener la ruta de la imagen desde imageJacketPaths (ya con la extensión incluida)
                                 String? imagePath = imageJacketPaths[groupName];
+                                imagePath ??= 'assets/images/default_image.png';
 
-                                // Si la ruta no está definida, asignamos una imagen predeterminada
-                                if (imagePath == null) {
-                                  imagePath = 'assets/images/default_image.png';
-                                }
-
-                                // Aquí se carga la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
+                                        image: AssetImage(imagePath),
                                         fit: BoxFit.contain,
                                       ),
                                     ),
                                   ),
                                 );
-                              }).toList(),
+                              }),
                             ],
                           ),
                         ),
 
-                        // Mostrar las imágenes para la parte inferior del cuerpo (pantalón)
+                        // Imágenes para la parte inferior del cuerpo (pantalón)
                         Expanded(
                           flex: 1,
                           child: Stack(
@@ -1246,342 +1279,364 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage('assets/images/avatar_front.png'),
+                                      image: AssetImage(
+                                          'assets/images/avatar_front.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
                               ),
-                              // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedJacketGroups.entries
                                   .where((entry) =>
                               [
                                 'Pectorales',
                                 'Abdominales',
                                 'Cuádriceps',
-                                'Bíceps'
-                              ].contains(entry.key) &&
-                                  entry.value) // Filtra solo los grupos seleccionados
+                                'Bíceps',
+                              ].contains(entry.key) && entry.value)
                                   .map((entry) {
                                 String groupName = entry.key;
-
-                                // Obtener la ruta de la imagen desde imageShapePaths (ya con la extensión incluida)
                                 String? imagePath = imageJacketPaths[groupName];
-
-                                // Si la ruta no está definida, asignamos una imagen predeterminada
-                                if (imagePath == null) {
-                                  imagePath = 'assets/images/default_image.png';
-                                }
-
-                                // Aquí se carga la imagen con la ruta completa, incluyendo la extensión
-                                return Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ],
-                          ),
-                        ),
-
-                        // Lista para la parte inferior del cuerpo (pantalón)
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              // Crear una lista con los grupos de tipo pantalón que quieres mostrar
-                              'Pectorales',
-                              'Abdominales',
-                              'Cuádriceps',
-                              'Bíceps',
-                              'Gemelos',
-                            ].map((group) {
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-                                child: Row(
-                                  children: [
-                                    customCheckbox(group, 'traje'), // Se pasa el tipo 'pantalon' aquí
-                                    Flexible(
-                                      child: GestureDetector(
-                                        onTap: () => handleTextFieldTap(group, 'traje'), // Pasamos 'pantalon'
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF313030),
-                                                borderRadius: BorderRadius.circular(7),
-                                              ),
-                                              child: TextField(
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                                decoration: InputDecoration(
-                                                  hintText: group,
-                                                  hintStyle: TextStyle(
-                                                    color: hintJacketColors[group],
-                                                    fontSize: 14,
-                                                  ),
-                                                  border: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.circular(7),
-                                                  ),
-                                                  filled: true,
-                                                  fillColor: const Color(0xFF313030),
-                                                  isDense: true,
-                                                  enabled: false,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]
-                else if (selectedEquipOption == 'BIO-SHAPE') ...[
-                  // Campos específicos para BIO-SHAPE
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Sección vacía
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              // Crear una lista con los grupos específicos para BIO-SHAPE
-                              'Lumbares',
-                              'Glúteo superior',
-                              'Glúteo inferior',
-                              'Isquiotibiales',
-                            ].map((group) {
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-                                child: Row(
-                                  children: [
-                                    customCheckbox(group, "pantalon"), // Checkbox de selección
-                                    Flexible(
-                                      child: GestureDetector(
-                                        onTap: () => handleTextFieldTap(group, "pantalon"), // Al hacer clic en el texto
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF313030),
-                                                borderRadius: BorderRadius.circular(7),
-                                              ),
-                                              child: TextField(
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                                decoration: InputDecoration(
-                                                  hintText: group,
-                                                  hintStyle: TextStyle(
-                                                    color: hintShapeColors[group],
-                                                    fontSize: 14,
-                                                  ),
-                                                  border: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.circular(7),
-                                                  ),
-                                                  filled: true,
-                                                  fillColor: const Color(0xFF313030),
-                                                  isDense: true,
-                                                  enabled: false,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-
-                        // Mostrar las imágenes de la parte posterior para BIO-SHAPE
-                        Expanded(
-                          flex: 1,
-                          child: Stack(
-                            children: [
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage('assets/images/pantalon_post.png'),
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
-                              ...selectedShapeGroups.entries
-                                  .where((entry) =>
-                              [
-                                'Lumbares',
-                                'Glúteo superior',
-                                'Glúteo inferior',
-                                'Isquiotibiales',
-                                'Gemelos'
-                              ].contains(entry.key) && entry.value) // Filtra solo los grupos seleccionados
-                                  .map((entry) {
-                                String groupName = entry.key;
-
-                                // Obtener la ruta de la imagen desde imagePaths
-                                String? imagePath = imageShapePaths[groupName];
-
-                                // Si la ruta no está definida, se asigna una ruta predeterminada
-                                if (imagePath == null) {
-                                  imagePath = 'assets/images/default_image.png';
-                                }
+                                imagePath ??= 'assets/images/default_image.png';
 
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath), // Usar la ruta de la imagen desde la base de datos
+                                        image: AssetImage(imagePath),
                                         fit: BoxFit.contain,
                                       ),
                                     ),
                                   ),
                                 );
-                              }).toList(),
+                              }),
                             ],
                           ),
                         ),
 
-                        // Mostrar las imágenes de la parte frontal para BIO-SHAPE
+                        // Segunda lista de grupos: Pectorales, Abdominales, Cuádriceps, Bíceps, Gemelos
                         Expanded(
-                          flex: 1,
-                          child: Stack(
+                          child: ListView(
                             children: [
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage('assets/images/pantalon_front.png'),
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
-                              ...selectedShapeGroups.entries
-                                  .where((entry) =>
-                              [
+                              ...[
+                                'Pectorales',
                                 'Abdominales',
                                 'Cuádriceps',
-                                'Bíceps'
-                              ].contains(entry.key) && entry.value) // Filtra solo los grupos seleccionados
-                                  .map((entry) {
-                                String groupName = entry.key;
-
-                                // Obtener la ruta de la imagen desde imagePaths
-                                String? imagePath = imageShapePaths[groupName];
-
-                                // Si la ruta no está definida, se asigna una ruta predeterminada
-                                if (imagePath == null) {
-                                  imagePath = 'assets/images/default_image.png';
-                                }
-
-                                return Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(imagePath), // Usar la ruta de la imagen desde la base de datos
-                                        fit: BoxFit.contain,
+                                'Bíceps',
+                                'Gemelos'
+                              ]
+                                  .map((groupName) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: screenHeight * 0.01),
+                                  child: Row(
+                                    children: [
+                                      customCheckbox(groupName, 'BIO-JACKET'),
+                                      Flexible(
+                                        child: GestureDetector(
+                                          onTap: () =>
+                                              handleTextFieldTap(
+                                                  groupName, 'BIO-JACKET'),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
+                                            children: [
+                                              Container(
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                      0xFF313030),
+                                                  borderRadius: BorderRadius
+                                                      .circular(7),
+                                                ),
+                                                child: TextField(
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14),
+                                                  textAlign: TextAlign.center,
+                                                  decoration: InputDecoration(
+                                                    hintText: groupName,
+                                                    hintStyle: TextStyle(
+                                                      color: hintJacketColors[groupName],
+                                                      fontSize: 14,
+                                                    ),
+                                                    border: OutlineInputBorder(
+                                                      borderRadius: BorderRadius
+                                                          .circular(7),
+                                                    ),
+                                                    filled: true,
+                                                    fillColor: const Color(
+                                                        0xFF313030),
+                                                    isDense: true,
+                                                    enabled: false,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 );
                               }).toList(),
                             ],
                           ),
                         ),
-
-                        // Lista de grupos musculares para la parte frontal
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              // Crear una lista con los grupos musculares de la parte frontal para BIO-SHAPE
-                              'Abdominales',
-                              'Cuádriceps',
-                              'Bíceps',
-                              'Gemelos',
-                            ].map((group) {
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-                                child: Row(
-                                  children: [
-                                    customCheckbox(group, "pantalon"), // Checkbox de selección
-                                    Flexible(
-                                      child: GestureDetector(
-                                        onTap: () => handleTextFieldTap(group, "pantalon"), // Al hacer clic en el texto
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF313030),
-                                                borderRadius: BorderRadius.circular(7),
-                                              ),
-                                              child: TextField(
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                                decoration: InputDecoration(
-                                                  hintText: group,
-                                                  hintStyle: TextStyle(
-                                                    color: hintShapeColors[group],
-                                                    fontSize: 14,
+                      ],
+                    ),
+                  )
+                ]
+                else
+                  if (selectedEquipOption == 'BIO-SHAPE') ...[
+                    // Campos específicos para BIO-SHAPE
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Sección vacía para la primera lista de músculos (parte superior)
+                          Expanded(
+                            child: ListView(
+                              children: [
+                                // Listar solo los grupos correspondientes a la primera lista de músculos
+                                ...[
+                                  'Lumbares',
+                                  'Glúteo superior',
+                                  'Glúteo inferior',
+                                  'Isquiotibiales'
+                                ]
+                                    .map((groupName) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom: screenHeight * 0.01),
+                                    child: Row(
+                                      children: [
+                                        customCheckbox(groupName,
+                                            'MUSCULOS PARTE SUPERIOR'),
+                                        Flexible(
+                                          child: GestureDetector(
+                                            onTap: () =>
+                                                handleTextFieldTap(groupName,
+                                                    'MUSCULOS PARTE SUPERIOR'),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment
+                                                  .start,
+                                              children: [
+                                                Container(
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                        0xFF313030),
+                                                    borderRadius: BorderRadius
+                                                        .circular(7),
                                                   ),
-                                                  border: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.circular(7),
+                                                  child: TextField(
+                                                    style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                    decoration: InputDecoration(
+                                                      hintText: groupName,
+                                                      hintStyle: TextStyle(
+                                                        color: hintShapeColors[groupName],
+                                                        fontSize: 14,
+                                                      ),
+                                                      border: OutlineInputBorder(
+                                                        borderRadius: BorderRadius
+                                                            .circular(7),
+                                                      ),
+                                                      filled: true,
+                                                      fillColor: const Color(
+                                                          0xFF313030),
+                                                      isDense: true,
+                                                      enabled: false,
+                                                    ),
                                                   ),
-                                                  filled: true,
-                                                  fillColor: const Color(0xFF313030),
-                                                  isDense: true,
-                                                  enabled: false,
                                                 ),
-                                              ),
+                                              ],
                                             ),
-                                          ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
+                            ),
+                          ),
+
+                          // Mostrar las imágenes para la parte superior del cuerpo
+                          Expanded(
+                            flex: 1,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/pantalon_post.png'),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Mostrar imágenes para los grupos seleccionados
+                                ...selectedShapeGroups.entries
+                                    .where((entry) =>
+                                [
+                                  'Lumbares',
+                                  'Glúteo superior',
+                                  'Glúteo inferior',
+                                  'Isquiotibiales',
+                                  'Gemelos',
+                                ].contains(entry.key) && entry
+                                    .value) // Solo mostrar los seleccionados
+                                    .map((entry) {
+                                  String groupName = entry.key;
+                                  String? imagePath = imageShapePaths[groupName];
+                                  imagePath ??=
+                                  'assets/images/default_image.png';
+
+                                  return Positioned.fill(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(imagePath),
+                                          fit: BoxFit.contain,
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
+                                  );
+                                }),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]
+
+                          Expanded(
+                            flex: 1,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/pantalon_front.png'),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Mostrar imágenes para los grupos seleccionados
+                                ...selectedShapeGroups.entries
+                                    .where((entry) =>
+                                [
+                                  'Abdominales',
+                                  'Cuádriceps',
+                                  'Bíceps',
+
+                                ].contains(entry.key) && entry
+                                    .value) // Solo mostrar los seleccionados
+                                    .map((entry) {
+                                  String groupName = entry.key;
+                                  String? imagePath = imageShapePaths[groupName];
+                                  imagePath ??=
+                                  'assets/images/default_image.png';
+
+                                  return Positioned.fill(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(imagePath),
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+
+                          // Sección vacía para la segunda lista de músculos (parte inferior)
+                          Expanded(
+                            child: ListView(
+                              children: [
+                                // Listar solo los grupos correspondientes a la segunda lista de músculos
+                                ...[
+                                  'Abdominales',
+                                  'Cuádriceps',
+                                  'Bíceps',
+                                  'Gemelos'
+                                ]
+                                    .map((groupName) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom: screenHeight * 0.01),
+                                    child: Row(
+                                      children: [
+                                        customCheckbox(groupName,
+                                            'MUSCULOS PARTE INFERIOR'),
+                                        Flexible(
+                                          child: GestureDetector(
+                                            onTap: () =>
+                                                handleTextFieldTap(groupName,
+                                                    'MUSCULOS PARTE INFERIOR'),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment
+                                                  .start,
+                                              children: [
+                                                Container(
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                        0xFF313030),
+                                                    borderRadius: BorderRadius
+                                                        .circular(7),
+                                                  ),
+                                                  child: TextField(
+                                                    style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                    decoration: InputDecoration(
+                                                      hintText: groupName,
+                                                      hintStyle: TextStyle(
+                                                        color: hintShapeColors[groupName],
+                                                        fontSize: 14,
+                                                      ),
+                                                      border: OutlineInputBorder(
+                                                        borderRadius: BorderRadius
+                                                            .circular(7),
+                                                      ),
+                                                      filled: true,
+                                                      fillColor: const Color(
+                                                          0xFF313030),
+                                                      isDense: true,
+                                                      enabled: false,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    )
+
+                  ]
               ],
             ),
           ),
@@ -1619,8 +1674,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     );
   }
 
-  TextStyle get _labelStyle => const TextStyle(
-      color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+  TextStyle get _labelStyle =>
+      const TextStyle(
+          color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
 
   TextStyle get _inputTextStyle =>
       const TextStyle(color: Colors.white, fontSize: 14);

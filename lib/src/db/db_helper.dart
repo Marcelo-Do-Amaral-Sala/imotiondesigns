@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -26,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 40,
+      version: 49,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
@@ -79,23 +81,6 @@ class DatabaseHelper {
     )
   ''');
 
-
-    // Crear la tabla Programas
-    await db.execute('''
-      CREATE TABLE Programas (
-        id_programa INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        tipo TEXT NOT NULL CHECK(tipo IN ('Individual', 'Recovery')),
-        imagen TEXT,
-        frecuencia INTEGER,
-        rampa INTEGER,
-        pulso INTEGER,
-        contraccion INTEGER,
-        pausa INTEGER,
-        descripcion TEXT
-      );
-    ''');
-
     // Crear la tabla Programas_Automaticos
     await db.execute('''
       CREATE TABLE Programas_Automaticos (
@@ -119,7 +104,7 @@ class DatabaseHelper {
       );
     ''');
 
-    // Insertar programas de tipo Individual (hardcodeados)
+  /*  // Insertar programas de tipo Individual (hardcodeados)
     await db.insert('Programas', {
       'nombre': 'CALIBRACIÓN',
       'tipo': 'Individual',
@@ -428,7 +413,7 @@ class DatabaseHelper {
       'pausa': 0,
       'descripcion':
           'Este programa tiene los mismos beneficios que el programa Celulítico.Sin embargo, al tener un ancho de pulso mayor está más enfocado a trabajar con hombres o mujeres que busquen realizar un trabajo más profundo y más intenso. ',
-    });
+    });*/
 
     await db.transaction((txn) async {
       try {
@@ -1994,24 +1979,6 @@ class DatabaseHelper {
       }
     });
 
-    // Crear la tabla grupos_musculares_pantalon
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS grupos_musculares_pantalon (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        imagen TEXT NOT NULL
-      )
-    ''');
-
-    // Crear la tabla grupos_musculares_traje
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS grupos_musculares_traje (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        imagen TEXT NOT NULL
-      )
-    ''');
-
     // Crear la tabla grupos_musculares
     await db.execute('''
       CREATE TABLE IF NOT EXISTS grupos_musculares (
@@ -2022,375 +1989,217 @@ class DatabaseHelper {
     ''');
 
     // Insertar valores predeterminados en la tabla grupos_musculares
-    await db.insert('grupos_musculares', {
-      'nombre': 'Pectorales',
-      'imagen': 'assets/images/Pectorales.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png'});
     print('Inserted into grupos_musculares: Pectorales');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Trapecios',
-      'imagen': 'assets/images/Trapecios.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png'});
     print('Inserted into grupos_musculares: Trapecios');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Dorsales',
-      'imagen': 'assets/images/Dorsales.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png'});
     print('Inserted into grupos_musculares: Dorsales');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Glúteos',
-      'imagen': 'assets/images/Glúteos.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png'});
     print('Inserted into grupos_musculares: Glúteos');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Isquios',
-      'imagen': 'assets/images/Isquios.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Isquios', 'imagen': 'assets/images/Isquios.png'});
     print('Inserted into grupos_musculares: Isquios');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Lumbares',
-      'imagen': 'assets/images/Lumbares.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png'});
     print('Inserted into grupos_musculares: Lumbares');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Abdominales',
-      'imagen': 'assets/images/Abdominales.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Abdominales', 'imagen': 'assets/images/Abdominales.png'});
     print('Inserted into grupos_musculares: Abdominales');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Cuádriceps',
-      'imagen': 'assets/images/Cuádriceps.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png'});
     print('Inserted into grupos_musculares: Cuádriceps');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Bíceps',
-      'imagen': 'assets/images/Bíceps.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png'});
     print('Inserted into grupos_musculares: Bíceps');
 
-    await db.insert('grupos_musculares', {
-      'nombre': 'Gemelos',
-      'imagen': 'assets/images/Gemelos.png'
-    });
+    await db.insert('grupos_musculares',
+        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png'});
     print('Inserted into grupos_musculares: Gemelos');
 
-    // Insertar valores predeterminados en la tabla grupos_musculares_traje
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Pectorales',
-      'imagen': 'assets/images/Pectorales.png'
-    });
-    print('Inserted into grupos_musculares_traje: Pectorales');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Trapecios',
-      'imagen': 'assets/images/Trapecios.png'
-    });
-    print('Inserted into grupos_musculares_traje: Trapecios');
+    await db.execute(''' 
+      CREATE TABLE IF NOT EXISTS grupos_musculares_equipamiento (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        imagen TEXT NOT NULL,
+        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+      )
+    ''');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Dorsales',
-      'imagen': 'assets/images/Dorsales.png'
-    });
-    print('Inserted into grupos_musculares_traje: Dorsales');
+    // BIO-JACKET
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Trapecios" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Glúteos',
-      'imagen': 'assets/images/Glúteos.png'
-    });
-    print('Inserted into grupos_musculares_traje: Glúteos');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Isquios',
-      'imagen': 'assets/images/Isquios.png'
-    });
-    print('Inserted into grupos_musculares_traje: Isquios');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Lumbares',
-      'imagen': 'assets/images/Lumbares.png'
-    });
-    print('Inserted into grupos_musculares_traje: Lumbares');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Abdominales',
-      'imagen': 'assets/images/Abdominales.png'
-    });
-    print('Inserted into grupos_musculares_traje: Abdominales');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Isquios', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Isquios" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Cuádriceps',
-      'imagen': 'assets/images/Cuádriceps.png'
-    });
-    print('Inserted into grupos_musculares_traje: Cuádriceps');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Pectorales" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Bíceps',
-      'imagen': 'assets/images/Bíceps.png'
-    });
-    print('Inserted into grupos_musculares_traje: Bíceps');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Abdominales', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Abdominales" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_traje', {
-      'nombre': 'Gemelos',
-      'imagen': 'assets/images/Gemelos.png'
-    });
-    print('Inserted into grupos_musculares_traje: Gemelos');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
 
-    // Insertar valores predeterminados en la tabla grupos_musculares_pantalon
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Lumbares',
-      'imagen': 'assets/images/lumbares_pantalon.png'
-    });
-    print('Inserted into grupos_musculares_pantalon: Lumbares');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Glúteo superior',
-      'imagen': 'assets/images/gluteosup_pantalon.png'
-    });
-    print('Inserted into grupos_musculares_pantalon: Glúteo superior');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+    print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
 
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Glúteo inferior',
-      'imagen': 'assets/images/gluteoinf_pantalon.png'
-    });
-    print('Inserted into grupos_musculares_pantalon: Glúteo inferior');
+    // BIO-SHAPE
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Lumbares', 'imagen': 'assets/images/lumbares_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
 
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Isquiotibiales',
-      'imagen': 'assets/images/isquios_pantalon.png'
-    });
-    print('Inserted into grupos_musculares_pantalon: Isquiotibiales');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Glúteo superior', 'imagen': 'assets/images/gluteosup_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Glúteo superior" TIPO "BIO-SHAPE"');
 
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Abdominales',
-      'imagen': 'assets/images/abdomen_pantalon.png'
-    });
-    print('Inserted into grupos_musculares_pantalon: Abdominales');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Glúteo inferior', 'imagen': 'assets/images/gluteoinf_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Glúteo inferior" TIPO "BIO-SHAPE"');
 
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Cuádriceps',
-      'imagen': 'assets/images/cuadriceps_pantalon.png'
-    });
-    print('Inserted into grupos_musculares_pantalon: Cuádriceps');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/isquios_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
 
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Bíceps',
-      'imagen': 'assets/images/biceps_pantalon.png'
-    });
-    print('Inserted into grupos_musculares_pantalon: Bíceps');
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Abdominales', 'imagen': 'assets/images/abdomen_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Abdominales" TIPO "BIO-SHAPE"');
 
-    await db.insert('grupos_musculares_pantalon', {
-      'nombre': 'Gemelos',
-      'imagen': 'assets/images/gemelos_pantalon.png'
-    });
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/cuadriceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
+
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Bíceps', 'imagen': 'assets/images/biceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
+
+    await db.insert('grupos_musculares_equipamiento',
+        {'nombre': 'Gemelos', 'imagen': 'assets/images/gemelos_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
+
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 40) {
-      // Crear la tabla grupos_musculares_pantalon
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS grupos_musculares_pantalon (
+    if (oldVersion < 49) {
+
+      await db.execute(''' 
+      CREATE TABLE IF NOT EXISTS grupos_musculares_equipamiento (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL,
-        imagen TEXT NOT NULL
+        imagen TEXT NOT NULL,
+        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
       )
     ''');
 
-      // Crear la tabla grupos_musculares_traje
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS grupos_musculares_traje (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        imagen TEXT NOT NULL
-      )
-    ''');
+      // BIO-JACKET
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Trapecios" TIPO "BIO-JACKET"');
 
-      // Crear la tabla grupos_musculares
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS grupos_musculares (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        imagen TEXT NOT NULL
-      )
-    ''');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
 
-      // Insertar valores predeterminados en la tabla grupos_musculares
-      await db.insert('grupos_musculares', {
-        'nombre': 'Pectorales',
-        'imagen': 'assets/images/Pectorales.png'
-      });
-      print('Inserted into grupos_musculares: Pectorales');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Trapecios',
-        'imagen': 'assets/images/Trapecios.png'
-      });
-      print('Inserted into grupos_musculares: Trapecios');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Dorsales',
-        'imagen': 'assets/images/Dorsales.png'
-      });
-      print('Inserted into grupos_musculares: Dorsales');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Isquios', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Isquios" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Glúteos',
-        'imagen': 'assets/images/Glúteos.png'
-      });
-      print('Inserted into grupos_musculares: Glúteos');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Pectorales" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Isquios',
-        'imagen': 'assets/images/Isquios.png'
-      });
-      print('Inserted into grupos_musculares: Isquios');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Abdominales', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Abdominales" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Lumbares',
-        'imagen': 'assets/images/Lumbares.png'
-      });
-      print('Inserted into grupos_musculares: Lumbares');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Abdominales',
-        'imagen': 'assets/images/Abdominales.png'
-      });
-      print('Inserted into grupos_musculares: Abdominales');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Cuádriceps',
-        'imagen': 'assets/images/Cuádriceps.png'
-      });
-      print('Inserted into grupos_musculares: Cuádriceps');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+      print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Bíceps',
-        'imagen': 'assets/images/Bíceps.png'
-      });
-      print('Inserted into grupos_musculares: Bíceps');
+      // BIO-SHAPE
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Lumbares', 'imagen': 'assets/images/lumbares_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
 
-      await db.insert('grupos_musculares', {
-        'nombre': 'Gemelos',
-        'imagen': 'assets/images/Gemelos.png'
-      });
-      print('Inserted into grupos_musculares: Gemelos');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Glúteo superior', 'imagen': 'assets/images/gluteosup_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Glúteo superior" TIPO "BIO-SHAPE"');
 
-      // Insertar valores predeterminados en la tabla grupos_musculares_traje
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Pectorales',
-        'imagen': 'assets/images/Pectorales.png'
-      });
-      print('Inserted into grupos_musculares_traje: Pectorales');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Glúteo inferior', 'imagen': 'assets/images/gluteoinf_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Glúteo inferior" TIPO "BIO-SHAPE"');
 
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Trapecios',
-        'imagen': 'assets/images/Trapecios.png'
-      });
-      print('Inserted into grupos_musculares_traje: Trapecios');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/isquios_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
 
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Dorsales',
-        'imagen': 'assets/images/Dorsales.png'
-      });
-      print('Inserted into grupos_musculares_traje: Dorsales');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Abdominales', 'imagen': 'assets/images/abdomen_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Abdominales" TIPO "BIO-SHAPE"');
 
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Glúteos',
-        'imagen': 'assets/images/Glúteos.png'
-      });
-      print('Inserted into grupos_musculares_traje: Glúteos');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/cuadriceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
 
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Isquios',
-        'imagen': 'assets/images/Isquios.png'
-      });
-      print('Inserted into grupos_musculares_traje: Isquios');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Bíceps', 'imagen': 'assets/images/biceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
 
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Lumbares',
-        'imagen': 'assets/images/Lumbares.png'
-      });
-      print('Inserted into grupos_musculares_traje: Lumbares');
-
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Abdominales',
-        'imagen': 'assets/images/Abdominales.png'
-      });
-      print('Inserted into grupos_musculares_traje: Abdominales');
-
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Cuádriceps',
-        'imagen': 'assets/images/Cuádriceps.png'
-      });
-      print('Inserted into grupos_musculares_traje: Cuádriceps');
-
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Bíceps',
-        'imagen': 'assets/images/Bíceps.png'
-      });
-      print('Inserted into grupos_musculares_traje: Bíceps');
-
-      await db.insert('grupos_musculares_traje', {
-        'nombre': 'Gemelos',
-        'imagen': 'assets/images/Gemelos.png'
-      });
-      print('Inserted into grupos_musculares_traje: Gemelos');
-
-      // Insertar valores predeterminados en la tabla grupos_musculares_pantalon
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Lumbares',
-        'imagen': 'assets/images/lumbares_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Lumbares');
-
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Glúteo superior',
-        'imagen': 'assets/images/gluteosup_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Glúteo superior');
-
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Glúteo inferior',
-        'imagen': 'assets/images/gluteoinf_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Glúteo inferior');
-
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Isquiotibiales',
-        'imagen': 'assets/images/isquios_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Isquiotibiales');
-
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Abdominales',
-        'imagen': 'assets/images/abdomen_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Abdominales');
-
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Cuádriceps',
-        'imagen': 'assets/images/cuadriceps_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Cuádriceps');
-
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Bíceps',
-        'imagen': 'assets/images/biceps_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Bíceps');
-
-      await db.insert('grupos_musculares_pantalon', {
-        'nombre': 'Gemelos',
-        'imagen': 'assets/images/gemelos_pantalon.png'
-      });
-      print('Inserted into grupos_musculares_pantalon: Gemelos');
+      await db.insert('grupos_musculares_equipamiento',
+          {'nombre': 'Gemelos', 'imagen': 'assets/images/gemelos_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+      print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
     }
   }
 
@@ -2446,6 +2255,8 @@ class DatabaseHelper {
     }
   }
 
+
+
 /* METODOS ACTUALIZACION BBDD*/
 
   // Actualizar un cliente
@@ -2496,6 +2307,7 @@ class DatabaseHelper {
       );
     }
   }
+
 
   /*METODOS GET DE LA BBDD*/
 
@@ -2564,6 +2376,7 @@ class DatabaseHelper {
         await db.query('grupos_musculares');
     return result;
   }
+
   // Obtener los datos de la tabla grupos_musculares
   Future<List<Map<String, dynamic>>> getGruposMuscularesTraje() async {
     final db = await database;
@@ -2676,6 +2489,36 @@ class DatabaseHelper {
       return []; // Retorna una lista vacía si hay un error
     }
   }
+
+  Future<List<Map<String, dynamic>>> obtenerGruposMuscularesPorEquipamiento(Database db, String tipoEquipamiento) async {
+    // Verifica que el tipo de equipamiento sea válido
+    if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
+      throw ArgumentError('Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
+    }
+
+    // Imprime el tipo de equipamiento
+    print('Obteniendo grupos musculares para el tipo de equipamiento: $tipoEquipamiento');
+
+    // Realiza la consulta en la base de datos
+    List<Map<String, dynamic>> gruposMusculares = await db.query(
+      'grupos_musculares_equipamiento', // Nombre de la tabla
+      where: 'tipo_equipamiento = ?',    // Filtro por tipo de equipamiento
+      whereArgs: [tipoEquipamiento],     // Argumento del filtro
+    );
+
+    // Imprime el resultado de la consulta
+    print('Grupos musculares obtenidos: ${gruposMusculares.length} elementos.');
+
+    // Itera sobre los resultados e imprime cada grupo muscular y su tipo de equipamiento
+    for (var grupo in gruposMusculares) {
+      print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}"');
+    }
+
+    return gruposMusculares;
+  }
+
+
+
 
   /*METODOS DE BORRADO DE BBD*/
 

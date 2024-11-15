@@ -12,8 +12,7 @@ import '../info_programs/programs_auto_list_view.dart';
 class OverlayIndividuales extends StatefulWidget {
   final VoidCallback onClose;
 
-  const OverlayIndividuales({Key? key, required this.onClose})
-      : super(key: key);
+  const OverlayIndividuales({super.key, required this.onClose});
 
   @override
   _OverlayIndividualesState createState() => _OverlayIndividualesState();
@@ -36,10 +35,6 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +49,8 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
         ),
       ),
       content: isInfoVisible && selectedProgram != null
-          ? Column()
-          : ProgramsIndividualesListView(),
+          ? const Column()
+          : const ProgramsIndividualesListView(),
       onClose: widget.onClose,
     );
   }
@@ -64,7 +59,7 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
 class OverlayAuto extends StatefulWidget {
   final VoidCallback onClose; // Callback para cerrar el overlay
 
-  const OverlayAuto({Key? key, required this.onClose}) : super(key: key);
+  const OverlayAuto({super.key, required this.onClose});
 
   @override
   _OverlayAutoState createState() => _OverlayAutoState();
@@ -243,7 +238,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
 class OverlayRecovery extends StatefulWidget {
   final VoidCallback onClose;
 
-  const OverlayRecovery({Key? key, required this.onClose}) : super(key: key);
+  const OverlayRecovery({super.key, required this.onClose});
 
   @override
   _OverlayRecoveryState createState() => _OverlayRecoveryState();
@@ -266,10 +261,6 @@ class _OverlayRecoveryState extends State<OverlayRecovery>
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -284,8 +275,8 @@ class _OverlayRecoveryState extends State<OverlayRecovery>
         ),
       ),
       content: isInfoVisible && selectedProgram != null
-          ? Column()
-          : ProgramsRecoveryListView(),
+          ? const Column()
+          : const ProgramsRecoveryListView(),
       onClose: widget.onClose,
     );
   }
@@ -294,8 +285,7 @@ class _OverlayRecoveryState extends State<OverlayRecovery>
 class OverlayCrearPrograma extends StatefulWidget {
   final VoidCallback onClose;
 
-  const OverlayCrearPrograma({Key? key, required this.onClose})
-      : super(key: key);
+  const OverlayCrearPrograma({super.key, required this.onClose});
 
   @override
   _OverlayCrearProgramaState createState() => _OverlayCrearProgramaState();
@@ -400,19 +390,19 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
       children: [
         IndividualProgramForm(
           onDataChanged: (data) {
-            print(data); // Verify that the data is arriving correctly
+            debugPrint(data as String?); // Verify that the data is arriving correctly
             setState(() {});
           },
         ),
         AutomaticProgramForm(
           onDataChanged: (data) {
-            print(data); // Verify that the data is arriving correctly
+            debugPrint(data as String?);
             setState(() {});
           },
         ),
         RecoveryProgramForm(
           onDataChanged: (data) {
-            print(data); // Verify that the data is arriving correctly
+            debugPrint(data as String?);
             setState(() {});
           },
         ),
