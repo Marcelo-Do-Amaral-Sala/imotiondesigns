@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../db/db_helper.dart';
 import '../custom_clients/bonos_table_custom.dart';
@@ -15,40 +17,26 @@ class ClientsFormBonos extends StatefulWidget {
 class _ClientsFormBonosState extends State<ClientsFormBonos> {
   final _indexController = TextEditingController();
   final _nameController = TextEditingController();
+  final _bonosController = TextEditingController();
   String? selectedOption;
+  int? clientId; // Variable para almacenar el ID del cliente
+  int? lastClientId;
+
+  List<Map<String, String>> availableBonos = []; // Cambiar el tipo aquí
+  List<Map<String, String>> consumedBonos = [];
+  int totalBonosAvailables = 0; // Total de bonos disponibles
   Map<String, dynamic>? selectedClient;
 
-  List<Map<String, String>> availableBonos = [
-    {'date': '12/12/2024', 'quantity': '5'},
-    {'date': '12/02/2024', 'quantity': '15'},
-    {'date': '12/12/2024', 'quantity': '5'},
-    {'date': '12/02/2024', 'quantity': '15'},
-    {'date': '12/12/2024', 'quantity': '5'},
-    {'date': '12/02/2024', 'quantity': '15'},
-    {'date': '12/12/2024', 'quantity': '5'},
-    {'date': '12/02/2024', 'quantity': '15'},
-    {'date': '12/12/2024', 'quantity': '5'},
-    {'date': '12/02/2024', 'quantity': '15'},
-  ];
-
-  List<Map<String, String>> consumedBonos = [
-    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
-    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
-    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
-    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
-    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
-    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
-    {'date': '10/12/2024', 'hour': '12:00', 'quantity': '50'},
-    {'date': '10/10/2024', 'hour': '14:00', 'quantity': '500'},
-  ];
 
   @override
   void initState() {
     super.initState();
     _loadMostRecentClient();
+    if (clientId != null) {
+      _loadAvailableBonos(clientId!);
+    }
   }
 
-  // Cargar el cliente más reciente desde la base de datos
   Future<void> _loadMostRecentClient() async {
     final dbHelper = DatabaseHelper();
     final client = await dbHelper.getMostRecentClient();
@@ -56,18 +44,68 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     if (client != null) {
       setState(() {
         selectedClient = client;
-        _indexController.text = client['id'].toString();
+        lastClientId = client['id'];
+        _indexController.text = lastClientId.toString();
         _nameController.text = client['name'] ?? '';
         selectedOption = client['status'];
       });
+
+      if (lastClientId != null) {
+        _loadAvailableBonos(lastClientId!);
+      }
     }
   }
-
   @override
   void dispose() {
     _indexController.dispose();
     _nameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadAvailableBonos(int clienteId) async {
+    final dbHelper = DatabaseHelper();
+    final bonos = await dbHelper.getAvailableBonosByClientId(clienteId);
+
+    if (bonos.isEmpty) {
+      print('No se encontraron bonos disponibles para el cliente $clienteId');
+    }
+
+    setState(() {
+      availableBonos = bonos.where((bono) {
+        return bono['estado'] == 'Disponible';
+      }).map((bono) {
+        return {
+          'date': bono['fecha']?.toString() ?? '',
+          // Aseguramos que 'fecha' sea String
+          'quantity': bono['cantidad']?.toString() ?? '',
+          // Aseguramos que 'cantidad' sea String
+        };
+      }).toList();
+    });
+    // Recalcular el total de bonos
+    totalBonosAvailables = _calculateTotalBonos(availableBonos);
+  }
+
+  int _calculateTotalBonos(List<Map<String, dynamic>> bonos) {
+    return bonos.fold(0, (sum, bono) {
+      return sum +
+          (int.tryParse(bono['quantity']) ??
+              0); // Garantizar que la cantidad sea int
+    });
+  }
+
+  Future<void> _saveBonos(int clienteId, int cantidadBonos) async {
+    final dbHelper = DatabaseHelper();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
+
+    await dbHelper.insertBono({
+      'cliente_id': clienteId,
+      'cantidad': cantidadBonos,
+      'estado': 'Disponible',
+      'fecha': formattedDate,
+    });
+
+    _loadAvailableBonos(clienteId);
   }
 
   @override
@@ -121,7 +159,9 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
           }, enabled: false), // Deshabilitar dropdown
           SizedBox(width: screenWidth * 0.02),
           OutlinedButton(
-            onPressed: () {}, // Mantener vacío para que InkWell funcione
+            onPressed: () {
+              _addBonos(context);
+            }, // Mantener vacío para que InkWell funcione
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.all(10.0),
               side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
@@ -205,7 +245,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildTotalContainer(screenHeight, "TOTAL", "123", Colors.green),
+        _buildTotalContainer(screenHeight, "TOTAL", totalBonosAvailables.toString(), Colors.green),
         SizedBox(width: screenWidth * 0.02),
         _buildTotalContainer(screenHeight, "TOTAL", "456", Colors.red),
       ],
@@ -335,6 +375,158 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
       enabled: enabled,
     );
   }
+  Future<void> _addBonos(BuildContext context) async {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: const Color(0xFF494949),
+          shape: RoundedRectangleBorder(
+            side: const BorderSide(color: Color(0xFF2be4f3), width: 2),
+            borderRadius: BorderRadius.circular(7),
+          ),
+          child: SizedBox(
+            height: screenHeight * 0.4,
+            width: screenWidth * 0.4,
+            child: Column(
+              children: [
+                Container(
+                  width: screenWidth,
+                  height: screenHeight * 0.1,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(7),
+                    border: const Border(
+                      bottom: BorderSide(color: Color(0xFF2be4f3)),
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      const Center(
+                        child: Text(
+                          "COMPRAR BONOS",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2be4f3),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(
+                            Icons.close_sharp,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(20.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF313030),
+                            borderRadius: BorderRadius.circular(7),
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: TextField(
+                            controller: _bonosController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            style: const TextStyle(color: Colors.white, fontSize: 20),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              filled: true,
+                              fillColor: Color(0xFF313030),
+                              hintText: 'Introduzca los bonos',
+                              hintStyle: TextStyle(color: Colors.grey, fontSize: 20),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final cantidadBonos = int.tryParse(_bonosController.text);
+                            if (cantidadBonos == null || cantidadBonos <= 0) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Introduzca un valor válido",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                              return;
+                            }
+
+                            await _saveBonos(lastClientId!, cantidadBonos);
+                            Navigator.of(context).pop();
+                            _bonosController.clear();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Bonos añadidos correctamente",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.green),
+                            foregroundColor: MaterialStateProperty.all(Colors.white),
+                            padding: MaterialStateProperty.all(
+                              const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                            ),
+                          ),
+                          child: const Text(
+                            'AÑADIR',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
 }

@@ -28,12 +28,12 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 49,
+      version: 54,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
       onUpgrade:
-          _onUpgrade, // Método que se ejecuta al actualizar la base de datos
+      _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
   }
 
@@ -104,7 +104,7 @@ class DatabaseHelper {
       );
     ''');
 
-  /*  // Insertar programas de tipo Individual (hardcodeados)
+    /*  // Insertar programas de tipo Individual (hardcodeados)
     await db.insert('Programas', {
       'nombre': 'CALIBRACIÓN',
       'tipo': 'Individual',
@@ -555,7 +555,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -723,7 +723,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -887,7 +887,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -910,7 +910,7 @@ class DatabaseHelper {
           'nombre': 'FUERZA',
           'imagen': 'assets/images/STRENGTH.png',
           'descripcion':
-              'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
+          'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
           'duracionTotal': 25, // Duración total del programa en minutos
         });
 
@@ -1029,7 +1029,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1052,7 +1052,7 @@ class DatabaseHelper {
           'nombre': 'HIPERTROFIA',
           'imagen': 'assets/images/HIPERTROFIA.png',
           'descripcion':
-              'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
+          'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
           'duracionTotal': 25, // Duración total del programa en minutos
         });
 
@@ -1177,7 +1177,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1200,7 +1200,7 @@ class DatabaseHelper {
           'nombre': 'RESISTENCIA 1',
           'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
+          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
           'duracionTotal': 25,
           // Duración total del programa automático en minutos
         });
@@ -1326,7 +1326,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1349,7 +1349,7 @@ class DatabaseHelper {
           'nombre': 'RESISTENCIA 2',
           'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
+          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
           'duracionTotal': 25,
           // Duración total del programa automático en minutos
         });
@@ -1487,7 +1487,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1510,7 +1510,7 @@ class DatabaseHelper {
           'nombre': 'CARDIO',
           'imagen': 'assets/images/CARDIO.png',
           'descripcion':
-              'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
+          'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
           'duracionTotal': 25,
           // Duración total del programa automático en minutos
         });
@@ -1666,7 +1666,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1689,7 +1689,7 @@ class DatabaseHelper {
           'nombre': 'CROSS MAX',
           'imagen': 'assets/images/CROSSMAX.png',
           'descripcion':
-              'Programa experto. Entrenamiento para la mejora de la condición física.',
+          'Programa experto. Entrenamiento para la mejora de la condición física.',
           'duracionTotal': 25,
           // Duración total del programa automático en minutos
         });
@@ -1827,7 +1827,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -1962,7 +1962,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2006,15 +2006,15 @@ class DatabaseHelper {
     print('Inserted into grupos_musculares: Glúteos');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Isquios', 'imagen': 'assets/images/Isquios.png'});
-    print('Inserted into grupos_musculares: Isquios');
+        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png'});
+    print('Inserted into grupos_musculares: Isquiotibiales');
 
     await db.insert('grupos_musculares',
         {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png'});
     print('Inserted into grupos_musculares: Lumbares');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Abdominales', 'imagen': 'assets/images/Abdominales.png'});
+        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png'});
     print('Inserted into grupos_musculares: Abdominales');
 
     await db.insert('grupos_musculares',
@@ -2041,83 +2041,256 @@ class DatabaseHelper {
 
     // BIO-JACKET
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Trapecios',
+          'imagen': 'assets/images/Trapecios.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Trapecios" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Dorsales',
+          'imagen': 'assets/images/Dorsales.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Lumbares',
+          'imagen': 'assets/images/Lumbares.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Glúteos',
+          'imagen': 'assets/images/Glúteos.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Isquios', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Isquiotibiales',
+          'imagen': 'assets/images/Isquios.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Isquios" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Pectorales',
+          'imagen': 'assets/images/Pectorales.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Pectorales" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Abdominales', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
-    print('INSERTADO "Abdominales" TIPO "BIO-JACKET"');
+        {
+          'nombre': 'Abdomen',
+          'imagen': 'assets/images/Abdominales.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+    print('INSERTADO "Abdomen" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Cuádriceps',
+          'imagen': 'assets/images/Cuádriceps.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Bíceps',
+          'imagen': 'assets/images/Bíceps.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+        {
+          'nombre': 'Gemelos',
+          'imagen': 'assets/images/Gemelos.png',
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
     print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
 
     // BIO-SHAPE
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/lumbares_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+        {
+          'nombre': 'Lumbares',
+          'imagen': 'assets/images/lumbares_pantalon.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
     print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Glúteo superior', 'imagen': 'assets/images/gluteosup_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+        {
+          'nombre': 'Glúteos',
+          'imagen': 'assets/images/gluteo_shape.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
     print('INSERTADO "Glúteo superior" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Glúteo inferior', 'imagen': 'assets/images/gluteoinf_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
-    print('INSERTADO "Glúteo inferior" TIPO "BIO-SHAPE"');
-
-    await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/isquios_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+        {
+          'nombre': 'Isquiotibiales',
+          'imagen': 'assets/images/isquios_pantalon.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
     print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Abdominales', 'imagen': 'assets/images/abdomen_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+        {
+          'nombre': 'Abdomen',
+          'imagen': 'assets/images/abdomen_pantalon.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
     print('INSERTADO "Abdominales" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/cuadriceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+        {
+          'nombre': 'Cuádriceps',
+          'imagen': 'assets/images/cuadriceps_pantalon.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
     print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/biceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+        {
+          'nombre': 'Bíceps',
+          'imagen': 'assets/images/biceps_pantalon.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
     print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento',
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/gemelos_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+        {
+          'nombre': 'Gemelos',
+          'imagen': 'assets/images/gemelos_pantalon.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
     print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
+
+    await db.execute('''
+  CREATE TABLE IF NOT EXISTS cronaxia (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    valor REAL DEFAULT 0.0,  -- Cambiado a REAL con valor por defecto 0.0
+    tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+  )
+''');
+
+// Inserciones con prints para ver si se han realizado correctamente
+    await db.insert('cronaxia', {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Trapecio" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Isquiotibiales" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Abdomen" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
+
+    await db.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+    print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
+
+// Inserciones para BIO-SHAPE con prints
+    await db.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+    print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
+
+    await db.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+    print('INSERTADO "Glúteos" TIPO "BIO-SHAPE"');
+
+    await db.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+    print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
+
+    await db.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+    print('INSERTADO "Abdomen" TIPO "BIO-SHAPE"');
+
+    await db.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+    print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
+
+    await db.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+    print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
+
+    await db.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+    print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
+
+
+
+/*
+    await db.execute('''
+      CREATE TABLE programas_predeterminados (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        imagen TEXT,
+        frecuencia REAL,
+        pulso REAL,
+        contraccion REAL,
+        pausa REAL,
+        tipo TEXT,
+        equipamiento TEXT
+      );
+    ''');
+    await db.execute('''
+      CREATE TABLE programas_creados (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        imagen TEXT,
+        frecuencia REAL,
+        pulso REAL,
+        contraccion REAL,
+        pausa REAL,
+        tipo TEXT,
+        equipamiento TEXT
+      );
+    ''');
+
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS programa_cronaxia (
+    programa_id INTEGER,
+    cronaxia_id INTEGER,
+    FOREIGN KEY (programa_id) REFERENCES Programas(id),
+    FOREIGN KEY (cronaxia_id) REFERENCES cronaxia(id)
+ );
+    ''');
+
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS ProgramaGrupoMuscular (
+    programa_id INTEGER,
+    grupo_muscular_id INTEGER,
+    FOREIGN KEY (programa_id) REFERENCES Programas(id),
+    FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares_equipamiento(id)
+    );
+    ''');
+*/
+
+
 
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 49) {
-
+    if (oldVersion < 54) {
       await db.execute(''' 
       CREATE TABLE IF NOT EXISTS grupos_musculares_equipamiento (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -2129,77 +2302,203 @@ class DatabaseHelper {
 
       // BIO-JACKET
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Trapecios',
+            'imagen': 'assets/images/Trapecios.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Trapecios" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Dorsales',
+            'imagen': 'assets/images/Dorsales.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Lumbares',
+            'imagen': 'assets/images/Lumbares.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Glúteos',
+            'imagen': 'assets/images/Glúteos.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Isquios', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Isquiotibiales',
+            'imagen': 'assets/images/Isquios.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Isquios" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Pectorales',
+            'imagen': 'assets/images/Pectorales.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Pectorales" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Abdominales', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento' : 'BIO-JACKET'});
-      print('INSERTADO "Abdominales" TIPO "BIO-JACKET"');
+          {
+            'nombre': 'Abdomen',
+            'imagen': 'assets/images/Abdominales.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
+      print('INSERTADO "Abdomen" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Cuádriceps',
+            'imagen': 'assets/images/Cuádriceps.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Bíceps',
+            'imagen': 'assets/images/Bíceps.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento' : 'BIO-JACKET'});
+          {
+            'nombre': 'Gemelos',
+            'imagen': 'assets/images/Gemelos.png',
+            'tipo_equipamiento': 'BIO-JACKET'
+          });
       print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
 
       // BIO-SHAPE
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/lumbares_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+          {
+            'nombre': 'Lumbares',
+            'imagen': 'assets/images/lumbares_pantalon.png',
+            'tipo_equipamiento': 'BIO-SHAPE'
+          });
       print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
 
-      await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Glúteo superior', 'imagen': 'assets/images/gluteosup_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+    await db.insert('grupos_musculares_equipamiento',
+        {
+          'nombre': 'Glúteos',
+          'imagen': 'assets/images/gluteo_shape.png',
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
       print('INSERTADO "Glúteo superior" TIPO "BIO-SHAPE"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Glúteo inferior', 'imagen': 'assets/images/gluteoinf_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
-      print('INSERTADO "Glúteo inferior" TIPO "BIO-SHAPE"');
-
-      await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/isquios_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+          {
+            'nombre': 'Isquiotibiales',
+            'imagen': 'assets/images/isquios_pantalon.png',
+            'tipo_equipamiento': 'BIO-SHAPE'
+          });
       print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Abdominales', 'imagen': 'assets/images/abdomen_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+          {
+            'nombre': 'Abdomen',
+            'imagen': 'assets/images/abdomen_pantalon.png',
+            'tipo_equipamiento': 'BIO-SHAPE'
+          });
       print('INSERTADO "Abdominales" TIPO "BIO-SHAPE"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/cuadriceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+          {
+            'nombre': 'Cuádriceps',
+            'imagen': 'assets/images/cuadriceps_pantalon.png',
+            'tipo_equipamiento': 'BIO-SHAPE'
+          });
       print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/biceps_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+          {
+            'nombre': 'Bíceps',
+            'imagen': 'assets/images/biceps_pantalon.png',
+            'tipo_equipamiento': 'BIO-SHAPE'
+          });
       print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
 
       await db.insert('grupos_musculares_equipamiento',
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/gemelos_pantalon.png', 'tipo_equipamiento' : 'BIO-SHAPE'});
+          {
+            'nombre': 'Gemelos',
+            'imagen': 'assets/images/gemelos_pantalon.png',
+            'tipo_equipamiento': 'BIO-SHAPE'
+          });
       print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
+
+      await db.execute('''
+  CREATE TABLE IF NOT EXISTS cronaxia (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    valor REAL DEFAULT 0.0,  -- Cambiado a REAL con valor por defecto 0.0
+    tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+  )
+''');
+
+// Inserciones con prints para ver si se han realizado correctamente
+      await db.insert('cronaxia', {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Trapecio" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Isquiotibiales" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Abdomen" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
+
+      await db.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
+
+// Inserciones para BIO-SHAPE con prints
+      await db.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
+
+      await db.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      print('INSERTADO "Glúteos" TIPO "BIO-SHAPE"');
+
+      await db.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
+
+      await db.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      print('INSERTADO "Abdomen" TIPO "BIO-SHAPE"');
+
+      await db.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
+
+      await db.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
+
+      await db.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
+
+
+
     }
   }
 
@@ -2214,7 +2513,7 @@ class DatabaseHelper {
         'clientes',
         client,
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
     } catch (e) {
       print('Error inserting client: $e');
@@ -2232,7 +2531,7 @@ class DatabaseHelper {
           'grupo_muscular_id': grupoMuscularId,
         },
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
       return true; // Si la inserción fue exitosa, retorna true
     } catch (e) {
@@ -2254,7 +2553,6 @@ class DatabaseHelper {
       print('Error inserting bono: $e');
     }
   }
-
 
 
 /* METODOS ACTUALIZACION BBDD*/
@@ -2373,7 +2671,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+    await db.query('grupos_musculares');
     return result;
   }
 
@@ -2381,7 +2679,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getGruposMuscularesTraje() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_traje');
+    await db.query('grupos_musculares_traje');
     return result;
   }
 
@@ -2389,7 +2687,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getGruposMuscularesPantalon() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_pantalon');
+    await db.query('grupos_musculares_pantalon');
     return result;
   }
 
@@ -2417,7 +2715,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> obtenerProgramasIndividual(
       Database db) async {
     String query =
-        '''SELECT id_programa, nombre, tipo, imagen, frecuencia, rampa, pulso, contraccion, pausa, descripcion
+    '''SELECT id_programa, nombre, tipo, imagen, frecuencia, rampa, pulso, contraccion, pausa, descripcion
                     FROM Programas
                     WHERE tipo = 'Individual';''';
 
@@ -2435,7 +2733,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> obtenerProgramasRecovery(
       Database db) async {
     String query =
-        '''SELECT id_programa, nombre, tipo, imagen, frecuencia, rampa, pulso, contraccion, pausa, descripcion
+    '''SELECT id_programa, nombre, tipo, imagen, frecuencia, rampa, pulso, contraccion, pausa, descripcion
                     FROM Programas
                     WHERE tipo = 'Recovery';''';
 
@@ -2490,20 +2788,23 @@ class DatabaseHelper {
     }
   }
 
-  Future<List<Map<String, dynamic>>> obtenerGruposMuscularesPorEquipamiento(Database db, String tipoEquipamiento) async {
+  Future<List<Map<String, dynamic>>> obtenerGruposMuscularesPorEquipamiento(
+      Database db, String tipoEquipamiento) async {
     // Verifica que el tipo de equipamiento sea válido
     if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
-      throw ArgumentError('Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
+      throw ArgumentError(
+          'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
     }
 
     // Imprime el tipo de equipamiento
-    print('Obteniendo grupos musculares para el tipo de equipamiento: $tipoEquipamiento');
+    print(
+        'Obteniendo grupos musculares para el tipo de equipamiento: $tipoEquipamiento');
 
     // Realiza la consulta en la base de datos
     List<Map<String, dynamic>> gruposMusculares = await db.query(
       'grupos_musculares_equipamiento', // Nombre de la tabla
-      where: 'tipo_equipamiento = ?',    // Filtro por tipo de equipamiento
-      whereArgs: [tipoEquipamiento],     // Argumento del filtro
+      where: 'tipo_equipamiento = ?', // Filtro por tipo de equipamiento
+      whereArgs: [tipoEquipamiento], // Argumento del filtro
     );
 
     // Imprime el resultado de la consulta
@@ -2511,13 +2812,43 @@ class DatabaseHelper {
 
     // Itera sobre los resultados e imprime cada grupo muscular y su tipo de equipamiento
     for (var grupo in gruposMusculares) {
-      print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}"');
+      print(
+          'INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}"');
     }
 
     return gruposMusculares;
   }
 
+  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(
+      Database db, String tipoEquipamiento) async {
+    // Verifica que el tipo de equipamiento sea válido
+    if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
+      throw ArgumentError(
+          'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
+    }
 
+    // Imprime el tipo de equipamiento
+    print(
+        'Cronaxia para el tipo de equipamiento: $tipoEquipamiento');
+
+    // Realiza la consulta en la base de datos
+    List<Map<String, dynamic>> cronaxias = await db.query(
+      'cronaxia', // Nombre de la tabla
+      where: 'tipo_equipamiento = ?', // Filtro por tipo de equipamiento
+      whereArgs: [tipoEquipamiento], // Argumento del filtro
+    );
+
+    // Imprime el resultado de la consulta
+    print('Grupos musculares obtenidos: ${cronaxias.length} elementos.');
+
+    // Itera sobre los resultados e imprime cada grupo muscular y su tipo de equipamiento
+    for (var grupo in cronaxias) {
+      print(
+          'INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}"');
+    }
+
+    return cronaxias;
+  }
 
 
   /*METODOS DE BORRADO DE BBD*/

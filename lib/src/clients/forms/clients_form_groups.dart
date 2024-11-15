@@ -50,8 +50,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
 
     // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
     setState(() {
-      selectedGroups = {for (var row in result) row['nombre']: false};
-      hintColors = {for (var row in result) row['nombre']: Colors.white};
+      selectedGroups = {for (var row in result) row['nombre']: true};
+      hintColors = {for (var row in result) row['nombre']: const Color(0xFF2be4f3)};
       groupIds = {for (var row in result) row['nombre']: row['id']};
       imagePaths = {for (var row in result) row['nombre']: row['imagen']};
     });
@@ -331,7 +331,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               'Dorsales',
                               'Lumbares',
                               'Glúteos',
-                              'Isquios',
+                              'Isquiotibiales',
                             ].map((group) {
                               return Padding(
                                 padding: EdgeInsets.only(bottom: screenHeight * 0.02),
@@ -405,7 +405,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 'Dorsales',
                                 'Lumbares',
                                 'Glúteos',
-                                'Isquios',
+                                'Isquiotibiales',
                                 'Gemelos'
                               ].contains(entry.key) &&
                                   entry.value) // Filtra solo los grupos seleccionados
@@ -455,7 +455,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                   .where((entry) =>
                               [
                                 'Pectorales',
-                                'Abdominales',
+                                'Abdomen',
                                 'Cuádriceps',
                                 'Bíceps'
                               ].contains(entry.key) &&
@@ -492,7 +492,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                             children: [
                               // Crear una lista con los grupos que quieres mostrar explícitamente
                               'Pectorales',
-                              'Abdominales',
+                              'Abdomen',
                               'Cuádriceps',
                               'Bíceps',
                               'Gemelos',

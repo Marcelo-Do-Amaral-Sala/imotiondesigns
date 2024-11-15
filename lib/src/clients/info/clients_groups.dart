@@ -389,7 +389,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                               'Dorsales',
                               'Lumbares',
                               'Glúteos',
-                              'Isquios',
+                              'Isquiotibiales',
                             ].map((group) {
                               return Padding(
                                 padding: EdgeInsets.only(bottom: screenHeight * 0.02),
@@ -463,7 +463,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                 'Dorsales',
                                 'Lumbares',
                                 'Glúteos',
-                                'Isquios',
+                                'Isquiotibiales',
                                 'Gemelos'
                               ].contains(entry.key) &&
                                   entry.value) // Filtra solo los grupos seleccionados
@@ -513,7 +513,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   .where((entry) =>
                               [
                                 'Pectorales',
-                                'Abdominales',
+                                'Abdomen',
                                 'Cuádriceps',
                                 'Bíceps'
                               ].contains(entry.key) &&
@@ -550,7 +550,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                             children: [
                               // Crear una lista con los grupos que quieres mostrar explícitamente
                               'Pectorales',
-                              'Abdominales',
+                              'Abdomen',
                               'Cuádriceps',
                               'Bíceps',
                               'Gemelos',
