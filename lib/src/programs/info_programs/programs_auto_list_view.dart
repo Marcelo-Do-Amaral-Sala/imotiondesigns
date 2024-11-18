@@ -72,19 +72,16 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
 
     return Padding(
       padding: const EdgeInsets.all(30.0),
-      child: Flexible(
-        flex: 1,
-        child: Container(
-          width: screenWidth,
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 46, 46, 46),
-            borderRadius: BorderRadius.circular(7.0),
-          ),
-          child: Column(
-            children: [
-              _buildRowView(screenHeight, screenWidth),
-            ],
-          ),
+      child: Container(
+        width: screenWidth,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 46, 46, 46),
+          borderRadius: BorderRadius.circular(7.0),
+        ),
+        child: Column(
+          children: [
+            _buildRowView(screenHeight, screenWidth),
+          ],
         ),
       ),
     );
@@ -118,7 +115,7 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
                   child: GestureDetector(
                     onTap: () {
                       // Llamamos a la función onProgramTap pasando los datos del programa
-                      widget.onProgramTap(program); // Ejecuatamos el callback
+                      widget.onProgramTap(program); // Ejecuatemos el callback
                     },
                     child: Column(
                       children: [

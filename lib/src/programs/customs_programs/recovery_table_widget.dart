@@ -26,21 +26,21 @@ class _RecoveryTableWidgetState extends State<RecoveryTableWidget> {
                     DataRowWidget(
                       imagen: row['imagen'] ?? '',
                       nombre: row['nombre'] ?? '',
-                      frecuencia: (row['frecuencia'] is int)
+                      frecuencia: (row['frecuencia'] is double)
                           ? row['frecuencia']
-                          : int.tryParse(row['frecuencia'].toString()) ?? 0,
-                      pulso: (row['pulso'] is int)
+                          : double.tryParse(row['frecuencia'].toString()) ?? 0.0,
+                      pulso: (row['pulso'] is double)
                           ? row['pulso']
-                          : int.tryParse(row['pulso'].toString()) ?? 0,
-                      rampa: (row['rampa'] is int)
+                          : double.tryParse(row['pulso'].toString()) ?? 0.0,
+                      rampa: (row['rampa'] is double)
                           ? row['rampa']
-                          : int.tryParse(row['rampa'].toString()) ?? 0,
-                      contraccion: (row['contraccion'] is int)
+                          : double.tryParse(row['rampa'].toString()) ?? 0.0,
+                      contraccion: (row['contraccion'] is double)
                           ? row['contraccion']
-                          : int.tryParse(row['contraccion'].toString()) ?? 0,
-                      pausa: (row['pausa'] is int)
+                          : double.tryParse(row['contraccion'].toString()) ?? 0.0,
+                      pausa: (row['pausa'] is double)
                           ? row['pausa']
-                          : int.tryParse(row['pausa'].toString()) ?? 0,
+                          : double.tryParse(row['pausa'].toString()) ?? 0.0,
                     ),
                     const SizedBox(height: 10), // Espaciado entre filas
                   ],
@@ -96,11 +96,11 @@ class _RecoveryTableWidgetState extends State<RecoveryTableWidget> {
 class DataRowWidget extends StatefulWidget {
   final String? imagen; // Ruta de la imagen
   final String nombre;
-  final int frecuencia;
-  final int pulso;
-  final int rampa;
-  final int contraccion;
-  final int pausa;
+  final double frecuencia;
+  final double pulso;
+  final double rampa;
+  final double contraccion;
+  final double pausa;
 
   const DataRowWidget({
     super.key,
@@ -140,11 +140,11 @@ class _DataRowWidgetState extends State<DataRowWidget> {
           // Mostrar la imagen si existe
           buildCell(widget.nombre, isNameColumn: true),
           // Estilo especial solo para la columna de nombre
-          buildCell(widget.frecuencia.toString()),
-          buildCell(widget.pulso.toString()),
-          buildCell(widget.rampa.toString()),
-          buildCell(widget.contraccion.toString()),
-          buildCell(widget.pausa.toString()),
+          buildCell(formatNumber(widget.frecuencia)),
+          buildCell(formatNumber(widget.pulso)),
+          buildCell(formatNumber(widget.rampa)),
+          buildCell(formatNumber(widget.contraccion)),
+          buildCell(formatNumber(widget.pausa)),
         ],
       ),
     );
@@ -184,5 +184,10 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         ),
       ),
     );
+  }
+
+  // Función para formatear los números, eliminando decimales si es un número entero
+  String formatNumber(double value) {
+    return value == value.toInt() ? value.toInt().toString() : value.toStringAsFixed(2);
   }
 }

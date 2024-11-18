@@ -17,18 +17,39 @@ class _ProgramsIndividualesListViewState
   @override
   void initState() {
     super.initState();
-    _fetchPrograms(); // Llamamos a la función para obtener los programas al iniciar
+    _fetchIndividualPrograms(); // Llamamos a la función para obtener los programas al iniciar
   }
-
-  // Función para obtener los programas de tipo 'Individual'
-  Future<void> _fetchPrograms() async {
+// Función para obtener los programas de tipo 'Individual' y sus cronaxias y grupos
+  Future<void> _fetchIndividualPrograms() async {
     var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
     try {
-      // Llamamos a la función que obtiene los programas de la base de datos
-      final programData = await DatabaseHelper().obtenerProgramasIndividual(db);
+      // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
+      final programData = await DatabaseHelper().obtenerProgramasPredeterminadosPorTipoIndividual(db);
 
       // Verifica el contenido de los datos obtenidos
       print('Programas obtenidos: $programData');
+
+      // Iteramos sobre los programas y obtenemos las cronaxias y los grupos de las tablas intermedias
+      for (var program in programData) {
+        // Obtener cronaxias
+        var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, program['id_programa']);
+        var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, program['id_programa']);
+
+        // Imprimir los valores de las cronaxias y los grupos
+        print('Programa: ${program['nombre']}');
+
+        print('Cronaxias asociadas:');
+        for (var cronaxia in cronaxias) {
+          print(' - ${cronaxia['nombre']} (Valor: ${cronaxia['valor']})');
+        }
+
+        print('Grupos musculares asociados:');
+        for (var grupo in grupos) {
+          print(' - ${grupo['nombre']}');
+        }
+
+        print('---');  // Separador para cada programa
+      }
 
       // Actualizamos el estado con los programas obtenidos
       setState(() {
@@ -38,6 +59,8 @@ class _ProgramsIndividualesListViewState
       print('Error fetching programs: $e');
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

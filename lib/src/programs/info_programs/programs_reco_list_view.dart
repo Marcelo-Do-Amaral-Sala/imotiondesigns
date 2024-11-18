@@ -15,22 +15,44 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
   @override
   void initState() {
     super.initState();
-    _fetchProgramsRecovery(); // Cargar los programas al iniciar el estado
+    _fetchRecoveryPrograms(); // Cargar los programas al iniciar el estado
   }
 
-  Future<void> _fetchProgramsRecovery() async {
-    var db = await DatabaseHelper().database; // Obtenemos la instancia de la base de datos
+  Future<void> _fetchRecoveryPrograms() async {
+    var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
     try {
-      // Crear la instancia de DatabaseHelper y llamar al método de instancia obtenerProgramasRecovery
-      final programData = await DatabaseHelper().obtenerProgramasRecovery(db);
+      // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
+      final programData = await DatabaseHelper().obtenerProgramasPredeterminadosPorTipoRecovery(db);
 
       // Verifica el contenido de los datos obtenidos
       print('Programas obtenidos: $programData');
 
-      setState(() {
-        allPrograms = programData; // Asigna los programas obtenidos a la lista
-      });
+      // Iteramos sobre los programas y obtenemos las cronaxias y los grupos de las tablas intermedias
+      for (var program in programData) {
+        // Obtener cronaxias
+        var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, program['id']);
+        var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, program['id']);
 
+        // Imprimir los valores de las cronaxias y los grupos
+        print('Programa: ${program['nombre']}');
+
+        print('Cronaxias asociadas:');
+        for (var cronaxia in cronaxias) {
+          print(' - ${cronaxia['nombre']} (Valor: ${cronaxia['valor']})');
+        }
+
+        print('Grupos musculares asociados:');
+        for (var grupo in grupos) {
+          print(' - ${grupo['nombre']}');
+        }
+
+        print('---');  // Separador para cada programa
+      }
+
+      // Actualizamos el estado con los programas obtenidos
+      setState(() {
+        allPrograms = programData; // Asignamos los programas obtenidos a la lista
+      });
     } catch (e) {
       print('Error fetching programs: $e');
     }

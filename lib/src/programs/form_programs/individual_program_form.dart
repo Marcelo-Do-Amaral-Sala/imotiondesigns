@@ -105,7 +105,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
       // Obtener grupos musculares para BIO-JACKET
       var gruposJacket = await DatabaseHelper()
-          .obtenerGruposMuscularesPorEquipamiento(db, 'BIO-JACKET');
+          .obtenerCronaxiaPorEquipamiento(db, 'BIO-JACKET');
 
       // Asignar datos para BIO-JACKET
       setState(() {
@@ -125,7 +125,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
       // Obtener grupos musculares para BIO-SHAPE
       var gruposShape = await DatabaseHelper()
-          .obtenerGruposMuscularesPorEquipamiento(db, 'BIO-SHAPE');
+          .obtenerCronaxiaPorEquipamiento(db, 'BIO-SHAPE');
 
       // Asignar datos para BIO-SHAPE
       setState(() {
@@ -194,6 +194,43 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       print('Error al obtener los grupos musculares: $e');
     }
   }
+
+  Future<void> _insertarPrograma() async {
+    // Recoger los valores de los controladores de texto
+    String nombrePrograma = _nameController.text;
+    String equipamiento = selectedEquipOption ?? ''; // Manejar el caso de que no se seleccione una opción
+    double frecuencia = double.tryParse(_frequencyController.text) ?? 0.0;
+    double pulso = double.tryParse(_pulseController.text) ?? 0.0;
+    double contraccion = double.tryParse(_contractionController.text) ?? 0.0;
+    double pausa = double.tryParse(_pauseController.text) ?? 0.0;
+    int rampa = int.tryParse(_rampaController.text) ?? 0;
+
+    // Crear el mapa con los datos que se insertarán en la base de datos
+    Map<String, dynamic> programaData = {
+      'nombre': nombrePrograma,
+      'imagen': 'ruta/a/imagen', // Puedes agregar la ruta de la imagen aquí si es necesario
+      'frecuencia': frecuencia,
+      'pulso': pulso,
+      'contraccion': contraccion,
+      'rampa': rampa,
+      'pausa': pausa,
+      'tipo': 'Individual', // Puedes actualizar esto según el tipo de programa que quieras
+      'equipamiento': equipamiento,
+    };
+
+// Mostrar todos los datos insertados en el print
+    print("Datos insertados: ");
+    programaData.forEach((key, value) {
+      print('$key: $value');
+    });
+    // Usar el objeto db para insertar los datos en la base de datos
+    await dbHelper.insertarProgramaPredeterminado(programaData);
+
+    // Aquí puedes mostrar un mensaje de éxito o realizar alguna acción adicional si es necesario.
+    print("Programa insertado exitosamente");
+  }
+
+
 
 
 // Función para crear el checkbox personalizado
@@ -609,7 +646,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   GestureDetector(
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    onTap: () async {},
+                    onTap: () async {
+                      await _insertarPrograma();
+                    },
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),
@@ -759,8 +798,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           alignment: Alignment.center,
                                           decoration: _inputDecoration(),
                                           child: TextField(
-                                            controller: controllersShape[
-                                            gruposBioShape[i]['nombre']],
+                                            controller: controllersJacket[
+                                            gruposBioJacket[i]['nombre']],
                                             keyboardType: TextInputType.number,
                                             inputFormatters: <TextInputFormatter>[
                                               FilteringTextInputFormatter
@@ -840,6 +879,39 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 ],
                               ),
                             ),
+                            SizedBox(width: screenWidth * 0.04),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  for (int i = 9;
+                                  i < 10;
+                                  i++) // Aquí ajustamos el rango de grupos
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
+                                            gruposBioJacket[i]['nombre']],
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       )),
@@ -862,7 +934,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
                                       style: _labelStyle,
                                     ),
                                     Container(
@@ -895,15 +967,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
                                       style: _labelStyle,
                                     ),
                                     Container(
                                       alignment: Alignment.center,
                                       decoration: _inputDecoration(),
                                       child: TextField(
-                                        controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
+                                        controller: controllersShape[
+                                        gruposBioShape[i]['nombre']],
                                         keyboardType: TextInputType.number,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
@@ -923,53 +995,20 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Itera sobre los últimos grupos musculares
-                              for (int i = 6; i < 9; i++)
+                              for (int i = 6; i < 7; i++)
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
                                       style: _labelStyle,
                                     ),
                                     Container(
                                       alignment: Alignment.center,
                                       decoration: _inputDecoration(),
                                       child: TextField(
-                                        controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.04),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              for (int i = 9;
-                                  i < 10;
-                                  i++) // Aquí ajustamos el rango de grupos
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
+                                        controller: controllersShape[
+                                        gruposBioShape[i]['nombre']],
                                         keyboardType: TextInputType.number,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
