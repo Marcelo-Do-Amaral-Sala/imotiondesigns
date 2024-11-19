@@ -47,6 +47,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   Map<String, TextEditingController> controllersJacket = {};
   Map<String, TextEditingController> controllersShape = {};
 
+
   @override
   void initState() {
     super.initState();
@@ -86,13 +87,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       // Asignar datos para BIO-JACKET
       setState(() {
         gruposBioJacket = gruposJacket;
-        selectedJacketGroups = {
-          for (var row in gruposJacket) row['nombre']: false
-        };
-        groupJacketIds = {
-          for (var row in gruposJacket) row['nombre']: row['id']
-        };
-
         // Inicializar controladores para cada grupo muscular de BIO-JACKET
         controllersJacket = {
           for (var row in gruposJacket) row['nombre']: TextEditingController(),
@@ -106,12 +100,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       // Asignar datos para BIO-SHAPE
       setState(() {
         gruposBioShape = gruposShape;
-        selectedShapeGroups = {
-          for (var row in gruposShape) row['nombre']: false
-        };
-        groupShapeIds = {for (var row in gruposShape) row['nombre']: row['id']};
-
-        // Inicializar controladores para cada grupo muscular de BIO-SHAPE
         controllersShape = {
           for (var row in gruposShape) row['nombre']: TextEditingController(),
         };
@@ -121,13 +109,14 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     }
   }
 
+
+
   Future<void> fetchGruposMusculares() async {
     try {
-      Database db = await DatabaseHelper().database;
+     DatabaseHelper db =DatabaseHelper();
 
       // Obtener grupos musculares para BIO-JACKET
-      var gruposJacket = await DatabaseHelper()
-          .obtenerGruposMuscularesPorEquipamiento(db, 'BIO-JACKET');
+      var gruposJacket = await db.getGruposMuscularesEquipamiento('BIO-JACKET');
 
       // Asignar datos para BIO-JACKET
       setState(() {
@@ -136,8 +125,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           for (var row in gruposJacket) row['nombre']: true // Cambiado a true
         };
         hintJacketColors = {
-          for (var row in gruposJacket) row['nombre']: const Color(0xFF2be4f3)
-          // Color de selección
+          for (var row in gruposJacket) row['nombre']: const Color(0xFF2be4f3) // Color de selección
         };
         groupJacketIds = {
           for (var row in gruposJacket) row['nombre']: row['id']
@@ -148,8 +136,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       });
 
       // Obtener grupos musculares para BIO-SHAPE
-      var gruposShape = await DatabaseHelper()
-          .obtenerGruposMuscularesPorEquipamiento(db, 'BIO-SHAPE');
+      var gruposShape = await db.getGruposMuscularesEquipamiento('BIO-SHAPE');
 
       // Asignar datos para BIO-SHAPE
       setState(() {
@@ -158,10 +145,11 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           for (var row in gruposShape) row['nombre']: true // Cambiado a true
         };
         hintShapeColors = {
-          for (var row in gruposShape) row['nombre']: const Color(0xFF2be4f3)
-          // Color de selección
+          for (var row in gruposShape) row['nombre']: const Color(0xFF2be4f3) // Color de selección
         };
-        groupShapeIds = {for (var row in gruposShape) row['nombre']: row['id']};
+        groupShapeIds = {
+          for (var row in gruposShape) row['nombre']: row['id']
+        };
         imageShapePaths = {
           for (var row in gruposShape) row['nombre']: row['imagen']
         };
@@ -170,6 +158,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       print('Error al obtener los grupos musculares: $e');
     }
   }
+
 
 // Función para guardar el programa predeterminado desde el formulario
   Future<void> guardarProgramaPredeterminado() async {
@@ -277,22 +266,24 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     print('Cronaxias actualizadas exitosamente');
   }
 
+
+
 // Función para crear el checkbox personalizado
   Widget customCheckbox(String option, String groupType) {
     // Según el tipo de grupo, actualizamos el mapa adecuado
     Map<String, bool> selectedGroups =
-        groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+    groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
     Map<String, Color> hintColors =
-        groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
+    groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
 
     return GestureDetector(
       onTap: () {
         setState(() {
           // Asegurarse de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
           selectedGroups[option] =
-              !(selectedGroups[option] ?? false); // Si es null, toma false
+          !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
-              selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
       },
       child: Container(
@@ -319,9 +310,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   void handleTextFieldTap(String option, String groupType) {
     // Según el tipo de grupo, actualizamos el mapa adecuado
     Map<String, bool> selectedGroups =
-        groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+    groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
     Map<String, Color> hintColors =
-        groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
+    groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
 
     setState(() {
       // Cambiar el estado de selección
@@ -333,6 +324,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           : Colors.white; // Color cuando no está seleccionado
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1176,6 +1168,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               style: _inputTextStyle,
                               decoration: _inputDecorationStyle(
                                 hintText: 'Introducir nombre de programa',
+                                enabled: false,
                               ),
                             ),
                           ),
@@ -1191,30 +1184,32 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
-                            child: DropdownButton<String>(
-                              hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
-                              value: selectedEquipOption,
-                              items: [
-                                DropdownMenuItem(
-                                  value: 'BIO-JACKET',
-                                  child: Text('BIO-JACKET',
-                                      style: _dropdownItemStyle),
+                            child: AbsorbPointer( // Deshabilita interacciones con el Dropdown
+                              child: DropdownButton<String>(
+                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                value: selectedEquipOption,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'BIO-JACKET',
+                                    child: Text('BIO-JACKET', style: _dropdownItemStyle),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'BIO-SHAPE',
+                                    child: Text('BIO-SHAPE', style: _dropdownItemStyle),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedEquipOption = value;
+                                  });
+                                },
+                                dropdownColor: const Color(0xFF313030),
+                                icon: const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Color(0xFF2be4f3),
+                                  size: 30,
                                 ),
-                                DropdownMenuItem(
-                                  value: 'BIO-SHAPE',
-                                  child: Text('BIO-SHAPE',
-                                      style: _dropdownItemStyle),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedEquipOption = value;
-                                });
-                              },
-                              dropdownColor: const Color(0xFF313030),
-                              icon: const Icon(Icons.arrow_drop_down,
-                                  color: Color(0xFF2be4f3), size: 30),
+                              ),
                             ),
                           ),
                         ],
@@ -1720,7 +1715,55 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   GestureDetector(
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    onTap: () async {},
+                    onTap: () async {
+                      // Crear una instancia de DatabaseHelper
+                      DatabaseHelper dbHelper = DatabaseHelper();
+
+                      // Llamar al método de instancia para obtener el programa más reciente
+                      Map<String, dynamic>? programa = await dbHelper.getMostRecentPrograma();
+
+                      if (programa != null) {
+                        int programaId = programa['id_programa'];
+                        String tipoEquipamiento = programa['tipo_equipamiento'];
+
+                        print('El último id_programa es: $programaId');
+                        print('El tipo de equipamiento es: $tipoEquipamiento');
+
+                        // Filtrar los grupos musculares seleccionados según el tipo de grupo
+                        List<int> selectedGroupIds = [];
+
+                        // Usamos directamente los mapas de grupos seleccionados
+                        Map<String, bool> selectedGroups =
+                        tipoEquipamiento == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+
+                        // Filtrar los grupos seleccionados
+                        selectedGroups.forEach((key, isSelected) {
+                          if (isSelected) {
+                            int? groupId = tipoEquipamiento == 'BIO-JACKET' ? groupJacketIds[key] : groupShapeIds[key];
+                            if (groupId != null) {
+                              selectedGroupIds.add(groupId);
+                            }
+                          }
+                        });
+
+                        // Mostrar los nuevos grupos musculares seleccionados
+                        print('Nuevos grupos musculares seleccionados: $selectedGroupIds');
+
+                        // Asegurarnos de que hay elementos en selectedGroupIds antes de actualizar
+                        if (selectedGroupIds.isNotEmpty) {
+                          // Llamamos a la función para actualizar los grupos musculares en la base de datos
+                          await dbHelper.actualizarGruposMusculares(programaId, selectedGroupIds);
+                          print('Grupos musculares actualizados para el programa $programaId');
+                        } else {
+                          print('No se seleccionaron grupos musculares.');
+                        }
+
+                      } else {
+                        print('No se encontraron programas en la base de datos');
+                      }
+                    },
+
+
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),

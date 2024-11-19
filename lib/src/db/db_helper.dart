@@ -6819,6 +6819,32 @@ CREATE TABLE programa_cronaxia (
     }
   }
 
+// Función para actualizar los grupos musculares asociados a un programa
+  Future<void> actualizarGruposMusculares(int programaId, List<int> nuevosGruposMuscularesIds) async {
+    final db = await database;
+
+    // Empezamos una transacción para asegurar que todas las operaciones se ejecuten de manera atómica
+    await db.transaction((txn) async {
+      // Primero, eliminamos todos los grupos musculares existentes para el programa
+      await txn.delete('ProgramaGrupoMuscular', where: 'programa_id = ?', whereArgs: [programaId]);
+      print('Grupos musculares existentes eliminados para el programa $programaId');
+
+      // Ahora insertamos los nuevos grupos musculares seleccionados
+      for (int grupoId in nuevosGruposMuscularesIds) {
+        // Insertamos en la tabla ProgramaGrupoMuscular
+        await txn.insert('ProgramaGrupoMuscular', {
+          'programa_id': programaId,
+          'grupo_muscular_id': grupoId,
+        });
+        print('Nuevo grupo muscular $grupoId asociado al programa $programaId');
+      }
+    });
+
+    print('Grupos musculares actualizados para el programa $programaId');
+  }
+
+
+
   /*METODOS GET DE LA BBDD*/
 
   // Obtener todos los clientes
@@ -6887,21 +6913,23 @@ CREATE TABLE programa_cronaxia (
     return result;
   }
 
-  // Obtener los datos de la tabla grupos_musculares
-  Future<List<Map<String, dynamic>>> getGruposMuscularesTraje() async {
+// Obtener los datos de la tabla grupos_musculares filtrados por tipo de equipamiento
+  Future<List<Map<String, dynamic>>> getGruposMuscularesEquipamiento(String tipoEquipamiento) async {
     final db = await database;
-    final List<Map<String, dynamic>> result =
-    await db.query('grupos_musculares_traje');
+
+    // Consulta con filtro por tipo de equipamiento
+    final List<Map<String, dynamic>> result = await db.query(
+      'grupos_musculares_equipamiento',
+      where: 'tipo_equipamiento = ?', // Filtro por tipo
+      whereArgs: [tipoEquipamiento], // Argumento para tipo de equipamiento
+    );
+
     return result;
   }
 
-  // Obtener los datos de la tabla grupos_musculares
-  Future<List<Map<String, dynamic>>> getGruposMuscularesPantalon() async {
-    final db = await database;
-    final List<Map<String, dynamic>> result =
-    await db.query('grupos_musculares_pantalon');
-    return result;
-  }
+
+
+
 
   Future<List<Map<String, dynamic>>> getAvailableBonosByClientId(
       int clientId) async {
