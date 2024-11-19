@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -28,12 +26,12 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 64,
+      version: 93,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
       onUpgrade:
-          _onUpgrade, // Método que se ejecuta al actualizar la base de datos
+      _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
   }
 
@@ -80,7 +78,6 @@ class DatabaseHelper {
       FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
     )
   ''');
-
 
     // Crear la tabla grupos_musculares
     await db.execute('''
@@ -263,109 +260,6 @@ class DatabaseHelper {
     print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
 
     await db.execute('''
-  CREATE TABLE IF NOT EXISTS cronaxia (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL,
-    valor REAL DEFAULT 0.0,  -- Cambiado a REAL con valor por defecto 0.0
-    tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
-  )
-''');
-
-// Inserciones con prints para ver si se han realizado correctamente
-    await db.insert('cronaxia', {
-      'nombre': 'Trapecio',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-JACKET'
-    });
-    print('INSERTADO "Trapecio" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia', {
-      'nombre': 'Lumbares',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-JACKET'
-    });
-    print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia', {
-      'nombre': 'Dorsales',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-JACKET'
-    });
-    print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-    print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia', {
-      'nombre': 'Isquiotibiales',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-JACKET'
-    });
-    print('INSERTADO "Isquiotibiales" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia', {
-      'nombre': 'Pectorales',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-JACKET'
-    });
-    print('INSERTADO "Pectorales" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-    print('INSERTADO "Abdomen" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia', {
-      'nombre': 'Cuádriceps',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-JACKET'
-    });
-    print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-    print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-    print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
-
-// Inserciones para BIO-SHAPE con prints
-    await db.insert('cronaxia',
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-    print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-    print('INSERTADO "Glúteos" TIPO "BIO-SHAPE"');
-
-    await db.insert('cronaxia', {
-      'nombre': 'Isquiotibiales',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-SHAPE'
-    });
-    print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-    print('INSERTADO "Abdomen" TIPO "BIO-SHAPE"');
-
-    await db.insert('cronaxia', {
-      'nombre': 'Cuádriceps',
-      'valor': 0.0,
-      'tipo_equipamiento': 'BIO-SHAPE'
-    });
-    print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-    print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
-
-    await db.insert('cronaxia',
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-    print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
-
-    await db.execute('''
       CREATE TABLE programas_predeterminados (
         id_programa INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT,
@@ -376,20 +270,21 @@ class DatabaseHelper {
         contraccion REAL,
         pausa REAL,
         tipo TEXT,
-        equipamiento TEXT
+        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
       );
     ''');
     print("Tabla 'programas_predeterminados' creada.");
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS programa_cronaxia (
-        programa_id INTEGER,
-        cronaxia_id INTEGER,
-        FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id_programa),
-        FOREIGN KEY (cronaxia_id) REFERENCES cronaxia(id)
-      );
-    ''');
-    print("Tabla 'programa_cronaxia' creada.");
+    CREATE TABLE IF NOT EXISTS cronaxia (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    programa_id INTEGER, 
+    nombre TEXT NOT NULL,
+    valor REAL DEFAULT 0.0,  -- Cambiado a REAL con valor por defecto 0.0
+    tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET')),
+     FOREIGN KEY (programa_id) REFERENCES programas(id_programa)
+  )
+''');
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS ProgramaGrupoMuscular (
@@ -400,6 +295,43 @@ class DatabaseHelper {
       );
     ''');
     print("Tabla 'ProgramaGrupoMuscular' creada.");
+
+// Iniciamos la transacción
+    await db.transaction((txn) async {
+      // Inserciones para el tipo de equipamiento 'BIO-JACKET'
+      await txn.insert('cronaxia', {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+
+      // Inserciones para el tipo de equipamiento 'BIO-SHAPE'
+      await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+
+      // Imprimir mensaje para verificar inserciones
+      print('Inserciones completadas para los tipos de equipamiento BIO-JACKET y BIO-SHAPE');
+    });
+
+    await db.execute(''' -- Tabla intermedia programa_cronaxia
+CREATE TABLE programa_cronaxia (
+  programa_id INTEGER,
+  cronaxia_id INTEGER,
+  valor REAL,
+  PRIMARY KEY (programa_id, cronaxia_id),
+  FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id),
+  FOREIGN KEY (cronaxia_id) REFERENCES cronaxia(id)
+)''');
 
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
@@ -412,67 +344,54 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 1,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'  // Equipamiento seleccionado
       });
 
       print("Programa insertado con ID: $programaId1");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId1,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId1 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId1 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares asociados al tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId1,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId1,
+          'grupo_muscular_id': grupo['id'],
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId1 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId1 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId2 = await txn.insert('programas_predeterminados', {
@@ -484,70 +403,54 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId2");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      final tipoEquipamiento = 'BIO-JACKET';
+
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
+
+      // Paso 3: Para cada cronaxia, se actualiza su valor (si hay un nuevo valor, se usa, sino se usa el valor existente)
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor'];
 
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
-
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa y almacenar el valor
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId2,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,
+          // Aquí se almacena el valor de la cronaxia en la relación
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId2 CON ID CRONAXIA $cronaxiaId');
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId2 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+  SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId2,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId2,
+          'grupo_muscular_id': grupo['id'],
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId2 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId2 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
-      // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId3 = await txn.insert('programas_predeterminados', {
         'nombre': 'STRENGTH 2',
         'imagen': 'assets/images/STRENGTH2.png',
@@ -557,68 +460,49 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 3,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId3");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      final tipoEquipamiento = 'BIO-JACKET';
 
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor'];
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa y almacenar el valor
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId3,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,
+          // Aquí se almacena el valor de la cronaxia en la relación
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId3 CON ID CRONAXIA $cronaxiaId');
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId3 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+  SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId3,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId3,
+          'grupo_muscular_id': grupo['id'],
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId3 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId3 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId4 = await txn.insert('programas_predeterminados', {
@@ -630,67 +514,73 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 4,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId4");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 200.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 250.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 200.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 300.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 150.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 350.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 150.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 150.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      final tipoEquipamiento = 'BIO-JACKET';
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Modificar valores específicos de cronaxias basándonos en su ID
+        // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
+        final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+            ? 200 // Nuevo valor para 'frecuencia'
+            : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+            ? 250 // Nuevo valor para 'rampa'
+            : (cronaxiaId == 3) // ID = 3 'pulso'
+            ? 200
+            : (cronaxiaId == 4) // ID = 4 'contracción'
+            ? 400
+            : (cronaxiaId == 5) // ID = 5 'pausa'
+            ? 300
+            : (cronaxiaId == 6) // ID = 6 'tipo'
+            ? 150
+            : (cronaxiaId == 7) // ID = 7 'equipamiento'
+            ? 350
+            : (cronaxiaId == 8) // ID = 8 'otro'
+            ? 400
+            : (cronaxiaId == 9)
+            ? 150
+            : (cronaxiaId == 10)
+            ? 150
+            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId4,
           'cronaxia_id': cronaxiaId,
+          'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId4 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia con ID $cronaxiaId al programa ID $programaId4 con valor $nuevoValor en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 5: Asociar grupos musculares con el programa
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId4,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId4,
+          'grupo_muscular_id': grupo['id'],
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR $grupoId');
+
+        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId5 = await txn.insert('programas_predeterminados', {
@@ -702,68 +592,58 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId5");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
 
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId5,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId5 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId5 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId5,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId5, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId5 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId5 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId6 = await txn.insert('programas_predeterminados', {
@@ -775,67 +655,57 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId6");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId6,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId6 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId6 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId6,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId6, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId6 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId6 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId7 = await txn.insert('programas_predeterminados', {
@@ -847,68 +717,58 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId7");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId7,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId7 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId7 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
+
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId7,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId7, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId7 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId7 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId8 = await txn.insert('programas_predeterminados', {
@@ -920,68 +780,56 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
-
       print("Programa insertado con ID: $programaId8");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId8,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId8 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId8 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId8,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId8, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId8 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId8 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId9 = await txn.insert('programas_predeterminados', {
@@ -993,68 +841,57 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 4,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId9");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId9,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId9 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId9 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId9,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId9, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId9 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId9 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId10 = await txn.insert('programas_predeterminados', {
@@ -1066,68 +903,57 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId10");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId10,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId10 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId10 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId10,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId10, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId10 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId10 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId11 = await txn.insert('programas_predeterminados', {
@@ -1139,68 +965,57 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId11");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId11,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId11 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId11 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId11,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId11, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId11 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId11 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId12 = await txn.insert('programas_predeterminados', {
@@ -1212,68 +1027,58 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId12");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId12,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId12 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId12 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
+
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId12,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId12, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId12 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId12 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId13 = await txn.insert('programas_predeterminados', {
@@ -1285,67 +1090,56 @@ class DatabaseHelper {
         'contraccion': 10,
         'pausa': 4,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
-
       print("Programa insertado con ID: $programaId13");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId13,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId13 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId13 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId13,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId13, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId13 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId13 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId14 = await txn.insert('programas_predeterminados', {
@@ -1357,68 +1151,58 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 2,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId14");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId14,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId14 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId14 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
+
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId14,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId14, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId14 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId14 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId15 = await txn.insert('programas_predeterminados', {
@@ -1430,68 +1214,56 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 4,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
-
       print("Programa insertado con ID: $programaId15");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId15,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId15 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId15 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId15,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId15, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId15 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId15 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId16 = await txn.insert('programas_predeterminados', {
@@ -1503,68 +1275,57 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 4,
         'tipo': 'Individual',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId16");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId16,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId16 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId16 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId16,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId16, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId16 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId16 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId17 = await txn.insert('programas_predeterminados', {
@@ -1576,68 +1337,57 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId17");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId17,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId17 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId17 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId17,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId17, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId17 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId17 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId18 = await txn.insert('programas_predeterminados', {
@@ -1649,68 +1399,56 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 1,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId18");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId18,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId18 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId18 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
-
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId18,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId18, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId18 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId18 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId19 = await txn.insert('programas_predeterminados', {
@@ -1722,67 +1460,56 @@ class DatabaseHelper {
         'contraccion': 10,
         'pausa': 1,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId19");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId19,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId19 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId19 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
-
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId19,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId19, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId19 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId19 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId20 = await txn.insert('programas_predeterminados', {
@@ -1794,68 +1521,56 @@ class DatabaseHelper {
         'contraccion': 3,
         'pausa': 2,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId20");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-        // Asociación de cada cronaxia al programa
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId20,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId20 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId20 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
-
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId20,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId20, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId20 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId20 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId21 = await txn.insert('programas_predeterminados', {
@@ -1867,60 +1582,67 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 3,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId21");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 375.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      final tipoEquipamiento = 'BIO-JACKET';
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Modificar valores específicos de cronaxias basándonos en su ID
+        // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
+        final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+            ? 375 // Nuevo valor para 'frecuencia'
+            : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+            ? 400 // Nuevo valor para 'rampa'
+            : (cronaxiaId == 3) // ID = 3 'pulso'
+            ? 400
+            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId21,
           'cronaxia_id': cronaxiaId,
+          'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId21 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia con ID $cronaxiaId al programa ID $programaId21 con valor $nuevoValor en la tabla programa_cronaxia');
       }
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento 
+    WHERE tipo_equipamiento = ? AND id IN (1, 2, 3)
+  ''', [
+        tipoEquipamiento
+      ]); // Filtrar por tipo de equipamiento y los IDs específicos (1, 2, 3)
 
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId21,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId21,
+          // Relación con el programa
+          'grupo_muscular_id': grupo['id'],
+          // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId21 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId21 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId22 = await txn.insert('programas_predeterminados', {
@@ -1932,68 +1654,57 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 3,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId22");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
 
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId22,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId22 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId22 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
-
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId22,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId22, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId22 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId22 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId23 = await txn.insert('programas_predeterminados', {
@@ -2005,68 +1716,57 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId23");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
 
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
 
-        // Asociación de cada cronaxia al programa
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId23,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId23 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId23 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
-
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId23,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId23, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId23 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId23 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
-
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId24 = await txn.insert('programas_predeterminados', {
@@ -2078,64 +1778,55 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Recovery',
-        'equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'BIO-JACKET'
       });
 
       print("Programa insertado con ID: $programaId24");
 
-      // Lista de cronaxias para asociar al programa
-      final cronaxias = [
-        {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
 
-      // Inserción de cronaxias y asociación al programa
-      for (var cronaxia in cronaxias) {
-        final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-        print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+      // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Asociación de cada cronaxia al programa
+      // Seleccionar cronaxias del tipo de equipamiento
+      final cronaxiasQuery = await txn.query(
+        'cronaxia',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento],
+      );
+
+      // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+      for (var cronaxia in cronaxiasQuery) {
+        final cronaxiaId = cronaxia['id'];
+        final nombreCronaxia = cronaxia['nombre'];
+        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+        // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId24,
           'cronaxia_id': cronaxiaId,
+          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
         });
-        print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId24 CON ID CRONAXIA $cronaxiaId');
+
+        print(
+            'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId24 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
+      // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+      List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+        tipoEquipamiento
+      ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-      // Inserción de grupos musculares en una sola transacción
-      final gruposMusculares = [
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-      ];
-
-      // Mostrar los grupos musculares insertados
-      print("\nGrupos musculares insertados:");
+      // Para cada grupo muscular, insertamos la relación con el programa
       for (var grupo in gruposMusculares) {
-        final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-        print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-        // Relacionar cada grupo muscular con el programa
+        // Insertar la asociación de cada grupo muscular con el programa
         await txn.insert('ProgramaGrupoMuscular', {
-          'programa_id': programaId24,  // Relación con el programa
-          'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+          'programa_id': programaId24, // Relación con el programa
+          'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
         });
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId24 CON ID GRUPO MUSCULAR $grupoId');
+
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId24 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
 
@@ -2149,7 +1840,6 @@ class DatabaseHelper {
         duracionTotal REAL
       );
     ''');
-
 
     // Crear la tabla Programas_Automaticos_Subprogramas
     await db.execute('''
@@ -2297,7 +1987,7 @@ class DatabaseHelper {
           // Realizamos la consulta para obtener el nombre del subprograma
           var result = await txn.query('programas_predeterminados',
               columns: ['nombre'],
-              where: 'id = ?',
+              where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']]);
 
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
@@ -2625,7 +2315,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -2766,7 +2457,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -2913,7 +2605,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -3061,7 +2754,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -3221,7 +2915,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -3399,7 +3094,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -3559,7 +3255,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -3693,7 +3390,8 @@ class DatabaseHelper {
         // Consulta para obtener los subprogramas relacionados y sus nombres
         for (var subprograma in subprogramas) {
           // Realizamos la consulta para obtener el nombre del subprograma
-          var result = await txn.query('programas_predeterminados',
+          var result = await txn.query(
+            'programas_predeterminados',
             columns: ['nombre'],
             where: 'id_programa = ?',
             whereArgs: [subprograma['id_programa_relacionado']],
@@ -3718,116 +3416,10 @@ class DatabaseHelper {
         print('Error durante la transacción: $e');
       }
     });
-
-
-
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 64) {
-      await db.execute('''
-  CREATE TABLE IF NOT EXISTS cronaxia (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL,
-    valor REAL DEFAULT 0.0,  -- Cambiado a REAL con valor por defecto 0.0
-    tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
-  )
-''');
-
-// Inserciones con prints para ver si se han realizado correctamente
-      await db.insert('cronaxia', {
-        'nombre': 'Trapecio',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-JACKET'
-      });
-      print('INSERTADO "Trapecio" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia', {
-        'nombre': 'Lumbares',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-JACKET'
-      });
-      print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia', {
-        'nombre': 'Dorsales',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-JACKET'
-      });
-      print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia', {
-        'nombre': 'Isquiotibiales',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-JACKET'
-      });
-      print('INSERTADO "Isquiotibiales" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia', {
-        'nombre': 'Pectorales',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-JACKET'
-      });
-      print('INSERTADO "Pectorales" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      print('INSERTADO "Abdomen" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia', {
-        'nombre': 'Cuádriceps',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-JACKET'
-      });
-      print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      print('INSERTADO "Gemelos" TIPO "BIO-JACKET"');
-
-// Inserciones para BIO-SHAPE con prints
-      await db.insert('cronaxia',
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      print('INSERTADO "Glúteos" TIPO "BIO-SHAPE"');
-
-      await db.insert('cronaxia', {
-        'nombre': 'Isquiotibiales',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-SHAPE'
-      });
-      print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      print('INSERTADO "Abdomen" TIPO "BIO-SHAPE"');
-
-      await db.insert('cronaxia', {
-        'nombre': 'Cuádriceps',
-        'valor': 0.0,
-        'tipo_equipamiento': 'BIO-SHAPE'
-      });
-      print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
-
-      await db.insert('cronaxia',
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
-
+    if (oldVersion < 93) {
       await db.execute('''
       CREATE TABLE programas_predeterminados (
         id_programa INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -3839,20 +3431,31 @@ class DatabaseHelper {
         contraccion REAL,
         pausa REAL,
         tipo TEXT,
-        equipamiento TEXT
+        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
       );
     ''');
       print("Tabla 'programas_predeterminados' creada.");
 
       await db.execute('''
-      CREATE TABLE IF NOT EXISTS programa_cronaxia (
-        programa_id INTEGER,
-        cronaxia_id INTEGER,
-        FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id_programa),
-        FOREIGN KEY (cronaxia_id) REFERENCES cronaxia(id)
-      );
-    ''');
-      print("Tabla 'programa_cronaxia' creada.");
+    CREATE TABLE IF NOT EXISTS cronaxia (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    programa_id INTEGER, 
+    nombre TEXT NOT NULL,
+    valor REAL DEFAULT 0.0,  -- Cambiado a REAL con valor por defecto 0.0
+    tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET')),
+     FOREIGN KEY (programa_id) REFERENCES programas(id_programa)
+  )
+''');
+
+      await db.execute(''' -- Tabla intermedia programa_cronaxia
+CREATE TABLE programa_cronaxia (
+  programa_id INTEGER,
+  cronaxia_id INTEGER,
+  valor REAL,
+  PRIMARY KEY (programa_id, cronaxia_id),
+  FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id),
+  FOREIGN KEY (cronaxia_id) REFERENCES cronaxia(id)
+)''');
 
       await db.execute('''
       CREATE TABLE IF NOT EXISTS ProgramaGrupoMuscular (
@@ -3863,6 +3466,34 @@ class DatabaseHelper {
       );
     ''');
       print("Tabla 'ProgramaGrupoMuscular' creada.");
+
+// Iniciamos la transacción
+      await db.transaction((txn) async {
+        // Inserciones para el tipo de equipamiento 'BIO-JACKET'
+        await txn.insert('cronaxia', {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+
+        // Inserciones para el tipo de equipamiento 'BIO-SHAPE'
+        await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+        await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+        await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+        await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+        await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+        await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+        await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+
+        // Imprimir mensaje para verificar inserciones
+        print('Inserciones completadas para los tipos de equipamiento BIO-JACKET y BIO-SHAPE');
+      });
+
 
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
@@ -3875,67 +3506,54 @@ class DatabaseHelper {
           'contraccion': 4,
           'pausa': 1,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'  // Equipamiento seleccionado
         });
 
         print("Programa insertado con ID: $programaId1");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId1,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId1 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId1 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares asociados al tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId1,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId1,
+            'grupo_muscular_id': grupo['id'],
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId1 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId1 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId2 = await txn.insert('programas_predeterminados', {
@@ -3947,70 +3565,54 @@ class DatabaseHelper {
           'contraccion': 4,
           'pausa': 2,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId2");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        final tipoEquipamiento = 'BIO-JACKET';
+
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
+
+        // Paso 3: Para cada cronaxia, se actualiza su valor (si hay un nuevo valor, se usa, sino se usa el valor existente)
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor'];
 
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
-
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa y almacenar el valor
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId2,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,
+            // Aquí se almacena el valor de la cronaxia en la relación
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId2 CON ID CRONAXIA $cronaxiaId');
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId2 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+  SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId2,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId2,
+            'grupo_muscular_id': grupo['id'],
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId2 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId2 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId3 = await txn.insert('programas_predeterminados', {
           'nombre': 'STRENGTH 2',
           'imagen': 'assets/images/STRENGTH2.png',
@@ -4020,68 +3622,49 @@ class DatabaseHelper {
           'contraccion': 5,
           'pausa': 3,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId3");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        final tipoEquipamiento = 'BIO-JACKET';
 
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor'];
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa y almacenar el valor
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId3,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,
+            // Aquí se almacena el valor de la cronaxia en la relación
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId3 CON ID CRONAXIA $cronaxiaId');
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId3 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+  SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId3,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId3,
+            'grupo_muscular_id': grupo['id'],
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId3 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId3 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId4 = await txn.insert('programas_predeterminados', {
@@ -4093,67 +3676,73 @@ class DatabaseHelper {
           'contraccion': 6,
           'pausa': 4,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId4");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 200.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 250.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 200.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 300.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 150.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 350.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 150.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 150.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        final tipoEquipamiento = 'BIO-JACKET';
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Modificar valores específicos de cronaxias basándonos en su ID
+          // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
+          final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+              ? 200 // Nuevo valor para 'frecuencia'
+              : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+              ? 250 // Nuevo valor para 'rampa'
+              : (cronaxiaId == 3) // ID = 3 'pulso'
+              ? 200
+              : (cronaxiaId == 4) // ID = 4 'contracción'
+              ? 400
+              : (cronaxiaId == 5) // ID = 5 'pausa'
+              ? 300
+              : (cronaxiaId == 6) // ID = 6 'tipo'
+              ? 150
+              : (cronaxiaId == 7) // ID = 7 'equipamiento'
+              ? 350
+              : (cronaxiaId == 8) // ID = 8 'otro'
+              ? 400
+              : (cronaxiaId == 9)
+              ? 150
+              : (cronaxiaId == 10)
+              ? 150
+              : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId4,
             'cronaxia_id': cronaxiaId,
+            'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId4 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia con ID $cronaxiaId al programa ID $programaId4 con valor $nuevoValor en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 5: Asociar grupos musculares con el programa
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [tipoEquipamiento]);
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId4,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId4,
+            'grupo_muscular_id': grupo['id'],
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR $grupoId');
+
+          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId5 = await txn.insert('programas_predeterminados', {
@@ -4165,68 +3754,58 @@ class DatabaseHelper {
           'contraccion': 6,
           'pausa': 3,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId5");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
 
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId5,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId5 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId5 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId5,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId5, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId5 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId5 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId6 = await txn.insert('programas_predeterminados', {
@@ -4238,67 +3817,57 @@ class DatabaseHelper {
           'contraccion': 6,
           'pausa': 3,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId6");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId6,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId6 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId6 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId6,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId6, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId6 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId6 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId7 = await txn.insert('programas_predeterminados', {
@@ -4310,68 +3879,58 @@ class DatabaseHelper {
           'contraccion': 4,
           'pausa': 2,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId7");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId7,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId7 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId7 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
+
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId7,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId7, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId7 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId7 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId8 = await txn.insert('programas_predeterminados', {
@@ -4383,68 +3942,56 @@ class DatabaseHelper {
           'contraccion': 4,
           'pausa': 2,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
-
         print("Programa insertado con ID: $programaId8");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId8,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId8 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId8 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId8,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId8, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId8 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId8 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId9 = await txn.insert('programas_predeterminados', {
@@ -4456,68 +4003,57 @@ class DatabaseHelper {
           'contraccion': 5,
           'pausa': 4,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId9");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId9,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId9 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId9 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId9,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId9, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId9 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId9 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId10 = await txn.insert('programas_predeterminados', {
@@ -4529,68 +4065,57 @@ class DatabaseHelper {
           'contraccion': 1,
           'pausa': 0,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId10");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId10,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId10 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId10 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId10,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId10, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId10 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId10 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId11 = await txn.insert('programas_predeterminados', {
@@ -4602,68 +4127,57 @@ class DatabaseHelper {
           'contraccion': 1,
           'pausa': 0,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId11");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId11,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId11 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId11 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId11,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId11, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId11 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId11 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId12 = await txn.insert('programas_predeterminados', {
@@ -4675,68 +4189,58 @@ class DatabaseHelper {
           'contraccion': 1,
           'pausa': 0,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId12");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId12,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId12 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId12 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
+
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId12,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId12, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId12 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId12 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId13 = await txn.insert('programas_predeterminados', {
@@ -4748,67 +4252,56 @@ class DatabaseHelper {
           'contraccion': 10,
           'pausa': 4,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
-
         print("Programa insertado con ID: $programaId13");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId13,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId13 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId13 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId13,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId13, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId13 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId13 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId14 = await txn.insert('programas_predeterminados', {
@@ -4820,68 +4313,58 @@ class DatabaseHelper {
           'contraccion': 6,
           'pausa': 2,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId14");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId14,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId14 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId14 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
+
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId14,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId14, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId14 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId14 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId15 = await txn.insert('programas_predeterminados', {
@@ -4893,68 +4376,56 @@ class DatabaseHelper {
           'contraccion': 4,
           'pausa': 4,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
-
         print("Programa insertado con ID: $programaId15");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId15,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId15 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId15 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId15,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId15, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId15 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId15 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId16 = await txn.insert('programas_predeterminados', {
@@ -4966,68 +4437,57 @@ class DatabaseHelper {
           'contraccion': 4,
           'pausa': 4,
           'tipo': 'Individual',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId16");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId16,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId16 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId16 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId16,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId16, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId16 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId16 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId17 = await txn.insert('programas_predeterminados', {
@@ -5039,68 +4499,57 @@ class DatabaseHelper {
           'contraccion': 6,
           'pausa': 3,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId17");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId17,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId17 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId17 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId17,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId17, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId17 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId17 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId18 = await txn.insert('programas_predeterminados', {
@@ -5112,68 +4561,56 @@ class DatabaseHelper {
           'contraccion': 5,
           'pausa': 1,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId18");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId18,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId18 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId18 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
-
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId18,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId18, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId18 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId18 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId19 = await txn.insert('programas_predeterminados', {
@@ -5185,67 +4622,56 @@ class DatabaseHelper {
           'contraccion': 10,
           'pausa': 1,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId19");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId19,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId19 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId19 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
-
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId19,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId19, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId19 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId19 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId20 = await txn.insert('programas_predeterminados', {
@@ -5257,68 +4683,56 @@ class DatabaseHelper {
           'contraccion': 3,
           'pausa': 2,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId20");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
-          // Asociación de cada cronaxia al programa
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId20,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId20 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId20 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
-
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId20,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId20, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId20 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId20 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId21 = await txn.insert('programas_predeterminados', {
@@ -5330,60 +4744,67 @@ class DatabaseHelper {
           'contraccion': 4,
           'pausa': 3,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId21");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 375.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 400.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        final tipoEquipamiento = 'BIO-JACKET';
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Modificar valores específicos de cronaxias basándonos en su ID
+          // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
+          final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+              ? 375 // Nuevo valor para 'frecuencia'
+              : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+              ? 400 // Nuevo valor para 'rampa'
+              : (cronaxiaId == 3) // ID = 3 'pulso'
+              ? 400
+              : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId21,
             'cronaxia_id': cronaxiaId,
+            'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId21 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia con ID $cronaxiaId al programa ID $programaId21 con valor $nuevoValor en la tabla programa_cronaxia');
         }
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento 
+    WHERE tipo_equipamiento = ? AND id IN (1, 2, 3)
+  ''', [
+          tipoEquipamiento
+        ]); // Filtrar por tipo de equipamiento y los IDs específicos (1, 2, 3)
 
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId21,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId21,
+            // Relación con el programa
+            'grupo_muscular_id': grupo['id'],
+            // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId21 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId21 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId22 = await txn.insert('programas_predeterminados', {
@@ -5395,68 +4816,57 @@ class DatabaseHelper {
           'contraccion': 5,
           'pausa': 3,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId22");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
 
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId22,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId22 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId22 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
-
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId22,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId22, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId22 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId22 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId23 = await txn.insert('programas_predeterminados', {
@@ -5468,68 +4878,57 @@ class DatabaseHelper {
           'contraccion': 1,
           'pausa': 0,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId23");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
 
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
 
-          // Asociación de cada cronaxia al programa
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId23,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId23 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId23 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
-
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId23,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId23, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId23 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId23 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId24 = await txn.insert('programas_predeterminados', {
@@ -5541,66 +4940,67 @@ class DatabaseHelper {
           'contraccion': 1,
           'pausa': 0,
           'tipo': 'Recovery',
-          'equipamiento': 'BIO-JACKET'
+          'tipo_equipamiento': 'BIO-JACKET'
         });
 
         print("Programa insertado con ID: $programaId24");
 
-        // Lista de cronaxias para asociar al programa
-        final cronaxias = [
-          {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
 
-        // Inserción de cronaxias y asociación al programa
-        for (var cronaxia in cronaxias) {
-          final cronaxiaId = await txn.insert('cronaxia', cronaxia);
-          print('INSERTADO "${cronaxia['nombre']}" TIPO "${cronaxia['tipo_equipamiento']}" CON ID $cronaxiaId');
+        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
+        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
-          // Asociación de cada cronaxia al programa
+        // Seleccionar cronaxias del tipo de equipamiento
+        final cronaxiasQuery = await txn.query(
+          'cronaxia',
+          where: 'tipo_equipamiento = ?',
+          whereArgs: [tipoEquipamiento],
+        );
+
+        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
+        for (var cronaxia in cronaxiasQuery) {
+          final cronaxiaId = cronaxia['id'];
+          final nombreCronaxia = cronaxia['nombre'];
+          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+
+          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId24,
             'cronaxia_id': cronaxiaId,
+            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
           });
-          print('ASOCIADO "${cronaxia['nombre']}" AL PROGRAMA ID $programaId24 CON ID CRONAXIA $cronaxiaId');
+
+          print(
+              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId24 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
+        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
+        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
+    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
+  ''', [
+          tipoEquipamiento
+        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
 
-        // Inserción de grupos musculares en una sola transacción
-        final gruposMusculares = [
-          {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png', 'tipo_equipamiento': 'BIO-JACKET'},
-          {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png', 'tipo_equipamiento': 'BIO-JACKET'},
-        ];
-
-        // Mostrar los grupos musculares insertados
-        print("\nGrupos musculares insertados:");
+        // Para cada grupo muscular, insertamos la relación con el programa
         for (var grupo in gruposMusculares) {
-          final grupoId = await txn.insert('grupos_musculares_equipamiento', grupo);
-          print('INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}" CON ID $grupoId');
-
-          // Relacionar cada grupo muscular con el programa
+          // Insertar la asociación de cada grupo muscular con el programa
           await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId24,  // Relación con el programa
-            'grupo_muscular_id': grupoId,  // Relación con el grupo muscular
+            'programa_id': programaId24, // Relación con el programa
+            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
           });
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId24 CON ID GRUPO MUSCULAR $grupoId');
+
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId24 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
+
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS ProgramaGrupoMuscular (
+        programa_id INTEGER,
+        grupo_muscular_id INTEGER,
+        FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id_programa),
+        FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares_equipamiento(id)
+      );
+    ''');
+      print("Tabla 'ProgramaGrupoMuscular' creada.");
 
       // Crear la tabla Programas_Automaticos
       await db.execute('''
@@ -5612,7 +5012,6 @@ class DatabaseHelper {
         duracionTotal REAL
       );
     ''');
-
 
       // Crear la tabla Programas_Automaticos_Subprogramas
       await db.execute('''
@@ -5750,7 +5149,8 @@ class DatabaseHelper {
           // Verificamos los subprogramas insertados
           print('Programa Automático: TONIFICACIÓN');
           print('ID: $idProgramaAutomatico');
-          print('Descripción: Aumento de la resistencia y retraso de la fatiga.');
+          print(
+              'Descripción: Aumento de la resistencia y retraso de la fatiga.');
           print('Duración Total: 25.0');
           print('Subprogramas:');
           print('*****************************************************');
@@ -5760,7 +5160,7 @@ class DatabaseHelper {
             // Realizamos la consulta para obtener el nombre del subprograma
             var result = await txn.query('programas_predeterminados',
                 columns: ['nombre'],
-                where: 'id = ?',
+                where: 'id_programa = ?',
                 whereArgs: [subprograma['id_programa_relacionado']]);
 
             // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
@@ -5785,7 +5185,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "GLÚTEOS"
-          int idProgramaAutomatico2 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico2 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'GLÚTEOS',
             'imagen': 'assets/images/GLUTEOS.png',
             'descripcion': 'Fortalece los músculos del suelo pélvico',
@@ -5953,7 +5354,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "SUELO PÉLVICO"
-          int idProgramaAutomatico3 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico3 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'SUELO PÉLVICO',
             'imagen': 'assets/images/SUELOPELV.png',
             'descripcion': 'Fortalece los músculos del suelo pélvico',
@@ -6088,7 +5490,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -6116,7 +5519,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "FUERZA"
-          int idProgramaAutomatico4 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico4 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'FUERZA',
             'imagen': 'assets/images/STRENGTH.png',
             'descripcion':
@@ -6229,7 +5633,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -6257,7 +5662,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "HIPERTROFIA"
-          int idProgramaAutomatico5 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico5 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'HIPERTROFIA',
             'imagen': 'assets/images/HIPERTROFIA.png',
             'descripcion':
@@ -6376,7 +5782,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -6404,7 +5811,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "RESISTENCIA 1"
-          int idProgramaAutomatico6 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico6 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'RESISTENCIA 1',
             'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
             'descripcion':
@@ -6524,7 +5932,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -6552,7 +5961,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "RESISTENCIA 2"
-          int idProgramaAutomatico7 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico7 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'RESISTENCIA 2',
             'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
             'descripcion':
@@ -6684,7 +6094,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -6712,7 +6123,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "CARDIO"
-          int idProgramaAutomatico8 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico8 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'CARDIO',
             'imagen': 'assets/images/CARDIO.png',
             'descripcion':
@@ -6862,7 +6274,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -6890,7 +6303,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "CROSS MAX"
-          int idProgramaAutomatico9 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico9 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'CROSS MAX',
             'imagen': 'assets/images/CROSSMAX.png',
             'descripcion':
@@ -7022,7 +6436,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -7050,7 +6465,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "SLIM"
-          int idProgramaAutomatico10 = await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico10 =
+          await txn.insert('Programas_Automaticos', {
             'nombre': 'SLIM',
             'imagen': 'assets/images/SLIM.png',
             'descripcion': 'Quema de grasa y creación de nuevas células.',
@@ -7156,7 +6572,8 @@ class DatabaseHelper {
           // Consulta para obtener los subprogramas relacionados y sus nombres
           for (var subprograma in subprogramas) {
             // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
+            var result = await txn.query(
+              'programas_predeterminados',
               columns: ['nombre'],
               where: 'id_programa = ?',
               whereArgs: [subprograma['id_programa_relacionado']],
@@ -7181,12 +6598,8 @@ class DatabaseHelper {
           print('Error durante la transacción: $e');
         }
       });
-
-
     }
   }
-
-
 
   /*METODOS DE INSERCION BBDD*/
 
@@ -7198,7 +6611,7 @@ class DatabaseHelper {
         'clientes',
         client,
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
     } catch (e) {
       print('Error inserting client: $e');
@@ -7216,7 +6629,7 @@ class DatabaseHelper {
           'grupo_muscular_id': grupoMuscularId,
         },
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
       return true; // Si la inserción fue exitosa, retorna true
     } catch (e) {
@@ -7239,15 +6652,91 @@ class DatabaseHelper {
     }
   }
 
-  // Método para insertar un programa
-  Future<void> insertarProgramaPredeterminado(
-      Map<String, dynamic> programaData) async {
+// Función para insertar un programa predeterminado
+  Future<int> insertarProgramaPredeterminado(
+      Map<String, dynamic> programa) async {
     final db = await database;
-    await db.insert(
-      'programas_predeterminados', // El nombre de tu tabla
-      programaData,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    int idPrograma = await db.insert('programas_predeterminados', programa);
+    print('Programa insertado con ID: $idPrograma');
+    return idPrograma;
+  }
+
+// Función para insertar las cronaxias por defecto
+  Future<void> insertarCronaxiasPorDefecto(int programaId,
+      String tipoEquipamiento) async {
+    final db = await database;
+
+    // Obtén las cronaxias asociadas al tipo de equipamiento para el programa recién creado
+    List<Map<String, dynamic>> cronaxias = await db.query('cronaxia',
+        where: 'tipo_equipamiento = ?', whereArgs: [tipoEquipamiento]);
+
+    print(
+        'Cronaxias encontradas para el tipo de equipamiento $tipoEquipamiento: ${cronaxias
+            .length}');
+
+    // Iterar sobre las cronaxias encontradas
+    for (var cronaxia in cronaxias) {
+      print(
+          'Cronaxia: ${cronaxia['nombre']} con valor: ${cronaxia['valor']}');
+
+      // Verificar si la cronaxia ya está asociada con el programa en la tabla intermedia
+      var existingCronaxia = await db.query('programa_cronaxia',
+          where: 'programa_id = ? AND cronaxia_id = ?',
+          whereArgs: [programaId, cronaxia['id']]);
+
+      // Si no existe, insertamos la cronaxia en la tabla intermedia
+      if (existingCronaxia.isEmpty) {
+        await db.insert('programa_cronaxia', {
+          'programa_id': programaId,
+          'cronaxia_id': cronaxia['id'],
+          'valor' : 0.0,
+        });
+        print(
+            'Cronaxia insertada: ${cronaxia['nombre']} para el programa $programaId');
+      } else {
+        print(
+            'Cronaxia ya existe: ${cronaxia['nombre']} para el programa $programaId');
+      }
+    }
+  }
+
+// Función para insertar los grupos musculares por defecto
+  Future<void> insertarGruposMuscularesPorDefecto(int programaId,
+      String tipoEquipamiento) async {
+    final db = await database;
+
+    // Obtén los grupos musculares asociados al tipo de equipamiento para el programa recién creado
+    List<Map<String, dynamic>> gruposMusculares = await db.query(
+        'grupos_musculares_equipamiento',
+        where: 'tipo_equipamiento = ?',
+        whereArgs: [tipoEquipamiento]);
+
+    print(
+        'Grupos musculares encontrados para el tipo de equipamiento $tipoEquipamiento: ${gruposMusculares
+            .length}');
+
+    // Iterar sobre los grupos musculares encontrados
+    for (var grupoMuscular in gruposMusculares) {
+      print('Grupo muscular: ${grupoMuscular['nombre']}');
+
+      // Verificar si el grupo muscular ya está asociado con el programa en la tabla intermedia
+      var existingGrupoMuscular = await db.query('ProgramaGrupoMuscular',
+          where: 'programa_id = ? AND grupo_muscular_id = ?',
+          whereArgs: [programaId, grupoMuscular['id']]);
+
+      // Si no existe, insertamos el grupo muscular en la tabla intermedia
+      if (existingGrupoMuscular.isEmpty) {
+        await db.insert('ProgramaGrupoMuscular', {
+          'programa_id': programaId,
+          'grupo_muscular_id': grupoMuscular['id'],
+        });
+        print(
+            'Grupo muscular insertado: ${grupoMuscular['nombre']} para el programa $programaId');
+      } else {
+        print(
+            'Grupo muscular ya existe: ${grupoMuscular['nombre']} para el programa $programaId');
+      }
+    }
   }
 
 /* METODOS ACTUALIZACION BBDD*/
@@ -7298,6 +6787,35 @@ class DatabaseHelper {
         conflictAlgorithm: ConflictAlgorithm
             .replace, // Si existe un conflicto (mismo cliente y grupo), se reemplaza el registro
       );
+    }
+  }
+
+  // Función para actualizar una cronaxia
+  Future<void> updateCronaxia(int programaId, int cronaxiaId, double valor) async {
+    final db = await database;
+
+    // Verifica si la cronaxia existe en la tabla
+    final existingCronaxia = await db.query(
+      'programa_cronaxia',
+      where: 'programa_id = ? AND cronaxia_id = ?',
+      whereArgs: [programaId, cronaxiaId],
+    );
+
+    // Si la cronaxia existe, actualizamos el valor
+    if (existingCronaxia.isNotEmpty) {
+      try {
+        await db.update(
+          'programa_cronaxia',
+          {'valor': valor},
+          where: 'programa_id = ? AND cronaxia_id = ?',
+          whereArgs: [programaId, cronaxiaId],
+        );
+        print('Cronaxia actualizada correctamente');
+      } catch (e) {
+        print('Error al actualizar la cronaxia: $e');
+      }
+    } else {
+      print('Cronaxia con programa_id $programaId y cronaxia_id $cronaxiaId no encontrada');
     }
   }
 
@@ -7365,7 +6883,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+    await db.query('grupos_musculares');
     return result;
   }
 
@@ -7373,7 +6891,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getGruposMuscularesTraje() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_traje');
+    await db.query('grupos_musculares_traje');
     return result;
   }
 
@@ -7381,7 +6899,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getGruposMuscularesPantalon() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares_pantalon');
+    await db.query('grupos_musculares_pantalon');
     return result;
   }
 
@@ -7407,95 +6925,183 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> obtenerProgramasPredeterminadosPorTipoIndividual(Database db) async {
-    try {
-      // Realizar la consulta a la tabla 'programas_predeterminados' filtrando por 'tipo' = 'Individual'
-      List<Map<String, dynamic>> programas = await db.query(
-        'programas_predeterminados',
-        where: 'tipo = ?',
-        whereArgs: ['Individual'],
-      );
 
-      // Verificar si se encontraron programas
-      if (programas.isNotEmpty) {
-        print('Programas Predeterminados con tipo "Individual":');
-        for (var programa in programas) {
-          // Verifica si 'id_programa' es null o tiene un valor inválido
-          var idPrograma = programa['id_programa'];
-          if (idPrograma == null) {
-            print('Error: El programa no tiene un id_programa válido.');
-            continue;  // Salta al siguiente programa si el id_programa es null
-          }
 
-          // Asegúrate de que 'id_programa' es un int
-          if (idPrograma is! int) {
-            print('Error: El id_programa no es un entero válido.');
-            continue;  // Salta al siguiente programa si el tipo de 'id_programa' no es int
-          }
+    // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
+    final List<Map<String, dynamic>> programasConDetalles = await db.rawQuery('''
+    SELECT 
+      p.id_programa,
+      p.nombre AS nombre,
+      p.imagen,
+      p.frecuencia,
+      p.pulso,
+      p.rampa,
+      p.contraccion,
+      p.pausa,
+      p.tipo,
+      p.tipo_equipamiento,
+      c.id AS cronaxia_id,
+      c.nombre AS nombre_cronaxia,
+      pc.valor AS valor_cronaxia,
+      gm.id AS grupo_muscular_id,
+      gm.nombre AS nombre_grupo_muscular
+    FROM 
+      programas_predeterminados p
+    LEFT JOIN 
+      programa_cronaxia pc ON p.id_programa = pc.programa_id
+    LEFT JOIN 
+      cronaxia c ON pc.cronaxia_id = c.id
+    LEFT JOIN 
+      ProgramaGrupoMuscular pgm ON p.id_programa = pgm.programa_id
+    LEFT JOIN 
+      grupos_musculares_equipamiento gm ON pgm.grupo_muscular_id = gm.id
+    WHERE 
+      p.tipo = 'Individual'
+    ORDER BY 
+      p.id_programa, c.id, gm.id
+  ''');
 
-          // Continuar con la impresión de los otros campos
-          print('ID: $idPrograma');
-          print('Nombre: ${programa['nombre']}');
-          print('Imagen: ${programa['imagen']}');
-          print('Frecuencia: ${programa['frecuencia']}');
-          print('Pulso: ${programa['pulso']}');
-          print('Rampa: ${programa['rampa']}');
-          print('Contracción: ${programa['contraccion']}');
-          print('Pausa: ${programa['pausa']}');
-          print('Tipo: ${programa['tipo']}');
-          print('Equipamiento: ${programa['equipamiento']}');
-          print('-----------------------------------');
-        }
-      } else {
-        print('No se encontraron programas con tipo "Individual".');
+    // Procesar los resultados para estructurar la salida en una lista de programas
+    List<Map<String, dynamic>> programas = [];
+    Map<int, Map<String, dynamic>> programaMap = {};
+
+    for (var row in programasConDetalles) {
+      int programaId = row['id_programa'];
+
+      // Verifica si ya tenemos el programa en el mapa
+      if (!programaMap.containsKey(programaId)) {
+        programaMap[programaId] = {
+          'id_programa': row['id_programa'],
+          'nombre': row['nombre'],
+          'imagen': row['imagen'],
+          'frecuencia': row['frecuencia'],
+          'pulso': row['pulso'],
+          'rampa': row['rampa'],
+          'contraccion': row['contraccion'],
+          'pausa': row['pausa'],
+          'tipo': row['tipo'],
+          'tipo_equipamiento': row['tipo_equipamiento'],
+          'cronaxias': [],
+          'grupos_musculares': [],
+        };
       }
 
-      return programas;
-    } catch (e) {
-      print('Error al obtener programas predeterminados con tipo "Individual": $e');
-      return [];
+      // Agregar la cronaxia actual al programa si existe
+      if (row['cronaxia_id'] != null) {
+        programaMap[programaId]?['cronaxias'].add({
+          'id': row['cronaxia_id'],
+          'nombre': row['nombre_cronaxia'],
+          'valor': row['valor_cronaxia'],
+        });
+      }
+
+      // Agregar el grupo muscular actual al programa si existe
+      if (row['grupo_muscular_id'] != null) {
+        programaMap[programaId]?['grupos_musculares'].add({
+          'id': row['grupo_muscular_id'],
+          'nombre': row['nombre_grupo_muscular'],
+        });
+      }
     }
+    // Convertir el mapa a lista
+    programas = programaMap.values.toList();
+
+
+
+    return programas;
   }
+
 
 
   Future<List<Map<String, dynamic>>> obtenerProgramasPredeterminadosPorTipoRecovery(Database db) async {
-    try {
-      // Realizar la consulta a la tabla 'programas_predeterminados' filtrando por 'tipo' = 'Individual'
-      List<Map<String, dynamic>> programas = await db.query(
-        'programas_predeterminados',
-        where: 'tipo = ?',
-        whereArgs: ['Recovery'],
-      );
 
-      // Verificar si se encontraron programas
-      if (programas.isNotEmpty) {
-        print('Programas Predeterminados con tipo "Individual":');
-        for (var programa in programas) {
-          print('ID: ${programa['id_programa']}');
-          print('Nombre: ${programa['nombre']}');
-          print('Imagen: ${programa['imagen']}');
-          print('Frecuencia: ${programa['frecuencia']}');
-          print('Pulso: ${programa['pulso']}');
-          print('Rampa: ${programa['rampa']}');
-          print('Contracción: ${programa['contraccion']}');
-          print('Pausa: ${programa['pausa']}');
-          print('Tipo: ${programa['tipo']}');
-          print('Equipamiento: ${programa['equipamiento']}');
-          print('-----------------------------------');
-        }
-      } else {
-        print('No se encontraron programas con tipo "Individual".');
+
+    // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
+    final List<Map<String, dynamic>> programasConDetalles = await db.rawQuery('''
+    SELECT 
+      p.id_programa,
+      p.nombre AS nombre,
+      p.imagen,
+      p.frecuencia,
+      p.pulso,
+      p.rampa,
+      p.contraccion,
+      p.pausa,
+      p.tipo,
+      p.tipo_equipamiento,
+      c.id AS cronaxia_id,
+      c.nombre AS nombre_cronaxia,
+      pc.valor AS valor_cronaxia,
+      gm.id AS grupo_muscular_id,
+      gm.nombre AS nombre_grupo_muscular
+    FROM 
+      programas_predeterminados p
+    LEFT JOIN 
+      programa_cronaxia pc ON p.id_programa = pc.programa_id
+    LEFT JOIN 
+      cronaxia c ON pc.cronaxia_id = c.id
+    LEFT JOIN 
+      ProgramaGrupoMuscular pgm ON p.id_programa = pgm.programa_id
+    LEFT JOIN 
+      grupos_musculares_equipamiento gm ON pgm.grupo_muscular_id = gm.id
+    WHERE 
+      p.tipo = 'Recovery'
+    ORDER BY 
+      p.id_programa, c.id, gm.id
+  ''');
+
+    // Procesar los resultados para estructurar la salida en una lista de programas
+    List<Map<String, dynamic>> programas = [];
+    Map<int, Map<String, dynamic>> programaMap = {};
+
+    for (var row in programasConDetalles) {
+      int programaId = row['id_programa'];
+
+      // Verifica si ya tenemos el programa en el mapa
+      if (!programaMap.containsKey(programaId)) {
+        programaMap[programaId] = {
+          'id_programa': row['id_programa'],
+          'nombre': row['nombre'],
+          'imagen': row['imagen'],
+          'frecuencia': row['frecuencia'],
+          'pulso': row['pulso'],
+          'rampa': row['rampa'],
+          'contraccion': row['contraccion'],
+          'pausa': row['pausa'],
+          'tipo': row['tipo'],
+          'tipo_equipamiento': row['tipo_equipamiento'],
+          'cronaxias': [],
+          'grupos_musculares': [],
+        };
       }
 
-      return programas;
-    } catch (e) {
-      print('Error al obtener programas predeterminados con tipo "Individual": $e');
-      return [];
+      // Agregar la cronaxia actual al programa si existe
+      if (row['cronaxia_id'] != null) {
+        programaMap[programaId]?['cronaxias'].add({
+          'id': row['cronaxia_id'],
+          'nombre': row['nombre_cronaxia'],
+          'valor': row['valor_cronaxia'],
+        });
+      }
+
+      // Agregar el grupo muscular actual al programa si existe
+      if (row['grupo_muscular_id'] != null) {
+        programaMap[programaId]?['grupos_musculares'].add({
+          'id': row['grupo_muscular_id'],
+          'nombre': row['nombre_grupo_muscular'],
+        });
+      }
     }
+    // Convertir el mapa a lista
+    programas = programaMap.values.toList();
+
+
+
+    return programas;
   }
 
-
-
-  Future<List<Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(
+  Future<List<
+      Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(
       Database db) async {
     try {
       // Consulta los programas automáticos
@@ -7508,7 +7114,8 @@ class DatabaseHelper {
 
       for (var programa in programas) {
         // Obtiene los subprogramas relacionados con el programa actual
-        final List<Map<String, dynamic>> subprogramas = await db.rawQuery('''
+        final List<Map<String, dynamic>> subprogramas = await db.rawQuery(
+            '''
         SELECT pa.id_programa_automatico, pa.id_programa_relacionado, pr.nombre, pa.ajuste, pa.duracion
         FROM Programas_Automaticos_Subprogramas pa
         JOIN programas_predeterminados pr ON pr.id_programa = pa.id_programa_relacionado
@@ -7538,7 +7145,8 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> obtenerGruposMuscularesPorEquipamiento(
       Database db, String tipoEquipamiento) async {
     // Verifica que el tipo de equipamiento sea válido
-    if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
+    if (tipoEquipamiento != 'BIO-SHAPE' &&
+        tipoEquipamiento != 'BIO-JACKET') {
       throw ArgumentError(
           'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
     }
@@ -7555,7 +7163,8 @@ class DatabaseHelper {
     );
 
     // Imprime el resultado de la consulta
-    print('Grupos musculares obtenidos: ${gruposMusculares.length} elementos.');
+    print('Grupos musculares obtenidos: ${gruposMusculares
+        .length} elementos.');
 
     // Itera sobre los resultados e imprime cada grupo muscular y su tipo de equipamiento
     for (var grupo in gruposMusculares) {
@@ -7566,10 +7175,11 @@ class DatabaseHelper {
     return gruposMusculares;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(
-      Database db, String tipoEquipamiento) async {
+  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(Database db,
+      String tipoEquipamiento) async {
     // Verifica que el tipo de equipamiento sea válido
-    if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
+    if (tipoEquipamiento != 'BIO-SHAPE' &&
+        tipoEquipamiento != 'BIO-JACKET') {
       throw ArgumentError(
           'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
     }
@@ -7596,39 +7206,8 @@ class DatabaseHelper {
     return cronaxias;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerProgramasPredeterminados(Database db) async {
-    try {
-      // Realizar la consulta a la tabla 'programas_predeterminados'
-      List<Map<String, dynamic>> programas = await db.query('programas_predeterminados');
-
-      // Imprimir los programas obtenidos
-      if (programas.isNotEmpty) {
-        print('Programas Predeterminados obtenidos:');
-        for (var programa in programas) {
-          print('ID: ${programa['id']}');
-          print('Nombre: ${programa['nombre']}');
-          print('Imagen: ${programa['imagen']}');
-          print('Frecuencia: ${programa['frecuencia']}');
-          print('Pulso: ${programa['pulso']}');
-          print('Rampa: ${programa['rampa']}');
-          print('Contracción: ${programa['contraccion']}');
-          print('Pausa: ${programa['pausa']}');
-          print('Tipo: ${programa['tipo']}');
-          print('Equipamiento: ${programa['equipamiento']}');
-          print('-----------------------------------');
-        }
-      } else {
-        print('No se encontraron programas predeterminados.');
-      }
-
-      return programas;
-    } catch (e) {
-      print('Error al obtener programas predeterminados: $e');
-      return [];
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(Database db, int programaId) async {
+  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(Database db,
+      int programaId) async {
     final List<Map<String, dynamic>> grupos = await db.rawQuery('''
       SELECT g.id, g.nombre, g.imagen, g.tipo_equipamiento
       FROM grupos_musculares_equipamiento g
@@ -7639,17 +7218,31 @@ class DatabaseHelper {
     return grupos;
   }
 
-  // Función para obtener las cronaxias asociadas a un programa (con su nombre y valor)
   Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(Database db, int programaId) async {
-    final List<Map<String, dynamic>> cronaxias = await db.rawQuery('''
-      SELECT c.id, c.nombre, c.valor, c.tipo_equipamiento
-      FROM cronaxia c
-      INNER JOIN programa_cronaxia pc ON c.id = pc.cronaxia_id
-      WHERE pc.programa_id = ?
-    ''', [programaId]);
-
-    return cronaxias;
+    return await db.rawQuery('''
+    SELECT c.nombre, pc.valor
+    FROM programa_cronaxia AS pc
+    INNER JOIN cronaxia AS c ON pc.cronaxia_id = c.id
+    WHERE pc.programa_id = ?
+  ''', [programaId]);
   }
+
+
+  // Obtener el programa más reciente (con el id más alto)
+  Future<int?> getMostRecentProgramaId() async {
+    final db = await database;
+    // Realizamos una consulta que ordene por programa_id de forma descendente (del más grande al más pequeño)
+    final List<Map<String, dynamic>> result = await db.query(
+      'programas_predeterminados', // Asume que la tabla se llama 'programas'
+      orderBy: 'id_programa DESC', // Ordenamos por programa_id de manera descendente
+      limit: 1, // Solo nos interesa el primer resultado (el más reciente)
+    );
+    if (result.isNotEmpty) {
+      return result.first['id_programa']; // Retorna el programa_id más reciente
+    }
+    return null; // Si no hay programas en la base de datos
+  }
+
 
   /*METODOS DE BORRADO DE BBD*/
 

@@ -30,8 +30,8 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
       // Iteramos sobre los programas y obtenemos las cronaxias y los grupos de las tablas intermedias
       for (var program in programData) {
         // Obtener cronaxias
-        var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, program['id']);
-        var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, program['id']);
+        var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, program['id_programa']);
+        var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, program['id_programa']);
 
         // Imprimir los valores de las cronaxias y los grupos
         print('Programa: ${program['nombre']}');
@@ -57,6 +57,7 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
       print('Error fetching programs: $e');
     }
   }
+
 
 
 

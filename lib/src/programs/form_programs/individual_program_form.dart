@@ -25,13 +25,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   final _lumbController = TextEditingController();
   final _dorController = TextEditingController();
   final _glutController = TextEditingController();
-  final _glutSupController = TextEditingController();
-  final _glutInfController = TextEditingController();
   final _isquioController = TextEditingController();
   final _pectController = TextEditingController();
   final _abdoController = TextEditingController();
-  final _abdoSupController = TextEditingController();
-  final _abdoInfController = TextEditingController();
   final _cuadriController = TextEditingController();
   final _bicepsController = TextEditingController();
   final _gemeloController = TextEditingController();
@@ -83,13 +79,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     _lumbController.dispose();
     _dorController.dispose();
     _glutController.dispose();
-    _glutSupController.dispose();
-    _glutInfController.dispose();
     _isquioController.dispose();
     _pectController.dispose();
     _abdoController.dispose();
-    _abdoSupController.dispose();
-    _abdoInfController.dispose();
     _cuadriController.dispose();
     _bicepsController.dispose();
     _gemeloController.dispose();
@@ -195,7 +187,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     }
   }
 
-  Future<void> _insertarPrograma() async {
+// Función para guardar el programa predeterminado desde el formulario
+  Future<void> guardarProgramaPredeterminado() async {
     // Recoger los valores de los controladores de texto
     String nombrePrograma = _nameController.text;
     String equipamiento = selectedEquipOption ?? ''; // Manejar el caso de que no se seleccione una opción
@@ -205,30 +198,94 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     double pausa = double.tryParse(_pauseController.text) ?? 0.0;
     int rampa = int.tryParse(_rampaController.text) ?? 0;
 
-    // Crear el mapa con los datos que se insertarán en la base de datos
-    Map<String, dynamic> programaData = {
+    // Crear el mapa con los datos del programa
+    Map<String, dynamic> programa = {
       'nombre': nombrePrograma,
-      'imagen': 'ruta/a/imagen', // Puedes agregar la ruta de la imagen aquí si es necesario
+      'imagen': 'assets/images/cliente.png', // Puedes agregar la ruta de la imagen aquí si es necesario
       'frecuencia': frecuencia,
       'pulso': pulso,
       'contraccion': contraccion,
       'rampa': rampa,
       'pausa': pausa,
       'tipo': 'Individual', // Puedes actualizar esto según el tipo de programa que quieras
-      'equipamiento': equipamiento,
+      'tipo_equipamiento': equipamiento,
     };
 
-// Mostrar todos los datos insertados en el print
-    print("Datos insertados: ");
-    programaData.forEach((key, value) {
-      print('$key: $value');
-    });
-    // Usar el objeto db para insertar los datos en la base de datos
-    await dbHelper.insertarProgramaPredeterminado(programaData);
+    // Insertar el programa en la base de datos
+    int programaId = await DatabaseHelper().insertarProgramaPredeterminado(programa);
 
-    // Aquí puedes mostrar un mensaje de éxito o realizar alguna acción adicional si es necesario.
-    print("Programa insertado exitosamente");
+    // Insertar las cronaxias y grupos musculares por defecto
+    await DatabaseHelper().insertarCronaxiasPorDefecto(programaId, equipamiento);
+    await DatabaseHelper().insertarGruposMuscularesPorDefecto(programaId, equipamiento);
+
+    // Mostrar un mensaje o hacer alguna acción adicional si es necesario
+    print('Programa guardado correctamente.');
   }
+
+  Future<void> actualizarCronaxias(int programaId, String tipoEquipamiento) async {
+    // Iterar sobre los controladores según el tipo de equipamiento
+    if (tipoEquipamiento == 'BIO-JACKET') {
+      for (var grupo in gruposBioJacket) {
+        String nombre = grupo['nombre'];
+        var controller = controllersJacket[nombre];
+
+        // Verificar si el controlador es válido antes de acceder a su texto
+        if (controller == null) {
+          print('Error: El controlador para "$nombre" es nulo.');
+          continue; // Salir del ciclo actual si el controlador es nulo
+        }
+
+        // Depuración: verificar si el controlador tiene el valor correcto
+        print('Valor para grupo "$nombre": ${controller.text}');
+
+        // Verifica que el valor no sea nulo antes de actualizar
+        double valor = controller.text.isNotEmpty
+            ? double.tryParse(controller.text) ?? 0.0  // Usar valor por defecto si es nulo o vacío
+            : 0.0;
+
+        // Imprimir el valor antes de actualizarlo
+        print('Actualizando cronaxia para grupo "$nombre" con valor: $valor');
+
+        // Llamar a la función de actualización desde el DatabaseHelper
+        await DatabaseHelper().updateCronaxia(programaId, grupo['id'], valor);
+
+        // Confirmar si la actualización fue exitosa
+        print('Cronaxia para "$nombre" actualizada con valor: $valor');
+      }
+    } else if (tipoEquipamiento == 'BIO-SHAPE') {
+      for (var grupo in gruposBioShape) {
+        String nombre = grupo['nombre'];
+        var controller = controllersShape[nombre];
+
+        // Verificar si el controlador es válido antes de acceder a su texto
+        if (controller == null) {
+          print('Error: El controlador para "$nombre" es nulo.');
+          continue; // Salir del ciclo actual si el controlador es nulo
+        }
+
+        // Depuración: verificar si el controlador tiene el valor correcto
+        print('Valor para grupo "$nombre": ${controller.text}');
+
+        // Verificar si el valor es vacío, de ser así, usar 0.0
+        double valor = controller.text.isNotEmpty
+            ? double.tryParse(controller.text) ?? 0.0
+            : 0.0;
+
+        // Imprimir el valor antes de actualizarlo
+        print('Actualizando cronaxia para grupo "$nombre" con valor: $valor');
+
+        // Llamar a la función de actualización desde el DatabaseHelper
+        await DatabaseHelper().updateCronaxia(programaId, grupo['id'], valor);
+
+        // Confirmar si la actualización fue exitosa
+        print('Cronaxia para "$nombre" actualizada con valor: $valor');
+      }
+    }
+
+    print('Cronaxias actualizadas exitosamente');
+  }
+
+
 
 
 
@@ -647,7 +704,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
-                      await _insertarPrograma();
+                      await guardarProgramaPredeterminado();
                     },
                     child: AnimatedScale(
                       scale: scaleFactorTick,
@@ -1038,7 +1095,22 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   GestureDetector(
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                    onTap: () async {},
+                    onTap: () async {
+                      // Crear una instancia de DatabaseHelper
+                      DatabaseHelper dbHelper = DatabaseHelper();
+
+                      // Llamar al método de instancia
+                      int? programaId = await dbHelper.getMostRecentProgramaId();
+
+                      if (programaId != null) {
+                        print('El último id_programa es: $programaId');
+                        String tipoEquipamiento = 'BIO-JACKET'; // Asume el tipo de equipamiento
+                        await actualizarCronaxias(programaId, tipoEquipamiento);
+                        print('Cronaxias actualizadas al hacer tap.');
+                      } else {
+                        print('No se encontraron programas en la base de datos');
+                      }
+                    },
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),
@@ -1054,6 +1126,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       ),
                     ),
                   ),
+
+
+
                 ],
               ),
             ),

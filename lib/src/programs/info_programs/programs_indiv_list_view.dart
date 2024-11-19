@@ -19,7 +19,7 @@ class _ProgramsIndividualesListViewState
     super.initState();
     _fetchIndividualPrograms(); // Llamamos a la función para obtener los programas al iniciar
   }
-// Función para obtener los programas de tipo 'Individual' y sus cronaxias y grupos
+
   Future<void> _fetchIndividualPrograms() async {
     var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
     try {
