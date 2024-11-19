@@ -7228,20 +7228,26 @@ CREATE TABLE programa_cronaxia (
   }
 
 
-  // Obtener el programa más reciente (con el id más alto)
-  Future<int?> getMostRecentProgramaId() async {
+// Obtener el programa más reciente (con el id más alto) y su tipo de equipamiento
+  Future<Map<String, dynamic>?> getMostRecentPrograma() async {
     final db = await database;
-    // Realizamos una consulta que ordene por programa_id de forma descendente (del más grande al más pequeño)
+    // Realizamos una consulta que ordene por id_programa de forma descendente (del más grande al más pequeño)
     final List<Map<String, dynamic>> result = await db.query(
-      'programas_predeterminados', // Asume que la tabla se llama 'programas'
-      orderBy: 'id_programa DESC', // Ordenamos por programa_id de manera descendente
+      'programas_predeterminados', // Tabla 'programas'
+      orderBy: 'id_programa DESC', // Ordenamos por id_programa de manera descendente
       limit: 1, // Solo nos interesa el primer resultado (el más reciente)
     );
+
     if (result.isNotEmpty) {
-      return result.first['id_programa']; // Retorna el programa_id más reciente
+      return {
+        'id_programa': result.first['id_programa'],
+        'tipo_equipamiento': result.first['tipo_equipamiento'],
+      }; // Retorna tanto el id_programa como el tipo_equipamiento
     }
-    return null; // Si no hay programas en la base de datos
+
+    return null; // Si no se encontró ningún programa
   }
+
 
 
   /*METODOS DE BORRADO DE BBD*/
