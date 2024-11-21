@@ -6,8 +6,9 @@ import '../../db/db_helper.dart';
 
 class IndividualProgramForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
+  final VoidCallback onClose;
 
-  const IndividualProgramForm({super.key, required this.onDataChanged});
+  const IndividualProgramForm({super.key, required this.onDataChanged, required this.onClose});
 
   @override
   IndividualProgramFormState createState() => IndividualProgramFormState();
@@ -264,6 +265,54 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     }
 
     print('Cronaxias actualizadas exitosamente');
+  }
+
+  // Función para manejar la actualización de los grupos musculares
+  Future<void> actualizarGruposEnPrograma() async {
+    // Crear una instancia de DatabaseHelper
+    DatabaseHelper dbHelper = DatabaseHelper();
+
+    // Llamar al método de instancia para obtener el programa más reciente
+    Map<String, dynamic>? programa = await dbHelper.getMostRecentPrograma();
+
+    if (programa != null) {
+      int programaId = programa['id_programa'];
+      String tipoEquipamiento = programa['tipo_equipamiento'];
+
+      print('El último id_programa es: $programaId');
+      print('El tipo de equipamiento es: $tipoEquipamiento');
+
+      // Filtrar los grupos musculares seleccionados según el tipo de grupo
+      List<int> selectedGroupIds = [];
+
+      // Usamos directamente los mapas de grupos seleccionados
+      Map<String, bool> selectedGroups =
+      tipoEquipamiento == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+
+      // Filtrar los grupos seleccionados
+      selectedGroups.forEach((key, isSelected) {
+        if (isSelected) {
+          int? groupId = tipoEquipamiento == 'BIO-JACKET' ? groupJacketIds[key] : groupShapeIds[key];
+          if (groupId != null) {
+            selectedGroupIds.add(groupId);
+          }
+        }
+      });
+
+      // Mostrar los nuevos grupos musculares seleccionados
+      print('Nuevos grupos musculares seleccionados: $selectedGroupIds');
+
+      // Asegurarnos de que hay elementos en selectedGroupIds antes de actualizar
+      if (selectedGroupIds.isNotEmpty) {
+        // Llamamos a la función para actualizar los grupos musculares en la base de datos
+        await dbHelper.actualizarGruposMusculares(programaId, selectedGroupIds);
+        print('Grupos musculares actualizados para el programa $programaId');
+      } else {
+        print('No se seleccionaron grupos musculares.');
+      }
+    } else {
+      print('No se encontraron programas en la base de datos');
+    }
   }
 
 
@@ -1716,54 +1765,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
-                      // Crear una instancia de DatabaseHelper
-                      DatabaseHelper dbHelper = DatabaseHelper();
-
-                      // Llamar al método de instancia para obtener el programa más reciente
-                      Map<String, dynamic>? programa = await dbHelper.getMostRecentPrograma();
-
-                      if (programa != null) {
-                        int programaId = programa['id_programa'];
-                        String tipoEquipamiento = programa['tipo_equipamiento'];
-
-                        print('El último id_programa es: $programaId');
-                        print('El tipo de equipamiento es: $tipoEquipamiento');
-
-                        // Filtrar los grupos musculares seleccionados según el tipo de grupo
-                        List<int> selectedGroupIds = [];
-
-                        // Usamos directamente los mapas de grupos seleccionados
-                        Map<String, bool> selectedGroups =
-                        tipoEquipamiento == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
-
-                        // Filtrar los grupos seleccionados
-                        selectedGroups.forEach((key, isSelected) {
-                          if (isSelected) {
-                            int? groupId = tipoEquipamiento == 'BIO-JACKET' ? groupJacketIds[key] : groupShapeIds[key];
-                            if (groupId != null) {
-                              selectedGroupIds.add(groupId);
-                            }
-                          }
-                        });
-
-                        // Mostrar los nuevos grupos musculares seleccionados
-                        print('Nuevos grupos musculares seleccionados: $selectedGroupIds');
-
-                        // Asegurarnos de que hay elementos en selectedGroupIds antes de actualizar
-                        if (selectedGroupIds.isNotEmpty) {
-                          // Llamamos a la función para actualizar los grupos musculares en la base de datos
-                          await dbHelper.actualizarGruposMusculares(programaId, selectedGroupIds);
-                          print('Grupos musculares actualizados para el programa $programaId');
-                        } else {
-                          print('No se seleccionaron grupos musculares.');
-                        }
-
-                      } else {
-                        print('No se encontraron programas en la base de datos');
-                      }
+                      await actualizarGruposEnPrograma();
+                      widget.onClose();
                     },
-
-
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),

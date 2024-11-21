@@ -393,6 +393,7 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
             debugPrint(data as String?); // Verify that the data is arriving correctly
             setState(() {});
           },
+          onClose: widget.onClose,
         ),
         AutomaticProgramForm(
           onDataChanged: (data) {
@@ -405,6 +406,7 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
             debugPrint(data as String?);
             setState(() {});
           },
+          onClose: widget.onClose,
         ),
       ],
     );
