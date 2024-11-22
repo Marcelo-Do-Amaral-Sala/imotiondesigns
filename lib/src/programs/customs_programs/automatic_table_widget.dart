@@ -21,7 +21,9 @@ class SubprogramTableWidget extends StatelessWidget {
                 return Column(
                   children: [
                     DataRowWidget(
-                      orden: (index + 1).toString(), // Índice (empezando desde 1)
+                      orden: (subprograma['orden'] is int)
+                      ? subprograma['orden']
+                      : int.tryParse(subprograma['orden'].toString()) ?? 0,// Índice (empezando desde 1)
                       nombre: subprograma['nombre'] ?? 'N/A',
                       // Manejo de duracionTotal y ajuste como valores double
                       duracion: (subprograma['duracion'] is double)
@@ -80,7 +82,7 @@ class SubprogramTableWidget extends StatelessWidget {
 }
 
 class DataRowWidget extends StatelessWidget {
-  final String orden;
+  final int orden;
   final String nombre;
   final double duracion;
   final double ajuste;
@@ -102,7 +104,7 @@ class DataRowWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildCell(orden),
+          buildCell(orden.toString()),
           buildCell(nombre, isNameColumn: true),
           buildCell(duracion.toString()),
           buildCell(ajuste.toString()),

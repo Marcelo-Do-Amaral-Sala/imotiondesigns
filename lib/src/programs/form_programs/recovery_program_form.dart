@@ -477,26 +477,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ID', style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: 'Automático',
-                                enabled: false,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
                           Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
@@ -512,7 +492,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                         ],
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.02),
+                    SizedBox(width: screenWidth * 0.1),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -776,26 +756,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ID', style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: 'Automático',
-                                enabled: false,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
                           Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
@@ -812,7 +772,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                         ],
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.02),
+                    SizedBox(width: screenWidth * 0.1),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1188,26 +1148,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ID', style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: 'Automático',
-                                enabled: false,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
                           Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
@@ -1224,7 +1164,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                         ],
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.02),
+                    SizedBox(width: screenWidth * 0.1),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

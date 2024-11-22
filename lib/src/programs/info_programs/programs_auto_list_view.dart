@@ -56,6 +56,7 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
         'imagen': program['imagen'],
         'descripcion_programa_automatico': program['descripcion'],
         'duracionTotal': program['duracionTotal'],
+        'tipo_equipamiento' : program['tipo_equipamiento'],
         'subprogramas': subprogramas,
       };
 

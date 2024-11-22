@@ -15,7 +15,7 @@ class IndividualProgramForm extends StatefulWidget {
 }
 
 class IndividualProgramFormState extends State<IndividualProgramForm>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin  {
   final _nameController = TextEditingController();
   final _frequencyController = TextEditingController();
   final _pulseController = TextEditingController();
@@ -114,7 +114,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
   Future<void> fetchGruposMusculares() async {
     try {
-     DatabaseHelper db =DatabaseHelper();
+      DatabaseHelper db =DatabaseHelper();
 
       // Obtener grupos musculares para BIO-JACKET
       var gruposJacket = await db.getGruposMuscularesEquipamiento('BIO-JACKET');
@@ -190,7 +190,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
     // Insertar el programa en la base de datos
     int programaId =
-        await DatabaseHelper().insertarProgramaPredeterminado(programa);
+    await DatabaseHelper().insertarProgramaPredeterminado(programa);
 
     // Insertar las cronaxias y grupos musculares por defecto
     await DatabaseHelper()
@@ -222,7 +222,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         // Verifica que el valor no sea nulo antes de actualizar
         double valor = controller.text.isNotEmpty
             ? double.tryParse(controller.text) ??
-                0.0 // Usar valor por defecto si es nulo o vacío
+            0.0 // Usar valor por defecto si es nulo o vacío
             : 0.0;
 
         // Imprimir el valor antes de actualizarlo
@@ -477,26 +477,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ID', style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: 'Automático',
-                                enabled: false,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
                           Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
@@ -512,7 +492,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                         ],
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.02),
+                    SizedBox(width: screenWidth * 0.1),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -523,7 +503,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
                               hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -614,7 +594,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('RAMPA (sx10)', style: _labelStyle),
                                       Container(
@@ -650,7 +630,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('CONTRACCIÓN (s.)',
                                           style: _labelStyle),
@@ -668,7 +648,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                               hintText:
-                                                  'Introducir contracción'),
+                                              'Introducir contracción'),
                                         ),
                                       ),
                                     ],
@@ -689,7 +669,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text('PAUSA (s.)', style: _labelStyle),
                                       Container(
@@ -776,26 +756,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ID', style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: 'Automático',
-                                enabled: false,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
                           Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
@@ -812,7 +772,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                         ],
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.02),
+                    SizedBox(width: screenWidth * 0.1),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -862,255 +822,255 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   // Campos específicos para BIO-JACKET
                   Expanded(
                       child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Primera columna de TextFields
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los primeros grupos musculares
-                              for (int i = 0; i < 3; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Primera columna de TextFields
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los primeros grupos musculares
+                                  for (int i = 0; i < 3; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.04),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los siguientes grupos musculares
-                              for (int i = 3; i < 6; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.04),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los siguientes grupos musculares
+                                  for (int i = 3; i < 6; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.04),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los últimos grupos musculares
-                              for (int i = 6; i < 9; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.04),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los últimos grupos musculares
+                                  for (int i = 6; i < 9; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.04),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              for (int i = 9;
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.04),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  for (int i = 9;
                                   i < 10;
                                   i++) // Aquí ajustamos el rango de grupos
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
+                      )),
                 ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
                   // Campos específicos para BIO-SHAPE
                   Expanded(
                       child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Primera columna de TextFields
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los primeros grupos musculares
-                              for (int i = 0; i < 3; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Primera columna de TextFields
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los primeros grupos musculares
+                                  for (int i = 0; i < 3; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.04),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los siguientes grupos musculares
-                              for (int i = 3; i < 6; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.04),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los siguientes grupos musculares
+                                  for (int i = 3; i < 6; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.04),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los últimos grupos musculares
-                              for (int i = 6; i < 7; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.04),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los últimos grupos musculares
+                                  for (int i = 6; i < 7; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
+                      )),
                 ],
               ],
             ),
@@ -1188,26 +1148,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('ID', style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: 'Automático',
-                                enabled: false,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
                           Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
@@ -1224,7 +1164,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                         ],
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.02),
+                    SizedBox(width: screenWidth * 0.1),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1297,15 +1237,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                               groupName, 'BIO-JACKET'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: const TextStyle(
@@ -1316,17 +1256,17 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 14,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),
@@ -1362,15 +1302,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               ),
                               ...selectedJacketGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Trapecios',
-                                        'Dorsales',
-                                        'Lumbares',
-                                        'Glúteos',
-                                        'Isquiotibiales',
-                                        'Gemelos'
-                                      ].contains(entry.key) &&
-                                      entry.value)
+                              [
+                                'Trapecios',
+                                'Dorsales',
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquiotibiales',
+                                'Gemelos'
+                              ].contains(entry.key) &&
+                                  entry.value)
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageJacketPaths[groupName];
@@ -1409,13 +1349,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               ),
                               ...selectedJacketGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Pectorales',
-                                        'Abdomen',
-                                        'Cuádriceps',
-                                        'Bíceps',
-                                      ].contains(entry.key) &&
-                                      entry.value)
+                              [
+                                'Pectorales',
+                                'Abdomen',
+                                'Cuádriceps',
+                                'Bíceps',
+                              ].contains(entry.key) &&
+                                  entry.value)
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageJacketPaths[groupName];
@@ -1459,15 +1399,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                               groupName, 'BIO-JACKET'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: const TextStyle(
@@ -1478,17 +1418,17 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 14,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),
@@ -1539,15 +1479,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                               'MUSCULOS PARTE SUPERIOR'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: const TextStyle(
@@ -1558,17 +1498,17 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 14,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),
@@ -1605,14 +1545,14 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               // Mostrar imágenes para los grupos seleccionados
                               ...selectedShapeGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Lumbares',
-                                        'Glúteos',
-                                        'Isquiotibiales',
-                                        'Gemelos',
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Solo mostrar los seleccionados
+                              [
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquiotibiales',
+                                'Gemelos',
+                              ].contains(entry.key) &&
+                                  entry
+                                      .value) // Solo mostrar los seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageShapePaths[groupName];
@@ -1651,13 +1591,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               // Mostrar imágenes para los grupos seleccionados
                               ...selectedShapeGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Abdomen',
-                                        'Cuádriceps',
-                                        'Bíceps',
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Solo mostrar los seleccionados
+                              [
+                                'Abdomen',
+                                'Cuádriceps',
+                                'Bíceps',
+                              ].contains(entry.key) &&
+                                  entry
+                                      .value) // Solo mostrar los seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageShapePaths[groupName];
@@ -1702,15 +1642,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                               'MUSCULOS PARTE INFERIOR'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: const TextStyle(
@@ -1721,17 +1661,17 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 14,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),

@@ -26,12 +26,12 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 93,
+      version: 98,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
       onUpgrade:
-      _onUpgrade, // Método que se ejecuta al actualizar la base de datos
+          _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
   }
 
@@ -260,7 +260,7 @@ class DatabaseHelper {
     print('INSERTADO "Gemelos" TIPO "BIO-SHAPE"');
 
     await db.execute('''
-      CREATE TABLE programas_predeterminados (
+      CREATE TABLE IF NOT EXISTS programas_predeterminados (
         id_programa INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT,
         imagen TEXT,
@@ -299,32 +299,98 @@ class DatabaseHelper {
 // Iniciamos la transacción
     await db.transaction((txn) async {
       // Inserciones para el tipo de equipamiento 'BIO-JACKET'
-      await txn.insert('cronaxia', {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-      await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+      await txn.insert('cronaxia', {
+        'nombre': 'Trapecio',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Lumbares',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Dorsales',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Glúteos',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Isquiotibiales',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Pectorales',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Abdomen',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Cuádriceps',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Bíceps',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Gemelos',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-JACKET'
+      });
 
       // Inserciones para el tipo de equipamiento 'BIO-SHAPE'
-      await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-      await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {
+        'nombre': 'Lumbares',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-SHAPE'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Glúteos',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-SHAPE'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Isquiotibiales',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-SHAPE'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Abdomen',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-SHAPE'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': 'Cuádriceps',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-SHAPE'
+      });
+      await txn.insert('cronaxia',
+          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+      await txn.insert('cronaxia', {
+        'nombre': 'Gemelos',
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-SHAPE'
+      });
 
       // Imprimir mensaje para verificar inserciones
-      print('Inserciones completadas para los tipos de equipamiento BIO-JACKET y BIO-SHAPE');
+      print(
+          'Inserciones completadas para los tipos de equipamiento BIO-JACKET y BIO-SHAPE');
     });
 
     await db.execute(''' -- Tabla intermedia programa_cronaxia
-CREATE TABLE programa_cronaxia (
+  CREATE TABLE IF NOT EXISTS programa_cronaxia (
   programa_id INTEGER,
   cronaxia_id INTEGER,
   valor REAL,
@@ -344,13 +410,14 @@ CREATE TABLE programa_cronaxia (
         'contraccion': 4,
         'pausa': 1,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'  // Equipamiento seleccionado
+        'tipo_equipamiento': 'BIO-JACKET' // Equipamiento seleccionado
       });
 
       print("Programa insertado con ID: $programaId1");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -363,13 +430,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId1,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -422,7 +491,6 @@ CREATE TABLE programa_cronaxia (
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia = cronaxia['valor'];
-
 
         // Relacionar la cronaxia con el programa y almacenar el valor
         await txn.insert('programa_cronaxia', {
@@ -530,37 +598,41 @@ CREATE TABLE programa_cronaxia (
       // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Modificar valores específicos de cronaxias basándonos en su ID
         // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
-        final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+        final nuevoValor = (cronaxiaId ==
+                1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
             ? 200 // Nuevo valor para 'frecuencia'
-            : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-            ? 250 // Nuevo valor para 'rampa'
-            : (cronaxiaId == 3) // ID = 3 'pulso'
-            ? 200
-            : (cronaxiaId == 4) // ID = 4 'contracción'
-            ? 400
-            : (cronaxiaId == 5) // ID = 5 'pausa'
-            ? 300
-            : (cronaxiaId == 6) // ID = 6 'tipo'
-            ? 150
-            : (cronaxiaId == 7) // ID = 7 'equipamiento'
-            ? 350
-            : (cronaxiaId == 8) // ID = 8 'otro'
-            ? 400
-            : (cronaxiaId == 9)
-            ? 150
-            : (cronaxiaId == 10)
-            ? 150
-            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+            : (cronaxiaId ==
+                    2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+                ? 250 // Nuevo valor para 'rampa'
+                : (cronaxiaId == 3) // ID = 3 'pulso'
+                    ? 200
+                    : (cronaxiaId == 4) // ID = 4 'contracción'
+                        ? 400
+                        : (cronaxiaId == 5) // ID = 5 'pausa'
+                            ? 300
+                            : (cronaxiaId == 6) // ID = 6 'tipo'
+                                ? 150
+                                : (cronaxiaId == 7) // ID = 7 'equipamiento'
+                                    ? 350
+                                    : (cronaxiaId == 8) // ID = 8 'otro'
+                                        ? 400
+                                        : (cronaxiaId == 9)
+                                            ? 150
+                                            : (cronaxiaId == 10)
+                                                ? 150
+                                                : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId4,
           'cronaxia_id': cronaxiaId,
-          'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
+          'valor': nuevoValor,
+          // Aquí almacenamos el valor modificado para este programa
         });
 
         print(
@@ -578,7 +650,8 @@ CREATE TABLE programa_cronaxia (
           'grupo_muscular_id': grupo['id'],
         });
 
-        print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR ${grupo['id']}');
+        print(
+            'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR ${grupo['id']}');
       }
     });
     await db.transaction((txn) async {
@@ -597,9 +670,9 @@ CREATE TABLE programa_cronaxia (
 
       print("Programa insertado con ID: $programaId5");
 
-
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -612,13 +685,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId5,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -661,7 +736,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId6");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -674,13 +750,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId6,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -723,7 +801,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId7");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -736,19 +815,20 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId7,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
             'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId7 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
-
 
       // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
       List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
@@ -785,7 +865,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId8");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -798,13 +879,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId8,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -847,7 +930,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId9");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -860,13 +944,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId9,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -909,7 +995,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId10");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -922,13 +1009,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId10,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -971,7 +1060,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId11");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -984,13 +1074,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId11,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1033,7 +1125,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId12");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1046,19 +1139,20 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId12,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
             'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId12 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
-
 
       // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
       List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
@@ -1095,7 +1189,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId13");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1108,13 +1203,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId13,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1157,7 +1254,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId14");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1170,19 +1268,20 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId14,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
             'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId14 con valor $valorCronaxia en la tabla programa_cronaxia');
       }
-
 
       // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
       List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
@@ -1219,7 +1318,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId15");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1232,13 +1332,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId15,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1281,7 +1383,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId16");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1294,13 +1397,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId16,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1343,7 +1448,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId17");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1356,13 +1462,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId17,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1405,7 +1513,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId18");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1418,13 +1527,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId18,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1466,7 +1577,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId19");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1479,13 +1591,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId19,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1527,7 +1641,8 @@ CREATE TABLE programa_cronaxia (
       print("Programa insertado con ID: $programaId20");
 
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1540,13 +1655,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId20,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1598,23 +1715,27 @@ CREATE TABLE programa_cronaxia (
       // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Modificar valores específicos de cronaxias basándonos en su ID
         // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
-        final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+        final nuevoValor = (cronaxiaId ==
+                1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
             ? 375 // Nuevo valor para 'frecuencia'
-            : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-            ? 400 // Nuevo valor para 'rampa'
-            : (cronaxiaId == 3) // ID = 3 'pulso'
-            ? 400
-            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+            : (cronaxiaId ==
+                    2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+                ? 400 // Nuevo valor para 'rampa'
+                : (cronaxiaId == 3) // ID = 3 'pulso'
+                    ? 400
+                    : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId21,
           'cronaxia_id': cronaxiaId,
-          'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
+          'valor': nuevoValor,
+          // Aquí almacenamos el valor modificado para este programa
         });
 
         print(
@@ -1659,9 +1780,9 @@ CREATE TABLE programa_cronaxia (
 
       print("Programa insertado con ID: $programaId22");
 
-
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1674,13 +1795,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId22,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1721,9 +1844,9 @@ CREATE TABLE programa_cronaxia (
 
       print("Programa insertado con ID: $programaId23");
 
-
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1736,13 +1859,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId23,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1783,9 +1908,9 @@ CREATE TABLE programa_cronaxia (
 
       print("Programa insertado con ID: $programaId24");
 
-
       // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-      final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+      final tipoEquipamiento =
+          'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
       // Seleccionar cronaxias del tipo de equipamiento
       final cronaxiasQuery = await txn.query(
@@ -1798,13 +1923,15 @@ CREATE TABLE programa_cronaxia (
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
-        final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        final valorCronaxia =
+            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
           'programa_id': programaId24,
           'cronaxia_id': cronaxiaId,
-          'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+          'valor': valorCronaxia,
+          // Mantener el valor predeterminado de la cronaxia
         });
 
         print(
@@ -1832,20 +1959,22 @@ CREATE TABLE programa_cronaxia (
 
     // Crear la tabla Programas_Automaticos
     await db.execute('''
-      CREATE TABLE Programas_Automaticos (
+      CREATE TABLE IF NOT EXISTS Programas_Automaticos (
         id_programa_automatico INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL,
         imagen TEXT,
         descripcion TEXT,
-        duracionTotal REAL
+        duracionTotal REAL,
+        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
       );
     ''');
 
     // Crear la tabla Programas_Automaticos_Subprogramas
     await db.execute('''
-      CREATE TABLE Programas_Automaticos_Subprogramas (
+      CREATE TABLE IF NOT EXISTS Programas_Automaticos_Subprogramas (
         id_programa_automatico INTEGER,
         id_programa_relacionado INTEGER,
+        orden INTEGER,
         ajuste REAL,
         duracion REAL,
         FOREIGN KEY (id_programa_automatico) REFERENCES Programas_Automaticos(id_programa_automatico),
@@ -1861,6 +1990,7 @@ CREATE TABLE programa_cronaxia (
           'imagen': 'assets/images/TONING.png',
           'descripcion': 'Aumento de la resistencia y retraso de la fatiga.',
           'duracionTotal': 25,
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -1969,6 +2099,12 @@ CREATE TABLE programa_cronaxia (
           },
         ];
 
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
+        }
+
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -1979,6 +2115,7 @@ CREATE TABLE programa_cronaxia (
         print('ID: $idProgramaAutomatico');
         print('Descripción: Aumento de la resistencia y retraso de la fatiga.');
         print('Duración Total: 25.0');
+        print('Tipo Equipamiento: BIO-JACKET');
         print('Subprogramas:');
         print('*****************************************************');
 
@@ -1993,7 +2130,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2017,6 +2154,7 @@ CREATE TABLE programa_cronaxia (
           'imagen': 'assets/images/GLUTEOS.png',
           'descripcion': 'Fortalece los músculos del suelo pélvico',
           'duracionTotal': 25, // Duración total del programa en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2136,7 +2274,11 @@ CREATE TABLE programa_cronaxia (
             'duracion': 5
           },
         ];
-
+// Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
+        }
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -2161,7 +2303,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2185,6 +2327,7 @@ CREATE TABLE programa_cronaxia (
           'imagen': 'assets/images/SUELOPELV.png',
           'descripcion': 'Fortalece los músculos del suelo pélvico',
           'duracionTotal': 25, // Duración total del programa en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2298,7 +2441,11 @@ CREATE TABLE programa_cronaxia (
             'duracion': 5
           },
         ];
-
+// Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
+        }
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -2325,7 +2472,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2348,8 +2495,9 @@ CREATE TABLE programa_cronaxia (
           'nombre': 'FUERZA',
           'imagen': 'assets/images/STRENGTH.png',
           'descripcion':
-          'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
+              'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
           'duracionTotal': 25, // Duración total del programa en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2440,6 +2588,11 @@ CREATE TABLE programa_cronaxia (
           },
         ];
 
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+        }
+
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -2467,7 +2620,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2490,8 +2643,9 @@ CREATE TABLE programa_cronaxia (
           'nombre': 'HIPERTROFIA',
           'imagen': 'assets/images/HIPERTROFIA.png',
           'descripcion':
-          'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
+              'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
           'duracionTotal': 25, // Duración total del programa en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2587,6 +2741,10 @@ CREATE TABLE programa_cronaxia (
             'duracion': 5
           },
         ];
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+        }
 
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
@@ -2615,7 +2773,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2638,9 +2796,9 @@ CREATE TABLE programa_cronaxia (
           'nombre': 'RESISTENCIA 1',
           'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
           'descripcion':
-          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
+              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
           'duracionTotal': 25,
-          // Duración total del programa automático en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2737,6 +2895,12 @@ CREATE TABLE programa_cronaxia (
           },
         ];
 
+
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+        }
+
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -2764,7 +2928,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2787,9 +2951,9 @@ CREATE TABLE programa_cronaxia (
           'nombre': 'RESISTENCIA 2',
           'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
           'descripcion':
-          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
+              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
           'duracionTotal': 25,
-          // Duración total del programa automático en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2898,6 +3062,11 @@ CREATE TABLE programa_cronaxia (
           },
         ];
 
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+        }
+
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -2925,7 +3094,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2948,9 +3117,9 @@ CREATE TABLE programa_cronaxia (
           'nombre': 'CARDIO',
           'imagen': 'assets/images/CARDIO.png',
           'descripcion':
-          'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
+              'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
           'duracionTotal': 25,
-          // Duración total del programa automático en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3077,6 +3246,11 @@ CREATE TABLE programa_cronaxia (
           },
         ];
 
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+        }
+
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -3104,7 +3278,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3127,9 +3301,9 @@ CREATE TABLE programa_cronaxia (
           'nombre': 'CROSS MAX',
           'imagen': 'assets/images/CROSSMAX.png',
           'descripcion':
-          'Programa experto. Entrenamiento para la mejora de la condición física.',
+              'Programa experto. Entrenamiento para la mejora de la condición física.',
           'duracionTotal': 25,
-          // Duración total del programa automático en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3238,6 +3412,11 @@ CREATE TABLE programa_cronaxia (
           },
         ];
 
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+        }
+
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -3265,7 +3444,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3289,7 +3468,7 @@ CREATE TABLE programa_cronaxia (
           'imagen': 'assets/images/SLIM.png',
           'descripcion': 'Quema de grasa y creación de nuevas células.',
           'duracionTotal': 25,
-          // Duración total del programa automático en minutos
+          'tipo_equipamiento': 'BIO-JACKET',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3374,6 +3553,12 @@ CREATE TABLE programa_cronaxia (
           },
         ];
 
+
+        // Asignamos un orden a cada subprograma
+        for (int i = 0; i < subprogramas.length; i++) {
+          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+        }
+
         // Insertamos los subprogramas
         for (var subprograma in subprogramas) {
           await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -3400,7 +3585,7 @@ CREATE TABLE programa_cronaxia (
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-          as String // Aquí hacemos el cast explícito a String
+                  as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3419,9 +3604,9 @@ CREATE TABLE programa_cronaxia (
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 93) {
+    if (oldVersion < 98) {
       await db.execute('''
-      CREATE TABLE programas_predeterminados (
+      CREATE TABLE IF NOT EXISTS programas_predeterminados (
         id_programa INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT,
         imagen TEXT,
@@ -3448,7 +3633,7 @@ CREATE TABLE programa_cronaxia (
 ''');
 
       await db.execute(''' -- Tabla intermedia programa_cronaxia
-CREATE TABLE programa_cronaxia (
+CREATE TABLE IF NOT EXISTS programa_cronaxia (
   programa_id INTEGER,
   cronaxia_id INTEGER,
   valor REAL,
@@ -3470,31 +3655,98 @@ CREATE TABLE programa_cronaxia (
 // Iniciamos la transacción
       await db.transaction((txn) async {
         // Inserciones para el tipo de equipamiento 'BIO-JACKET'
-        await txn.insert('cronaxia', {'nombre': 'Trapecio', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Dorsales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Pectorales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
-        await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-JACKET'});
+        await txn.insert('cronaxia', {
+          'nombre': 'Trapecio',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Lumbares',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Dorsales',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Glúteos',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Isquiotibiales',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Pectorales',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Abdomen',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Cuádriceps',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Bíceps',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Gemelos',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-JACKET'
+        });
 
         // Inserciones para el tipo de equipamiento 'BIO-SHAPE'
-        await txn.insert('cronaxia', {'nombre': 'Lumbares', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-        await txn.insert('cronaxia', {'nombre': 'Glúteos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-        await txn.insert('cronaxia', {'nombre': 'Isquiotibiales', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-        await txn.insert('cronaxia', {'nombre': 'Abdomen', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-        await txn.insert('cronaxia', {'nombre': 'Cuádriceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-        await txn.insert('cronaxia', {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
-        await txn.insert('cronaxia', {'nombre': 'Gemelos', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
+        await txn.insert('cronaxia', {
+          'nombre': 'Lumbares',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Glúteos',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Isquiotibiales',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Abdomen',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Cuádriceps',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Bíceps',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
+        await txn.insert('cronaxia', {
+          'nombre': 'Gemelos',
+          'valor': 0.0,
+          'tipo_equipamiento': 'BIO-SHAPE'
+        });
 
         // Imprimir mensaje para verificar inserciones
-        print('Inserciones completadas para los tipos de equipamiento BIO-JACKET y BIO-SHAPE');
+        print(
+            'Inserciones completadas para los tipos de equipamiento BIO-JACKET y BIO-SHAPE');
       });
-
-
       await db.transaction((txn) async {
         // Paso 1: Insertar el programa en la tabla programas_predeterminados
         int programaId1 = await txn.insert('programas_predeterminados', {
@@ -3506,13 +3758,14 @@ CREATE TABLE programa_cronaxia (
           'contraccion': 4,
           'pausa': 1,
           'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'  // Equipamiento seleccionado
+          'tipo_equipamiento': 'BIO-JACKET' // Equipamiento seleccionado
         });
 
         print("Programa insertado con ID: $programaId1");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -3525,13 +3778,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId1,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -3584,7 +3839,6 @@ CREATE TABLE programa_cronaxia (
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
           final valorCronaxia = cronaxia['valor'];
-
 
           // Relacionar la cronaxia con el programa y almacenar el valor
           await txn.insert('programa_cronaxia', {
@@ -3692,37 +3946,41 @@ CREATE TABLE programa_cronaxia (
         // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Modificar valores específicos de cronaxias basándonos en su ID
           // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
-          final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+          final nuevoValor = (cronaxiaId ==
+                  1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
               ? 200 // Nuevo valor para 'frecuencia'
-              : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-              ? 250 // Nuevo valor para 'rampa'
-              : (cronaxiaId == 3) // ID = 3 'pulso'
-              ? 200
-              : (cronaxiaId == 4) // ID = 4 'contracción'
-              ? 400
-              : (cronaxiaId == 5) // ID = 5 'pausa'
-              ? 300
-              : (cronaxiaId == 6) // ID = 6 'tipo'
-              ? 150
-              : (cronaxiaId == 7) // ID = 7 'equipamiento'
-              ? 350
-              : (cronaxiaId == 8) // ID = 8 'otro'
-              ? 400
-              : (cronaxiaId == 9)
-              ? 150
-              : (cronaxiaId == 10)
-              ? 150
-              : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+              : (cronaxiaId ==
+                      2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+                  ? 250 // Nuevo valor para 'rampa'
+                  : (cronaxiaId == 3) // ID = 3 'pulso'
+                      ? 200
+                      : (cronaxiaId == 4) // ID = 4 'contracción'
+                          ? 400
+                          : (cronaxiaId == 5) // ID = 5 'pausa'
+                              ? 300
+                              : (cronaxiaId == 6) // ID = 6 'tipo'
+                                  ? 150
+                                  : (cronaxiaId == 7) // ID = 7 'equipamiento'
+                                      ? 350
+                                      : (cronaxiaId == 8) // ID = 8 'otro'
+                                          ? 400
+                                          : (cronaxiaId == 9)
+                                              ? 150
+                                              : (cronaxiaId == 10)
+                                                  ? 150
+                                                  : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId4,
             'cronaxia_id': cronaxiaId,
-            'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
+            'valor': nuevoValor,
+            // Aquí almacenamos el valor modificado para este programa
           });
 
           print(
@@ -3740,7 +3998,8 @@ CREATE TABLE programa_cronaxia (
             'grupo_muscular_id': grupo['id'],
           });
 
-          print('ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR ${grupo['id']}');
+          print(
+              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR ${grupo['id']}');
         }
       });
       await db.transaction((txn) async {
@@ -3759,9 +4018,9 @@ CREATE TABLE programa_cronaxia (
 
         print("Programa insertado con ID: $programaId5");
 
-
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -3774,13 +4033,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId5,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -3823,7 +4084,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId6");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -3836,13 +4098,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId6,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -3885,7 +4149,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId7");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -3898,19 +4163,20 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId7,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
               'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId7 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
-
 
         // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
         List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
@@ -3947,7 +4213,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId8");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -3960,13 +4227,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId8,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4009,7 +4278,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId9");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4022,13 +4292,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId9,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4071,7 +4343,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId10");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4084,13 +4357,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId10,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4133,7 +4408,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId11");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4146,13 +4422,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId11,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4195,7 +4473,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId12");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4208,19 +4487,20 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId12,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
               'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId12 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
-
 
         // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
         List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
@@ -4257,7 +4537,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId13");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4270,13 +4551,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId13,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4319,7 +4602,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId14");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4332,19 +4616,20 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId14,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
               'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId14 con valor $valorCronaxia en la tabla programa_cronaxia');
         }
-
 
         // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
         List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
@@ -4381,7 +4666,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId15");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4394,13 +4680,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId15,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4443,7 +4731,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId16");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4456,13 +4745,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId16,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4505,7 +4796,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId17");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4518,13 +4810,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId17,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4567,7 +4861,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId18");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4580,13 +4875,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId18,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4628,7 +4925,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId19");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4641,13 +4939,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId19,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4689,7 +4989,8 @@ CREATE TABLE programa_cronaxia (
         print("Programa insertado con ID: $programaId20");
 
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4702,13 +5003,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId20,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4760,23 +5063,27 @@ CREATE TABLE programa_cronaxia (
         // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Modificar valores específicos de cronaxias basándonos en su ID
           // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
-          final nuevoValor = (cronaxiaId == 1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+          final nuevoValor = (cronaxiaId ==
+                  1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
               ? 375 // Nuevo valor para 'frecuencia'
-              : (cronaxiaId == 2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-              ? 400 // Nuevo valor para 'rampa'
-              : (cronaxiaId == 3) // ID = 3 'pulso'
-              ? 400
-              : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+              : (cronaxiaId ==
+                      2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+                  ? 400 // Nuevo valor para 'rampa'
+                  : (cronaxiaId == 3) // ID = 3 'pulso'
+                      ? 400
+                      : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId21,
             'cronaxia_id': cronaxiaId,
-            'valor': nuevoValor,  // Aquí almacenamos el valor modificado para este programa
+            'valor': nuevoValor,
+            // Aquí almacenamos el valor modificado para este programa
           });
 
           print(
@@ -4821,9 +5128,9 @@ CREATE TABLE programa_cronaxia (
 
         print("Programa insertado con ID: $programaId22");
 
-
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4836,13 +5143,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId22,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4883,9 +5192,9 @@ CREATE TABLE programa_cronaxia (
 
         print("Programa insertado con ID: $programaId23");
 
-
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4898,13 +5207,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId23,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4945,9 +5256,9 @@ CREATE TABLE programa_cronaxia (
 
         print("Programa insertado con ID: $programaId24");
 
-
         // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento = 'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
+        final tipoEquipamiento =
+            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
 
         // Seleccionar cronaxias del tipo de equipamiento
         final cronaxiasQuery = await txn.query(
@@ -4960,13 +5271,15 @@ CREATE TABLE programa_cronaxia (
         for (var cronaxia in cronaxiasQuery) {
           final cronaxiaId = cronaxia['id'];
           final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+          final valorCronaxia = cronaxia[
+              'valor']; // Usamos el valor predeterminado de la cronaxia
 
           // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
           await txn.insert('programa_cronaxia', {
             'programa_id': programaId24,
             'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,  // Mantener el valor predeterminado de la cronaxia
+            'valor': valorCronaxia,
+            // Mantener el valor predeterminado de la cronaxia
           });
 
           print(
@@ -4992,32 +5305,25 @@ CREATE TABLE programa_cronaxia (
         }
       });
 
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS ProgramaGrupoMuscular (
-        programa_id INTEGER,
-        grupo_muscular_id INTEGER,
-        FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id_programa),
-        FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares_equipamiento(id)
-      );
-    ''');
-      print("Tabla 'ProgramaGrupoMuscular' creada.");
-
       // Crear la tabla Programas_Automaticos
       await db.execute('''
-      CREATE TABLE Programas_Automaticos (
+      CREATE TABLE IF NOT EXISTS Programas_Automaticos (
         id_programa_automatico INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL,
         imagen TEXT,
         descripcion TEXT,
-        duracionTotal REAL
+        duracionTotal REAL,
+        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+      
       );
     ''');
 
       // Crear la tabla Programas_Automaticos_Subprogramas
       await db.execute('''
-      CREATE TABLE Programas_Automaticos_Subprogramas (
+      CREATE TABLE IF NOT EXISTS Programas_Automaticos_Subprogramas (
         id_programa_automatico INTEGER,
         id_programa_relacionado INTEGER,
+        orden INTEGER,
         ajuste REAL,
         duracion REAL,
         FOREIGN KEY (id_programa_automatico) REFERENCES Programas_Automaticos(id_programa_automatico),
@@ -5033,6 +5339,7 @@ CREATE TABLE programa_cronaxia (
             'imagen': 'assets/images/TONING.png',
             'descripcion': 'Aumento de la resistencia y retraso de la fatiga.',
             'duracionTotal': 25,
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -5141,6 +5448,12 @@ CREATE TABLE programa_cronaxia (
             },
           ];
 
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] =
+                i + 1; // Asignamos un orden empezando por 1
+          }
+
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -5149,9 +5462,9 @@ CREATE TABLE programa_cronaxia (
           // Verificamos los subprogramas insertados
           print('Programa Automático: TONIFICACIÓN');
           print('ID: $idProgramaAutomatico');
-          print(
-              'Descripción: Aumento de la resistencia y retraso de la fatiga.');
+          print('Descripción: Aumento de la resistencia y retraso de la fatiga.');
           print('Duración Total: 25.0');
+          print('Tipo Equipamiento: BIO-JACKET');
           print('Subprogramas:');
           print('*****************************************************');
 
@@ -5185,12 +5498,12 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "GLÚTEOS"
-          int idProgramaAutomatico2 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico2 = await txn.insert('Programas_Automaticos', {
             'nombre': 'GLÚTEOS',
             'imagen': 'assets/images/GLUTEOS.png',
             'descripcion': 'Fortalece los músculos del suelo pélvico',
             'duracionTotal': 25, // Duración total del programa en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -5310,7 +5623,11 @@ CREATE TABLE programa_cronaxia (
               'duracion': 5
             },
           ];
-
+// Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] =
+                i + 1; // Asignamos un orden empezando por 1
+          }
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -5354,12 +5671,12 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "SUELO PÉLVICO"
-          int idProgramaAutomatico3 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico3 = await txn.insert('Programas_Automaticos', {
             'nombre': 'SUELO PÉLVICO',
             'imagen': 'assets/images/SUELOPELV.png',
             'descripcion': 'Fortalece los músculos del suelo pélvico',
             'duracionTotal': 25, // Duración total del programa en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -5473,7 +5790,11 @@ CREATE TABLE programa_cronaxia (
               'duracion': 5
             },
           ];
-
+// Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] =
+                i + 1; // Asignamos un orden empezando por 1
+          }
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -5519,13 +5840,13 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "FUERZA"
-          int idProgramaAutomatico4 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico4 = await txn.insert('Programas_Automaticos', {
             'nombre': 'FUERZA',
             'imagen': 'assets/images/STRENGTH.png',
             'descripcion':
             'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
             'duracionTotal': 25, // Duración total del programa en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -5616,6 +5937,11 @@ CREATE TABLE programa_cronaxia (
             },
           ];
 
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          }
+
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -5662,13 +5988,13 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "HIPERTROFIA"
-          int idProgramaAutomatico5 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico5 = await txn.insert('Programas_Automaticos', {
             'nombre': 'HIPERTROFIA',
             'imagen': 'assets/images/HIPERTROFIA.png',
             'descripcion':
             'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
             'duracionTotal': 25, // Duración total del programa en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -5764,6 +6090,10 @@ CREATE TABLE programa_cronaxia (
               'duracion': 5
             },
           ];
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          }
 
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
@@ -5811,14 +6141,13 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "RESISTENCIA 1"
-          int idProgramaAutomatico6 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico6 = await txn.insert('Programas_Automaticos', {
             'nombre': 'RESISTENCIA 1',
             'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
             'descripcion':
             'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
             'duracionTotal': 25,
-            // Duración total del programa automático en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -5915,6 +6244,12 @@ CREATE TABLE programa_cronaxia (
             },
           ];
 
+
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          }
+
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -5961,14 +6296,13 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "RESISTENCIA 2"
-          int idProgramaAutomatico7 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico7 = await txn.insert('Programas_Automaticos', {
             'nombre': 'RESISTENCIA 2',
             'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
             'descripcion':
             'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
             'duracionTotal': 25,
-            // Duración total del programa automático en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -6077,6 +6411,11 @@ CREATE TABLE programa_cronaxia (
             },
           ];
 
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          }
+
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -6123,14 +6462,13 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "CARDIO"
-          int idProgramaAutomatico8 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico8 = await txn.insert('Programas_Automaticos', {
             'nombre': 'CARDIO',
             'imagen': 'assets/images/CARDIO.png',
             'descripcion':
             'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
             'duracionTotal': 25,
-            // Duración total del programa automático en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -6257,6 +6595,11 @@ CREATE TABLE programa_cronaxia (
             },
           ];
 
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          }
+
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -6303,14 +6646,13 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "CROSS MAX"
-          int idProgramaAutomatico9 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico9 = await txn.insert('Programas_Automaticos', {
             'nombre': 'CROSS MAX',
             'imagen': 'assets/images/CROSSMAX.png',
             'descripcion':
             'Programa experto. Entrenamiento para la mejora de la condición física.',
             'duracionTotal': 25,
-            // Duración total del programa automático en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -6419,6 +6761,11 @@ CREATE TABLE programa_cronaxia (
             },
           ];
 
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          }
+
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -6465,13 +6812,12 @@ CREATE TABLE programa_cronaxia (
       await db.transaction((txn) async {
         try {
           // Insertamos el programa automático "SLIM"
-          int idProgramaAutomatico10 =
-          await txn.insert('Programas_Automaticos', {
+          int idProgramaAutomatico10 = await txn.insert('Programas_Automaticos', {
             'nombre': 'SLIM',
             'imagen': 'assets/images/SLIM.png',
             'descripcion': 'Quema de grasa y creación de nuevas células.',
             'duracionTotal': 25,
-            // Duración total del programa automático en minutos
+            'tipo_equipamiento': 'BIO-JACKET',
           });
 
           // Lista de subprogramas con sus detalles
@@ -6556,6 +6902,12 @@ CREATE TABLE programa_cronaxia (
             },
           ];
 
+
+          // Asignamos un orden a cada subprograma
+          for (int i = 0; i < subprogramas.length; i++) {
+            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          }
+
           // Insertamos los subprogramas
           for (var subprograma in subprogramas) {
             await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
@@ -6611,7 +6963,7 @@ CREATE TABLE programa_cronaxia (
         'clientes',
         client,
         conflictAlgorithm:
-        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
     } catch (e) {
       print('Error inserting client: $e');
@@ -6629,7 +6981,7 @@ CREATE TABLE programa_cronaxia (
           'grupo_muscular_id': grupoMuscularId,
         },
         conflictAlgorithm:
-        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
       return true; // Si la inserción fue exitosa, retorna true
     } catch (e) {
@@ -6661,9 +7013,46 @@ CREATE TABLE programa_cronaxia (
     return idPrograma;
   }
 
+  // Función para insertar un programa predeterminado
+  Future<int> insertarProgramaAutomatico(
+      Map<String, dynamic> programaAuto) async {
+    final db = await database;
+    int idProgramaAuto = await db.insert('Programas_Automaticos', programaAuto);
+    print('Programa insertado con ID: $idProgramaAuto');
+    return idProgramaAuto;
+  }
+
+// Insertar relación entre un programa automático y subprogramas
+  Future<bool> insertAutomaticProgram(
+      int programaId, List<Map<String, dynamic>> subprogramas) async {
+    final db = await database;
+    try {
+      // Ahora insertamos los subprogramas relacionados
+      for (var subprograma in subprogramas) {
+        await db.insert(
+          'Programas_Automaticos_Subprogramas',
+          {
+            'id_programa_automatico': programaId,
+            // Usamos el ID del programa automático insertado
+            'id_programa_relacionado': subprograma['id_programa_relacionado'],
+            'orden' : subprograma['orden'],
+            'ajuste': subprograma['ajuste'],
+            'duracion': subprograma['duracion'],
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      return true; // Si la inserción fue exitosa, retorna true
+    } catch (e) {
+      print('Error inserting automatic program subprograms: $e');
+      return false; // Si ocurrió un error, retorna false
+    }
+  }
+
 // Función para insertar las cronaxias por defecto
-  Future<void> insertarCronaxiasPorDefecto(int programaId,
-      String tipoEquipamiento) async {
+  Future<void> insertarCronaxiasPorDefecto(
+      int programaId, String tipoEquipamiento) async {
     final db = await database;
 
     // Obtén las cronaxias asociadas al tipo de equipamiento para el programa recién creado
@@ -6671,13 +7060,11 @@ CREATE TABLE programa_cronaxia (
         where: 'tipo_equipamiento = ?', whereArgs: [tipoEquipamiento]);
 
     print(
-        'Cronaxias encontradas para el tipo de equipamiento $tipoEquipamiento: ${cronaxias
-            .length}');
+        'Cronaxias encontradas para el tipo de equipamiento $tipoEquipamiento: ${cronaxias.length}');
 
     // Iterar sobre las cronaxias encontradas
     for (var cronaxia in cronaxias) {
-      print(
-          'Cronaxia: ${cronaxia['nombre']} con valor: ${cronaxia['valor']}');
+      print('Cronaxia: ${cronaxia['nombre']} con valor: ${cronaxia['valor']}');
 
       // Verificar si la cronaxia ya está asociada con el programa en la tabla intermedia
       var existingCronaxia = await db.query('programa_cronaxia',
@@ -6689,7 +7076,7 @@ CREATE TABLE programa_cronaxia (
         await db.insert('programa_cronaxia', {
           'programa_id': programaId,
           'cronaxia_id': cronaxia['id'],
-          'valor' : 0.0,
+          'valor': 0.0,
         });
         print(
             'Cronaxia insertada: ${cronaxia['nombre']} para el programa $programaId');
@@ -6701,8 +7088,8 @@ CREATE TABLE programa_cronaxia (
   }
 
 // Función para insertar los grupos musculares por defecto
-  Future<void> insertarGruposMuscularesPorDefecto(int programaId,
-      String tipoEquipamiento) async {
+  Future<void> insertarGruposMuscularesPorDefecto(
+      int programaId, String tipoEquipamiento) async {
     final db = await database;
 
     // Obtén los grupos musculares asociados al tipo de equipamiento para el programa recién creado
@@ -6712,8 +7099,7 @@ CREATE TABLE programa_cronaxia (
         whereArgs: [tipoEquipamiento]);
 
     print(
-        'Grupos musculares encontrados para el tipo de equipamiento $tipoEquipamiento: ${gruposMusculares
-            .length}');
+        'Grupos musculares encontrados para el tipo de equipamiento $tipoEquipamiento: ${gruposMusculares.length}');
 
     // Iterar sobre los grupos musculares encontrados
     for (var grupoMuscular in gruposMusculares) {
@@ -6791,7 +7177,8 @@ CREATE TABLE programa_cronaxia (
   }
 
   // Función para actualizar una cronaxia
-  Future<void> updateCronaxia(int programaId, int cronaxiaId, double valor) async {
+  Future<void> updateCronaxia(
+      int programaId, int cronaxiaId, double valor) async {
     final db = await database;
 
     // Verifica si la cronaxia existe en la tabla
@@ -6815,19 +7202,23 @@ CREATE TABLE programa_cronaxia (
         print('Error al actualizar la cronaxia: $e');
       }
     } else {
-      print('Cronaxia con programa_id $programaId y cronaxia_id $cronaxiaId no encontrada');
+      print(
+          'Cronaxia con programa_id $programaId y cronaxia_id $cronaxiaId no encontrada');
     }
   }
 
 // Función para actualizar los grupos musculares asociados a un programa
-  Future<void> actualizarGruposMusculares(int programaId, List<int> nuevosGruposMuscularesIds) async {
+  Future<void> actualizarGruposMusculares(
+      int programaId, List<int> nuevosGruposMuscularesIds) async {
     final db = await database;
 
     // Empezamos una transacción para asegurar que todas las operaciones se ejecuten de manera atómica
     await db.transaction((txn) async {
       // Primero, eliminamos todos los grupos musculares existentes para el programa
-      await txn.delete('ProgramaGrupoMuscular', where: 'programa_id = ?', whereArgs: [programaId]);
-      print('Grupos musculares existentes eliminados para el programa $programaId');
+      await txn.delete('ProgramaGrupoMuscular',
+          where: 'programa_id = ?', whereArgs: [programaId]);
+      print(
+          'Grupos musculares existentes eliminados para el programa $programaId');
 
       // Ahora insertamos los nuevos grupos musculares seleccionados
       for (int grupoId in nuevosGruposMuscularesIds) {
@@ -6842,8 +7233,6 @@ CREATE TABLE programa_cronaxia (
 
     print('Grupos musculares actualizados para el programa $programaId');
   }
-
-
 
   /*METODOS GET DE LA BBDD*/
 
@@ -6909,12 +7298,13 @@ CREATE TABLE programa_cronaxia (
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-    await db.query('grupos_musculares');
+        await db.query('grupos_musculares');
     return result;
   }
 
 // Obtener los datos de la tabla grupos_musculares filtrados por tipo de equipamiento
-  Future<List<Map<String, dynamic>>> getGruposMuscularesEquipamiento(String tipoEquipamiento) async {
+  Future<List<Map<String, dynamic>>> getGruposMuscularesEquipamiento(
+      String tipoEquipamiento) async {
     final db = await database;
 
     // Consulta con filtro por tipo de equipamiento
@@ -6926,10 +7316,6 @@ CREATE TABLE programa_cronaxia (
 
     return result;
   }
-
-
-
-
 
   Future<List<Map<String, dynamic>>> getAvailableBonosByClientId(
       int clientId) async {
@@ -6952,11 +7338,18 @@ CREATE TABLE programa_cronaxia (
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerProgramasPredeterminadosPorTipoIndividual(Database db) async {
+  // Obtener todos los bonos
+  Future<List<Map<String, dynamic>>> getAllPrograms() async {
+    final db = await database;
+    final result = await db.query('programas_predeterminados');
+    return result;
+  }
 
-
+  Future<List<Map<String, dynamic>>>
+      obtenerProgramasPredeterminadosPorTipoIndividual(Database db) async {
     // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
-    final List<Map<String, dynamic>> programasConDetalles = await db.rawQuery('''
+    final List<Map<String, dynamic>> programasConDetalles =
+        await db.rawQuery('''
     SELECT 
       p.id_programa,
       p.nombre AS nombre,
@@ -7034,18 +7427,14 @@ CREATE TABLE programa_cronaxia (
     // Convertir el mapa a lista
     programas = programaMap.values.toList();
 
-
-
     return programas;
   }
 
-
-
-  Future<List<Map<String, dynamic>>> obtenerProgramasPredeterminadosPorTipoRecovery(Database db) async {
-
-
+  Future<List<Map<String, dynamic>>>
+      obtenerProgramasPredeterminadosPorTipoRecovery(Database db) async {
     // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
-    final List<Map<String, dynamic>> programasConDetalles = await db.rawQuery('''
+    final List<Map<String, dynamic>> programasConDetalles =
+        await db.rawQuery('''
     SELECT 
       p.id_programa,
       p.nombre AS nombre,
@@ -7123,13 +7512,10 @@ CREATE TABLE programa_cronaxia (
     // Convertir el mapa a lista
     programas = programaMap.values.toList();
 
-
-
     return programas;
   }
 
-  Future<List<
-      Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(
+  Future<List<Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(
       Database db) async {
     try {
       // Consulta los programas automáticos
@@ -7142,9 +7528,8 @@ CREATE TABLE programa_cronaxia (
 
       for (var programa in programas) {
         // Obtiene los subprogramas relacionados con el programa actual
-        final List<Map<String, dynamic>> subprogramas = await db.rawQuery(
-            '''
-        SELECT pa.id_programa_automatico, pa.id_programa_relacionado, pr.nombre, pa.ajuste, pa.duracion
+        final List<Map<String, dynamic>> subprogramas = await db.rawQuery('''
+        SELECT pa.id_programa_automatico, pa.id_programa_relacionado, pr.nombre, pa.orden, pa.ajuste, pa.duracion 
         FROM Programas_Automaticos_Subprogramas pa
         JOIN programas_predeterminados pr ON pr.id_programa = pa.id_programa_relacionado
         WHERE pa.id_programa_automatico = ?
@@ -7158,6 +7543,7 @@ CREATE TABLE programa_cronaxia (
             'imagen': programa['imagen'],
             'descripcion': programa['descripcion'],
             'duracionTotal': programa['duracionTotal'],
+            'tipo_equipamiento': programa['tipo_equipamiento'],
             'subprogramas': subprogramas,
           });
         }
@@ -7173,8 +7559,7 @@ CREATE TABLE programa_cronaxia (
   Future<List<Map<String, dynamic>>> obtenerGruposMuscularesPorEquipamiento(
       Database db, String tipoEquipamiento) async {
     // Verifica que el tipo de equipamiento sea válido
-    if (tipoEquipamiento != 'BIO-SHAPE' &&
-        tipoEquipamiento != 'BIO-JACKET') {
+    if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
       throw ArgumentError(
           'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
     }
@@ -7191,8 +7576,7 @@ CREATE TABLE programa_cronaxia (
     );
 
     // Imprime el resultado de la consulta
-    print('Grupos musculares obtenidos: ${gruposMusculares
-        .length} elementos.');
+    print('Grupos musculares obtenidos: ${gruposMusculares.length} elementos.');
 
     // Itera sobre los resultados e imprime cada grupo muscular y su tipo de equipamiento
     for (var grupo in gruposMusculares) {
@@ -7203,11 +7587,10 @@ CREATE TABLE programa_cronaxia (
     return gruposMusculares;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(Database db,
-      String tipoEquipamiento) async {
+  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(
+      Database db, String tipoEquipamiento) async {
     // Verifica que el tipo de equipamiento sea válido
-    if (tipoEquipamiento != 'BIO-SHAPE' &&
-        tipoEquipamiento != 'BIO-JACKET') {
+    if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
       throw ArgumentError(
           'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
     }
@@ -7234,8 +7617,8 @@ CREATE TABLE programa_cronaxia (
     return cronaxias;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(Database db,
-      int programaId) async {
+  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(
+      Database db, int programaId) async {
     final List<Map<String, dynamic>> grupos = await db.rawQuery('''
       SELECT g.id, g.nombre, g.imagen, g.tipo_equipamiento
       FROM grupos_musculares_equipamiento g
@@ -7246,7 +7629,8 @@ CREATE TABLE programa_cronaxia (
     return grupos;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(Database db, int programaId) async {
+  Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(
+      Database db, int programaId) async {
     return await db.rawQuery('''
     SELECT c.nombre, pc.valor
     FROM programa_cronaxia AS pc
@@ -7255,14 +7639,14 @@ CREATE TABLE programa_cronaxia (
   ''', [programaId]);
   }
 
-
 // Obtener el programa más reciente (con el id más alto) y su tipo de equipamiento
   Future<Map<String, dynamic>?> getMostRecentPrograma() async {
     final db = await database;
     // Realizamos una consulta que ordene por id_programa de forma descendente (del más grande al más pequeño)
     final List<Map<String, dynamic>> result = await db.query(
       'programas_predeterminados', // Tabla 'programas'
-      orderBy: 'id_programa DESC', // Ordenamos por id_programa de manera descendente
+      orderBy: 'id_programa DESC',
+      // Ordenamos por id_programa de manera descendente
       limit: 1, // Solo nos interesa el primer resultado (el más reciente)
     );
 
@@ -7275,8 +7659,6 @@ CREATE TABLE programa_cronaxia (
 
     return null; // Si no se encontró ningún programa
   }
-
-
 
   /*METODOS DE BORRADO DE BBD*/
 
