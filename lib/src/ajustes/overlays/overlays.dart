@@ -269,3 +269,88 @@ class _OverlayBackupState extends State<OverlayBackup>
     );
   }
 }
+
+
+
+class OverlayIdioma extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayIdioma({super.key, required this.onClose});
+
+  @override
+  _OverlayIdiomaState createState() => _OverlayIdiomaState();
+}
+
+class _OverlayIdiomaState extends State<OverlayIdioma>
+    with SingleTickerProviderStateMixin {
+  String? selectedIdioma;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  final List<Map<String, dynamic>> idiomas = [
+    {"nombre": "Español", "icono": "assets/images/cliente.png"},
+    {"nombre": "Inglés", "icono": "assets/images/cliente.png"},
+    {"nombre": "Francés", "icono": "assets/images/cliente.png"},
+    {"nombre": "Italiano", "icono": "assets/images/cliente.png"},
+    {"nombre": "Portugués", "icono": "assets/images/cliente.png"},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return MainOverlay(
+      title: const Text(
+        "SELECCIONAR IDIOMA",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: idiomas.length,
+          itemBuilder: (context, index) {
+            final idioma = idiomas[index];
+            return ListTile(
+              leading: Image.asset(
+                idioma['icono'],
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
+              title: Text(
+                idioma['nombre'],
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              trailing: Radio<String>(
+                value: idioma['nombre'],
+                groupValue: selectedIdioma,
+                onChanged: (value) {
+                  setState(() {
+                    selectedIdioma = value;
+                  });
+                },
+              ),
+              onTap: () {
+                setState(() {
+                  selectedIdioma = idioma['nombre'];
+                });
+              },
+            );
+          },
+        ),
+      ),
+      onClose: widget.onClose,
+    );
+  }
+}

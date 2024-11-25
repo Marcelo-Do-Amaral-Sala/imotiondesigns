@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:imotion_designs/src/ajustes/overlays/overlay_backup.dart';
+import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 import 'package:imotion_designs/src/programs/overlays/overlays_programs.dart';
 
 class AjustesMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
-  const AjustesMenuView({super.key, required this.onBack});
+  final Function() onNavigatetoLicencia; // Callback para navegar de vuelta
+  const AjustesMenuView({super.key, required this.onBack, required this.onNavigatetoLicencia});
 
   @override
   State<AjustesMenuView> createState() => _AjustesMenuViewState();
@@ -121,6 +122,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView> {
                                     () {
                                   setState(() {
                                     scaleFactorLicencia = 1;
+                                    widget.onNavigatetoLicencia();
                                   });
                                 },
                                     () {
@@ -165,6 +167,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView> {
                                     () {
                                   setState(() {
                                     scaleFactorIdioma = 1;
+                                    toggleOverlay(1);
                                   });
                                 },
                                     () {
@@ -263,6 +266,10 @@ class _AjustesMenuViewState extends State<AjustesMenuView> {
       case 0:
         return OverlayBackup(
           onClose: () => toggleOverlay(0),
+        );
+      case 1:
+        return OverlayIdioma(
+          onClose: () => toggleOverlay(1),
         );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada

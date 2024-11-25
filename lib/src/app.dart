@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/ajustes/form/licencia_form.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
 import 'ajustes/menus/ajustes_menu.dart';
@@ -43,6 +44,14 @@ class _AppState extends State<App> {
         viewToDisplay = AjustesMenuView(
           onBack: () =>
               navigateTo('mainMenu'), // Callback para volver a MainMenuView
+          onNavigatetoLicencia: () => navigateTo('licencia'),
+        );
+        break;
+
+      case 'licencia':
+        viewToDisplay = LicenciaFormView(
+          onBack: () =>
+              navigateTo('ajustes'), // Callback para volver a MainMenuView
         );
         break;
       case 'mainMenu':
