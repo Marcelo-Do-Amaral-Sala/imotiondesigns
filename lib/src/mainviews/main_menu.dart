@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/bio/overlay_bio.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../db/db_helper.dart';
@@ -30,11 +31,20 @@ class _MainMenuViewState extends State<MainMenuView> {
   bool isOverlayVisible = false;
   String overlayContentType = '';
   Map<String, String>? clientData;
+  int overlayIndex = -1; // -1 indica que no hay overlay visible
+
 
   @override
   void initState() {
     super.initState();
     _initializeDatabase();
+  }
+
+  void toggleOverlay(int index) {
+    setState(() {
+      isOverlayVisible = !isOverlayVisible;
+      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
+    });
   }
 
   Future<void> _initializeDatabase() async {
@@ -163,6 +173,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 () {
                                   setState(() {
                                     scaleFactorBio = 1;
+                                    toggleOverlay(0);
                                   });
                                 },
                                 () {
@@ -226,9 +237,29 @@ class _MainMenuViewState extends State<MainMenuView> {
               ],
             ),
           ),
+          // Overlay: Esto se coloca fuera del contenido principal y en el centro de la pantalla
+          if (isOverlayVisible)
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.center,
+                child: _getOverlayWidget(overlayIndex),
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  Widget _getOverlayWidget(int overlayIndex) {
+    switch (overlayIndex) {
+      case 0:
+        return OverlayBioimpedancia(
+          onClose: () => toggleOverlay(0),
+        );
+
+      default:
+        return Container(); // Si no coincide con ninguno de los índices, no muestra nada
+    }
   }
 
   Widget buildButton(BuildContext context, String imagePath, String text,

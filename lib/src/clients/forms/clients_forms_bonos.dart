@@ -174,7 +174,7 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
               'AÑADIR BONOS',
               style: TextStyle(
                 color: Color(0xFF2be4f3),
-                fontSize: 16,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
