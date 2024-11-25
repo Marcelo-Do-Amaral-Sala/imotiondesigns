@@ -40,6 +40,8 @@ dependencies:
   flutter_radar_chart: ^0.2.1
   fl_chart: ^0.69.0
   wakelock_plus: ^1.2.8
+  flutter_dotenv: ^5.2.1
+  restart_app: ^1.3.2
 
 
 
@@ -142,6 +144,7 @@ flutter:
     - assets/images/ibodyPro.png
     - assets/images/obtenerBio.png
     - assets/images/leerbio.png
+    - .env
 
   #   - images/a_dot_ham.jpeg
 

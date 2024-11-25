@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:http/http.dart' as http;
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -11,18 +16,18 @@ class DatabaseHelper {
 
   DatabaseHelper._internal();
 
-  // Asegúrate de que la base de datos esté inicializada
   Future<Database> get database async {
-    if (_database != null)
-      return _database!; // Si la base de datos ya está abierta, devuélvela.
-    _database = await _initDatabase(); // Si no, la inicializa.
+    if (_database != null) {
+      return _database!;
+    }
+    _database = await _initDatabase();
     return _database!;
   }
 
-  // Inicializar la base de datos
   Future<Database> _initDatabase() async {
-    String path = join(
-        await getDatabasesPath(), 'my_database.db'); // Ruta de la base de datos
+    // Asegúrate de que la base de datos no se sobrescriba si ya existe
+    var databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, 'my_database.db');
 
     return await openDatabase(
       path,
@@ -7701,4 +7706,176 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
       content: Text('Base de datos eliminada con éxito.'),
     ));
   }*/
+
+    static Future<File> backupDatabase() async {
+    try {
+      var databasesPath = await getDatabasesPath();
+      String path = join(databasesPath, 'my_database.db');
+      final file = File(path);
+      if (await file.exists()) {
+        return file;
+      } else {
+        throw Exception("La base de datos no existe en la ruta especificada.");
+      }
+    } catch (e) {
+      throw Exception("Error al hacer la copia de seguridad: $e");
+    }
+  }
+
+  // Método para obtener el SHA del archivo en GitHub
+  static Future<String?> _getFileSha(String owner, String repo, String fileName, String token) async {
+    String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'token $token',
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      return responseData['sha'];  // Devuelve el SHA si el archivo existe
+    } else {
+      return null;  // Si no existe, el archivo será creado
+    }
+  }
+
+// Método para subir o actualizar el archivo de la base de datos en GitHub
+  static Future<void> uploadDatabaseToGitHub() async {
+    try {
+      // Cargar el token desde el archivo .env
+      String? token = dotenv.env['GITHUB_TOKEN'];  // Obtener el token desde el .env
+
+      // Asegurarse de que el token esté presente
+      if (token == null || token.isEmpty) {
+        throw Exception('El token de GitHub no está configurado correctamente en el archivo .env');
+      }
+
+      // Obtener la copia de seguridad de la base de datos
+      File backupFile = await backupDatabase();
+      String fileName = 'database_v25.db';  // Nombre del archivo en GitHub
+      String owner = 'Marcelo-Do-Amaral-Sala';  // Usuario de GitHub
+      String repo = 'imotiondesigns';  // Repositorio de GitHub
+
+      // Leer el archivo y codificarlo en base64
+      List<int> fileBytes = await backupFile.readAsBytes();
+      String contentBase64 = base64Encode(fileBytes);
+
+      // Print para ver el contenido antes de subirlo
+      print("Contenido a subir (base64, tamaño ${contentBase64.length} caracteres): $contentBase64");
+
+      // Verificar si el archivo ya existe en el repositorio
+      String? fileSha = await _getFileSha(owner, repo, fileName, token);
+
+      // Construir la URL de la API de GitHub para subir el archivo
+      String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';
+
+      // Realizar la solicitud PUT para subir o actualizar el archivo
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'token $token',  // Usar el token cargado desde el .env
+          'Accept': 'application/vnd.github.v3+json',
+        },
+        body: jsonEncode({
+          'message': 'Subida o actualización de copia de seguridad',
+          'content': contentBase64,
+          'sha': fileSha,  // Si el archivo ya existe, pasamos el SHA para actualizarlo
+        }),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Copia de seguridad subida o actualizada exitosamente en GitHub');
+      } else {
+        throw Exception('Error al subir o actualizar la copia de seguridad: ${response.body}');
+      }
+    } catch (e) {
+      print('Error al subir o actualizar la copia de seguridad a GitHub: $e');
+    }
+  }
+
+  static Future<void> downloadDatabaseFromGitHub() async {
+    try {
+      // Cargar el token desde el archivo .env
+      String? token = dotenv.env['GITHUB_TOKEN'];  // Obtener el token desde el .env
+
+      // Asegurarse de que el token esté presente
+      if (token == null || token.isEmpty) {
+        throw Exception('El token de GitHub no está configurado correctamente en el archivo .env');
+      }
+
+      String fileName = 'database_v25.db';
+      String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
+      String repo = 'imotiondesigns'; // Repositorio de GitHub
+
+      // Construir la URL de la API de GitHub
+      String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';
+
+      // Realizar la solicitud GET para obtener el archivo
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'token $token',
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Parsear el contenido de la respuesta
+        final responseData = jsonDecode(response.body);
+
+        // Verificar si 'content' está presente en la respuesta
+        if (!responseData.containsKey('content')) {
+          throw Exception('El contenido base64 no está disponible en la respuesta.');
+        }
+
+        // Obtener el contenido codificado en base64
+        String base64Content = responseData['content'];
+
+        // Eliminar saltos de línea del contenido base64
+        base64Content = base64Content.replaceAll('\n', '');
+
+        // **Nuevo: Imprimir el contenido base64 descargado para depuración**
+        print("Contenido descargado (base64, tamaño ${base64Content.length} caracteres): $base64Content");
+
+        // Verificar que el contenido base64 no esté vacío
+        if (base64Content.isEmpty) {
+          throw Exception('El contenido base64 descargado está vacío.');
+        }
+
+        // Decodificar el contenido de base64 a bytes
+        List<int> fileBytes = base64Decode(base64Content);
+
+        // Verificar que el tamaño del archivo descargado sea mayor que 0
+        if (fileBytes.isEmpty) {
+          throw Exception('El archivo descargado tiene un tamaño inválido.');
+        }
+
+        // **Nuevo: Verificar la estructura del archivo descargado**
+        if (fileBytes.length < 1024) { // Verifica que el archivo sea lo suficientemente grande
+          throw Exception('El archivo descargado es muy pequeño, probablemente está corrupto.');
+        }
+
+        // Guardar los bytes en un archivo local
+        final String path = join(await getDatabasesPath(), 'my_database.db');
+        File localFile = File(path);
+
+        // Asegúrate de que el archivo pueda escribirse
+        await localFile.writeAsBytes(fileBytes);
+
+        print('Copia de seguridad descargada y guardada exitosamente en: $path');
+
+        // Opción de probar que el archivo es válido (puedes añadir tu lógica aquí)
+        // Puedes abrir el archivo para verificar que se puede usar
+        // db = await openDatabase(path);
+      } else {
+        throw Exception('Error al descargar la copia de seguridad: ${response.body}');
+      }
+    } catch (e) {
+      print('Error al descargar la copia de seguridad desde GitHub: $e');
+    }
+  }
+
 }

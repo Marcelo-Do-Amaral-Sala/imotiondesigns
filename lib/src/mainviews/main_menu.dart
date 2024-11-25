@@ -12,8 +12,9 @@ import '../db/db_helper_web.dart';
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToClients;
   final Function() onNavigateToPrograms;
+  final Function() onNavigateToAjustes;
 
-  const MainMenuView({Key? key, required this.onNavigateToClients, required this.onNavigateToPrograms})
+  const MainMenuView({Key? key, required this.onNavigateToClients, required this.onNavigateToPrograms, required this.onNavigateToAjustes})
       : super(key: key);
 
   @override
@@ -204,6 +205,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 () {
                                   setState(() {
                                     scaleFactorAjustes = 1;
+                                    widget.onNavigateToAjustes();
                                   });
                                 },
                                 () {
