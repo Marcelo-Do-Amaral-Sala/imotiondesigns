@@ -3918,7 +3918,17 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     });
   }
 
+  Future<void> updateUsuarioPerfil(int userId, int perfilId) async {
+    final db = await database;
 
+    // Actualizar la relación entre el usuario y el perfil
+    await db.update(
+      'usuario_perfil',
+      {'perfil_id': perfilId},
+      where: 'usuario_id = ?',
+      whereArgs: [userId],
+    );
+  }
 
 /* METODOS ACTUALIZACION BBDD*/
 
@@ -3936,6 +3946,31 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
         await db.update(
           'clientes',
           client,
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      } catch (e) {
+        print('Error updating client: $e');
+      }
+    } else {
+      print('Client with id $id not found');
+    }
+  }
+
+  // Actualizar un cliente
+  Future<void> updateUser(int id, Map<String, dynamic> user) async {
+    final db = await database;
+    // Verifica si el cliente existe
+    final existingUser = await db.query(
+      'usuarios',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (existingUser.isNotEmpty) {
+      try {
+        await db.update(
+          'usuarios',
+          user,
           where: 'id = ?',
           whereArgs: [id],
         );
@@ -4065,6 +4100,20 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     final db = await database;
     final List<Map<String, dynamic>> result = await db.query(
       'clientes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
+  }
+
+  // Obtener un cliente por ID
+  Future<Map<String, dynamic>?> getUserById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'usuarios',
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -4498,6 +4547,26 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     return result;
   }
 
+  Future<String?> getTipoPerfilByUserId(int userId) async {
+    final db = await database;
+
+    // Consulta para obtener el tipo de perfil del usuario a partir de la tabla `usuario_perfil`
+    final result = await db.rawQuery('''
+      SELECT tp.tipo
+      FROM tipos_perfil tp
+      JOIN usuario_perfil up ON tp.id = up.perfil_id
+      WHERE up.usuario_id = ?
+    ''', [userId]);
+
+    if (result.isNotEmpty) {
+      // Asegúrate de convertir a String, en caso de que el valor no sea null
+      return result.first['tipo'] as String?; // Convertimos explícitamente a String?
+    }
+
+    return null; // Si no se encuentra el tipo de perfil, devuelve null
+  }
+
+
   // Obtener el cliente más reciente (con el id más alto)
   Future<Map<String, dynamic>?> getMostRecentUser() async {
     final db = await database;
@@ -4551,10 +4620,16 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     );
   }
 
-  Future<int> eliminarUsuario(int id) async {
+  // Eliminar un cliente por ID
+  Future<void> deleteUser(int id) async {
     final db = await database;
-    return await db.delete('usuarios', where: 'id = ?', whereArgs: [id]);
+    await db.delete(
+      'usuarios',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
+
 
 
   // Eliminar un bono por ID
@@ -4613,21 +4688,21 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
 // Método para subir o actualizar el archivo de la base de datos en GitHub
-  static Future<void> uploadDatabaseToGitHub() async {
+  static Future<void> uploadDatabaseToGitHub(String licenseNumber) async {
     try {
       // Cargar el token desde el archivo .env
-      String? token = dotenv
-          .env['GITHUB_TOKEN']; // Obtener el token desde el .env
+      String? token = dotenv.env['GITHUB_TOKEN']; // Obtener el token desde el .env
 
       // Asegurarse de que el token esté presente
       if (token == null || token.isEmpty) {
-        throw Exception(
-            'El token de GitHub no está configurado correctamente en el archivo .env');
+        throw Exception('El token de GitHub no está configurado correctamente en el archivo .env');
       }
 
       // Obtener la copia de seguridad de la base de datos
       File backupFile = await backupDatabase();
-      String fileName = 'database_v25.db'; // Nombre del archivo en GitHub
+
+      // Incluir el número de licencia en el nombre del archivo
+      String fileName = 'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
       String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
       String repo = 'imotiondesigns'; // Repositorio de GitHub
 
@@ -4636,8 +4711,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       String contentBase64 = base64Encode(fileBytes);
 
       // Print para ver el contenido antes de subirlo
-      print("Contenido a subir (base64, tamaño ${contentBase64
-          .length} caracteres): $contentBase64");
+      print("Contenido a subir (base64, tamaño ${contentBase64.length} caracteres): $contentBase64");
 
       // Verificar si el archivo ya existe en el repositorio
       String? fileSha = await _getFileSha(owner, repo, fileName, token);
@@ -4649,31 +4723,28 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       final response = await http.put(
         Uri.parse(url),
         headers: {
-          'Authorization': 'token $token',
-          // Usar el token cargado desde el .env
+          'Authorization': 'token $token', // Usar el token cargado desde el .env
           'Accept': 'application/vnd.github.v3+json',
         },
         body: jsonEncode({
           'message': 'Subida o actualización de copia de seguridad',
           'content': contentBase64,
-          'sha': fileSha,
-          // Si el archivo ya existe, pasamos el SHA para actualizarlo
+          'sha': fileSha, // Si el archivo ya existe, pasamos el SHA para actualizarlo
         }),
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         print('Copia de seguridad subida o actualizada exitosamente en GitHub');
       } else {
-        throw Exception(
-            'Error al subir o actualizar la copia de seguridad: ${response
-                .body}');
+        throw Exception('Error al subir o actualizar la copia de seguridad: ${response.body}');
       }
     } catch (e) {
       print('Error al subir o actualizar la copia de seguridad a GitHub: $e');
     }
   }
 
-  static Future<void> downloadDatabaseFromGitHub() async {
+
+  static Future<void> downloadDatabaseFromGitHub(String licenseNumber ) async {
     try {
       // Cargar el token desde el archivo .env
       String? token = dotenv
@@ -4685,7 +4756,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
             'El token de GitHub no está configurado correctamente en el archivo .env');
       }
 
-      String fileName = 'database_v25.db';
+      String fileName = 'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
       String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
       String repo = 'imotiondesigns'; // Repositorio de GitHub
 

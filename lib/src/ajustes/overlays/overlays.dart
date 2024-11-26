@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/ajustes/form/user_form_bonos.dart';
+import 'package:imotion_designs/src/ajustes/info/admins_activity.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
 import 'package:imotion_designs/src/ajustes/info/entrenadores_list_view.dart';
 import 'package:restart_app/restart_app.dart';
@@ -9,6 +10,8 @@ import '../../db/db_helper.dart';
 import '../../db/db_helper_traducciones.dart';
 import '../../servicios/sync.dart';
 import '../form/user_form.dart';
+import '../info/admins_bonos.dart';
+import '../info/admins_data.dart';
 
 class OverlayBackup extends StatefulWidget {
   final VoidCallback onClose;
@@ -19,12 +22,10 @@ class OverlayBackup extends StatefulWidget {
   _OverlayBackupState createState() => _OverlayBackupState();
 }
 
-class _OverlayBackupState extends State<OverlayBackup>
-    with SingleTickerProviderStateMixin {
+class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProviderStateMixin {
   bool isBodyPro = true;
   String? selectedGender;
-  bool showConfirmation =
-      false; // Nuevo estado para mostrar mensaje de confirmación
+  bool showConfirmation = false; // Nuevo estado para mostrar mensaje de confirmación
   bool isLoading = false;
   String statusMessage = 'Listo para hacer la copia de seguridad';
   final DatabaseHelper _dbHelper = DatabaseHelper();
@@ -54,7 +55,7 @@ class _OverlayBackupState extends State<OverlayBackup>
       print('SUBIENDO BACKUP...');
 
       // Realiza la subida del backup a GitHub
-      await DatabaseHelper.uploadDatabaseToGitHub();
+      await DatabaseHelper.uploadDatabaseToGitHub('12345');
 
       // Reabrir la base de datos después de subir el backup
       await dbHelper.initializeDatabase();
@@ -97,7 +98,7 @@ class _OverlayBackupState extends State<OverlayBackup>
       debugPrint("Database open (after re-opening): ${db.isOpen}");
 
       // Descargar la copia de seguridad desde GitHub
-      await DatabaseHelper.downloadDatabaseFromGitHub();
+      await DatabaseHelper.downloadDatabaseFromGitHub('12345');
 
       // Verificar nuevamente si la base de datos sigue abierta después de la descarga
       final dbAfterDownload = await dbHelper.database;
@@ -146,11 +147,10 @@ class _OverlayBackupState extends State<OverlayBackup>
                 OutlinedButton(
                   onPressed: () {
                     _uploadBackup();
-                  }, // Mantener vacío para que InkWell funcione
+                  },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -169,7 +169,7 @@ class _OverlayBackupState extends State<OverlayBackup>
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      showConfirmation = true; // Mostrar confirmación al pulsar
+                      showConfirmation = true;
                     });
                   },
                   style: OutlinedButton.styleFrom(
@@ -191,82 +191,93 @@ class _OverlayBackupState extends State<OverlayBackup>
                 ),
               ],
             ),
-            if (showConfirmation) ...[
+            if (isLoading) ...[
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-              const Text(
-                '¿Seguro que quieres restaurar la copia?',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+              Text(
+                statusMessage,
+                style: const TextStyle(color: Colors.white, fontSize: 18),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  OutlinedButton(
-                    onPressed: () async {
-                      try {
-                        // Primero se descarga la base de datos
-                        await _downloadBackup();
+            ] else ...[
+              if (showConfirmation) ...[
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                const Text(
+                  '¿Seguro que quieres restaurar la copia?',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () async {
+                        try {
+                          // Primero se descarga la base de datos
+                          await _downloadBackup();
+                          // Después de la descarga, ocultamos la confirmación (si es necesario)
+                          setState(() {
+                            showConfirmation = false;
+                          });
 
-                        // Después de la descarga, ocultamos la confirmación (si es necesario)
+                          // Finalmente, reiniciamos la aplicación
+                          await Restart.restartApp();
+                        } catch (e) {
+                          print('Error al descargar la copia de seguridad: $e');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(10.0),
+                        side: const BorderSide(width: 1.0, color: Colors.green),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
+                      child: const Text(
+                        'SÍ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: () {
                         setState(() {
-                          showConfirmation = false;
+                          showConfirmation = false; // Ocultar confirmación
                         });
-
-                        // Finalmente, reiniciamos la aplicación
-                        await Restart.restartApp();
-                      } catch (e) {
-                        // Manejo de errores en caso de que algo falle durante la descarga
-                        print('Error al descargar la copia de seguridad: $e');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(10.0),
-                      side: const BorderSide(width: 1.0, color: Colors.green),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(10.0),
+                        side: const BorderSide(width: 1.0, color: Colors.red),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        backgroundColor: Colors.red,
                       ),
-                      backgroundColor: Colors.green,
-                    ),
-                    child: const Text(
-                      'SÍ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
+                      child: const Text(
+                        'NO',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        showConfirmation = false; // Ocultar confirmación
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(10.0),
-                      side: const BorderSide(width: 1.0, color: Colors.red),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7),
-                      ),
-                      backgroundColor: Colors.red,
-                    ),
-                    child: const Text(
-                      'NO',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ],
           ],
         ),
@@ -364,9 +375,9 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                       hint: Text("Selecciona un idioma"),
                       items: ['es', 'en', 'fr', 'pt', 'it']
                           .map((lang) => DropdownMenuItem<String>(
-                        value: lang,
-                        child: Text(lang.toUpperCase()),
-                      ))
+                                value: lang,
+                                child: Text(lang.toUpperCase()),
+                              ))
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -384,15 +395,15 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                       child: _translations.isEmpty
                           ? Center(child: Text("NO HAY DATOS DISPONIBLES"))
                           : ListView.builder(
-                        itemCount: _translations.length,
-                        itemBuilder: (context, index) {
-                          String key =
-                          _translations.keys.elementAt(index);
-                          return ListTile(
-                            title: Text(_translations[key]!),
-                          );
-                        },
-                      ),
+                              itemCount: _translations.length,
+                              itemBuilder: (context, index) {
+                                String key =
+                                    _translations.keys.elementAt(index);
+                                return ListTile(
+                                  title: Text(_translations[key]!),
+                                );
+                              },
+                            ),
                     ),
                   ],
                 ),
@@ -543,30 +554,30 @@ class _OverlayAdminsState extends State<OverlayAdmins>
       ),
       content: isInfoVisible && selectedAdminData != null
           ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTabBar(),
-          Expanded(child: _buildTabBarView()),
-        ],
-      )
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTabBar(),
+                Expanded(child: _buildTabBarView()),
+              ],
+            )
           : AdminsListView(
-        onAdminTap: (adminData) {
-          selectAdmin(adminData);
-        },
-      ),
+              onAdminTap: (adminData) {
+                selectAdmin(adminData);
+              },
+            ),
       onClose: widget.onClose,
     );
   }
 
   Widget _buildTabBar() {
     return Container(
-      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
+      height: MediaQuery.of(context).size.height *
+          0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
       child: TabBar(
         controller: _tabController,
         onTap: (index) {
-          setState(() {
-          });
+          setState(() {});
         },
         tabs: [
           _buildTab('DATOS PERSONALES', 0),
@@ -608,46 +619,19 @@ class _OverlayAdminsState extends State<OverlayAdmins>
   Widget _buildTabBarView() {
     return IndexedStack(
       index: _tabController.index,
-     /* children: [
-        ClientsData(
-          clientData: selectedClientData!,
+      children: [
+        AdminsData(
+          adminData: selectedAdminData!,
           onDataChanged: (data) {
             print(data);
           },
           onClose: widget.onClose,
         ),
-        ClientsActivity(clientDataActivity: selectedClientData!),
-        ClientsBonos(clientDataBonos: selectedClientData!),
-        _showBioSubTab
-            ? _buildBioSubTabView()
-            : _showEvolutionSubTab
-            ? _buildEvolutionSubTabView()
-            : ClientsBio(
-          onClientTap: (clientData) {
-            setState(() {
-              _showBioSubTab = true;
-              _subTabData = clientData;
-            });
-          },
-          clientDataBio: selectedClientData!,
-          onEvolutionPressed: () {
-            setState(() {
-              _showEvolutionSubTab = true;
-              _showBioSubTab = false;
-            });
-          },
-        ),
-        ClientsGroups(
-          clientData: selectedClientData!,
-          onDataChanged: (data) {
-            print(data);
-          },
-          onClose: widget.onClose,
-        ),
-      ],*/
+        AdminsBonos(userDataBonos: selectedAdminData!),
+        AdminsActivity(adminDataActivity: selectedAdminData!),
+      ],
     );
   }
-
 }
 
 class OverlayTrainers extends StatefulWidget {
@@ -698,30 +682,30 @@ class _OverlayTrainersState extends State<OverlayTrainers>
       ),
       content: isInfoVisible && selectedTrainerData != null
           ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTabBar(),
-          Expanded(child: _buildTabBarView()),
-        ],
-      )
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTabBar(),
+                Expanded(child: _buildTabBarView()),
+              ],
+            )
           : EntrenadoresListView(
-        onTrainerTap: (trainerData) {
-          selectTrainer(trainerData);
-        },
-      ),
+              onTrainerTap: (trainerData) {
+                selectTrainer(trainerData);
+              },
+            ),
       onClose: widget.onClose,
     );
   }
 
   Widget _buildTabBar() {
     return Container(
-      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
+      height: MediaQuery.of(context).size.height *
+          0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
       child: TabBar(
         controller: _tabController,
         onTap: (index) {
-          setState(() {
-          });
+          setState(() {});
         },
         tabs: [
           _buildTab('DATOS PERSONALES', 0),
@@ -818,7 +802,7 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
   late TabController _tabController;
   bool isUserSaved = false; // Variable to check if the client has been saved
   Map<String, dynamic>?
-  selectedUserData; // Nullable Map, no late initialization required
+      selectedUserData; // Nullable Map, no late initialization required
 
   @override
   void initState() {
@@ -904,7 +888,8 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
 
   Widget _buildTabBar() {
     return Container(
-      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
+      height: MediaQuery.of(context).size.height *
+          0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
       child: GestureDetector(
         onTap: () {
@@ -936,7 +921,7 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
             dividerColor: Colors.black,
             labelColor: const Color(0xFF2be4f3),
             labelStyle:
-            const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             unselectedLabelColor: Colors.white,
           ),
         ),
@@ -978,11 +963,7 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
         selectedUserData != null
             ? UsersFormBonos(userDataBonos: selectedUserData!)
             : Center(child: Text("No client data available.")),
-
-
       ],
     );
   }
 }
-
-
