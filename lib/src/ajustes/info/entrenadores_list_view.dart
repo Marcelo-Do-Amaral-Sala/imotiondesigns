@@ -17,7 +17,7 @@ class EntrenadoresListView extends StatefulWidget {
 
 class _EntrenadoresListViewState extends State<EntrenadoresListView> {
   final TextEditingController _trainerNameController = TextEditingController();
-  String selectedOption = 'Todos'; // Valor predeterminado
+  String selectedTrainerOption = 'Todos'; // Valor predeterminado
 
   List<Map<String, dynamic>> allTrainers = []; // Lista original de clientes
   List<Map<String, dynamic>> filteredTrainers = []; // Lista filtrada
@@ -25,43 +25,44 @@ class _EntrenadoresListViewState extends State<EntrenadoresListView> {
   @override
   void initState() {
     super.initState();
-    //_fetchAdmins();
-    //_adminNameController.addListener(_filterAdmins);
+    _fetchTrainers();
+    _trainerNameController.addListener(_filterTrainers);
   }
 
-/*  Future<void> _fetchAdmins() async {
+  Future<void> _fetchTrainers() async {
     final dbHelper = DatabaseHelper();
     try {
-      final clientData = await dbHelper.getClients();
+      // Obtener los usuarios cuyo perfil es "Administrador" o "Ambos"
+      final trainerData = await dbHelper.getUsuariosPorTipoPerfil('Entrenador');
+
+      // Combina ambas listas
+      final allTrainerData = [...trainerData];
+
       setState(() {
-        allClients = clientData; // Asigna a la lista original
-        filteredClients = allClients; // Inicializa la lista filtrada
+        allTrainers = allTrainerData; // Asigna los usuarios filtrados
+        filteredTrainers = allTrainers; // Inicializa la lista filtrada
       });
-      _filterClients(); // Filtra para mostrar todos los clientes
+
+      _filterTrainers(); // Llama al filtro si es necesario
     } catch (e) {
       print('Error fetching clients: $e');
     }
-  }*/
+  }
 
-  /* void _filterClients() {
+
+  void _filterTrainers() {
     setState(() {
-      String searchText = _clientNameController.text.toLowerCase();
-      String indexText = _clientIndexController.text;
-
-      filteredClients = allClients.where((client) {
-        final matchesName = client['name']!.toLowerCase().contains(searchText);
-        final matchesIndex =
-            indexText.isEmpty || client['id'].toString() == indexText;
-
+      String searchText = _trainerNameController.text.toLowerCase();
+      filteredTrainers = allTrainers.where((trainer) {
+        final matchesName = trainer['name']!.toLowerCase().contains(searchText);
         // Filtra por estado basado en la selección del dropdown
         final matchesStatus =
-            selectedOption == 'Todos' || client['status'] == selectedOption;
-
-        return matchesName && matchesIndex && matchesStatus;
+            selectedTrainerOption == 'Todos' || trainer['status'] == selectedTrainerOption;
+        return matchesName && matchesStatus;
       }).toList();
     });
   }
-*/
+
   void _showPrint(Map<String, dynamic> trainerData) {
     _updateTrainerFields(trainerData);
     // Asegúrate de que los datos se pasen correctamente como Map<String, String>
@@ -74,7 +75,7 @@ class _EntrenadoresListViewState extends State<EntrenadoresListView> {
   void _updateTrainerFields(Map<String, dynamic> trainerData) {
     setState(() {
       _trainerNameController.text = trainerData['name'] ?? '';
-      selectedOption =
+      selectedTrainerOption =
           trainerData['status'] ?? 'Todos'; // Cambiar a 'Todos' si es nulo
     });
   }
@@ -158,7 +159,7 @@ class _EntrenadoresListViewState extends State<EntrenadoresListView> {
               borderRadius: BorderRadius.circular(7),
             ),
             child: DropdownButton<String>(
-              value: selectedOption,
+              value: selectedTrainerOption,
               items: const [
                 DropdownMenuItem(
                     value: 'Todos',
@@ -175,8 +176,8 @@ class _EntrenadoresListViewState extends State<EntrenadoresListView> {
               ],
               onChanged: (value) {
                 setState(() {
-                  selectedOption = value!;
-                  //_filterClients(); // Filtrar después de seleccionar
+                  selectedTrainerOption = value!;
+                  _filterTrainers(); // Filtrar después de seleccionar
                 });
               },
               dropdownColor: const Color(0xFF313030),

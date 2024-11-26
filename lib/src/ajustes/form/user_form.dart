@@ -70,16 +70,37 @@ class UserDataFormState extends State<UserDataForm> {
     }
   }
 
- /* void _collectData() async {
+  Future<void> _selectAltaDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        // Puedes poner cualquier fecha válida aquí, por ejemplo, hoy.
+        firstDate: DateTime(1900),
+        // Establecemos un límite inferior para la selección (por ejemplo, 1900).
+        lastDate:
+        DateTime(2050), // La última fecha seleccionable debe ser hace 18 años.
+    );
+
+    if (picked != null) {
+      // Aquí procesas la fecha seleccionada
+      setState(() {
+        // Formateamos la fecha seleccionada en el formato dd/MM/yyyy
+        _altaDate = DateFormat('dd/MM/yyyy').format(picked);
+      });
+    }
+  }
+
+  void _collectUserData() async {
     // Verificar que los campos no estén vacíos
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _phoneController.text.isEmpty ||
-        _heightController.text.isEmpty ||
-        _weightController.text.isEmpty ||
         selectedGender == null ||
         selectedOption == null ||
+        selectedControlSesiones == null ||
+        selectedControlTiempo == null ||
         _birthDate == null ||
+        _altaDate == null ||
         !_emailController.text.contains('@')) {
       // Verificación de '@' en el correo
       ScaffoldMessenger.of(context).showSnackBar(
@@ -101,19 +122,35 @@ class UserDataFormState extends State<UserDataForm> {
       name = name[0].toUpperCase() + name.substring(1).toLowerCase();
     }
 
+    // Datos del usuario
     final clientData = {
       'name': name, // Nombre con la primera letra en mayúscula
       'email': _emailController.text,
       'phone': _phoneController.text,
-      'height': _heightController.text,
-      'weight': _weightController.text,
+      'pwd': 'admin',
       'gender': selectedGender,
+      'altadate': _altaDate,
+      'controlsesiones': selectedControlSesiones,
+      'controltiempo': selectedControlTiempo,
       'status': selectedOption,
       'birthdate': _birthDate,
     };
 
     DatabaseHelper dbHelper = DatabaseHelper();
-    await dbHelper.insertClient(clientData);
+
+    // Insertar usuario en la tabla `usuarios`
+    int userId = await dbHelper.insertUser(clientData);
+
+    // Insertar tipo de perfil en la tabla `tipos_perfil` si aún no existe
+    int? perfilId = await dbHelper.getTipoPerfilId(selectedTipoPerfil!);
+
+    perfilId ??= await dbHelper.insertTipoPerfil(selectedTipoPerfil!);
+
+    // Imprimir el tipo de perfil que se ha insertado
+    print('Tipo de perfil insertado: $selectedTipoPerfil');
+
+    // Insertar la relación en la tabla `usuario_perfil`
+    await dbHelper.insertUsuarioPerfil(userId, perfilId);
 
     print('Datos del cliente insertados: $clientData');
 
@@ -129,9 +166,9 @@ class UserDataFormState extends State<UserDataForm> {
     );
 
     // Llama a la función onDataChanged para informar de los datos
-    widget.onDataChanged(
-        clientData); // Aquí notificamos que los datos fueron guardados
-  }*/
+    widget.onDataChanged(clientData); // Aquí notificamos que los datos fueron guardados
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +238,29 @@ class UserDataFormState extends State<UserDataForm> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.02),
+                      OutlinedButton(
+                        onPressed: () {
+                          //_addBonos(context);
+                        }, // Mantener vacío para que InkWell funcione
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(10.0),
+                          side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          backgroundColor: Colors.transparent,
+                        ),
+                        child: const Text(
+                          'RESET PASSWORD',
+                          style: TextStyle(
+                            color: Color(0xFF2be4f3),
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
@@ -285,7 +345,7 @@ class UserDataFormState extends State<UserDataForm> {
                             SizedBox(height: screenHeight * 0.02),
                             Text('FECHA DE ALTA', style: _labelStyle),
                             GestureDetector(
-                              onTap: () => _selectDate(context),
+                              onTap: () => _selectAltaDate(context),
                               child: Container(
                                 alignment: Alignment.center,
                                 decoration: _inputDecoration(),
@@ -304,6 +364,7 @@ class UserDataFormState extends State<UserDataForm> {
                                 items: [
                                   DropdownMenuItem(value: 'Administrador', child: Text('Administrador', style: _dropdownItemStyle)),
                                   DropdownMenuItem(value: 'Entrenador', child: Text('Entrenador', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(value: 'Ambos', child: Text('Ambos', style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -379,7 +440,7 @@ class UserDataFormState extends State<UserDataForm> {
                 onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                 onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                 onTap: () {
-                 // _collectData();
+                  _collectUserData();
                   print("TICK PULSADA");
                 },
                 child: AnimatedScale(

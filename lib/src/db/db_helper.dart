@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:http/http.dart' as http;
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -31,12 +31,12 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 98,
+      version: 100,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
       onUpgrade:
-          _onUpgrade, // Método que se ejecuta al actualizar la base de datos
+      _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
   }
 
@@ -436,7 +436,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -604,33 +604,33 @@ class DatabaseHelper {
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Modificar valores específicos de cronaxias basándonos en su ID
         // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
         final nuevoValor = (cronaxiaId ==
-                1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+            1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
             ? 200 // Nuevo valor para 'frecuencia'
             : (cronaxiaId ==
-                    2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-                ? 250 // Nuevo valor para 'rampa'
-                : (cronaxiaId == 3) // ID = 3 'pulso'
-                    ? 200
-                    : (cronaxiaId == 4) // ID = 4 'contracción'
-                        ? 400
-                        : (cronaxiaId == 5) // ID = 5 'pausa'
-                            ? 300
-                            : (cronaxiaId == 6) // ID = 6 'tipo'
-                                ? 150
-                                : (cronaxiaId == 7) // ID = 7 'equipamiento'
-                                    ? 350
-                                    : (cronaxiaId == 8) // ID = 8 'otro'
-                                        ? 400
-                                        : (cronaxiaId == 9)
-                                            ? 150
-                                            : (cronaxiaId == 10)
-                                                ? 150
-                                                : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+            2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+            ? 250 // Nuevo valor para 'rampa'
+            : (cronaxiaId == 3) // ID = 3 'pulso'
+            ? 200
+            : (cronaxiaId == 4) // ID = 4 'contracción'
+            ? 400
+            : (cronaxiaId == 5) // ID = 5 'pausa'
+            ? 300
+            : (cronaxiaId == 6) // ID = 6 'tipo'
+            ? 150
+            : (cronaxiaId == 7) // ID = 7 'equipamiento'
+            ? 350
+            : (cronaxiaId == 8) // ID = 8 'otro'
+            ? 400
+            : (cronaxiaId == 9)
+            ? 150
+            : (cronaxiaId == 10)
+            ? 150
+            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -691,7 +691,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -756,7 +756,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -821,7 +821,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -885,7 +885,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -950,7 +950,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1015,7 +1015,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1080,7 +1080,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1145,7 +1145,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1209,7 +1209,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1274,7 +1274,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1338,7 +1338,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1403,7 +1403,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1468,7 +1468,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1533,7 +1533,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1597,7 +1597,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1661,7 +1661,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1721,19 +1721,19 @@ class DatabaseHelper {
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Modificar valores específicos de cronaxias basándonos en su ID
         // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
         final nuevoValor = (cronaxiaId ==
-                1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+            1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
             ? 375 // Nuevo valor para 'frecuencia'
             : (cronaxiaId ==
-                    2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-                ? 400 // Nuevo valor para 'rampa'
-                : (cronaxiaId == 3) // ID = 3 'pulso'
-                    ? 400
-                    : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+            2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+            ? 400 // Nuevo valor para 'rampa'
+            : (cronaxiaId == 3) // ID = 3 'pulso'
+            ? 400
+            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1801,7 +1801,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1865,7 +1865,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1929,7 +1929,7 @@ class DatabaseHelper {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -2135,7 +2135,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2308,7 +2308,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2477,7 +2477,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2500,7 +2500,7 @@ class DatabaseHelper {
           'nombre': 'FUERZA',
           'imagen': 'assets/images/STRENGTH.png',
           'descripcion':
-              'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
+          'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2595,7 +2595,8 @@ class DatabaseHelper {
 
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
-          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
         }
 
         // Insertamos los subprogramas
@@ -2625,7 +2626,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2648,7 +2649,7 @@ class DatabaseHelper {
           'nombre': 'HIPERTROFIA',
           'imagen': 'assets/images/HIPERTROFIA.png',
           'descripcion':
-              'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
+          'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2748,7 +2749,8 @@ class DatabaseHelper {
         ];
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
-          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
         }
 
         // Insertamos los subprogramas
@@ -2778,7 +2780,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2801,7 +2803,7 @@ class DatabaseHelper {
           'nombre': 'RESISTENCIA 1',
           'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
+          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2903,7 +2905,8 @@ class DatabaseHelper {
 
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
-          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
         }
 
         // Insertamos los subprogramas
@@ -2933,7 +2936,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2956,7 +2959,7 @@ class DatabaseHelper {
           'nombre': 'RESISTENCIA 2',
           'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
+          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -3069,7 +3072,8 @@ class DatabaseHelper {
 
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
-          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
         }
 
         // Insertamos los subprogramas
@@ -3099,7 +3103,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3122,7 +3126,7 @@ class DatabaseHelper {
           'nombre': 'CARDIO',
           'imagen': 'assets/images/CARDIO.png',
           'descripcion':
-              'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
+          'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -3253,7 +3257,8 @@ class DatabaseHelper {
 
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
-          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
         }
 
         // Insertamos los subprogramas
@@ -3283,7 +3288,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3306,7 +3311,7 @@ class DatabaseHelper {
           'nombre': 'CROSS MAX',
           'imagen': 'assets/images/CROSSMAX.png',
           'descripcion':
-              'Programa experto. Entrenamiento para la mejora de la condición física.',
+          'Programa experto. Entrenamiento para la mejora de la condición física.',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -3419,7 +3424,8 @@ class DatabaseHelper {
 
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
-          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
         }
 
         // Insertamos los subprogramas
@@ -3449,7 +3455,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3561,7 +3567,8 @@ class DatabaseHelper {
 
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
-          subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
+          subprogramas[i]['orden'] =
+              i + 1; // Asignamos un orden empezando por 1
         }
 
         // Insertamos los subprogramas
@@ -3590,7 +3597,7 @@ class DatabaseHelper {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3606,3355 +3613,78 @@ class DatabaseHelper {
         print('Error durante la transacción: $e');
       }
     });
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        pwd TEXT NOT NULL,
+        status TEXT NOT NULL,
+        birthdate TEXT NOT NULL,
+        altadate TEXT TEXT NOT NULL,
+        controlsesiones TEXT NOT NULL,
+        controltiempo TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS tipos_perfil (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tipo TEXT NOT NULL UNIQUE
+)
+''');
+
+    await db.execute('''
+CREATE TABLE IF NOT EXISTS usuario_perfil (
+  usuario_id INTEGER NOT NULL,
+  perfil_id INTEGER NOT NULL,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE,
+  FOREIGN KEY (perfil_id) REFERENCES tipos_perfil (id) ON DELETE CASCADE,
+  PRIMARY KEY (usuario_id, perfil_id)
+)
+''');
+
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 98) {
+    if (oldVersion < 100) {
+      print("ONPUGRADE EJECUTADIO");
       await db.execute('''
-      CREATE TABLE IF NOT EXISTS programas_predeterminados (
-        id_programa INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        imagen TEXT,
-        frecuencia REAL,
-        pulso REAL,
-        rampa REAL,
-        contraccion REAL,
-        pausa REAL,
-        tipo TEXT,
-        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
-      );
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        pwd TEXT NOT NULL,
+        status TEXT NOT NULL,
+        birthdate TEXT NOT NULL,
+        altadate TEXT TEXT NOT NULL,
+        controlsesiones TEXT NOT NULL,
+        controltiempo TEXT NOT NULL
+      )
     ''');
-      print("Tabla 'programas_predeterminados' creada.");
 
       await db.execute('''
-    CREATE TABLE IF NOT EXISTS cronaxia (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    programa_id INTEGER, 
-    nombre TEXT NOT NULL,
-    valor REAL DEFAULT 0.0,  -- Cambiado a REAL con valor por defecto 0.0
-    tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET')),
-     FOREIGN KEY (programa_id) REFERENCES programas(id_programa)
-  )
+CREATE TABLE IF NOT EXISTS tipos_perfil (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tipo TEXT NOT NULL UNIQUE
+)
 ''');
 
-      await db.execute(''' -- Tabla intermedia programa_cronaxia
-CREATE TABLE IF NOT EXISTS programa_cronaxia (
-  programa_id INTEGER,
-  cronaxia_id INTEGER,
-  valor REAL,
-  PRIMARY KEY (programa_id, cronaxia_id),
-  FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id),
-  FOREIGN KEY (cronaxia_id) REFERENCES cronaxia(id)
-)''');
-
       await db.execute('''
-      CREATE TABLE IF NOT EXISTS ProgramaGrupoMuscular (
-        programa_id INTEGER,
-        grupo_muscular_id INTEGER,
-        FOREIGN KEY (programa_id) REFERENCES programas_predeterminados(id_programa),
-        FOREIGN KEY (grupo_muscular_id) REFERENCES grupos_musculares_equipamiento(id)
-      );
-    ''');
-      print("Tabla 'ProgramaGrupoMuscular' creada.");
+CREATE TABLE IF NOT EXISTS usuario_perfil (
+  usuario_id INTEGER NOT NULL,
+  perfil_id INTEGER NOT NULL,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE,
+  FOREIGN KEY (perfil_id) REFERENCES tipos_perfil (id) ON DELETE CASCADE,
+  PRIMARY KEY (usuario_id, perfil_id)
+)
+''');
 
-// Iniciamos la transacción
-      await db.transaction((txn) async {
-        // Inserciones para el tipo de equipamiento 'BIO-JACKET'
-        await txn.insert('cronaxia', {
-          'nombre': 'Trapecio',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Lumbares',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Dorsales',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Glúteos',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Isquiotibiales',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Pectorales',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Abdomen',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Cuádriceps',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Bíceps',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Gemelos',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        // Inserciones para el tipo de equipamiento 'BIO-SHAPE'
-        await txn.insert('cronaxia', {
-          'nombre': 'Lumbares',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-SHAPE'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Glúteos',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-SHAPE'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Isquiotibiales',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-SHAPE'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Abdomen',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-SHAPE'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Cuádriceps',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-SHAPE'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Bíceps',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-SHAPE'
-        });
-        await txn.insert('cronaxia', {
-          'nombre': 'Gemelos',
-          'valor': 0.0,
-          'tipo_equipamiento': 'BIO-SHAPE'
-        });
-
-        // Imprimir mensaje para verificar inserciones
-        print(
-            'Inserciones completadas para los tipos de equipamiento BIO-JACKET y BIO-SHAPE');
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId1 = await txn.insert('programas_predeterminados', {
-          'nombre': 'CALIBRACIÓN',
-          'imagen': 'assets/images/CALIBRACION.png',
-          'frecuencia': 80,
-          'rampa': 10,
-          'pulso': 350,
-          'contraccion': 4,
-          'pausa': 1,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET' // Equipamiento seleccionado
-        });
-
-        print("Programa insertado con ID: $programaId1");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId1,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId1 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares asociados al tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [tipoEquipamiento]);
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId1,
-            'grupo_muscular_id': grupo['id'],
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId1 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId2 = await txn.insert('programas_predeterminados', {
-          'nombre': 'STRENGTH 1',
-          'imagen': 'assets/images/STRENGTH1.png',
-          'frecuencia': 85,
-          'pulso': 350,
-          'rampa': 8,
-          'contraccion': 4,
-          'pausa': 2,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId2");
-
-        final tipoEquipamiento = 'BIO-JACKET';
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, se actualiza su valor (si hay un nuevo valor, se usa, sino se usa el valor existente)
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor'];
-
-          // Relacionar la cronaxia con el programa y almacenar el valor
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId2,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Aquí se almacena el valor de la cronaxia en la relación
-          });
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId2 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-  SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [tipoEquipamiento]);
-
-        for (var grupo in gruposMusculares) {
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId2,
-            'grupo_muscular_id': grupo['id'],
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId2 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        int programaId3 = await txn.insert('programas_predeterminados', {
-          'nombre': 'STRENGTH 2',
-          'imagen': 'assets/images/STRENGTH2.png',
-          'frecuencia': 85,
-          'rampa': 10,
-          'pulso': 400,
-          'contraccion': 5,
-          'pausa': 3,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId3");
-
-        final tipoEquipamiento = 'BIO-JACKET';
-
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia['valor'];
-
-          // Relacionar la cronaxia con el programa y almacenar el valor
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId3,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Aquí se almacena el valor de la cronaxia en la relación
-          });
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId3 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-  SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [tipoEquipamiento]);
-
-        for (var grupo in gruposMusculares) {
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId3,
-            'grupo_muscular_id': grupo['id'],
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId3 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId4 = await txn.insert('programas_predeterminados', {
-          'nombre': 'GLÚTEOS',
-          'imagen': 'assets/images/GLUTEOS.png',
-          'frecuencia': 85,
-          'rampa': 10,
-          'pulso': 0,
-          'contraccion': 6,
-          'pausa': 4,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId4");
-
-        final tipoEquipamiento = 'BIO-JACKET';
-
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Modificar valores específicos de cronaxias basándonos en su ID
-          // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
-          final nuevoValor = (cronaxiaId ==
-                  1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
-              ? 200 // Nuevo valor para 'frecuencia'
-              : (cronaxiaId ==
-                      2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-                  ? 250 // Nuevo valor para 'rampa'
-                  : (cronaxiaId == 3) // ID = 3 'pulso'
-                      ? 200
-                      : (cronaxiaId == 4) // ID = 4 'contracción'
-                          ? 400
-                          : (cronaxiaId == 5) // ID = 5 'pausa'
-                              ? 300
-                              : (cronaxiaId == 6) // ID = 6 'tipo'
-                                  ? 150
-                                  : (cronaxiaId == 7) // ID = 7 'equipamiento'
-                                      ? 350
-                                      : (cronaxiaId == 8) // ID = 8 'otro'
-                                          ? 400
-                                          : (cronaxiaId == 9)
-                                              ? 150
-                                              : (cronaxiaId == 10)
-                                                  ? 150
-                                                  : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId4,
-            'cronaxia_id': cronaxiaId,
-            'valor': nuevoValor,
-            // Aquí almacenamos el valor modificado para este programa
-          });
-
-          print(
-              'ASOCIADO cronaxia con ID $cronaxiaId al programa ID $programaId4 con valor $nuevoValor en la tabla programa_cronaxia');
-        }
-
-        // Paso 5: Asociar grupos musculares con el programa
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [tipoEquipamiento]);
-
-        for (var grupo in gruposMusculares) {
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId4,
-            'grupo_muscular_id': grupo['id'],
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId4 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId5 = await txn.insert('programas_predeterminados', {
-          'nombre': 'ABDOMINAL',
-          'imagen': 'assets/images/ABDOMINAL.png',
-          'frecuencia': 43,
-          'rampa': 8,
-          'pulso': 450,
-          'contraccion': 6,
-          'pausa': 3,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId5");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId5,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId5 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId5, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId5 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId6 = await txn.insert('programas_predeterminados', {
-          'nombre': 'SLIM',
-          'imagen': 'assets/images/SLIM.png',
-          'frecuencia': 66,
-          'rampa': 5,
-          'pulso': 350,
-          'contraccion': 6,
-          'pausa': 3,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId6");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId6,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId6 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId6, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId6 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId7 = await txn.insert('programas_predeterminados', {
-          'nombre': 'BODY BUILDING 1',
-          'imagen': 'assets/images/BODYBUILDING.png',
-          'frecuencia': 75,
-          'rampa': 5,
-          'pulso': 300,
-          'contraccion': 4,
-          'pausa': 2,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId7");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId7,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId7 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId7, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId7 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId8 = await txn.insert('programas_predeterminados', {
-          'nombre': 'BODY BUILDING 2',
-          'imagen': 'assets/images/BODYBUILDING2.png',
-          'frecuencia': 75,
-          'rampa': 5,
-          'pulso': 450,
-          'contraccion': 4,
-          'pausa': 2,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        print("Programa insertado con ID: $programaId8");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId8,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId8 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId8, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId8 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId9 = await txn.insert('programas_predeterminados', {
-          'nombre': 'FITNESS',
-          'imagen': 'assets/images/FITNESS.png',
-          'frecuencia': 90,
-          'rampa': 5,
-          'pulso': 350,
-          'contraccion': 5,
-          'pausa': 4,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId9");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId9,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId9 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId9, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId9 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId10 = await txn.insert('programas_predeterminados', {
-          'nombre': 'WARM UP',
-          'imagen': 'assets/images/WARMUP.png',
-          'frecuencia': 7,
-          'rampa': 2,
-          'pulso': 250,
-          'contraccion': 1,
-          'pausa': 0,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId10");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId10,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId10 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId10, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId10 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId11 = await txn.insert('programas_predeterminados', {
-          'nombre': 'CARDIO',
-          'imagen': 'assets/images/CARDIO.png',
-          'frecuencia': 10,
-          'rampa': 2,
-          'pulso': 350,
-          'contraccion': 1,
-          'pausa': 0,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId11");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId11,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId11 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId11, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId11 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId12 = await txn.insert('programas_predeterminados', {
-          'nombre': 'CELULITIS',
-          'imagen': 'assets/images/CELULITIS.png',
-          'frecuencia': 10,
-          'rampa': 5,
-          'pulso': 450,
-          'contraccion': 1,
-          'pausa': 0,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId12");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId12,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId12 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId12, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId12 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId13 = await txn.insert('programas_predeterminados', {
-          'nombre': 'RESISTENCIA',
-          'imagen': 'assets/images/RESISTENCIA.png',
-          'frecuencia': 43,
-          'rampa': 5,
-          'pulso': 350,
-          'contraccion': 10,
-          'pausa': 4,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        print("Programa insertado con ID: $programaId13");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId13,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId13 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId13, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId13 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId14 = await txn.insert('programas_predeterminados', {
-          'nombre': 'DEFINICIÓN',
-          'imagen': 'assets/images/DEFINICION.png',
-          'frecuencia': 33,
-          'rampa': 5,
-          'pulso': 350,
-          'contraccion': 6,
-          'pausa': 2,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId14");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId14,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId14 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId14, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId14 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId15 = await txn.insert('programas_predeterminados', {
-          'nombre': 'BASIC',
-          'imagen': 'assets/images/BASIC.png',
-          'frecuencia': 70,
-          'rampa': 5,
-          'pulso': 250,
-          'contraccion': 4,
-          'pausa': 4,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-        print("Programa insertado con ID: $programaId15");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId15,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId15 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId15, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId15 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId16 = await txn.insert('programas_predeterminados', {
-          'nombre': 'SUELO PÉLVICO',
-          'imagen': 'assets/images/SUELOPELV.png',
-          'frecuencia': 85,
-          'rampa': 10,
-          'pulso': 450,
-          'contraccion': 4,
-          'pausa': 4,
-          'tipo': 'Individual',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId16");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId16,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId16 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId16, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId16 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId17 = await txn.insert('programas_predeterminados', {
-          'nombre': 'DOLOR MECÁNICO',
-          'imagen': 'assets/images/DOLORMECANICO.png',
-          'frecuencia': 5,
-          'rampa': 5,
-          'pulso': 150,
-          'contraccion': 6,
-          'pausa': 3,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId17");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId17,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId17 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId17, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId17 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId18 = await txn.insert('programas_predeterminados', {
-          'nombre': 'DOLOR QUÍMICO',
-          'imagen': 'assets/images/DOLORQUIM.png',
-          'frecuencia': 110,
-          'rampa': 5,
-          'pulso': 250,
-          'contraccion': 5,
-          'pausa': 1,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId18");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId18,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId18 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId18, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId18 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId19 = await txn.insert('programas_predeterminados', {
-          'nombre': 'DOLOR NEURÁLGICO',
-          'imagen': 'assets/images/DOLORNEU.png',
-          'frecuencia': 150,
-          'rampa': 5,
-          'pulso': 100,
-          'contraccion': 10,
-          'pausa': 1,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId19");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId19,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId19 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId19, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId19 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId20 = await txn.insert('programas_predeterminados', {
-          'nombre': 'RELAX',
-          'imagen': 'assets/images/RELAX.png',
-          'frecuencia': 100,
-          'rampa': 2,
-          'pulso': 150,
-          'contraccion': 3,
-          'pausa': 2,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId20");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId20,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId20 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId20, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId20 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId21 = await txn.insert('programas_predeterminados', {
-          'nombre': 'CONTRACTURAS',
-          'imagen': 'assets/images/CONTRACTURAS.png',
-          'frecuencia': 120,
-          'rampa': 10,
-          'pulso': 0,
-          'contraccion': 4,
-          'pausa': 3,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId21");
-
-        final tipoEquipamiento = 'BIO-JACKET';
-
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa y sus valores modificados
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Modificar valores específicos de cronaxias basándonos en su ID
-          // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
-          final nuevoValor = (cronaxiaId ==
-                  1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
-              ? 375 // Nuevo valor para 'frecuencia'
-              : (cronaxiaId ==
-                      2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-                  ? 400 // Nuevo valor para 'rampa'
-                  : (cronaxiaId == 3) // ID = 3 'pulso'
-                      ? 400
-                      : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId21,
-            'cronaxia_id': cronaxiaId,
-            'valor': nuevoValor,
-            // Aquí almacenamos el valor modificado para este programa
-          });
-
-          print(
-              'ASOCIADO cronaxia con ID $cronaxiaId al programa ID $programaId21 con valor $nuevoValor en la tabla programa_cronaxia');
-        }
-
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento 
-    WHERE tipo_equipamiento = ? AND id IN (1, 2, 3)
-  ''', [
-          tipoEquipamiento
-        ]); // Filtrar por tipo de equipamiento y los IDs específicos (1, 2, 3)
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId21,
-            // Relación con el programa
-            'grupo_muscular_id': grupo['id'],
-            // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId21 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId22 = await txn.insert('programas_predeterminados', {
-          'nombre': 'DRENAJE',
-          'imagen': 'assets/images/DRENAJE.png',
-          'frecuencia': 21,
-          'rampa': 5,
-          'pulso': 350,
-          'contraccion': 5,
-          'pausa': 3,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId22");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId22,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId22 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId22, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId22 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId23 = await txn.insert('programas_predeterminados', {
-          'nombre': 'CAPILLARY',
-          'imagen': 'assets/images/CAPILLARY.png',
-          'frecuencia': 9,
-          'rampa': 2,
-          'pulso': 150,
-          'contraccion': 1,
-          'pausa': 0,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId23");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId23,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId23 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId23, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId23 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-      await db.transaction((txn) async {
-        // Paso 1: Insertar el programa en la tabla programas_predeterminados
-        int programaId24 = await txn.insert('programas_predeterminados', {
-          'nombre': 'METABOLIC',
-          'imagen': 'assets/images/METABOLIC.png',
-          'frecuencia': 7,
-          'rampa': 2,
-          'pulso': 350,
-          'contraccion': 1,
-          'pausa': 0,
-          'tipo': 'Recovery',
-          'tipo_equipamiento': 'BIO-JACKET'
-        });
-
-        print("Programa insertado con ID: $programaId24");
-
-        // Paso 2: Obtener las cronaxias para el tipo de equipamiento del programa
-        final tipoEquipamiento =
-            'BIO-JACKET'; // Tipo de equipamiento que estamos utilizando
-
-        // Seleccionar cronaxias del tipo de equipamiento
-        final cronaxiasQuery = await txn.query(
-          'cronaxia',
-          where: 'tipo_equipamiento = ?',
-          whereArgs: [tipoEquipamiento],
-        );
-
-        // Paso 3: Para cada cronaxia, insertamos la relación con el programa sin modificar los valores
-        for (var cronaxia in cronaxiasQuery) {
-          final cronaxiaId = cronaxia['id'];
-          final nombreCronaxia = cronaxia['nombre'];
-          final valorCronaxia = cronaxia[
-              'valor']; // Usamos el valor predeterminado de la cronaxia
-
-          // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
-          await txn.insert('programa_cronaxia', {
-            'programa_id': programaId24,
-            'cronaxia_id': cronaxiaId,
-            'valor': valorCronaxia,
-            // Mantener el valor predeterminado de la cronaxia
-          });
-
-          print(
-              'ASOCIADO cronaxia "$nombreCronaxia" al programa ID $programaId24 con valor $valorCronaxia en la tabla programa_cronaxia');
-        }
-        // Paso 4: Seleccionar los grupos musculares por tipo de equipamiento
-        List<Map<String, dynamic>> gruposMusculares = await txn.rawQuery('''
-    SELECT * FROM grupos_musculares_equipamiento WHERE tipo_equipamiento = ?
-  ''', [
-          tipoEquipamiento
-        ]); // Aquí 'tipoEquipamiento' es el tipo de equipamiento (e.g., 'BIO-JACKET')
-
-        // Para cada grupo muscular, insertamos la relación con el programa
-        for (var grupo in gruposMusculares) {
-          // Insertar la asociación de cada grupo muscular con el programa
-          await txn.insert('ProgramaGrupoMuscular', {
-            'programa_id': programaId24, // Relación con el programa
-            'grupo_muscular_id': grupo['id'], // Relación con el grupo muscular
-          });
-
-          print(
-              'ASOCIADO "${grupo['nombre']}" AL PROGRAMA ID $programaId24 CON ID GRUPO MUSCULAR ${grupo['id']}');
-        }
-      });
-
-      // Crear la tabla Programas_Automaticos
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS Programas_Automaticos (
-        id_programa_automatico INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        imagen TEXT,
-        descripcion TEXT,
-        duracionTotal REAL,
-        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
-      
-      );
-    ''');
-
-      // Crear la tabla Programas_Automaticos_Subprogramas
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS Programas_Automaticos_Subprogramas (
-        id_programa_automatico INTEGER,
-        id_programa_relacionado INTEGER,
-        orden INTEGER,
-        ajuste REAL,
-        duracion REAL,
-        FOREIGN KEY (id_programa_automatico) REFERENCES Programas_Automaticos(id_programa_automatico),
-        FOREIGN KEY (id_programa_relacionado) REFERENCES programas_predeterminados(id_programa)
-      );
-    ''');
-
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "TONIFICACIÓN"
-          int idProgramaAutomatico = await txn.insert('Programas_Automaticos', {
-            'nombre': 'TONIFICACIÓN',
-            'imagen': 'assets/images/TONING.png',
-            'descripcion': 'Aumento de la resistencia y retraso de la fatiga.',
-            'duracionTotal': 25,
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 1,
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 10,
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 9,
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 23,
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 5,
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 23,
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 2,
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 2,
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 2,
-              'ajuste': 1,
-              'duracion': 1.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico,
-              'id_programa_relacionado': 20,
-              'ajuste': -5,
-              'duracion': 5
-            },
-          ];
-
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] =
-                i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: TONIFICACIÓN');
-          print('ID: $idProgramaAutomatico');
-          print('Descripción: Aumento de la resistencia y retraso de la fatiga.');
-          print('Duración Total: 25.0');
-          print('Tipo Equipamiento: BIO-JACKET');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
-                columns: ['nombre'],
-                where: 'id_programa = ?',
-                whereArgs: [subprograma['id_programa_relacionado']]);
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "GLÚTEOS"
-          int idProgramaAutomatico2 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'GLÚTEOS',
-            'imagen': 'assets/images/GLUTEOS.png',
-            'descripcion': 'Fortalece los músculos del suelo pélvico',
-            'duracionTotal': 25, // Duración total del programa en minutos
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa recovery 2
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': -3,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 4, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico2,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -7,
-              'duracion': 5
-            },
-          ];
-// Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] =
-                i + 1; // Asignamos un orden empezando por 1
-          }
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: GLÚTEOS');
-          print('ID: $idProgramaAutomatico2');
-          print('Descripción: Fortalece los músculos del suelo pélvico');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query('programas_predeterminados',
-                columns: ['nombre'],
-                where: 'id_programa = ?',
-                whereArgs: [subprograma['id_programa_relacionado']]);
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "SUELO PÉLVICO"
-          int idProgramaAutomatico3 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'SUELO PÉLVICO',
-            'imagen': 'assets/images/SUELOPELV.png',
-            'descripcion': 'Fortalece los músculos del suelo pélvico',
-            'duracionTotal': 25, // Duración total del programa en minutos
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa individual 14
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 2
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico3,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-// Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] =
-                i + 1; // Asignamos un orden empezando por 1
-          }
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: SUELO PÉLVICO');
-          print('ID: $idProgramaAutomatico3');
-          print('Descripción: Fortalece los músculos del suelo pélvico');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "FUERZA"
-          int idProgramaAutomatico4 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'FUERZA',
-            'imagen': 'assets/images/STRENGTH.png',
-            'descripcion':
-            'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
-            'duracionTotal': 25, // Duración total del programa en minutos
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 2, // ID del programa individual 4
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 2, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 2, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 23, // ID del programa recovery 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 3
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico4,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: FUERZA');
-          print('ID: $idProgramaAutomatico4');
-          print(
-              'Descripción: Aumento de la fuerza trabajando la potencia del músculo y quema de grasa');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "HIPERTROFIA"
-          int idProgramaAutomatico5 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'HIPERTROFIA',
-            'imagen': 'assets/images/HIPERTROFIA.png',
-            'descripcion':
-            'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
-            'duracionTotal': 25, // Duración total del programa en minutos
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 9, // ID del programa individual 4
-              'ajuste': -3,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 9, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 9, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 23, // ID del programa recovery 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 8, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 3, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico5,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: HIPERTROFIA');
-          print('ID: $idProgramaAutomatico5');
-          print(
-              'Descripción: Incremento del número de fibras musculares y el tamaño de las mismas...');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "RESISTENCIA 1"
-          int idProgramaAutomatico6 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'RESISTENCIA 1',
-            'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
-            'descripcion':
-            'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
-            'duracionTotal': 25,
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 14, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 14, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 14, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 23, // ID del programa recovery 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 2, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 2, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 2, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico6,
-              'id_programa_relacionado': 21, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 5
-            },
-          ];
-
-
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: RESISTENCIA 1');
-          print('ID: $idProgramaAutomatico6');
-          print(
-              'Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "RESISTENCIA 2"
-          int idProgramaAutomatico7 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'RESISTENCIA 2',
-            'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
-            'descripcion':
-            'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
-            'duracionTotal': 25,
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 6, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 6, // ID del programa individual 14
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 6, // ID del programa recovery 1
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 13, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico7,
-              'id_programa_relacionado': 20, // ID del programa recovery 3
-              'ajuste': -5,
-              'duracion': 5
-            },
-          ];
-
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: RESISTENCIA 2');
-          print('ID: $idProgramaAutomatico7');
-          print(
-              'Descripción: Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "CARDIO"
-          int idProgramaAutomatico8 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'CARDIO',
-            'imagen': 'assets/images/CARDIO.png',
-            'descripcion':
-            'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
-            'duracionTotal': 25,
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 11, // ID del programa individual 4
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 11, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 11, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 14, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 23, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico8,
-              'id_programa_relacionado': 22, // ID del programa recovery 3
-              'ajuste': -7,
-              'duracion': 5
-            },
-          ];
-
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: CARDIO');
-          print('ID: $idProgramaAutomatico8');
-          print(
-              'Descripción: Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "CROSS MAX"
-          int idProgramaAutomatico9 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'CROSS MAX',
-            'imagen': 'assets/images/CROSSMAX.png',
-            'descripcion':
-            'Programa experto. Entrenamiento para la mejora de la condición física.',
-            'duracionTotal': 25,
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 9, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 9, // ID del programa individual 14
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 9, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 12, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 6, // ID del programa individual 2
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 0
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': -2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 5, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 12, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 1
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico9,
-              'id_programa_relacionado': 20, // ID del programa recovery 3
-              'ajuste': -5,
-              'duracion': 5
-            },
-          ];
-
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: CROSS MAX');
-          print('ID: $idProgramaAutomatico9');
-          print(
-              'Descripción: Programa experto. Entrenamiento para la mejora de la condición física.');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
-      await db.transaction((txn) async {
-        try {
-          // Insertamos el programa automático "SLIM"
-          int idProgramaAutomatico10 = await txn.insert('Programas_Automaticos', {
-            'nombre': 'SLIM',
-            'imagen': 'assets/images/SLIM.png',
-            'descripcion': 'Quema de grasa y creación de nuevas células.',
-            'duracionTotal': 25,
-            'tipo_equipamiento': 'BIO-JACKET',
-          });
-
-          // Lista de subprogramas con sus detalles
-          List<Map<String, dynamic>> subprogramas = [
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 1, // ID del programa individual 1
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 10, // ID del programa individual 2
-              'ajuste': 7,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 23, // ID del programa individual 3
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 3, // ID del programa individual 4
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 3, // ID del programa individual 14
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 3, // ID del programa recovery 1
-              'ajuste': 2,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 23, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 0.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 6, // ID del programa individual 2
-              'ajuste': 0,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 6, // ID del programa recovery 3
-              'ajuste': 2,
-              'duracion': 2.5
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': -4,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 16, // ID del programa recovery 3
-              'ajuste': 1,
-              'duracion': 2
-            },
-            {
-              'id_programa_automatico': idProgramaAutomatico10,
-              'id_programa_relacionado': 21, // ID del programa recovery 3
-              'ajuste': 0,
-              'duracion': 5
-            },
-          ];
-
-
-          // Asignamos un orden a cada subprograma
-          for (int i = 0; i < subprogramas.length; i++) {
-            subprogramas[i]['orden'] = i + 1; // Asignamos un orden empezando por 1
-          }
-
-          // Insertamos los subprogramas
-          for (var subprograma in subprogramas) {
-            await txn.insert('Programas_Automaticos_Subprogramas', subprograma);
-          }
-
-          // Verificamos los subprogramas insertados
-          print('Programa Automático: SLIM');
-          print('ID: $idProgramaAutomatico10');
-          print('Descripción: Quema de grasa y creación de nuevas células.');
-          print('Duración Total: 25.0');
-          print('Subprogramas:');
-          print('*****************************************************');
-
-          // Consulta para obtener los subprogramas relacionados y sus nombres
-          for (var subprograma in subprogramas) {
-            // Realizamos la consulta para obtener el nombre del subprograma
-            var result = await txn.query(
-              'programas_predeterminados',
-              columns: ['nombre'],
-              where: 'id_programa = ?',
-              whereArgs: [subprograma['id_programa_relacionado']],
-            );
-
-            // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
-            String nombreSubprograma = result.isNotEmpty
-                ? result.first['nombre']
-            as String // Aquí hacemos el cast explícito a String
-                : 'Desconocido';
-
-            print('Subprograma: $nombreSubprograma');
-            print('ID Subprograma: ${subprograma['id_programa_relacionado']}');
-            print('Ajuste: ${subprograma['ajuste']}');
-            print('Duración: ${subprograma['duracion']}');
-            print('*****************************************************');
-          }
-
-          // Si todo ha ido bien, imprimimos un mensaje de éxito
-          print('Programa automático y subprogramas insertados correctamente.');
-        } catch (e) {
-          print('Error durante la transacción: $e');
-        }
-      });
     }
   }
 
@@ -6968,7 +3698,7 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
         'clientes',
         client,
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
     } catch (e) {
       print('Error inserting client: $e');
@@ -6986,7 +3716,7 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
           'grupo_muscular_id': grupoMuscularId,
         },
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
       return true; // Si la inserción fue exitosa, retorna true
     } catch (e) {
@@ -7028,8 +3758,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
 // Insertar relación entre un programa automático y subprogramas
-  Future<bool> insertAutomaticProgram(
-      int programaId, List<Map<String, dynamic>> subprogramas) async {
+  Future<bool> insertAutomaticProgram(int programaId,
+      List<Map<String, dynamic>> subprogramas) async {
     final db = await database;
     try {
       // Ahora insertamos los subprogramas relacionados
@@ -7040,7 +3770,7 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
             'id_programa_automatico': programaId,
             // Usamos el ID del programa automático insertado
             'id_programa_relacionado': subprograma['id_programa_relacionado'],
-            'orden' : subprograma['orden'],
+            'orden': subprograma['orden'],
             'ajuste': subprograma['ajuste'],
             'duracion': subprograma['duracion'],
           },
@@ -7056,8 +3786,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
 // Función para insertar las cronaxias por defecto
-  Future<void> insertarCronaxiasPorDefecto(
-      int programaId, String tipoEquipamiento) async {
+  Future<void> insertarCronaxiasPorDefecto(int programaId,
+      String tipoEquipamiento) async {
     final db = await database;
 
     // Obtén las cronaxias asociadas al tipo de equipamiento para el programa recién creado
@@ -7065,7 +3795,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
         where: 'tipo_equipamiento = ?', whereArgs: [tipoEquipamiento]);
 
     print(
-        'Cronaxias encontradas para el tipo de equipamiento $tipoEquipamiento: ${cronaxias.length}');
+        'Cronaxias encontradas para el tipo de equipamiento $tipoEquipamiento: ${cronaxias
+            .length}');
 
     // Iterar sobre las cronaxias encontradas
     for (var cronaxia in cronaxias) {
@@ -7093,8 +3824,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
 // Función para insertar los grupos musculares por defecto
-  Future<void> insertarGruposMuscularesPorDefecto(
-      int programaId, String tipoEquipamiento) async {
+  Future<void> insertarGruposMuscularesPorDefecto(int programaId,
+      String tipoEquipamiento) async {
     final db = await database;
 
     // Obtén los grupos musculares asociados al tipo de equipamiento para el programa recién creado
@@ -7104,7 +3835,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
         whereArgs: [tipoEquipamiento]);
 
     print(
-        'Grupos musculares encontrados para el tipo de equipamiento $tipoEquipamiento: ${gruposMusculares.length}');
+        'Grupos musculares encontrados para el tipo de equipamiento $tipoEquipamiento: ${gruposMusculares
+            .length}');
 
     // Iterar sobre los grupos musculares encontrados
     for (var grupoMuscular in gruposMusculares) {
@@ -7129,6 +3861,28 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
       }
     }
   }
+
+  Future<int> insertUser(Map<String, dynamic> userData) async {
+    final db = await database;
+    return await db.insert('usuarios', userData);
+  }
+
+  // Este método inserta un nuevo tipo de perfil en la tabla `tipos_perfil`.
+  Future<int> insertTipoPerfil(String tipoPerfil) async {
+    final db = await database;
+    return await db.insert('tipos_perfil', {'tipo': tipoPerfil});
+  }
+
+  // Este método inserta la relación entre el usuario y el perfil en la tabla `usuario_perfil`.
+  Future<void> insertUsuarioPerfil(int userId, int perfilId) async {
+    final db = await database;
+    await db.insert('usuario_perfil', {
+      'usuario_id': userId,
+      'perfil_id': perfilId,
+    });
+  }
+
+
 
 /* METODOS ACTUALIZACION BBDD*/
 
@@ -7182,8 +3936,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
   // Función para actualizar una cronaxia
-  Future<void> updateCronaxia(
-      int programaId, int cronaxiaId, double valor) async {
+  Future<void> updateCronaxia(int programaId, int cronaxiaId,
+      double valor) async {
     final db = await database;
 
     // Verifica si la cronaxia existe en la tabla
@@ -7213,8 +3967,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
 // Función para actualizar los grupos musculares asociados a un programa
-  Future<void> actualizarGruposMusculares(
-      int programaId, List<int> nuevosGruposMuscularesIds) async {
+  Future<void> actualizarGruposMusculares(int programaId,
+      List<int> nuevosGruposMuscularesIds) async {
     final db = await database;
 
     // Empezamos una transacción para asegurar que todas las operaciones se ejecuten de manera atómica
@@ -7239,7 +3993,29 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
     print('Grupos musculares actualizados para el programa $programaId');
   }
 
+  Future<int> actualizarUsuario(int id, Map<String, dynamic> usuario) async {
+    final db = await database;
+    return await db.update(
+        'usuarios', usuario, where: 'id = ?', whereArgs: [id]);
+  }
+
+
   /*METODOS GET DE LA BBDD*/
+
+  // Este método obtiene el `id` del tipo de perfil, dado su nombre.
+  Future<int?> getTipoPerfilId(String tipoPerfil) async {
+    final db = await database;
+    var result = await db.query(
+      'tipos_perfil',
+      where: 'tipo = ?',
+      whereArgs: [tipoPerfil],
+    );
+    if (result.isNotEmpty) {
+      return result.first['id'] as int?;
+    }
+    return null;
+  }
+
 
   // Obtener todos los clientes
   Future<List<Map<String, dynamic>>> getClients() async {
@@ -7303,7 +4079,7 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+    await db.query('grupos_musculares');
     return result;
   }
 
@@ -7351,10 +4127,10 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
   Future<List<Map<String, dynamic>>>
-      obtenerProgramasPredeterminadosPorTipoIndividual(Database db) async {
+  obtenerProgramasPredeterminadosPorTipoIndividual(Database db) async {
     // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
     final List<Map<String, dynamic>> programasConDetalles =
-        await db.rawQuery('''
+    await db.rawQuery('''
     SELECT 
       p.id_programa,
       p.nombre AS nombre,
@@ -7436,10 +4212,10 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
   Future<List<Map<String, dynamic>>>
-      obtenerProgramasPredeterminadosPorTipoRecovery(Database db) async {
+  obtenerProgramasPredeterminadosPorTipoRecovery(Database db) async {
     // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
     final List<Map<String, dynamic>> programasConDetalles =
-        await db.rawQuery('''
+    await db.rawQuery('''
     SELECT 
       p.id_programa,
       p.nombre AS nombre,
@@ -7592,8 +4368,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
     return gruposMusculares;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(
-      Database db, String tipoEquipamiento) async {
+  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(Database db,
+      String tipoEquipamiento) async {
     // Verifica que el tipo de equipamiento sea válido
     if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
       throw ArgumentError(
@@ -7622,8 +4398,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
     return cronaxias;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(
-      Database db, int programaId) async {
+  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(Database db,
+      int programaId) async {
     final List<Map<String, dynamic>> grupos = await db.rawQuery('''
       SELECT g.id, g.nombre, g.imagen, g.tipo_equipamiento
       FROM grupos_musculares_equipamiento g
@@ -7634,8 +4410,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
     return grupos;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(
-      Database db, int programaId) async {
+  Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(Database db,
+      int programaId) async {
     return await db.rawQuery('''
     SELECT c.nombre, pc.valor
     FROM programa_cronaxia AS pc
@@ -7665,6 +4441,28 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
     return null; // Si no se encontró ningún programa
   }
 
+  Future<List<Map<String, dynamic>>> obtenerUsuarios() async {
+    final db = await database;
+    return await db.query('usuarios');
+  }
+
+  // Método para obtener los usuarios por tipo de perfil
+  Future<List<Map<String, dynamic>>> getUsuariosPorTipoPerfil(String tipoPerfil) async {
+    final db = await database;
+
+    // Consulta para obtener los usuarios con un tipo de perfil específico
+    final result = await db.rawQuery('''
+      SELECT u.*
+      FROM usuarios u
+      JOIN usuario_perfil up ON u.id = up.usuario_id
+      JOIN tipos_perfil tp ON up.perfil_id = tp.id
+      WHERE tp.tipo = ?
+    ''', [tipoPerfil]);
+
+    return result;
+  }
+
+
   /*METODOS DE BORRADO DE BBD*/
 
   // Método para eliminar la base de datos
@@ -7688,6 +4486,12 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
     );
   }
 
+  Future<int> eliminarUsuario(int id) async {
+    final db = await database;
+    return await db.delete('usuarios', where: 'id = ?', whereArgs: [id]);
+  }
+
+
   // Eliminar un bono por ID
   Future<void> deleteBono(int id) async {
     final db = await database;
@@ -7707,7 +4511,7 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
     ));
   }*/
 
-    static Future<File> backupDatabase() async {
+  static Future<File> backupDatabase() async {
     try {
       var databasesPath = await getDatabasesPath();
       String path = join(databasesPath, 'my_database.db');
@@ -7723,7 +4527,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   }
 
   // Método para obtener el SHA del archivo en GitHub
-  static Future<String?> _getFileSha(String owner, String repo, String fileName, String token) async {
+  static Future<String?> _getFileSha(String owner, String repo, String fileName,
+      String token) async {
     String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';
 
     final response = await http.get(
@@ -7736,9 +4541,9 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      return responseData['sha'];  // Devuelve el SHA si el archivo existe
+      return responseData['sha']; // Devuelve el SHA si el archivo existe
     } else {
-      return null;  // Si no existe, el archivo será creado
+      return null; // Si no existe, el archivo será creado
     }
   }
 
@@ -7746,25 +4551,28 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   static Future<void> uploadDatabaseToGitHub() async {
     try {
       // Cargar el token desde el archivo .env
-      String? token = dotenv.env['GITHUB_TOKEN'];  // Obtener el token desde el .env
+      String? token = dotenv
+          .env['GITHUB_TOKEN']; // Obtener el token desde el .env
 
       // Asegurarse de que el token esté presente
       if (token == null || token.isEmpty) {
-        throw Exception('El token de GitHub no está configurado correctamente en el archivo .env');
+        throw Exception(
+            'El token de GitHub no está configurado correctamente en el archivo .env');
       }
 
       // Obtener la copia de seguridad de la base de datos
       File backupFile = await backupDatabase();
-      String fileName = 'database_v25.db';  // Nombre del archivo en GitHub
-      String owner = 'Marcelo-Do-Amaral-Sala';  // Usuario de GitHub
-      String repo = 'imotiondesigns';  // Repositorio de GitHub
+      String fileName = 'database_v25.db'; // Nombre del archivo en GitHub
+      String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
+      String repo = 'imotiondesigns'; // Repositorio de GitHub
 
       // Leer el archivo y codificarlo en base64
       List<int> fileBytes = await backupFile.readAsBytes();
       String contentBase64 = base64Encode(fileBytes);
 
       // Print para ver el contenido antes de subirlo
-      print("Contenido a subir (base64, tamaño ${contentBase64.length} caracteres): $contentBase64");
+      print("Contenido a subir (base64, tamaño ${contentBase64
+          .length} caracteres): $contentBase64");
 
       // Verificar si el archivo ya existe en el repositorio
       String? fileSha = await _getFileSha(owner, repo, fileName, token);
@@ -7776,20 +4584,24 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
       final response = await http.put(
         Uri.parse(url),
         headers: {
-          'Authorization': 'token $token',  // Usar el token cargado desde el .env
+          'Authorization': 'token $token',
+          // Usar el token cargado desde el .env
           'Accept': 'application/vnd.github.v3+json',
         },
         body: jsonEncode({
           'message': 'Subida o actualización de copia de seguridad',
           'content': contentBase64,
-          'sha': fileSha,  // Si el archivo ya existe, pasamos el SHA para actualizarlo
+          'sha': fileSha,
+          // Si el archivo ya existe, pasamos el SHA para actualizarlo
         }),
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         print('Copia de seguridad subida o actualizada exitosamente en GitHub');
       } else {
-        throw Exception('Error al subir o actualizar la copia de seguridad: ${response.body}');
+        throw Exception(
+            'Error al subir o actualizar la copia de seguridad: ${response
+                .body}');
       }
     } catch (e) {
       print('Error al subir o actualizar la copia de seguridad a GitHub: $e');
@@ -7799,11 +4611,13 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
   static Future<void> downloadDatabaseFromGitHub() async {
     try {
       // Cargar el token desde el archivo .env
-      String? token = dotenv.env['GITHUB_TOKEN'];  // Obtener el token desde el .env
+      String? token = dotenv
+          .env['GITHUB_TOKEN']; // Obtener el token desde el .env
 
       // Asegurarse de que el token esté presente
       if (token == null || token.isEmpty) {
-        throw Exception('El token de GitHub no está configurado correctamente en el archivo .env');
+        throw Exception(
+            'El token de GitHub no está configurado correctamente en el archivo .env');
       }
 
       String fileName = 'database_v25.db';
@@ -7828,7 +4642,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
 
         // Verificar si 'content' está presente en la respuesta
         if (!responseData.containsKey('content')) {
-          throw Exception('El contenido base64 no está disponible en la respuesta.');
+          throw Exception(
+              'El contenido base64 no está disponible en la respuesta.');
         }
 
         // Obtener el contenido codificado en base64
@@ -7838,7 +4653,8 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
         base64Content = base64Content.replaceAll('\n', '');
 
         // **Nuevo: Imprimir el contenido base64 descargado para depuración**
-        print("Contenido descargado (base64, tamaño ${base64Content.length} caracteres): $base64Content");
+        print("Contenido descargado (base64, tamaño ${base64Content
+            .length} caracteres): $base64Content");
 
         // Verificar que el contenido base64 no esté vacío
         if (base64Content.isEmpty) {
@@ -7854,8 +4670,10 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
         }
 
         // **Nuevo: Verificar la estructura del archivo descargado**
-        if (fileBytes.length < 1024) { // Verifica que el archivo sea lo suficientemente grande
-          throw Exception('El archivo descargado es muy pequeño, probablemente está corrupto.');
+        if (fileBytes.length <
+            1024) { // Verifica que el archivo sea lo suficientemente grande
+          throw Exception(
+              'El archivo descargado es muy pequeño, probablemente está corrupto.');
         }
 
         // Guardar los bytes en un archivo local
@@ -7865,13 +4683,15 @@ CREATE TABLE IF NOT EXISTS programa_cronaxia (
         // Asegúrate de que el archivo pueda escribirse
         await localFile.writeAsBytes(fileBytes);
 
-        print('Copia de seguridad descargada y guardada exitosamente en: $path');
+        print(
+            'Copia de seguridad descargada y guardada exitosamente en: $path');
 
         // Opción de probar que el archivo es válido (puedes añadir tu lógica aquí)
         // Puedes abrir el archivo para verificar que se puede usar
         // db = await openDatabase(path);
       } else {
-        throw Exception('Error al descargar la copia de seguridad: ${response.body}');
+        throw Exception(
+            'Error al descargar la copia de seguridad: ${response.body}');
       }
     } catch (e) {
       print('Error al descargar la copia de seguridad desde GitHub: $e');

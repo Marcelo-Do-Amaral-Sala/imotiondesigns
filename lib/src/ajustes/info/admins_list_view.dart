@@ -16,7 +16,7 @@ class AdminsListView extends StatefulWidget {
 
 class _AdminsListViewState extends State<AdminsListView> {
   final TextEditingController _adminNameController = TextEditingController();
-  String selectedOption = 'Todos'; // Valor predeterminado
+  String selectedAdminOption = 'Todos'; // Valor predeterminado
 
   List<Map<String, dynamic>> allAdmins = []; // Lista original de clientes
   List<Map<String, dynamic>> filteredAdmins = []; // Lista filtrada
@@ -24,43 +24,49 @@ class _AdminsListViewState extends State<AdminsListView> {
   @override
   void initState() {
     super.initState();
-    //_fetchAdmins();
-    //_adminNameController.addListener(_filterAdmins);
+    _fetchAdmins();
+    _adminNameController.addListener(_filterAdmins);
   }
 
-/*  Future<void> _fetchAdmins() async {
+  Future<void> _fetchAdmins() async {
     final dbHelper = DatabaseHelper();
     try {
-      final clientData = await dbHelper.getClients();
+      // Obtener los usuarios cuyo perfil es "Administrador" o "Ambos"
+      final adminData = await dbHelper.getUsuariosPorTipoPerfil('Administrador');
+
+      // También podemos obtener usuarios con el tipo de perfil 'Ambos' si es necesario
+      final adminDataAmbos = await dbHelper.getUsuariosPorTipoPerfil('Ambos');
+
+      // Combina ambas listas
+      final allAdminData = [...adminData, ...adminDataAmbos];
+
       setState(() {
-        allClients = clientData; // Asigna a la lista original
-        filteredClients = allClients; // Inicializa la lista filtrada
+        allAdmins = allAdminData; // Asigna los usuarios filtrados
+        filteredAdmins = allAdmins; // Inicializa la lista filtrada
       });
-      _filterClients(); // Filtra para mostrar todos los clientes
+
+      _filterAdmins(); // Llama al filtro si es necesario
     } catch (e) {
       print('Error fetching clients: $e');
     }
-  }*/
+  }
 
- /* void _filterClients() {
+
+ void _filterAdmins() {
     setState(() {
-      String searchText = _clientNameController.text.toLowerCase();
-      String indexText = _clientIndexController.text;
+      String searchText = _adminNameController.text.toLowerCase();
 
-      filteredClients = allClients.where((client) {
-        final matchesName = client['name']!.toLowerCase().contains(searchText);
-        final matchesIndex =
-            indexText.isEmpty || client['id'].toString() == indexText;
-
+      filteredAdmins = allAdmins.where((admin) {
+        final matchesName = admin['name']!.toLowerCase().contains(searchText);
         // Filtra por estado basado en la selección del dropdown
         final matchesStatus =
-            selectedOption == 'Todos' || client['status'] == selectedOption;
+            selectedAdminOption == 'Todos' || admin['status'] == selectedAdminOption;
 
-        return matchesName && matchesIndex && matchesStatus;
+        return matchesName &&  matchesStatus;
       }).toList();
     });
   }
-*/
+
   void _showPrint(Map<String, dynamic> adminData) {
     _updateAdminFields(adminData);
     // Asegúrate de que los datos se pasen correctamente como Map<String, String>
@@ -73,7 +79,7 @@ class _AdminsListViewState extends State<AdminsListView> {
   void _updateAdminFields(Map<String, dynamic> adminData) {
     setState(() {
       _adminNameController.text = adminData['name'] ?? '';
-      selectedOption =
+      selectedAdminOption =
           adminData['status'] ?? 'Todos'; // Cambiar a 'Todos' si es nulo
     });
   }
@@ -157,7 +163,7 @@ class _AdminsListViewState extends State<AdminsListView> {
               borderRadius: BorderRadius.circular(7),
             ),
             child: DropdownButton<String>(
-              value: selectedOption,
+              value: selectedAdminOption,
               items: const [
                 DropdownMenuItem(
                     value: 'Todos',
@@ -174,8 +180,8 @@ class _AdminsListViewState extends State<AdminsListView> {
               ],
               onChanged: (value) {
                 setState(() {
-                  selectedOption = value!;
-                  //_filterClients(); // Filtrar después de seleccionar
+                  selectedAdminOption = value!;
+                  _filterAdmins(); // Filtrar después de seleccionar
                 });
               },
               dropdownColor: const Color(0xFF313030),

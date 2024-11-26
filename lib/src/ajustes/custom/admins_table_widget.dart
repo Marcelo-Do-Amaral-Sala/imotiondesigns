@@ -14,6 +14,13 @@ class AdminsTableWidget extends StatefulWidget {
 class _AdminsTableWidgetState extends State<AdminsTableWidget> {
   @override
   Widget build(BuildContext context) {
+    // Ordenar la lista de datos por el id de menor a mayor
+    List<Map<String, dynamic>> sortedData = List.from(widget.data);
+    sortedData.sort((a, b) {
+      int idA = a['id'] is int ? a['id'] : int.tryParse(a['id'].toString()) ?? 0;
+      int idB = b['id'] is int ? b['id'] : int.tryParse(b['id'].toString()) ?? 0;
+      return idA.compareTo(idB); // Ordenar de menor a mayor
+    });
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
