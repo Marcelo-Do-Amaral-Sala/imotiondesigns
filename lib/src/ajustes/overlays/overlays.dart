@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
+import 'package:imotion_designs/src/ajustes/info/entrenadores_list_view.dart';
 import 'package:restart_app/restart_app.dart';
 
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
+import '../../db/db_helper_traducciones.dart';
+import '../../servicios/sync.dart';
 
 class OverlayBackup extends StatefulWidget {
   final VoidCallback onClose;
@@ -270,8 +274,6 @@ class _OverlayBackupState extends State<OverlayBackup>
   }
 }
 
-
-
 class OverlayIdioma extends StatefulWidget {
   final VoidCallback onClose;
 
@@ -283,20 +285,54 @@ class OverlayIdioma extends StatefulWidget {
 
 class _OverlayIdiomaState extends State<OverlayIdioma>
     with SingleTickerProviderStateMixin {
-  String? selectedIdioma;
+  String? _selectedLanguage;
+  Map<String, String> _translations = {};
+  final SyncService _syncService = SyncService();
+  final DatabaseHelperTraducciones _dbHelperTraducciones =
+      DatabaseHelperTraducciones();
+  bool isLoading = false;
+  String statusMessage = 'Listo para hacer la copia de seguridad';
 
   @override
   void initState() {
     super.initState();
+    _showStoredTranslations();
+    // Establecer el idioma seleccionado por defecto como 'es'
+    _selectedLanguage = 'es';
+    _loadTranslations();
+    _fetchLocalTranslations('es'); // Cargar las traducciones en español
   }
 
-  final List<Map<String, dynamic>> idiomas = [
-    {"nombre": "Español", "icono": "assets/images/cliente.png"},
-    {"nombre": "Inglés", "icono": "assets/images/cliente.png"},
-    {"nombre": "Francés", "icono": "assets/images/cliente.png"},
-    {"nombre": "Italiano", "icono": "assets/images/cliente.png"},
-    {"nombre": "Portugués", "icono": "assets/images/cliente.png"},
-  ];
+  void _loadTranslations() async {
+    await _syncService.syncFirebaseToSQLite();
+    if (_selectedLanguage != null) {
+      _fetchLocalTranslations(_selectedLanguage!);
+    }
+  }
+
+  void _fetchLocalTranslations(String language) async {
+    final translations =
+        await _dbHelperTraducciones.getTranslationsByLanguage(language);
+    setState(() {
+      _translations = Map<String, String>.from(translations);
+      if (_translations.isEmpty) {
+        statusMessage =
+            "No hay datos disponibles, la base de datos está vacía.";
+        print("La base de datos está vacía.");
+      }
+    });
+  }
+
+  void _showStoredTranslations() async {
+    final allTranslations = await _dbHelperTraducciones.getAllTranslations();
+    if (allTranslations.isEmpty) {
+      print("No hay traducciones almacenadas.");
+    } else {
+      for (var translation in allTranslations) {
+        print(translation);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -311,46 +347,459 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: idiomas.length,
-          itemBuilder: (context, index) {
-            final idioma = idiomas[index];
-            return ListTile(
-              leading: Image.asset(
-                idioma['icono'],
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-              title: Text(
-                idioma['nombre'],
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Column(
+                  children: [
+                    SizedBox(height: 20),
+                    // Dropdown para seleccionar idioma
+                    DropdownButton<String>(
+                      value: _selectedLanguage,
+                      hint: Text("Selecciona un idioma"),
+                      items: ['es', 'en', 'fr', 'pt', 'it']
+                          .map((lang) => DropdownMenuItem<String>(
+                        value: lang,
+                        child: Text(lang.toUpperCase()),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedLanguage = value;
+                          _translations.clear();
+                        });
+                        if (value != null) {
+                          _fetchLocalTranslations(value);
+                        }
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    // Mostrar las traducciones en una lista
+                    Expanded(
+                      child: _translations.isEmpty
+                          ? Center(child: Text("NO HAY DATOS DISPONIBLES"))
+                          : ListView.builder(
+                        itemCount: _translations.length,
+                        itemBuilder: (context, index) {
+                          String key =
+                          _translations.keys.elementAt(index);
+                          return ListTile(
+                            title: Text(_translations[key]!),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              trailing: Radio<String>(
-                value: idioma['nombre'],
-                groupValue: selectedIdioma,
-                onChanged: (value) {
-                  setState(() {
-                    selectedIdioma = value;
-                  });
-                },
+            ],
+          )),
+      onClose: widget.onClose,
+    );
+  }
+}
+
+class OverlayServicio extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayServicio({super.key, required this.onClose});
+
+  @override
+  _OverlayServicioState createState() => _OverlayServicioState();
+}
+
+class _OverlayServicioState extends State<OverlayServicio>
+    with SingleTickerProviderStateMixin {
+  bool isBodyPro = true;
+  String? selectedGender;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainOverlay(
+      title: const Text(
+        "SERVICIO TÉCNICO",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+        child: Column(
+          children: [
+            const Text(
+              "CONTACTO",
+              style: TextStyle(
+                  color: Color(0xFF28E2F5),
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+            const Text(
+              "Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.5,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 46, 46, 46),
+                borderRadius: BorderRadius.circular(7.0),
               ),
-              onTap: () {
-                setState(() {
-                  selectedIdioma = idioma['nombre'];
-                });
-              },
-            );
-          },
+              child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      const Text(
+                        "E-MAIL: technical_service@i-motiongroup.com",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02),
+                      const Text(
+                        "WHATSAPP: (+34) 618 112 271",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  )),
+            ),
+          ],
         ),
       ),
       onClose: widget.onClose,
     );
   }
 }
+
+class OverlayAdmins extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayAdmins({Key? key, required this.onClose}) : super(key: key);
+
+  @override
+  _OverlayAdminsState createState() => _OverlayAdminsState();
+}
+
+class _OverlayAdminsState extends State<OverlayAdmins>
+    with SingleTickerProviderStateMixin {
+  Map<String, dynamic>? selectedAdminData;
+  bool isInfoVisible = false;
+  late TabController _tabController;
+
+  void selectAdmin(Map<String, dynamic> adminData) {
+    setState(() {
+      selectedAdminData = adminData;
+      isInfoVisible = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainOverlay(
+      title: const Text(
+        "ADMINISTRADORES",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: isInfoVisible && selectedAdminData != null
+          ? Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTabBar(),
+          Expanded(child: _buildTabBarView()),
+        ],
+      )
+          : AdminsListView(
+        onAdminTap: (adminData) {
+          selectAdmin(adminData);
+        },
+      ),
+      onClose: widget.onClose,
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
+      color: Colors.black,
+      child: TabBar(
+        controller: _tabController,
+        onTap: (index) {
+          setState(() {
+          });
+        },
+        tabs: [
+          _buildTab('DATOS PERSONALES', 0),
+          _buildTab('BONOS', 1),
+          _buildTab('ACTIVIDAD', 2),
+        ],
+        indicator: const BoxDecoration(
+          color: Color(0xFF494949),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
+        ),
+        dividerColor: Colors.black,
+        labelColor: const Color(0xFF2be4f3),
+        labelStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelColor: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildTab(String text, int index) {
+    return Tab(
+      child: SizedBox(
+        width: 200,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            decoration: _tabController.index == index
+                ? TextDecoration.underline
+                : TextDecoration.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabBarView() {
+    return IndexedStack(
+      index: _tabController.index,
+     /* children: [
+        ClientsData(
+          clientData: selectedClientData!,
+          onDataChanged: (data) {
+            print(data);
+          },
+          onClose: widget.onClose,
+        ),
+        ClientsActivity(clientDataActivity: selectedClientData!),
+        ClientsBonos(clientDataBonos: selectedClientData!),
+        _showBioSubTab
+            ? _buildBioSubTabView()
+            : _showEvolutionSubTab
+            ? _buildEvolutionSubTabView()
+            : ClientsBio(
+          onClientTap: (clientData) {
+            setState(() {
+              _showBioSubTab = true;
+              _subTabData = clientData;
+            });
+          },
+          clientDataBio: selectedClientData!,
+          onEvolutionPressed: () {
+            setState(() {
+              _showEvolutionSubTab = true;
+              _showBioSubTab = false;
+            });
+          },
+        ),
+        ClientsGroups(
+          clientData: selectedClientData!,
+          onDataChanged: (data) {
+            print(data);
+          },
+          onClose: widget.onClose,
+        ),
+      ],*/
+    );
+  }
+
+}
+
+class OverlayTrainers extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayTrainers({Key? key, required this.onClose}) : super(key: key);
+
+  @override
+  _OverlayTrainersState createState() => _OverlayTrainersState();
+}
+
+class _OverlayTrainersState extends State<OverlayTrainers>
+    with SingleTickerProviderStateMixin {
+  Map<String, dynamic>? selectedTrainerData;
+  bool isInfoVisible = false;
+  late TabController _tabController;
+
+  void selectTrainer(Map<String, dynamic> trainerData) {
+    setState(() {
+      selectedTrainerData = trainerData;
+      isInfoVisible = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainOverlay(
+      title: const Text(
+        "LISTA DE ENTRENADORES",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: isInfoVisible && selectedTrainerData != null
+          ? Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTabBar(),
+          Expanded(child: _buildTabBarView()),
+        ],
+      )
+          : EntrenadoresListView(
+        onTrainerTap: (trainerData) {
+          selectTrainer(trainerData);
+        },
+      ),
+      onClose: widget.onClose,
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
+      color: Colors.black,
+      child: TabBar(
+        controller: _tabController,
+        onTap: (index) {
+          setState(() {
+          });
+        },
+        tabs: [
+          _buildTab('DATOS PERSONALES', 0),
+          _buildTab('BONOS', 1),
+          _buildTab('ACTIVIDAD', 2),
+        ],
+        indicator: const BoxDecoration(
+          color: Color(0xFF494949),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(7.0)),
+        ),
+        dividerColor: Colors.black,
+        labelColor: const Color(0xFF2be4f3),
+        labelStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelColor: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildTab(String text, int index) {
+    return Tab(
+      child: SizedBox(
+        width: 200,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            decoration: _tabController.index == index
+                ? TextDecoration.underline
+                : TextDecoration.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabBarView() {
+    return IndexedStack(
+      index: _tabController.index,
+      /* children: [
+        ClientsData(
+          clientData: selectedClientData!,
+          onDataChanged: (data) {
+            print(data);
+          },
+          onClose: widget.onClose,
+        ),
+        ClientsActivity(clientDataActivity: selectedClientData!),
+        ClientsBonos(clientDataBonos: selectedClientData!),
+        _showBioSubTab
+            ? _buildBioSubTabView()
+            : _showEvolutionSubTab
+            ? _buildEvolutionSubTabView()
+            : ClientsBio(
+          onClientTap: (clientData) {
+            setState(() {
+              _showBioSubTab = true;
+              _subTabData = clientData;
+            });
+          },
+          clientDataBio: selectedClientData!,
+          onEvolutionPressed: () {
+            setState(() {
+              _showEvolutionSubTab = true;
+              _showBioSubTab = false;
+            });
+          },
+        ),
+        ClientsGroups(
+          clientData: selectedClientData!,
+          onDataChanged: (data) {
+            print(data);
+          },
+          onClose: widget.onClose,
+        ),
+      ],*/
+    );
+  }
+
+}
+

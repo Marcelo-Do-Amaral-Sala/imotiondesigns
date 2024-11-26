@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/ajustes/form/licencia_form.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
+
 import 'ajustes/menus/ajustes_menu.dart';
+import 'ajustes/menus/gestion_menu.dart';
 import 'clients/clients_main_view.dart';
 
 class App extends StatefulWidget {
@@ -13,7 +15,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-
   String currentView = 'mainMenu';
 
   void navigateTo(String view) {
@@ -45,6 +46,14 @@ class _AppState extends State<App> {
           onBack: () =>
               navigateTo('mainMenu'), // Callback para volver a MainMenuView
           onNavigatetoLicencia: () => navigateTo('licencia'),
+          onNavigatetoGestion: () => navigateTo('gestion'),
+        );
+        break;
+
+      case 'gestion':
+        viewToDisplay = GestionMenuView(
+          onBack: () =>
+              navigateTo('ajustes'), // Callback para volver a MainMenuView
         );
         break;
 
@@ -62,6 +71,10 @@ class _AppState extends State<App> {
           onNavigateToAjustes: () => navigateTo('ajustes'),
         );
         break;
+      /* case 'json':
+      default:
+        viewToDisplay=UploadJsonView();
+        break;*/
     }
 
     return MaterialApp(

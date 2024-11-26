@@ -7,6 +7,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../db/db_helper.dart';
 import '../db/db_helper_pc.dart';
 import '../db/db_helper_web.dart';
+import '../servicios/sync.dart';
 
 
 class MainMenuView extends StatefulWidget {
