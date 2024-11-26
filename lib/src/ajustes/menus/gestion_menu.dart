@@ -139,6 +139,7 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                                     () {
                                   setState(() {
                                     scaleFactorCrear = 1;
+                                    toggleOverlay(2);
                                   });
                                 },
                                     () {
@@ -224,10 +225,10 @@ class _GestionMenuViewState extends State<GestionMenuView> {
         return OverlayTrainers(
           onClose: () => toggleOverlay(1),
         );
-      /*case 2:
-        return OverlayServicio(
+      case 2:
+        return OverlayCrearNuevo(
           onClose: () => toggleOverlay(2),
-        );*/
+        );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada
     }
