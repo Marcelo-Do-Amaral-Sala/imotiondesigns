@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imotion_designs/src/ajustes/form/user_form_bonos.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
 import 'package:imotion_designs/src/ajustes/info/entrenadores_list_view.dart';
 import 'package:restart_app/restart_app.dart';
@@ -973,19 +974,12 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
             });
           },
         ),
-        /*// Check if selectedClientData is not null before passing it to ClientsFormBonos
-        selectedClientData != null
-            ? ClientsFormBonos(clientDataBonos: selectedClientData!)
+        // Check if selectedClientData is not null before passing it to ClientsFormBonos
+        selectedUserData != null
+            ? UsersFormBonos(userDataBonos: selectedUserData!)
             : Center(child: Text("No client data available.")),
-        selectedClientData != null
-            ? ClientsFormGroups(
-          onDataChanged: (data) {
-            print(data); // Handle changed data
-          },
-          onClose: widget.onClose,
-          clientDataGroups: selectedClientData!,
-        )*/
-            //: Center(child: Text("No client data available.")),
+
+
       ],
     );
   }

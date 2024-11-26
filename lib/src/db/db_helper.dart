@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 100,
+      version: 102,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
@@ -3647,10 +3647,21 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 )
 ''');
 
+    await db.execute('''
+    CREATE TABLE IF NOT EXISTS bonos_usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER,
+      cantidad INTEGER NOT NULL,
+      fecha TEXT NOT NULL,
+      estado TEXT NOT NULL,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+    )
+  ''');
+
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 100) {
+    if (oldVersion < 102) {
       print("ONPUGRADE EJECUTADIO");
       await db.execute('''
       CREATE TABLE IF NOT EXISTS usuarios (
@@ -3684,6 +3695,17 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   PRIMARY KEY (usuario_id, perfil_id)
 )
 ''');
+
+      await db.execute('''
+    CREATE TABLE IF NOT EXISTS bonos_usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER,
+      cantidad INTEGER NOT NULL,
+      fecha TEXT NOT NULL,
+      estado TEXT NOT NULL,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+    )
+  ''');
 
     }
   }
@@ -3732,6 +3754,20 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       await db.insert(
         'bonos',
         bono,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      print('Error inserting bono: $e');
+    }
+  }
+
+  // Insertar un bono
+  Future<void> insertBonoUsuario(Map<String, dynamic> bonoUser) async {
+    final db = await database;
+    try {
+      await db.insert(
+        'bonos_usuarios',
+        bonoUser,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
@@ -4459,6 +4495,35 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       WHERE tp.tipo = ?
     ''', [tipoPerfil]);
 
+    return result;
+  }
+
+  // Obtener el cliente más reciente (con el id más alto)
+  Future<Map<String, dynamic>?> getMostRecentUser() async {
+    final db = await database;
+    // Realizamos una consulta que ordene por el id de forma descendente (del más grande al más pequeño)
+    final List<Map<String, dynamic>> result = await db.query(
+      'usuarios',
+      orderBy: 'id DESC', // Ordenamos por id de manera descendente
+      limit: 1, // Solo nos interesa el primer resultado (el más reciente)
+    );
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null; // Si no hay clientes en la base de datos
+  }
+
+  Future<List<Map<String, dynamic>>> getAvailableBonosByUserId(
+      int userId) async {
+    final db = await database;
+    final result = await db.query(
+      'bonos_usuarios', // Nombre de la tabla de bonos
+      where: 'usuario_id = ? AND estado = ?',
+      whereArgs: [
+        userId,
+        'Disponible'
+      ], // Filtra por cliente y estado "Disponible"
+    );
     return result;
   }
 
