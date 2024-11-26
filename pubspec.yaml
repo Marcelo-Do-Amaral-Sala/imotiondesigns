@@ -149,6 +149,11 @@ flutter:
     - assets/images/ibodyPro.png
     - assets/images/obtenerBio.png
     - assets/images/leerbio.png
+    - assets/images/espana.png
+    - assets/images/francia.png
+    - assets/images/italia.png
+    - assets/images/portugal.png
+    - assets/images/reino-unido.png
     - .env
     - assets/traducciones.json
 

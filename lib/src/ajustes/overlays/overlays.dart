@@ -3,12 +3,14 @@ import 'package:imotion_designs/src/ajustes/form/user_form_bonos.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_activity.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
 import 'package:imotion_designs/src/ajustes/info/entrenadores_list_view.dart';
+import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 import '../../db/db_helper_traducciones.dart';
 import '../../servicios/sync.dart';
+import '../../servicios/translation_provider.dart';
 import '../form/user_form.dart';
 import '../info/admins_bonos.dart';
 import '../info/admins_data.dart';
@@ -22,7 +24,8 @@ class OverlayBackup extends StatefulWidget {
   _OverlayBackupState createState() => _OverlayBackupState();
 }
 
-class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProviderStateMixin {
+class _OverlayBackupState extends State<OverlayBackup>
+    with SingleTickerProviderStateMixin {
   bool isBodyPro = true;
   String? selectedGender;
   bool showConfirmation = false;
@@ -87,7 +90,8 @@ class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProvider
       final db = await dbHelper.database;
 
       // Imprimir el estado actual de la base de datos antes de hacer cualquier cosa
-      debugPrint("Estado de la base de datos antes de la inicialización: ${db.isOpen ? 'Abierta' : 'Cerrada'}");
+      debugPrint(
+          "Estado de la base de datos antes de la inicialización: ${db.isOpen ? 'Abierta' : 'Cerrada'}");
 
       setState(() {
         isLoading = true;
@@ -103,7 +107,8 @@ class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProvider
 
       // Verificar si la base de datos está abierta después de la inicialización
       if (!db.isOpen) {
-        throw Exception('La base de datos no se pudo abrir después de la inicialización');
+        throw Exception(
+            'La base de datos no se pudo abrir después de la inicialización');
       }
 
       debugPrint("Database open (after re-opening): ${db.isOpen}");
@@ -116,7 +121,8 @@ class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProvider
 
       // Verificar nuevamente si la base de datos sigue abierta después de la descarga
       final dbAfterDownload = await dbHelper.database;
-      debugPrint("Estado de la base de datos después de la descarga: ${dbAfterDownload.isOpen ? 'Abierta' : 'Cerrada'}");
+      debugPrint(
+          "Estado de la base de datos después de la descarga: ${dbAfterDownload.isOpen ? 'Abierta' : 'Cerrada'}");
 
       if (!dbAfterDownload.isOpen) {
         throw Exception('La base de datos está cerrada después de la descarga');
@@ -165,7 +171,8 @@ class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProvider
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -211,7 +218,8 @@ class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProvider
               LinearProgressIndicator(
                 value: progress, // Aquí se usa el valor del progreso
                 backgroundColor: Colors.grey[300],
-                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2be4f3)),
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(Color(0xFF2be4f3)),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Text(
@@ -300,7 +308,6 @@ class _OverlayBackupState extends State<OverlayBackup> with SingleTickerProvider
   }
 }
 
-
 class OverlayIdioma extends StatefulWidget {
   final VoidCallback onClose;
 
@@ -324,7 +331,6 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
   void initState() {
     super.initState();
     _showStoredTranslations();
-    // Establecer el idioma seleccionado por defecto como 'es'
     _selectedLanguage = 'es';
     _loadTranslations();
     _fetchLocalTranslations('es'); // Cargar las traducciones en español
@@ -361,8 +367,26 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
     }
   }
 
+  void _changeAppLanguage(String language) {
+    final provider = Provider.of<TranslationProvider>(context, listen: false);
+    provider.changeLanguage(language);
+
+    // Recargar traducciones para el idioma seleccionado
+    _fetchLocalTranslations(language);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Lista de países con nombres y banderas
+    final List<Map<String, String>> countries = [
+      {'name': 'Español', 'flag': 'assets/images/espana.png', 'lang': 'es'},
+      {'name': 'Inglés', 'flag': 'assets/images/reino-unido.png', 'lang': 'en'},
+      {'name': 'Francés', 'flag': 'assets/images/francia.png', 'lang': 'fr'},
+      {'name': 'Italiano', 'flag': 'assets/images/italia.png', 'lang': 'it'},
+      {'name': 'Portugués', 'flag': 'assets/images/portugal.png', 'lang': 'pt'},
+      // Puedes agregar más países aquí
+    ];
+
     return MainOverlay(
       title: const Text(
         "SELECCIONAR IDIOMA",
@@ -374,56 +398,226 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
         ),
       ),
       content: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Column(
-                  children: [
-                    SizedBox(height: 20),
-                    // Dropdown para seleccionar idioma
-                    DropdownButton<String>(
-                      value: _selectedLanguage,
-                      hint: Text("Selecciona un idioma"),
-                      items: ['es', 'en', 'fr', 'pt', 'it']
-                          .map((lang) => DropdownMenuItem<String>(
-                                value: lang,
-                                child: Text(lang.toUpperCase()),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedLanguage = value;
-                          _translations.clear();
-                        });
-                        if (value != null) {
-                          _fetchLocalTranslations(value);
-                        }
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    // Mostrar las traducciones en una lista
-                    Expanded(
-                      child: _translations.isEmpty
-                          ? Center(child: Text("NO HAY DATOS DISPONIBLES"))
-                          : ListView.builder(
-                              itemCount: _translations.length,
-                              itemBuilder: (context, index) {
-                                String key =
-                                    _translations.keys.elementAt(index);
-                                return ListTile(
-                                  title: Text(_translations[key]!),
-                                );
-                              },
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedLanguage = countries[0]['lang'];
+                    });
+                    _changeAppLanguage(countries[0]['lang']!);
+                  },
+                  child: AnimatedScale(
+                    scale: _selectedLanguage == countries[0]['lang'] ? 0.9 : 1,
+                    duration: const Duration(milliseconds: 100),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Contenedor con borde alrededor de la imagen
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle, // Forma circular
+                            border: _selectedLanguage == countries[0]['lang']
+                                ? Border.all(
+                                    color: Color(0xFF2be4f3),
+                                    width: 3) // Borde azul si seleccionado
+                                : null,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              countries[0]['flag']!,
+                              fit: BoxFit.cover,
+                              width: 80,
+                              height: 80,
                             ),
+                          ),
+                        ),
+                        Text(
+                          countries[0]['name']!,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          )),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedLanguage = countries[1]['lang'];
+                    });
+                    _changeAppLanguage(countries[1]['lang']!);
+                  },
+                  child: AnimatedScale(
+                    scale: _selectedLanguage == countries[1]['lang'] ? 0.9 : 1,
+                    duration: const Duration(milliseconds: 100),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: _selectedLanguage == countries[1]['lang']
+                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
+                                : null,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              countries[1]['flag']!,
+                              fit: BoxFit.cover,
+                              width: 80,
+                              height: 80,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          countries[1]['name']!,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedLanguage = countries[2]['lang'];
+                    });
+                    _changeAppLanguage(countries[2]['lang']!);
+                  },
+                  child: AnimatedScale(
+                    scale: _selectedLanguage == countries[2]['lang'] ? 0.9 : 1,
+                    duration: const Duration(milliseconds: 100),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: _selectedLanguage == countries[2]['lang']
+                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
+                                : null,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              countries[2]['flag']!,
+                              fit: BoxFit.cover,
+                              width: 80,
+                              height: 80,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          countries[2]['name']!,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedLanguage = countries[3]['lang'];
+                    });
+                    _changeAppLanguage(countries[3]['lang']!);
+                  },
+                  child: AnimatedScale(
+                    scale: _selectedLanguage == countries[3]['lang'] ? 0.9 : 1,
+                    duration: const Duration(milliseconds: 100),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: _selectedLanguage == countries[3]['lang']
+                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
+                                : null,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              countries[3]['flag']!,
+                              fit: BoxFit.cover,
+                              width: 80,
+                              height: 80,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          countries[3]['name']!,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedLanguage = countries[4]['lang'];
+                    });
+                    _changeAppLanguage(countries[4]['lang']!);
+                  },
+                  child: AnimatedScale(
+                    scale: _selectedLanguage == countries[4]['lang'] ? 0.9 : 1,
+                    duration: const Duration(milliseconds: 100),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: _selectedLanguage == countries[4]['lang']
+                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
+                                : null,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              countries[4]['flag']!,
+                              fit: BoxFit.cover,
+                              width: 80,
+                              height: 80,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          countries[4]['name']!,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
       onClose: widget.onClose,
     );
   }

@@ -2,21 +2,26 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/bio/overlay_bio.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
 import '../db/db_helper.dart';
 import '../db/db_helper_pc.dart';
 import '../db/db_helper_web.dart';
 import '../servicios/sync.dart';
-
+import '../servicios/translation_provider.dart'; // Importa el TranslationProvider
 
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToClients;
   final Function() onNavigateToPrograms;
   final Function() onNavigateToAjustes;
 
-  const MainMenuView({Key? key, required this.onNavigateToClients, required this.onNavigateToPrograms, required this.onNavigateToAjustes})
-      : super(key: key);
+  const MainMenuView({
+    Key? key,
+    required this.onNavigateToClients,
+    required this.onNavigateToPrograms,
+    required this.onNavigateToAjustes,
+  }) : super(key: key);
 
   @override
   State<MainMenuView> createState() => _MainMenuViewState();
@@ -35,7 +40,6 @@ class _MainMenuViewState extends State<MainMenuView> {
   Map<String, String>? clientData;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
 
-
   @override
   void initState() {
     super.initState();
@@ -52,39 +56,28 @@ class _MainMenuViewState extends State<MainMenuView> {
   Future<void> _initializeDatabase() async {
     try {
       if (kIsWeb) {
-        // Para la plataforma web, usamos sqflite_common_ffi_web
         debugPrint("Inicializando base de datos para Web...");
         databaseFactory = databaseFactoryFfi;
-        // Aquí no es necesario asignar `databaseFactory` para la web ya que sqflite_common_ffi_web lo maneja automáticamente
-        await DatabaseHelperWeb()
-            .initializeDatabase(); // Inicializamos la base de datos con el helper de Web
+        await DatabaseHelperWeb().initializeDatabase();
       } else if (Platform.isAndroid || Platform.isIOS) {
-        // Para plataformas móviles (Android/iOS)
         debugPrint("Inicializando base de datos para Móviles...");
-
-        // Usamos el factory de sqflite para dispositivos móviles
-        await DatabaseHelper()
-            .initializeDatabase(); // Inicializamos la base de datos con el helper de móviles
+        await DatabaseHelper().initializeDatabase();
       } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-        // Para plataformas de escritorio (Windows, macOS, Linux)
         debugPrint("Inicializando base de datos para Desktop...");
-
-        // En plataformas de escritorio, se usa `databaseFactoryFfi`
-        databaseFactory =
-            databaseFactoryFfi; // Usamos el backend FFI para escritorio
-
-        await DatabaseHelperPC()
-            .initializeDatabase(); // Inicializamos la base de datos con el helper de PC
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperPC().initializeDatabase();
       } else {
-        // Caso para plataformas no soportadas (como WebAssembly, otros casos)
-        throw UnsupportedError(
-            'Plataforma no soportada para la base de datos.');
+        throw UnsupportedError('Plataforma no soportada para la base de datos.');
       }
-
       debugPrint("Base de datos inicializada correctamente.");
     } catch (e) {
       debugPrint("Error al inicializar la base de datos: $e");
     }
+  }
+
+  // Función de traducción utilitaria
+  String tr(BuildContext context, String key) {
+    return Provider.of<TranslationProvider>(context, listen: false).translate(key);
   }
 
   @override
@@ -125,93 +118,73 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/panel.png',
-                                'PANEL DE CONTROL',
+                                tr(context, 'panel_de_control'),
                                 scaleFactorPanel,
-                                () {
-                                  setState(() {
-                                    scaleFactorPanel = 1;
-                                  });
-                                },
-                                () {
-                                  setState(() => scaleFactorPanel = 0.90);
-                                },
+                                    () => setState(() => scaleFactorPanel = 1),
+                                    () => setState(() => scaleFactorPanel = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
                                 'assets/images/cliente.png',
-                                'CLIENTES',
+                                tr(context, 'clientes'),
                                 scaleFactorClient,
-                                () {
+                                    () {
                                   scaleFactorClient = 1;
                                   widget.onNavigateToClients();
                                 },
-                                () {
-                                  setState(() => scaleFactorClient = 0.90);
-                                },
+                                    () => setState(() => scaleFactorClient = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
                                 'assets/images/programas.png',
-                                'PROGRAMAS',
+                                tr(context, 'programas'),
                                 scaleFactorProgram,
-                                () {
+                                    () {
                                   setState(() {
                                     scaleFactorProgram = 1;
                                     widget.onNavigateToPrograms();
                                   });
                                 },
-                                () {
-                                  setState(() => scaleFactorProgram = 0.90);
-                                },
+                                    () => setState(() => scaleFactorProgram = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
                                 'assets/images/bio.png',
-                                'BIOIMPEDANCIA',
+                                tr(context, 'bioimpedancia'),
                                 scaleFactorBio,
-                                () {
+                                    () {
                                   setState(() {
                                     scaleFactorBio = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                () {
-                                  setState(() => scaleFactorBio = 0.90);
-                                },
+                                    () => setState(() => scaleFactorBio = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
                                 'assets/images/tutoriales.png',
-                                'TUTORIALES',
+                                tr(context, 'tutoriales'),
                                 scaleFactorTuto,
-                                () {
-                                  setState(() {
-                                    scaleFactorTuto = 1;
-                                  });
-                                },
-                                () {
-                                  setState(() => scaleFactorTuto = 0.90);
-                                },
+                                    () => setState(() => scaleFactorTuto = 1),
+                                    () => setState(() => scaleFactorTuto = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
                                 'assets/images/ajustes.png',
-                                'AJUSTES',
+                                tr(context, 'ajustes'),
                                 scaleFactorAjustes,
-                                () {
+                                    () {
                                   setState(() {
                                     scaleFactorAjustes = 1;
                                     widget.onNavigateToAjustes();
                                   });
                                 },
-                                () {
-                                  setState(() => scaleFactorAjustes = 0.90);
-                                },
+                                    () => setState(() => scaleFactorAjustes = 0.90),
                               ),
                             ],
                           ),
@@ -220,18 +193,14 @@ class _MainMenuViewState extends State<MainMenuView> {
                       SizedBox(width: screenWidth * 0.01),
                       Expanded(
                         flex: 3,
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: AspectRatio(
-                                aspectRatio: 1, // Mantiene la proporción
-                                child: Image.asset(
-                                  'assets/images/logo.png',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
+                        child: Center(
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.contain,
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
@@ -240,7 +209,6 @@ class _MainMenuViewState extends State<MainMenuView> {
               ],
             ),
           ),
-          // Overlay: Esto se coloca fuera del contenido principal y en el centro de la pantalla
           if (isOverlayVisible)
             Positioned.fill(
               child: Align(
@@ -259,9 +227,8 @@ class _MainMenuViewState extends State<MainMenuView> {
         return OverlayBioimpedancia(
           onClose: () => toggleOverlay(0),
         );
-
       default:
-        return Container(); // Si no coincide con ninguno de los índices, no muestra nada
+        return Container();
     }
   }
 
@@ -293,21 +260,15 @@ class _MainMenuViewState extends State<MainMenuView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Contenedor para el ícono
                       Container(
                         padding: const EdgeInsets.all(10.0),
-                        width: screenWidth *
-                            0.05, // Ajusta el tamaño del ícono aquí
-                        height: screenHeight *
-                            0.1, // Ajusta la altura del ícono aquí
+                        width: screenWidth * 0.05,
+                        height: screenHeight * 0.1,
                         child: Image.asset(
                           imagePath,
-                          fit: BoxFit
-                              .contain, // Ajuste para llenar el contenedor
+                          fit: BoxFit.contain,
                         ),
                       ),
-
-                      // Contenedor para el texto
                       Expanded(
                         child: Text(
                           text,

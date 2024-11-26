@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:imotion_designs/src/app.dart';
 import 'package:imotion_designs/src/servicios/connectivity.dart';
 import 'package:imotion_designs/src/servicios/sync.dart';
+import 'package:imotion_designs/src/servicios/translation_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -31,14 +32,21 @@ void main() async {
   }
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) {
-        final connectivityService = ConnectivityService();
-        connectivityService
-            .startConnectivityCheck(); // Inicia la verificación de conectividad
-        return connectivityService;
-      },
-      child: App(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+          TranslationProvider()..changeLanguage('es'), // Idioma por defecto
+        ),
+        ChangeNotifierProvider(
+          create: (_) {
+            final connectivityService = ConnectivityService();
+            connectivityService.startConnectivityCheck(); // Inicia la verificación de conectividad
+            return connectivityService;
+          },
+        ),
+      ],
+      child: App(), // Aquí colocamos el widget raíz como child de MultiProvider
     ),
   );
 }
