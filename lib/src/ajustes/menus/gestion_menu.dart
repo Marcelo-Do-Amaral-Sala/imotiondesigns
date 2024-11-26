@@ -13,7 +13,6 @@ class GestionMenuView extends StatefulWidget {
 class _GestionMenuViewState extends State<GestionMenuView> {
   double scaleFactorBack = 1.0;
   double scaleFactorAdmins= 1.0;
-  double scaleFactorLista= 1.0;
   double scaleFactorCrear = 1.0;
   bool isOverlayVisible = false;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
@@ -119,27 +118,12 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Lista de entrenadores',
-                                scaleFactorLista,
-                                    () {
-                                  setState(() {
-                                    scaleFactorLista = 1;
-                                    toggleOverlay(1);
-                                  });
-                                },
-                                    () {
-                                  setState(() => scaleFactorLista = 0.90);
-                                },
-                              ),
-                              SizedBox(height: screenHeight * 0.02),
-                              buildButton(
-                                context,
                                 'Crear nuevo',
                                 scaleFactorCrear,
                                     () {
                                   setState(() {
                                     scaleFactorCrear = 1;
-                                    toggleOverlay(2);
+                                    toggleOverlay(1);
                                   });
                                 },
                                     () {
@@ -222,12 +206,8 @@ class _GestionMenuViewState extends State<GestionMenuView> {
           onClose: () => toggleOverlay(0),
         );
       case 1:
-        return OverlayTrainers(
-          onClose: () => toggleOverlay(1),
-        );
-      case 2:
         return OverlayCrearNuevo(
-          onClose: () => toggleOverlay(2),
+          onClose: () => toggleOverlay(1),
         );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada

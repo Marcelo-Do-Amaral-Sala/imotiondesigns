@@ -17,6 +17,7 @@ class AdminsListView extends StatefulWidget {
 class _AdminsListViewState extends State<AdminsListView> {
   final TextEditingController _adminNameController = TextEditingController();
   String selectedAdminOption = 'Todos'; // Valor predeterminado
+  String selectedTipo = 'Ambos'; // Valor predeterminado
 
   List<Map<String, dynamic>> allAdmins = []; // Lista original de clientes
   List<Map<String, dynamic>> filteredAdmins = []; // Lista filtrada
@@ -33,12 +34,12 @@ class _AdminsListViewState extends State<AdminsListView> {
     try {
       // Obtener los usuarios cuyo perfil es "Administrador" o "Ambos"
       final adminData = await dbHelper.getUsuariosPorTipoPerfil('Administrador');
-
+      final adminDataEntrenador = await dbHelper.getUsuariosPorTipoPerfil('Entrenador');
       // También podemos obtener usuarios con el tipo de perfil 'Ambos' si es necesario
       final adminDataAmbos = await dbHelper.getUsuariosPorTipoPerfil('Ambos');
 
       // Combina ambas listas
-      final allAdminData = [...adminData, ...adminDataAmbos];
+      final allAdminData = [...adminData, ...adminDataAmbos, ...adminDataEntrenador];
 
       setState(() {
         allAdmins = allAdminData; // Asigna los usuarios filtrados
@@ -52,20 +53,38 @@ class _AdminsListViewState extends State<AdminsListView> {
   }
 
 
- void _filterAdmins() {
-    setState(() {
-      String searchText = _adminNameController.text.toLowerCase();
+  Future<void> _filterAdmins() async {
+    String searchText = _adminNameController.text.toLowerCase();
+    final dbHelper = DatabaseHelper();
+    try {
+      // Lista base para los filtros
+      List<Map<String, dynamic>> admins;
 
-      filteredAdmins = allAdmins.where((admin) {
+      // Si el filtro de tipo no es 'Ambos', consulta la base de datos
+      if (selectedTipo != 'Ambos') {
+        admins = await dbHelper.getUsuariosPorTipoPerfil(selectedTipo);
+      } else {
+        // Usa todos los administradores si no se filtra por tipo
+        admins = List<Map<String, dynamic>>.from(allAdmins);
+      }
+
+      // Filtra por nombre
+      admins = admins.where((admin) {
         final matchesName = admin['name']!.toLowerCase().contains(searchText);
-        // Filtra por estado basado en la selección del dropdown
         final matchesStatus =
             selectedAdminOption == 'Todos' || admin['status'] == selectedAdminOption;
-
-        return matchesName &&  matchesStatus;
+        return matchesName && matchesStatus;
       }).toList();
-    });
+
+      // Actualiza el estado con la lista filtrada
+      setState(() {
+        filteredAdmins = admins;
+      });
+    } catch (e) {
+      print("Error al filtrar administradores: $e");
+    }
   }
+
 
   void _showPrint(Map<String, dynamic> adminData) {
     _updateAdminFields(adminData);
@@ -99,7 +118,9 @@ class _AdminsListViewState extends State<AdminsListView> {
               _buildTextField(
                   'NOMBRE', _adminNameController, 'Ingrese nombre'),
               SizedBox(width: screenWidth * 0.02),
-              _buildDropdown(),
+              _buildDropdown1(),
+              SizedBox(width: screenWidth * 0.02),
+              _buildDropdown2(),
             ],
           ),
           SizedBox(height: screenHeight * 0.03),
@@ -146,7 +167,7 @@ class _AdminsListViewState extends State<AdminsListView> {
     );
   }
 
-  Widget _buildDropdown() {
+  Widget _buildDropdown1() {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,6 +202,53 @@ class _AdminsListViewState extends State<AdminsListView> {
               onChanged: (value) {
                 setState(() {
                   selectedAdminOption = value!;
+                  _filterAdmins(); // Filtrar después de seleccionar
+                });
+              },
+              dropdownColor: const Color(0xFF313030),
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: Color(0xFF2be4f3), size: 30),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildDropdown2() {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('TIPO',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF313030),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: DropdownButton<String>(
+              value: selectedTipo,
+              items: const [
+                DropdownMenuItem(
+                    value: 'Ambos',
+                    child: Text('Ambos',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                DropdownMenuItem(
+                    value: 'Administrador',
+                    child: Text('Administrador',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                DropdownMenuItem(
+                    value: 'Entrenador',
+                    child: Text('Entrenador',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedTipo = value!;
                   _filterAdmins(); // Filtrar después de seleccionar
                 });
               },
