@@ -188,39 +188,6 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Campos de ID y NOMBRE
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('ID',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: const Color(0xFF313030),
-                                    borderRadius: BorderRadius.circular(7)),
-                                child: TextField(
-                                  controller: _indexController,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 14),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(7)),
-                                    filled: true,
-                                    fillColor: const Color(0xFF313030),
-                                    isDense: true,
-                                    enabled: false,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
                         Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +219,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenWidth * 0.02),
+                        SizedBox(width: screenWidth * 0.05),
                         Flexible(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

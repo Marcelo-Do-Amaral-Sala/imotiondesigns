@@ -130,10 +130,8 @@ class _ClientsBonosState extends State<ClientsBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildTextField('ID', _indexController, enabled: false), // Deshabilitar
-        SizedBox(width: screenWidth * 0.02),
         _buildTextField('NOMBRE', _nameController, enabled: false),
-        SizedBox(width: screenWidth * 0.02),
+        SizedBox(width: screenWidth * 0.05),
         _buildDropdownField('ESTADO', selectedOption, (value) {
           setState(() {
             selectedOption = value;

@@ -84,18 +84,11 @@ class _ClientsBioState extends State<ClientsBio> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Campo ID
-          Expanded(
-            child:
-                _buildTextField('ID', _indexController, false), // Deshabilitado
-          ),
-          SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
-          // Campo NOMBRE
           Expanded(
             child: _buildTextField(
                 'NOMBRE', _nameController, false), // Deshabilitado
           ),
-          SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
+          SizedBox(width: screenWidth * 0.05), // Espaciado entre campos
           // Campo ESTADO (Dropdown)
           Expanded(
             child: _buildDropdownField(

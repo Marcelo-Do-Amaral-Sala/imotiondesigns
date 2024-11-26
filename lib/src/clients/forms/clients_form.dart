@@ -158,26 +158,6 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('ID', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: 'Automático',
-                                  enabled: false,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.02),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
                             Text('NOMBRE', style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
@@ -193,7 +173,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                           ],
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.02),
+                      SizedBox(width: screenWidth * 0.05),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

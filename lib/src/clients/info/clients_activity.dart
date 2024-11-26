@@ -92,16 +92,10 @@ class _ClientsActivityState extends State<ClientsActivity> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // Campo ID
-                  Flexible(
-                    child: _buildTextField('ID', _indexController, false),
-                  ),
-                  SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
-                  // Campo NOMBRE
                   Flexible(
                     child: _buildTextField('NOMBRE', _nameController, false),
                   ),
-                  SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
+                  SizedBox(width: screenWidth * 0.05), // Espaciado entre campos
                   // Campo ESTADO
                   Flexible(
                     child: _buildDropdownField(
