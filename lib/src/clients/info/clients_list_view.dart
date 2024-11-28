@@ -101,11 +101,11 @@ class _ClientListViewState extends State<ClientListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             /* ElevatedButton(
+              ElevatedButton(
                 onPressed: _deleteDatabase,
                 // Llama al método que elimina la base de datos
                 child: Text('Eliminar Base de Datos'),
-              ),*/
+              ),
               _buildTextField(
                   'NOMBRE', _clientNameController, 'Ingrese nombre'),
               SizedBox(width: screenWidth * 0.05),

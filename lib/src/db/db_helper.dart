@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 102,
+      version: 107,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
@@ -3658,54 +3658,38 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     )
   ''');
 
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS videotutoriales (
+        id_tutorial INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        imagen TEXT,
+        video TEXT
+      );
+    ''');
+    await db.insert('videotutoriales', {
+      'nombre':'LICENCIA',
+      'imagen':'assets/images/RELAX.png',
+      'video': 'assets/videos/tutorial.mp4'
+    });
+
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 102) {
+    if (oldVersion < 107) {
       print("ONPUGRADE EJECUTADIO");
       await db.execute('''
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        gender TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        pwd TEXT NOT NULL,
-        status TEXT NOT NULL,
-        birthdate TEXT NOT NULL,
-        altadate TEXT TEXT NOT NULL,
-        controlsesiones TEXT NOT NULL,
-        controltiempo TEXT NOT NULL
-      )
+      CREATE TABLE IF NOT EXISTS videotutoriales (
+        id_tutorial INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        imagen TEXT,
+        video TEXT
+      );
     ''');
-
-      await db.execute('''
-CREATE TABLE IF NOT EXISTS tipos_perfil (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  tipo TEXT NOT NULL UNIQUE
-)
-''');
-
-      await db.execute('''
-CREATE TABLE IF NOT EXISTS usuario_perfil (
-  usuario_id INTEGER NOT NULL,
-  perfil_id INTEGER NOT NULL,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE,
-  FOREIGN KEY (perfil_id) REFERENCES tipos_perfil (id) ON DELETE CASCADE,
-  PRIMARY KEY (usuario_id, perfil_id)
-)
-''');
-
-      await db.execute('''
-    CREATE TABLE IF NOT EXISTS bonos_usuarios (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      usuario_id INTEGER,
-      cantidad INTEGER NOT NULL,
-      fecha TEXT NOT NULL,
-      estado TEXT NOT NULL,
-      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-    )
-  ''');
+      await db.insert('videotutoriales', {
+        'nombre':'LICENCIA',
+        'imagen':'assets/images/RELAX.png',
+        'video': 'assets/videos/tutorial.mp4'
+      });
 
     }
   }
@@ -4072,6 +4056,13 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
 
   /*METODOS GET DE LA BBDD*/
+
+  // Obtener todos los clientes
+  Future<List<Map<String, dynamic>>> getTutoriales() async {
+    final db = await database;
+    final List<Map<String, dynamic>> tuto = await db.query('videotutoriales');
+    return tuto;
+  }
 
   // Este método obtiene el `id` del tipo de perfil, dado su nombre.
   Future<int?> getTipoPerfilId(String tipoPerfil) async {

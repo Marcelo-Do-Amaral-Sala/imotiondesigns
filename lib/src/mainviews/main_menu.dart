@@ -1,26 +1,28 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/bio/overlay_bio.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 import '../db/db_helper.dart';
 import '../db/db_helper_pc.dart';
 import '../db/db_helper_web.dart';
-import '../servicios/sync.dart';
 import '../servicios/translation_provider.dart'; // Importa el TranslationProvider
 
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToClients;
   final Function() onNavigateToPrograms;
   final Function() onNavigateToAjustes;
+  final Function() onNavigateToTutoriales;
 
   const MainMenuView({
     Key? key,
     required this.onNavigateToClients,
     required this.onNavigateToPrograms,
     required this.onNavigateToAjustes,
+    required this.onNavigateToTutoriales,
   }) : super(key: key);
 
   @override
@@ -67,7 +69,8 @@ class _MainMenuViewState extends State<MainMenuView> {
         databaseFactory = databaseFactoryFfi;
         await DatabaseHelperPC().initializeDatabase();
       } else {
-        throw UnsupportedError('Plataforma no soportada para la base de datos.');
+        throw UnsupportedError(
+            'Plataforma no soportada para la base de datos.');
       }
       debugPrint("Base de datos inicializada correctamente.");
     } catch (e) {
@@ -77,7 +80,8 @@ class _MainMenuViewState extends State<MainMenuView> {
 
   // Función de traducción utilitaria
   String tr(BuildContext context, String key) {
-    return Provider.of<TranslationProvider>(context, listen: false).translate(key);
+    return Provider.of<TranslationProvider>(context, listen: false)
+        .translate(key);
   }
 
   @override
@@ -118,10 +122,10 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/panel.png',
-                               'PANEL DE CONTROL',
+                                'PANEL DE CONTROL',
                                 scaleFactorPanel,
-                                    () => setState(() => scaleFactorPanel = 1),
-                                    () => setState(() => scaleFactorPanel = 0.90),
+                                () => setState(() => scaleFactorPanel = 1),
+                                () => setState(() => scaleFactorPanel = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -129,11 +133,11 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/cliente.png',
                                 'CLIENTES',
                                 scaleFactorClient,
-                                    () {
+                                () {
                                   scaleFactorClient = 1;
                                   widget.onNavigateToClients();
                                 },
-                                    () => setState(() => scaleFactorClient = 0.90),
+                                () => setState(() => scaleFactorClient = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -141,13 +145,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/programas.png',
                                 'PROGRAMAS',
                                 scaleFactorProgram,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorProgram = 1;
                                     widget.onNavigateToPrograms();
                                   });
                                 },
-                                    () => setState(() => scaleFactorProgram = 0.90),
+                                () => setState(() => scaleFactorProgram = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -155,13 +159,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/bio.png',
                                 'BIOIMPEDANCIA',
                                 scaleFactorBio,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorBio = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                    () => setState(() => scaleFactorBio = 0.90),
+                                () => setState(() => scaleFactorBio = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -169,8 +173,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/tutoriales.png',
                                 'TUTORIALES',
                                 scaleFactorTuto,
-                                    () => setState(() => scaleFactorTuto = 1),
-                                    () => setState(() => scaleFactorTuto = 0.90),
+                                () {
+                                  setState(() {
+                                    scaleFactorTuto = 1;
+                                    widget.onNavigateToTutoriales();
+                                  });
+                                },
+                                () => setState(() => scaleFactorTuto = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -178,13 +187,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/ajustes.png',
                                 'AJUSTES',
                                 scaleFactorAjustes,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorAjustes = 1;
                                     widget.onNavigateToAjustes();
                                   });
                                 },
-                                    () => setState(() => scaleFactorAjustes = 0.90),
+                                () => setState(() => scaleFactorAjustes = 0.90),
                               ),
                             ],
                           ),

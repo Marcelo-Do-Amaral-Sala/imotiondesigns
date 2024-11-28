@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/ajustes/form/licencia_form.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
+import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
 
 import 'ajustes/menus/ajustes_menu.dart';
 import 'ajustes/menus/gestion_menu.dart';
@@ -41,6 +42,12 @@ class _AppState extends State<App> {
               navigateTo('mainMenu'), // Callback para volver a MainMenuView
         );
         break;
+      case 'tutoriales':
+        viewToDisplay = TutorialesMenuView(
+          onBack: () =>
+              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+        );
+        break;
       case 'ajustes':
         viewToDisplay = AjustesMenuView(
           onBack: () =>
@@ -69,6 +76,7 @@ class _AppState extends State<App> {
           onNavigateToClients: () => navigateTo('clients'),
           onNavigateToPrograms: () => navigateTo('programs'),
           onNavigateToAjustes: () => navigateTo('ajustes'),
+          onNavigateToTutoriales: () => navigateTo('tutoriales'),
         );
         break;
       /* case 'json':
