@@ -155,6 +155,7 @@ flutter:
     - assets/images/italia.png
     - assets/images/portugal.png
     - assets/images/reino-unido.png
+    - assets/images/mujer.png
     - .env
     - assets/traducciones1.json
     - assets/videos/tutorial.mp4

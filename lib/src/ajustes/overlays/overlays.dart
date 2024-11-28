@@ -682,29 +682,29 @@ class _OverlayServicioState extends State<OverlayServicio>
                 borderRadius: BorderRadius.circular(7.0),
               ),
               child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      const Text(
-                        "E-MAIL: technical_service@i-motiongroup.com",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02),
-                      const Text(
-                        "WHATSAPP: (+34) 618 112 271",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  )),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      "E-MAIL: technical_service@i-motiongroup.com",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    const Text(
+                      "WHATSAPP: (+34) 618 112 271",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
