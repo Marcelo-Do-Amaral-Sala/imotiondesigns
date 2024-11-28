@@ -4704,7 +4704,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       // Incluir el número de licencia en el nombre del archivo
       String fileName = 'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
       String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
-      String repo = 'imotiondesigns'; // Repositorio de GitHub
+      String repo = 'backups'; // Repositorio de GitHub
 
       // Leer el archivo y codificarlo en base64
       List<int> fileBytes = await backupFile.readAsBytes();
@@ -4758,7 +4758,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
       String fileName = 'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
       String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
-      String repo = 'imotiondesigns'; // Repositorio de GitHub
+      String repo = 'backups'; // Repositorio de GitHub
 
       // Construir la URL de la API de GitHub
       String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';

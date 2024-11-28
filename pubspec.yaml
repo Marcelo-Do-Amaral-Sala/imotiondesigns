@@ -155,7 +155,7 @@ flutter:
     - assets/images/portugal.png
     - assets/images/reino-unido.png
     - .env
-    - assets/traducciones.json
+    - assets/traducciones1.json
 
   #   - images/a_dot_ham.jpeg
 
