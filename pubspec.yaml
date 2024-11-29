@@ -156,6 +156,14 @@ flutter:
     - assets/images/portugal.png
     - assets/images/reino-unido.png
     - assets/images/mujer.png
+    - assets/images/repeat.png
+    - assets/images/flderecha.png
+    - assets/images/flizquierda.png
+    - assets/images/chalecoblanco.png
+    - assets/images/pantalonblanco.png
+    - assets/images/virtualtrainer.png
+    - assets/images/rayoaz.png
+    - assets/images/rayoverd.png
     - .env
     - assets/traducciones1.json
     - assets/videos/tutorial.mp4

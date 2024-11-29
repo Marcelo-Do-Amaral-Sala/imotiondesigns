@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/ajustes/form/licencia_form.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
+import 'package:imotion_designs/src/panel/views/panel_view.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
 import 'package:imotion_designs/src/servicios/simulacion_ia.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
@@ -30,6 +31,12 @@ class _AppState extends State<App> {
     Widget viewToDisplay;
 
     switch (currentView) {
+      case 'panel':
+        viewToDisplay = PanelView(
+          onBack: () =>
+              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+        );
+        break;
       case 'clients':
         viewToDisplay = ClientsView(
           onBack: () =>
@@ -75,6 +82,7 @@ class _AppState extends State<App> {
       case 'mainMenu':
       default:
         viewToDisplay = MainMenuView(
+          onNavigateToPanel: () => navigateTo('panel'),
           onNavigateToClients: () => navigateTo('clients'),
           onNavigateToPrograms: () => navigateTo('programs'),
           onNavigateToAjustes: () => navigateTo('ajustes'),

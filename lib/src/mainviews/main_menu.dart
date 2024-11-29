@@ -12,6 +12,7 @@ import '../db/db_helper_web.dart';
 import '../servicios/translation_provider.dart'; // Importa el TranslationProvider
 
 class MainMenuView extends StatefulWidget {
+  final Function() onNavigateToPanel;
   final Function() onNavigateToClients;
   final Function() onNavigateToPrograms;
   final Function() onNavigateToAjustes;
@@ -19,6 +20,7 @@ class MainMenuView extends StatefulWidget {
 
   const MainMenuView({
     Key? key,
+    required this.onNavigateToPanel,
     required this.onNavigateToClients,
     required this.onNavigateToPrograms,
     required this.onNavigateToAjustes,
@@ -124,7 +126,10 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/panel.png',
                                 'PANEL DE CONTROL',
                                 scaleFactorPanel,
-                                () => setState(() => scaleFactorPanel = 1),
+                                    () {
+                                      scaleFactorPanel = 1;
+                                  widget.onNavigateToPanel();
+                                },
                                 () => setState(() => scaleFactorPanel = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
