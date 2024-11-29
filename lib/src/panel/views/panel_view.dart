@@ -16,7 +16,9 @@ class _PanelViewState extends State<PanelView> {
   double scaleFactorTrainer = 1.0;
 
   double rotationAngle = 0.0; // Controla el ángulo de rotación de la flecha
-  bool _isExpanded = false;
+  bool _isExpanded1 = false;
+  bool _isExpanded2 = false;
+  bool _isExpanded3 = false;
 
   int selectedIndexEquip = 0;
 
@@ -56,7 +58,7 @@ class _PanelViewState extends State<PanelView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                    flex: 10,
+                    flex: 4,
                     child: Column(
                       children: [
                         Expanded(
@@ -137,6 +139,30 @@ class _PanelViewState extends State<PanelView> {
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
+                                GestureDetector(
+                                  onTapDown: (_) =>
+                                      setState(() => scaleFactorBack = 0.90),
+                                  onTapUp: (_) =>
+                                      setState(() => scaleFactorBack = 1.0),
+                                  onTap: () {
+                                    widget
+                                        .onBack(); // Llama al callback para volver a la vista anterior
+                                  },
+                                  child: AnimatedScale(
+                                    scale: scaleFactorBack,
+                                    duration: const Duration(milliseconds: 100),
+                                    child: SizedBox(
+                                      width: screenWidth * 0.1,
+                                      height: screenHeight * 0.1,
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          'assets/images/back.png',
+                                          fit: BoxFit.scaleDown,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -157,9 +183,9 @@ class _PanelViewState extends State<PanelView> {
                                       setState(() => scaleFactorBack = 1.0),
                                   onTap: () {
                                     setState(() {
-                                      _isExpanded =
-                                          !_isExpanded; // Cambia el estado de expansión
-                                      rotationAngle = _isExpanded
+                                      _isExpanded1 =
+                                          !_isExpanded1; // Cambia el estado de expansión
+                                      rotationAngle = _isExpanded1
                                           ? 3.14159
                                           : 0.0; // Cambia la dirección de la flecha (180 grados)
                                     });
@@ -169,7 +195,7 @@ class _PanelViewState extends State<PanelView> {
                                     turns: rotationAngle / (2 * 3.14159),
                                     // La rotación en turnos (rango de 0 a 1)
                                     child: SizedBox(
-                                      height: screenHeight * 0.1,
+                                      height: screenHeight * 0.2,
                                       child: ClipOval(
                                         child: Image.asset(
                                           'assets/images/flderecha.png',
@@ -181,66 +207,61 @@ class _PanelViewState extends State<PanelView> {
                                   ),
                                 ),
 
-                                SizedBox(width: screenWidth * 0.01),
+                                SizedBox(width: screenWidth * 0.02),
                                 // Este AnimatedContainer se expande/contrae en horizontal
                                 AnimatedSize(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
-                                  child: Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(10.0),
-                                      width:
-                                          _isExpanded ? screenWidth * 0.2 : 0,
-                                      // Expande en horizontal
-                                      height: screenHeight * 0.1,
-                                      // Mantiene la altura
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            255, 46, 46, 46),
-                                        borderRadius:
-                                            BorderRadius.circular(7.0),
-                                      ),
+                                  child: Container(
+                                    padding: EdgeInsets.all(10.0),
+                                    width:
+                                        _isExpanded1 ? screenWidth * 0.25 : 0,
+                                    // Expande en horizontal
+                                    height: screenHeight * 0.1,
+                                    // Mantiene la altura
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          const Color.fromARGB(255, 46, 46, 46),
+                                      borderRadius: BorderRadius.circular(7.0),
+                                    ),
 
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTapDown: (_) => setState(() =>
-                                                  scaleFactorCliente = 0.90),
-                                              onTapUp: (_) => setState(() =>
-                                                  scaleFactorCliente = 1.0),
-                                              onTap: () {
-                                                // Aquí puedes agregar la acción que se ejecuta cuando se toca el contenedor
-                                              },
-                                              child: AnimatedScale(
-                                                scale: scaleFactorCliente,
-                                                duration: const Duration(
-                                                    milliseconds: 100),
-                                                child: Container(
-                                                  width: screenHeight * 0.05,
-                                                  // El ancho del contenedor
-                                                  height: screenWidth * 0.05,
-                                                  // La altura del contenedor, debe ser igual al ancho para un círculo perfecto
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color:
-                                                        const Color(0xFF494949),
-                                                    shape: BoxShape
-                                                        .circle, // Forma circular
-                                                  ),
-                                                  child: Center(
-                                                    child: SizedBox(
-                                                      width: screenWidth * 0.03,
-                                                      height:
-                                                          screenHeight * 0.03,
-                                                      child: ClipOval(
-                                                        child: Image.asset(
-                                                          'assets/images/cliente.png',
-                                                          fit: BoxFit.scaleDown,
-                                                        ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTapDown: (_) => setState(() =>
+                                                scaleFactorCliente = 0.90),
+                                            onTapUp: (_) => setState(
+                                                () => scaleFactorCliente = 1.0),
+                                            onTap: () {
+                                              // Aquí puedes agregar la acción que se ejecuta cuando se toca el contenedor
+                                            },
+                                            child: AnimatedScale(
+                                              scale: scaleFactorCliente,
+                                              duration: const Duration(
+                                                  milliseconds: 100),
+                                              child: Container(
+                                                width: screenHeight * 0.1,
+                                                // El ancho del contenedor
+                                                height: screenWidth * 0.1,
+                                                // La altura del contenedor, debe ser igual al ancho para un círculo perfecto
+                                                decoration: const BoxDecoration(
+                                                  color:
+                                                      const Color(0xFF494949),
+                                                  shape: BoxShape
+                                                      .circle, // Forma circular
+                                                ),
+                                                child: Center(
+                                                  child: SizedBox(
+                                                    width: screenWidth * 0.05,
+                                                    height: screenHeight * 0.05,
+                                                    child: ClipOval(
+                                                      child: Image.asset(
+                                                        'assets/images/cliente.png',
+                                                        fit: BoxFit.scaleDown,
                                                       ),
                                                     ),
                                                   ),
@@ -248,105 +269,105 @@ class _PanelViewState extends State<PanelView> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: screenWidth * 0.005),
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedIndexEquip =
-                                                      0; // Sección 1 seleccionada
-                                                });
-                                              },
-                                              child: Container(
-                                                width: screenWidth * 0.05,
-                                                height: screenHeight * 0.05,
-                                                decoration: BoxDecoration(
-                                                  color: selectedIndexEquip == 0
-                                                      ? selectedColor
-                                                      : unselectedColor,
-                                                  borderRadius:
-                                                      const BorderRadius.only(
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  10.0),
-                                                          bottomLeft:
-                                                              Radius.circular(
-                                                                  10.0)),
-                                                ),
-                                                child: Center(
-                                                  child: Image.asset(
-                                                    'assets/images/chalecoblanco.png',
-                                                    fit: BoxFit.contain,
-                                                  ),
+                                        ),
+                                        SizedBox(width: screenWidth * 0.005),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedIndexEquip =
+                                                    0; // Sección 1 seleccionada
+                                              });
+                                            },
+                                            child: Container(
+                                              width: screenWidth * 0.1,
+                                              height: screenHeight * 0.1,
+                                              decoration: BoxDecoration(
+                                                color: selectedIndexEquip == 0
+                                                    ? selectedColor
+                                                    : unselectedColor,
+                                                borderRadius: const BorderRadius
+                                                    .only(
+                                                    topLeft:
+                                                        Radius.circular(10.0),
+                                                    bottomLeft:
+                                                        Radius.circular(10.0)),
+                                              ),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/images/chalecoblanco.png',
+                                                  fit: BoxFit.contain,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedIndexEquip =
-                                                      1; // Sección 2 seleccionada
-                                                });
-                                              },
-                                              child: Container(
-                                                width: screenWidth * 0.05,
-                                                height: screenHeight * 0.05,
-                                                decoration: BoxDecoration(
-                                                  color: selectedIndexEquip == 1
-                                                      ? selectedColor
-                                                      : unselectedColor,
-                                                  borderRadius:
-                                                      const BorderRadius.only(
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  10.0),
-                                                          bottomRight:
-                                                              Radius.circular(
-                                                                  10.0)),
-                                                ),
-                                                child: Center(
-                                                  child: Image.asset(
-                                                    'assets/images/pantalonblanco.png',
-                                                    fit: BoxFit.contain,
-                                                  ),
+                                        ),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedIndexEquip =
+                                                    1; // Sección 2 seleccionada
+                                              });
+                                            },
+                                            child: Container(
+                                              width: screenWidth * 0.1,
+                                              height: screenHeight * 0.1,
+                                              decoration: BoxDecoration(
+                                                color: selectedIndexEquip == 1
+                                                    ? selectedColor
+                                                    : unselectedColor,
+                                                borderRadius: const BorderRadius
+                                                    .only(
+                                                    topRight:
+                                                        Radius.circular(10.0),
+                                                    bottomRight:
+                                                        Radius.circular(10.0)),
+                                              ),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/images/pantalonblanco.png',
+                                                  fit: BoxFit.contain,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: screenWidth * 0.005),
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTapDown: (_) => setState(() =>
-                                                  scaleFactorRepeat = 0.90),
-                                              onTapUp: (_) => setState(() =>
-                                                  scaleFactorRepeat = 1.0),
-                                              onTap: () {
-                                                // Aquí puedes agregar la acción que se ejecuta cuando se toca el contenedor
-                                              },
-                                              child: AnimatedScale(
-                                                scale: scaleFactorRepeat,
-                                                duration: const Duration(
-                                                    milliseconds: 100),
-                                                child: Container(
-                                                  width: screenHeight * 0.05,
-                                                  // El ancho del contenedor
-                                                  height: screenWidth * 0.05,
-                                                  // La altura del contenedor, debe ser igual al ancho para un círculo perfecto
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: Colors.transparent,
-                                                    shape: BoxShape
-                                                        .circle, // Forma circular
-                                                  ),
-                                                  child: Center(
-                                                    child: SizedBox(
-                                                      child: ClipOval(
-                                                        child: Image.asset(
-                                                          'assets/images/repeat.png',
-                                                          fit: BoxFit.contain,
-                                                        ),
+                                        ),
+                                        SizedBox(width: screenWidth * 0.005),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTapDown: (_) => setState(
+                                                () => scaleFactorRepeat = 0.90),
+                                            onTapUp: (_) => setState(
+                                                () => scaleFactorRepeat = 1.0),
+                                            onTap: () {
+                                              // Aquí puedes agregar la acción que se ejecuta cuando se toca el contenedor
+                                            },
+                                            child: AnimatedScale(
+                                              scale: scaleFactorRepeat,
+                                              duration: const Duration(
+                                                  milliseconds: 100),
+                                              child: Container(
+                                                width: screenHeight * 0.1,
+                                                // El ancho del contenedor
+                                                height: screenWidth * 0.1,
+                                                // La altura del contenedor, debe ser igual al ancho para un círculo perfecto
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.transparent,
+                                                  shape: BoxShape
+                                                      .circle, // Forma circular
+                                                ),
+                                                child: Center(
+                                                  child: SizedBox(
+                                                    child: ClipOval(
+                                                      child: Image.asset(
+                                                        width:
+                                                            screenHeight * 0.1,
+                                                        // El ancho del contenedor
+                                                        height:
+                                                            screenWidth * 0.1,
+                                                        'assets/images/repeat.png',
+                                                        fit: BoxFit.contain,
                                                       ),
                                                     ),
                                                   ),
@@ -354,8 +375,8 @@ class _PanelViewState extends State<PanelView> {
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -363,7 +384,7 @@ class _PanelViewState extends State<PanelView> {
                                 Container(
                                   padding: const EdgeInsets.all(10.0),
                                   // Expande en horizontal
-                                  height: screenHeight * 0.15,
+                                  height: screenHeight * 0.2,
                                   // Mantiene la altura
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
@@ -394,27 +415,28 @@ class _PanelViewState extends State<PanelView> {
                                           'PROGRAMAS',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 13,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
                                       ),
-                                      SizedBox(width: screenWidth * 0.02),
+                                      SizedBox(width: screenWidth * 0.01),
                                       Column(children: [
                                         const Text(
                                           "NOMBRE PROGRAMA",
                                           style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 15,
                                             color: Color(0xFF2be4f3),
                                           ),
                                         ),
                                         Image.asset(
-                                          height: screenHeight * 0.1,
+                                          height: screenHeight * 0.07,
                                           'assets/images/cliente.png',
                                           fit: BoxFit.contain,
                                         ),
                                       ]),
+                                      SizedBox(width: screenWidth * 0.01),
                                       const Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -422,20 +444,20 @@ class _PanelViewState extends State<PanelView> {
                                           const Text(
                                             "frecuencia",
                                             style: TextStyle(
-                                                fontSize: 15,
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white),
                                           ),
                                           const Text(
                                             "pulso",
                                             style: TextStyle(
-                                                fontSize: 15,
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(width: screenWidth * 0.02),
+                                      SizedBox(width: screenWidth * 0.01),
                                       OutlinedButton(
                                         onPressed: () {},
                                         // Mantener vacío para que InkWell funcione
@@ -454,7 +476,7 @@ class _PanelViewState extends State<PanelView> {
                                           'CICLOS',
                                           style: TextStyle(
                                             color: Color(0xFF2be4f3),
-                                            fontSize: 13,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                           ),
                                           textAlign: TextAlign.center,
@@ -473,7 +495,7 @@ class _PanelViewState extends State<PanelView> {
                                         const Text("VIRTUAL TRAINER",
                                             style: TextStyle(
                                               color: const Color(0xFF2be4f3),
-                                              fontSize: 13,
+                                              fontSize: 15,
                                             )),
                                         GestureDetector(
                                           onTapDown: (_) => setState(
@@ -506,7 +528,7 @@ class _PanelViewState extends State<PanelView> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(width: screenWidth * 0.02),
+                                    SizedBox(width: screenWidth * 0.01),
                                     Image.asset(
                                       height: screenHeight * 0.1,
                                       'assets/images/rayoaz.png',
@@ -522,79 +544,23 @@ class _PanelViewState extends State<PanelView> {
                           flex: 4,
                           child: Container(
                             color: Colors.yellow,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex:4,
+                                  child: Text("contendor 1"),
+                                ),
+                                VerticalDivider(),
+                                Expanded(
+                                  child: Text("contendor 2"),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     )),
-                VerticalDivider(),
-                Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: [Text("EXPANDED2")],
-                    )),
-              ],
-            ),
-          ),
-          // Contenido adicional de la vista (botón de retroceso y demás)
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.02,
-              vertical: screenHeight * 0.07,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.05,
-                            vertical: screenHeight * 0.02,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.01),
-                      Expanded(
-                        flex: 3,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTapDown: (_) =>
-                                    setState(() => scaleFactorBack = 0.90),
-                                onTapUp: (_) =>
-                                    setState(() => scaleFactorBack = 1.0),
-                                onTap: () {
-                                  widget
-                                      .onBack(); // Llama al callback para volver a la vista anterior
-                                },
-                                child: AnimatedScale(
-                                  scale: scaleFactorBack,
-                                  duration: const Duration(milliseconds: 100),
-                                  child: SizedBox(
-                                    width: screenWidth * 0.1,
-                                    height: screenHeight * 0.1,
-                                    child: ClipOval(
-                                      child: Image.asset(
-                                        'assets/images/back.png',
-                                        fit: BoxFit.scaleDown,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
