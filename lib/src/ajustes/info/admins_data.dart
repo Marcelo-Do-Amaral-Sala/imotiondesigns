@@ -197,7 +197,7 @@ class AdminsDataState extends State<AdminsData> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          "Cliente actualizado correctamente",
+          "Usuario actualizado correctamente",
           style: TextStyle(
             color: Colors.white,
             fontSize: 17,
@@ -259,7 +259,7 @@ class AdminsDataState extends State<AdminsData> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                          "Cliente borrado correctamente",
+                          "Usuario borrado correctamente",
                           style: TextStyle(color: Colors.white, fontSize: 17),
                         ),
                         backgroundColor: Colors.orange,

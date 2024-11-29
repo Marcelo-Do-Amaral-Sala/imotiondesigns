@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/ajustes/form/licencia_form.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
+import 'package:imotion_designs/src/servicios/simulacion_ia.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
 
 import 'ajustes/menus/ajustes_menu.dart';
@@ -70,6 +71,7 @@ class _AppState extends State<App> {
               navigateTo('ajustes'), // Callback para volver a MainMenuView
         );
         break;
+
       case 'mainMenu':
       default:
         viewToDisplay = MainMenuView(

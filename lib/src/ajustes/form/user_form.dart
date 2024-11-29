@@ -157,7 +157,7 @@ class UserDataFormState extends State<UserDataForm> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          "Cliente añadido correctamente",
+          "Usuario añadido correctamente",
           style: TextStyle(color: Colors.white, fontSize: 17),
         ),
         backgroundColor: Colors.green,

@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
-import 'package:imotion_designs/src/programs/overlays/overlays_programs.dart';
 
 class AjustesMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
   final Function() onNavigatetoLicencia; // Callback para navegar de vuelta
   final Function() onNavigatetoGestion; // Callback para navegar de vuelta
-  const AjustesMenuView({super.key, required this.onBack, required this.onNavigatetoLicencia, required this.onNavigatetoGestion});
+  const AjustesMenuView(
+      {super.key,
+      required this.onBack,
+      required this.onNavigatetoLicencia,
+      required this.onNavigatetoGestion});
 
   @override
   State<AjustesMenuView> createState() => _AjustesMenuViewState();
 }
 
-class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProviderStateMixin {
+class _AjustesMenuViewState extends State<AjustesMenuView>
+    with SingleTickerProviderStateMixin {
   double scaleFactorBack = 1.0;
-  double scaleFactorLicencia= 1.0;
-  double scaleFactorCentros= 1.0;
+  double scaleFactorLicencia = 1.0;
+  double scaleFactorCentros = 1.0;
   double scaleFactorBackup = 1.0;
   double scaleFactorIdioma = 1.0;
   double scaleFactorServicio = 1.0;
@@ -36,30 +40,35 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
       vsync: this,
     );
 
-
     // Animación de opacidad para simular latencia
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     // Iniciar la animación de latido, pero solo hacerla una vez (sin repetir)
-    _controller.repeat(reverse: true, period: const Duration(milliseconds: 500)); // Reproducir la animación una sola vez
+    _controller.repeat(
+        reverse: true,
+        period: const Duration(milliseconds: 500)); // Reproducir la animación una sola vez
 
     // Después de 10 segundos, detener la animación y dejar la escala fija
     Future.delayed(const Duration(seconds: 6), () {
-      setState(() {
-        // Asegurarse de que la animación quede fija en el valor final
-        _controller.stop();
-        _opacityAnimation = Tween<double>(begin: 1.0, end: 1.0)
-            .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-      });
+      if (mounted) { // Verifica si el widget sigue montado
+        setState(() {
+          // Asegurarse de que la animación quede fija en el valor final
+          _controller.stop();
+          _opacityAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(
+              CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+        });
+      }
     });
   }
 
   void toggleOverlay(int index) {
-    setState(() {
-      isOverlayVisible = !isOverlayVisible;
-      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
-    });
+    if (mounted) { // Verifica si el widget sigue montado
+      setState(() {
+        isOverlayVisible = !isOverlayVisible;
+        overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
+      });
+    }
   }
   @override
   void dispose() {
@@ -119,7 +128,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(10.0),
@@ -152,13 +161,13 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                 context,
                                 'Licencia',
                                 scaleFactorLicencia,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorLicencia = 1;
                                     widget.onNavigatetoLicencia();
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorLicencia = 0.90);
                                 },
                               ),
@@ -167,13 +176,13 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                 context,
                                 'Gestión de centros',
                                 scaleFactorCentros,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorCentros = 1;
                                     widget.onNavigatetoGestion();
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorCentros = 0.90);
                                 },
                               ),
@@ -182,13 +191,13 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                 context,
                                 'Copia de seguridad',
                                 scaleFactorBackup,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorBackup = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorBackup = 0.90);
                                 },
                               ),
@@ -197,13 +206,13 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                 context,
                                 'Selección de idioma',
                                 scaleFactorIdioma,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorIdioma = 1;
                                     toggleOverlay(1);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorIdioma = 0.90);
                                 },
                               ),
@@ -212,13 +221,13 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                 context,
                                 'Servicio técnico',
                                 scaleFactorServicio,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorServicio = 1;
                                     toggleOverlay(2);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorServicio = 0.90);
                                 },
                               ),
@@ -287,7 +296,8 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                         padding: const EdgeInsets.all(8.0),
                                         decoration: BoxDecoration(
                                           color: Colors.red,
-                                          borderRadius: BorderRadius.circular(7),
+                                          borderRadius:
+                                              BorderRadius.circular(7),
                                         ),
                                         child: const Text(
                                           "¡Nuevo!",
@@ -300,14 +310,20 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTapDown: (_) => setState(() => scaleFactorVITA = 0.90),
-                                      onTapUp: (_) => setState(() => scaleFactorVITA = 1.0),
+                                      onTapDown: (_) => setState(
+                                          () => scaleFactorVITA = 0.90),
+                                      onTapUp: (_) =>
+                                          setState(() => scaleFactorVITA = 1.0),
                                       onTap: () {
-                                        // Acción al tocar la imagen (si es necesario)
+                                        setState(() {
+                                          isOverlayVisible=false;
+                                          toggleOverlay(3);
+                                        });
                                       },
                                       child: AnimatedScale(
                                         scale: scaleFactorVITA,
-                                        duration: const Duration(milliseconds: 100),
+                                        duration:
+                                            const Duration(milliseconds: 100),
                                         child: SizedBox(
                                           width: screenWidth * 0.1,
                                           height: screenHeight * 0.1,
@@ -335,16 +351,18 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
 
           // Overlay: Esto se coloca fuera del contenido principal y en el centro de la pantalla
           if (isOverlayVisible)
-            Positioned.fill(
-              top: screenHeight * 0.3,
-              bottom: screenHeight * 0.2,
-              left: screenWidth * 0.4,
-              right: screenWidth * 0.1,
+            Positioned(
+              // Aplica medidas personalizadas solo para el overlay 3
+              top: overlayIndex == 3 ? screenHeight *0.1: screenHeight * 0.3, // Puedes ajustar estos valores como quieras
+              bottom: overlayIndex == 3 ?screenHeight *0.1 : screenHeight * 0.2,
+              left: overlayIndex == 3 ? screenWidth * 0.4 : screenWidth * 0.4,
+              right: overlayIndex == 3 ? screenWidth * 0.1 : screenWidth * 0.1,
               child: Align(
                 alignment: Alignment.center,
                 child: _getOverlayWidget(overlayIndex),
               ),
             ),
+
         ],
       ),
     );
@@ -363,6 +381,10 @@ class _AjustesMenuViewState extends State<AjustesMenuView> with SingleTickerProv
       case 2:
         return OverlayServicio(
           onClose: () => toggleOverlay(2),
+        );
+      case 3:
+        return OverlayVita(
+          onClose: () => toggleOverlay(3),
         );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada

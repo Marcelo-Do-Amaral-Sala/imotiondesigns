@@ -288,11 +288,11 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _weightController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(3),
-                                ],
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')), // Permite números enteros y decimales
+                                    LengthLimitingTextInputFormatter(3),
+                                  ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(hintText: 'Introducir peso'),
                               ),

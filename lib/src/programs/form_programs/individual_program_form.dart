@@ -163,6 +163,23 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
 // Función para guardar el programa predeterminado desde el formulario
   Future<void> guardarProgramaPredeterminado() async {
+    if (_nameController.text.isEmpty ||
+        selectedEquipOption == null)
+    {
+      // Verificación de '@' en el correo
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Por favor, introduzca un nombre y el tipo de equipamiento al programa",
+            style: TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     // Recoger los valores de los controladores de texto
     String nombrePrograma = _nameController.text;
     String equipamiento = selectedEquipOption ??
@@ -198,8 +215,16 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     await DatabaseHelper()
         .insertarGruposMuscularesPorDefecto(programaId, equipamiento);
 
-    // Mostrar un mensaje o hacer alguna acción adicional si es necesario
-    print('Programa guardado correctamente.');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Programa individual creado correctamente",
+          style: TextStyle(color: Colors.white, fontSize: 17),
+        ),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   Future<void> actualizarCronaxias(
@@ -231,8 +256,16 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         // Llamar a la función de actualización desde el DatabaseHelper
         await DatabaseHelper().updateCronaxia(programaId, grupo['id'], valor);
 
-        // Confirmar si la actualización fue exitosa
-        print('Cronaxia para "$nombre" actualizada con valor: $valor');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Cronaxias añadidas correctamente",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
       }
     } else if (tipoEquipamiento == 'BIO-SHAPE') {
       for (var grupo in gruposBioShape) {
@@ -259,12 +292,19 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         // Llamar a la función de actualización desde el DatabaseHelper
         await DatabaseHelper().updateCronaxia(programaId, grupo['id'], valor);
 
-        // Confirmar si la actualización fue exitosa
-        print('Cronaxia para "$nombre" actualizada con valor: $valor');
       }
     }
 
-    print('Cronaxias actualizadas exitosamente');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Cronaxias añadidas correctamente",
+          style: TextStyle(color: Colors.white, fontSize: 17),
+        ),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   // Función para manejar la actualización de los grupos musculares
@@ -306,13 +346,22 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       if (selectedGroupIds.isNotEmpty) {
         // Llamamos a la función para actualizar los grupos musculares en la base de datos
         await dbHelper.actualizarGruposMusculares(programaId, selectedGroupIds);
-        print('Grupos musculares actualizados para el programa $programaId');
       } else {
         print('No se seleccionaron grupos musculares.');
       }
     } else {
       print('No se encontraron programas en la base de datos');
     }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Grupos activos añadidos correctamente",
+          style: TextStyle(color: Colors.white, fontSize: 17),
+        ),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
 
@@ -549,9 +598,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _frequencyController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
@@ -565,9 +614,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _pulseController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
@@ -602,11 +651,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _rampaController,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                            LengthLimitingTextInputFormatter(3),
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
@@ -639,11 +686,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _contractionController,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                            LengthLimitingTextInputFormatter(3),
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
@@ -677,11 +722,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _pauseController,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                            LengthLimitingTextInputFormatter(3),
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
@@ -846,10 +889,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           child: TextField(
                                             controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
                                           ),
@@ -879,10 +921,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           child: TextField(
                                             controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
                                           ),
@@ -912,10 +953,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           child: TextField(
                                             controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
                                           ),
@@ -945,10 +985,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           child: TextField(
                                             controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
                                           ),
@@ -989,10 +1028,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           child: TextField(
                                             controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
                                           ),
@@ -1022,10 +1060,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           child: TextField(
                                             controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
                                           ),
@@ -1055,10 +1092,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           child: TextField(
                                             controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
                                           ),

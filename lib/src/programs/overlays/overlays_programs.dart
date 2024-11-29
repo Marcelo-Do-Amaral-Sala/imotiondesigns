@@ -400,6 +400,7 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
             debugPrint(data as String?);
             setState(() {});
           },
+          onClose: widget.onClose,
         ),
         RecoveryProgramForm(
           onDataChanged: (data) {

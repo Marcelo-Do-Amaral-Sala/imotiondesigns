@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../db/db_helper.dart';
 
 class AutomaticProgramForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
+  final Function() onClose;
 
-  const AutomaticProgramForm({super.key, required this.onDataChanged});
+  const AutomaticProgramForm(
+      {super.key, required this.onDataChanged, required this.onClose});
 
   @override
   AutomaticProgramFormState createState() => AutomaticProgramFormState();
@@ -50,6 +53,27 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
     });
   }
 
+  void _eliminarElementoPorId(int idPrograma) {
+    setState(() {
+      // Eliminar la secuencia donde el id_programa coincida
+      secuencias
+          .removeWhere((elemento) => elemento['id_programa'] == idPrograma);
+
+      // Después de eliminar, actualizar el orden de las secuencias
+      _actualizarOrdenSecuencias();
+    });
+  }
+
+  void _actualizarOrdenSecuencias() {
+    // Primero, ordenar las secuencias por 'orden' de menor a mayor
+    secuencias.sort((a, b) => a['orden'].compareTo(b['orden']));
+
+    // Ajustar los 'orden' para que no haya huecos
+    for (int i = 0; i < secuencias.length; i++) {
+      secuencias[i]['orden'] = i + 1; // Reiniciar el orden de forma consecutiva
+    }
+  }
+
   Future<void> _fetchAllPrograms() async {
     var db = await DatabaseHelper()
         .database; // Obtener la instancia de la base de datos
@@ -71,12 +95,31 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
   }
 
   Future<void> _crearProgramaAutomatico() async {
+    if (_nameController.text.isEmpty ||
+        _durationController.text.isEmpty ||
+        selectedEquipOption == null ||
+        secuencias.isEmpty) {
+      // Verificación de '@' en el correo
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Por favor, introduzca todos los campos y secuencias",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return; // Esto previene la ejecución del código posterior
+    }
+
     // Datos del programa automático
     Map<String, dynamic> programaAuto = {
       'nombre': _nameController.text,
       'imagen': 'assets/images/cliente.png',
       'descripcion': _descController.text,
-      // Corregido el acceso a la descripción
       'duracionTotal': double.tryParse(_durationController.text) ?? 0.0,
       'tipo_equipamiento': selectedEquipOption ?? 'BIO-JACKET',
     };
@@ -98,14 +141,14 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
         int? idProgramaSeleccionado = sec['id_programa']; // Asumiendo que en sec tienes el id del programa
 
         var subprograma = {
-          'id_programa_automatico': programaId,  // ID del programa automático
-          'id_programa_relacionado': idProgramaSeleccionado,  // ID del programa seleccionado
+          'id_programa_automatico': programaId,
+          'id_programa_relacionado': idProgramaSeleccionado,
           'orden': int.tryParse(sec['orden'].toString()) ?? 0,
           'ajuste': double.tryParse(sec['ajuste'].toString()) ?? 0.0,
           'duracion': double.tryParse(sec['duracion'].toString()) ?? 0.0,
         };
 
-        print("Subprograma creado: $subprograma");  // Mostrar cada subprograma creado
+        print("Subprograma creado: $subprograma"); // Mostrar cada subprograma creado
         return subprograma;
       }).toList();
 
@@ -116,22 +159,17 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       bool success = await dbHelper.insertAutomaticProgram(programaId, subprogramas);
 
       // Notificar al usuario sobre el resultado
-      if (success) {
-        print("Subprogramas insertados con éxito.");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Programa automático y subprogramas creados con éxito')));
-      } else {
-        print("Error al insertar los subprogramas.");
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al crear el programa automático')));
+      if (mounted) {
+        if (success) {
+          print("Subprogramas insertados con éxito.");
+        } else {
+          print("Error al insertar los subprogramas.");
+        }
       }
     } else {
       print("Error al insertar el programa automático.");
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al insertar el programa automático')));
     }
   }
-
 
 
   @override
@@ -184,6 +222,14 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _durationController,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d*\.?\d*$')),
+                                  // Permite números enteros y decimales
+                                ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
                                   hintText: 'Introducir duración del programa',
@@ -254,14 +300,15 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                   // Encabezados de la tabla (no desplazables)
                                   Table(
                                     columnWidths: const {
-                                      0: FractionColumnWidth(0.2),
+                                      0: FractionColumnWidth(0.15),
                                       // 20% del ancho para la primera columna
-                                      1: FractionColumnWidth(0.4),
+                                      1: FractionColumnWidth(0.3),
                                       // 40% del ancho para la segunda columna
                                       2: FractionColumnWidth(0.2),
                                       // 20% del ancho para la tercera columna
                                       3: FractionColumnWidth(0.2),
                                       // 20% del ancho para la cuarta columna
+                                      4: FractionColumnWidth(0.15),
                                     },
                                     children: const [
                                       TableRow(
@@ -314,6 +361,18 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                               ),
                                             ),
                                           ),
+                                          Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Center(
+                                              child: Text(
+                                                'ACCIÓN',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ],
@@ -326,14 +385,15 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             .map((secuencia) {
                                           return Table(
                                             columnWidths: const {
-                                              0: FractionColumnWidth(0.2),
+                                              0: FractionColumnWidth(0.15),
                                               // 20% del ancho para la primera columna
-                                              1: FractionColumnWidth(0.4),
+                                              1: FractionColumnWidth(0.3),
                                               // 40% del ancho para la segunda columna
                                               2: FractionColumnWidth(0.2),
                                               // 20% del ancho para la tercera columna
                                               3: FractionColumnWidth(0.2),
                                               // 20% del ancho para la cuarta columna
+                                              4: FractionColumnWidth(0.15),
                                             },
                                             children: [
                                               TableRow(
@@ -392,6 +452,26 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                       ),
                                                     ),
                                                   ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            0.0),
+                                                    child: Center(
+                                                      child: IconButton(
+                                                        icon: const Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red),
+                                                        onPressed: () {
+                                                          // Acceder al id del programa de la secuencia
+                                                          int idPrograma =
+                                                              secuencia[
+                                                                  'id_programa'];
+                                                          _eliminarElementoPorId(
+                                                              idPrograma); // Llamar a la función para eliminar por ID
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             ],
@@ -445,7 +525,25 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                       onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                       onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                       onTap: () async {
-                        _addProgramaAuto(context);
+                        if (_nameController.text.isEmpty ||
+                            _durationController.text.isEmpty ||
+                            selectedEquipOption == null ||
+                            secuencias.isEmpty) {
+                          // Verificación de '@' en el correo
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Por favor, introduzca todos los campos y secuencias",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 17),
+                              ),
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          return;
+                        }
+                        await _addProgramaAuto(context);
                       },
                       child: AnimatedScale(
                         scale: scaleFactorTick,
@@ -599,13 +697,16 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                         child: TextField(
                                           controller: _descController,
                                           style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(hintText: 'Añadir una descripción'),
+                                          decoration: _inputDecorationStyle(
+                                              hintText:
+                                                  'Añadir una descripción'),
                                           maxLines: 4,
-                                          keyboardType: TextInputType.text, // Asegura que el teclado sea de tipo texto
-                                          textInputAction: TextInputAction.done, // Muestra el botón "Hecho" en el teclado
+                                          keyboardType: TextInputType.text,
+                                          // Asegura que el teclado sea de tipo texto
+                                          textInputAction: TextInputAction
+                                              .done, // Muestra el botón "Hecho" en el teclado
                                         ),
                                       ),
-
                                     ],
                                   ),
                                 ),
@@ -623,8 +724,18 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                       setState(() => scaleFactorTick = 1.0),
                                   onTap: () async {
                                     _crearProgramaAutomatico();
-                                    Navigator.of(context)
-                                        .pop(); // Cerrar el diálogo
+                                    Navigator.pop(context);
+                                    await widget.onClose();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Programa automático creado correctamente",
+                                          style: TextStyle(color: Colors.white, fontSize: 17),
+                                        ),
+                                        backgroundColor: Colors.green,
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
                                   },
                                   child: AnimatedScale(
                                     scale: scaleFactorTick,
@@ -666,7 +777,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         String? localSelectedProgram = selectedProgramOption;
-        int? localSelectedProgramId = null;  // Variable para almacenar el ID del programa seleccionado
+        int? localSelectedProgramId =
+            null; // Variable para almacenar el ID del programa seleccionado
 
         return Dialog(
           backgroundColor: const Color(0xFF494949),
@@ -680,7 +792,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
               maxWidth: screenWidth * 0.6,
             ),
             child: StatefulBuilder(
-              builder: (BuildContext context, void Function(void Function()) setState) {
+              builder: (BuildContext context,
+                  void Function(void Function()) setState) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -732,7 +845,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                     SizedBox(height: screenHeight * 0.01),
                     Flexible(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 20.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -742,7 +856,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30.0),
                                   width: screenWidth * 0.3,
                                   alignment: Alignment.centerLeft,
                                   decoration: _inputDecoration(),
@@ -761,12 +876,15 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                       setState(() {
                                         localSelectedProgram = value;
                                         // Al seleccionar un programa, guardar su ID también
-                                        localSelectedProgramId = allPrograms.firstWhere(
-                                                (program) => program['nombre'] == value)['id_programa'];
+                                        localSelectedProgramId =
+                                            allPrograms.firstWhere((program) =>
+                                                program['nombre'] ==
+                                                value)['id_programa'];
                                       });
                                     },
                                     dropdownColor: const Color(0xFF313030),
-                                    icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                    icon: const Icon(Icons.arrow_drop_down,
+                                        color: Color(0xFF2be4f3), size: 30),
                                     hint: Text(
                                       'Seleccione un programa',
                                       style: _dropdownHintStyle,
@@ -783,7 +901,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text('ORDEN', style: _labelStyle),
                                       Container(
@@ -791,6 +909,11 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _ordenController,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: <TextInputFormatter>[
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                          ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                               hintText: ''),
@@ -803,7 +926,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text('DURACIÓN (s)', style: _labelStyle),
                                       Container(
@@ -811,6 +934,13 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _tiempoController,
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(
+                                                RegExp(r'^\d*\.?\d*$')),
+                                            // Permite números enteros y decimales
+                                          ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                               hintText: '', enabled: true),
@@ -823,7 +953,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text('AJUSTE', style: _labelStyle),
                                       Container(
@@ -831,6 +961,13 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _ajusteController,
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(
+                                                RegExp(r'^\d*\.?\d*$')),
+                                            // Permite números enteros y decimales
+                                          ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                               hintText: '', enabled: true),
@@ -847,36 +984,46 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 GestureDetector(
-                                  onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                                  onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                                  onTapDown: (_) =>
+                                      setState(() => scaleFactorTick = 0.95),
+                                  onTapUp: (_) =>
+                                      setState(() => scaleFactorTick = 1.0),
                                   onTap: () async {
                                     // Verificar los valores que se están recogiendo
-                                    print("Programa Seleccionado: $localSelectedProgram");
-                                    print("ID Programa Seleccionado: $localSelectedProgramId");
+                                    print(
+                                        "Programa Seleccionado: $localSelectedProgram");
+                                    print(
+                                        "ID Programa Seleccionado: $localSelectedProgramId");
                                     print("Orden: ${_ordenController.text}");
-                                    print("Duración: ${_tiempoController.text}");
+                                    print(
+                                        "Duración: ${_tiempoController.text}");
                                     print("Ajuste: ${_ajusteController.text}");
 
                                     // Guardar la secuencia y actualizar la UI
-                                    if (localSelectedProgram != null && localSelectedProgramId != null) {
+                                    if (localSelectedProgram != null &&
+                                        localSelectedProgramId != null) {
                                       Map<String, dynamic> nuevaSecuencia = {
                                         'programa': localSelectedProgram,
-                                        'id_programa': localSelectedProgramId,  // Guardar el ID del programa
+                                        'id_programa': localSelectedProgramId,
+                                        // Guardar el ID del programa
                                         'orden': _ordenController.text,
                                         'duracion': _tiempoController.text,
                                         'ajuste': _ajusteController.text,
                                       };
 
-                                      _addSecuenciaCallback(nuevaSecuencia); // Actualiza el estado en el widget principal
+                                      _addSecuenciaCallback(
+                                          nuevaSecuencia); // Actualiza el estado en el widget principal
 
                                       // Limpiar los campos
                                       _ordenController.clear();
                                       _tiempoController.clear();
                                       _ajusteController.clear();
 
-                                      setState(() {}); // Asegúrate de que el diálogo se actualice
+                                      setState(
+                                          () {}); // Asegúrate de que el diálogo se actualice
 
-                                      Navigator.of(context).pop(); // Cerrar el diálogo
+                                      Navigator.of(context)
+                                          .pop(); // Cerrar el diálogo
                                     }
                                   },
                                   child: AnimatedScale(
@@ -909,7 +1056,6 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       },
     );
   }
-
 
   TextStyle get _labelStyle => const TextStyle(
       color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
