@@ -164,6 +164,30 @@ flutter:
     - assets/images/virtualtrainer.png
     - assets/images/rayoaz.png
     - assets/images/rayoverd.png
+    - assets/images/absazul.png
+    - assets/images/pecazul.png
+    - assets/images/cuazul.png
+    - assets/images/gemelosazul.png
+    - assets/images/bicepsazul.png
+    - assets/images/gluteoazul.png
+    - assets/images/dorsalazul.png
+    - assets/images/isquioazul.png
+    - assets/images/lumbarazul.png
+    - assets/images/trapazul.png
+    - assets/images/lumbar_pantalon_azul.png
+    - assets/images/avatar_frontal.png
+    - assets/images/avatar_post.png
+    - assets/images/pantalon_frontal.png
+    - assets/images/pantalon_posterior.png
+    - assets/images/RESET.png
+    - assets/images/average.png
+    - assets/images/mas.png
+    - assets/images/menos.png
+    - assets/images/play.png
+    - assets/images/pause.png
+    - assets/images/RELOJ.png
+    - assets/images/flecha-arriba.png
+    - assets/images/flecha-abajo.png
     - .env
     - assets/traducciones1.json
     - assets/videos/tutorial.mp4

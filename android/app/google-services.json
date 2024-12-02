@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1093761830210",
+    "project_id": "traducciones-v25",
+    "storage_bucket": "traducciones-v25.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093761830210:android:f8dc7e0abcb39a71b5ccdb",
+        "android_client_info": {
+          "package_name": "com.example.imotion_designs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMlx0YOt0_8Wvb4tT2Yhn4E4KRMS0metY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
