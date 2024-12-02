@@ -57,8 +57,7 @@ class _PanelViewState extends State<PanelView>
   double valueRampa = 1.0;
   double valuePause = 1.0;
 
-  bool musculosTrajeSelected = true;
-  bool musculosPantalonSelected = true;
+  bool isSessionStarted = false;
 
   @override
   void initState() {
@@ -647,279 +646,712 @@ class _PanelViewState extends State<PanelView>
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    // Fila 1
-                                    Row(
+                                    if(isSessionStarted) ...[           Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-                                             
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/pecazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/pecazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Espaciado entre filas
-                                    // Fila 2
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/mas.png',
-                                          size: 40.0,
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 2
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
                                                 BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/bicepsazul.png',
-                                              fit: BoxFit.cover,
+                                                child: Image.asset(
+                                                  'assets/images/bicepsazul.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/menos.png',
-                                          size: 40.0,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Espaciado entre filas
-                                    // Fila 3
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/mas.png',
-                                          size: 40.0,
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 3
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
                                                 BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/absazul.png',
-                                              fit: BoxFit.cover,
+                                                child: Image.asset(
+                                                  'assets/images/absazul.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/menos.png',
-                                          size: 40.0,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Espaciado entre filas
-                                    // Fila 4
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/mas.png',
-                                          size: 40.0,
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 4
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
                                                 BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/cuazul.png',
-                                              fit: BoxFit.cover,
+                                                child: Image.asset(
+                                                  'assets/images/cuazul.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/menos.png',
-                                          size: 40.0,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Espaciado entre filas
-                                    // Fila 5
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/mas.png',
-                                          size: 40.0,
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 5
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
                                                 BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/gemelosazul.png',
-                                              fit: BoxFit.cover,
+                                                child: Image.asset(
+                                                  'assets/images/gemelosazul.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        CustomIconButton(
-                                          onTap: () {
-                                            setState(() {
-
-                                            });
-                                          },
-                                          onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
-                                          },
-                                          imagePath: 'assets/images/menos.png',
-                                          size: 40.0,
-                                        ),
-                                      ],
-                                    ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),] else if (!isSessionStarted) ...[
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                BorderRadius.circular(10),
+                                                child: Image.asset(
+                                                  'assets/images/pec_blanco.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 2
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                BorderRadius.circular(10),
+                                                child: Image.asset(
+                                                  'assets/images/biceps_blanco.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 3
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                BorderRadius.circular(10),
+                                                child: Image.asset(
+                                                  'assets/images/abs_blanco.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 4
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                BorderRadius.circular(10),
+                                                child: Image.asset(
+                                                  'assets/images/cua_blanco.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      // Espaciado entre filas
+                                      // Fila 5
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/mas.png',
+                                            size: 40.0,
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Acción al tocar
+                                              print("Imagen tocada");
+                                            },
+                                            onLongPress: () {
+                                              // Acción al mantener presionado
+                                              print(
+                                                  "Imagen presionada prolongadamente");
+                                            },
+                                            child: SizedBox(
+                                              width: 70.0,
+                                              height: 70.0,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                BorderRadius.circular(10),
+                                                child: Image.asset(
+                                                  'assets/images/gemelos_blanco.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: screenWidth * 0.01),
+                                          CustomIconButton(
+                                            onTap: () {
+                                              setState(() {});
+                                            },
+                                            onTapDown: () {
+                                              print(
+                                                  "Botón presionado"); // Acción al presionar
+                                            },
+                                            onTapUp: () {
+                                              print(
+                                                  "Botón soltado"); // Acción al levantar
+                                            },
+                                            imagePath: 'assets/images/menos.png',
+                                            size: 40.0,
+                                          ),
+                                        ],
+                                      ),
+                                    ]
+                         
                                   ],
                                 ),
                                 Column(
                                   children: [
                                     Row(
                                       children: [
-                                        Image.asset(
-                                            "assets/images/avatar_frontal.png",
-                                            height: screenHeight * 0.4,
-                                            fit: BoxFit.cover),
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Imagen base del avatar
+                                            Image.asset(
+                                              "assets/images/avatar_frontal.png",
+                                              height: screenHeight * 0.4,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                            if (isSessionStarted) ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_pecho_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_gem_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ]
+                                          ],
+                                        ),
                                         Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -1017,28 +1449,88 @@ class _PanelViewState extends State<PanelView>
                                             ),
                                           ],
                                         ),
-                                        Image.asset(
-                                            "assets/images/avatar_post.png",
-                                            height: screenHeight * 0.4,
-                                            fit: BoxFit.cover),
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Imagen base del avatar
+                                            Image.asset(
+                                              "assets/images/avatar_post.png",
+                                              height: screenHeight * 0.4,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                            if (isSessionStarted) ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_trap_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_dorsal_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_gluteo_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_azul.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ]
+                                          ],
+                                        ),
                                       ],
                                     ),
                                     Row(
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
-                                          size: screenHeight*0.1,
+                                          size: screenHeight * 0.1,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         GestureDetector(
@@ -1050,6 +1542,10 @@ class _PanelViewState extends State<PanelView>
                                               // Si el temporizador está pausado, lo iniciamos o reanudamos
                                               _startTimer();
                                             }
+                                            setState(() {
+                                              isSessionStarted =
+                                                  !isSessionStarted; // Cambia el estado de la sesión
+                                            });
                                           },
                                           child: AnimatedScale(
                                             scale: scaleFactorBack,
@@ -1070,18 +1566,18 @@ class _PanelViewState extends State<PanelView>
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
-                                          size: screenHeight*0.1,
+                                          size: screenHeight * 0.1,
                                         ),
                                       ],
                                     )
@@ -1089,52 +1585,63 @@ class _PanelViewState extends State<PanelView>
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
+                                  children: [ if(isSessionStarted)...[
                                     // Fila 1
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/trapazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/trapazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1146,48 +1653,59 @@ class _PanelViewState extends State<PanelView>
                                     // Fila 2
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/dorsalazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/dorsalazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1199,48 +1717,59 @@ class _PanelViewState extends State<PanelView>
                                     // Fila 3
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/lumbarazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/lumbarazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1252,48 +1781,59 @@ class _PanelViewState extends State<PanelView>
                                     // Fila 4
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/gluteoazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/gluteoazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1305,54 +1845,386 @@ class _PanelViewState extends State<PanelView>
                                     // Fila 5
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/isquioazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/isquioazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
                                         ),
                                       ],
                                     ),
+                                  ] else if(!isSessionStarted)...[
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/mas.png',
+                                          size: 40.0,
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/trapazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/menos.png',
+                                          size: 40.0,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    // Espaciado entre filas
+                                    // Fila 2
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/mas.png',
+                                          size: 40.0,
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/dorsalazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/menos.png',
+                                          size: 40.0,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    // Espaciado entre filas
+                                    // Fila 3
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/mas.png',
+                                          size: 40.0,
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/lumbarazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/menos.png',
+                                          size: 40.0,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    // Espaciado entre filas
+                                    // Fila 4
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/mas.png',
+                                          size: 40.0,
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/gluteoazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/menos.png',
+                                          size: 40.0,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    // Espaciado entre filas
+                                    // Fila 5
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/mas.png',
+                                          size: 40.0,
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/isquioazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: screenWidth * 0.01),
+                                        CustomIconButton(
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                          onTapDown: () {
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
+                                          },
+                                          onTapUp: () {
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
+                                          },
+                                          imagePath: 'assets/images/menos.png',
+                                          size: 40.0,
+                                        ),
+                                      ],
+                                    ),
+                                  ]
+                                    // Fila 1
+
                                   ],
                                 ),
                               ] else if (selectedIndexEquip == 1) ...[
@@ -1366,44 +2238,55 @@ class _PanelViewState extends State<PanelView>
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/bicepsazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/bicepsazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1419,44 +2302,55 @@ class _PanelViewState extends State<PanelView>
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/absazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/absazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1472,44 +2366,55 @@ class _PanelViewState extends State<PanelView>
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/cuazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/cuazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1525,44 +2430,55 @@ class _PanelViewState extends State<PanelView>
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/gemelosazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/gemelosazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1575,10 +2491,70 @@ class _PanelViewState extends State<PanelView>
                                   children: [
                                     Row(
                                       children: [
-                                        Image.asset(
-                                            "assets/images/avatar_frontal.png",
-                                            height: screenHeight * 0.4,
-                                            fit: BoxFit.cover),
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Imagen base del avatar
+                                            Image.asset(
+                                              "assets/images/pantalon_frontal.png",
+                                              height: screenHeight * 0.4,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                            if (isSessionStarted) ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_inf_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_sup_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_gem_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ]
+                                          ],
+                                        ),
                                         Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -1676,28 +2652,78 @@ class _PanelViewState extends State<PanelView>
                                             ),
                                           ],
                                         ),
-                                        Image.asset(
-                                            "assets/images/avatar_post.png",
-                                            height: screenHeight * 0.4,
-                                            fit: BoxFit.cover),
+                                        Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Imagen base del avatar
+                                            Image.asset(
+                                              "assets/images/pantalon_posterior.png",
+                                              height: screenHeight * 0.4,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                            if (isSessionStarted) ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_sup_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_sup_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_azul_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ]
+                                          ],
+                                        ),
                                       ],
                                     ),
                                     Row(
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
-                                          size: screenHeight*0.1,
+                                          size: screenHeight * 0.1,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         GestureDetector(
@@ -1729,18 +2755,18 @@ class _PanelViewState extends State<PanelView>
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
-                                          size: screenHeight*0.1,
+                                          size: screenHeight * 0.1,
                                         ),
                                       ],
                                     )
@@ -1756,44 +2782,55 @@ class _PanelViewState extends State<PanelView>
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/lumbar_pantalon_azul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/lumbar_pantalon_azul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1809,44 +2846,55 @@ class _PanelViewState extends State<PanelView>
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/gluteoazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/gluteoazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: 40.0,
@@ -1862,46 +2910,57 @@ class _PanelViewState extends State<PanelView>
                                       children: [
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        SizedBox(
-                                          width: 70.0,
-                                          height: 70.0,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.asset(
-                                              'assets/images/isquioazul.png',
-                                              fit: BoxFit.cover,
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Acción al tocar
+                                            print("Imagen tocada");
+                                          },
+                                          onLongPress: () {
+                                            // Acción al mantener presionado
+                                            print(
+                                                "Imagen presionada prolongadamente");
+                                          },
+                                          child: SizedBox(
+                                            width: 70.0,
+                                            height: 70.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.asset(
+                                                'assets/images/isquioazul.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                           },
                                           onTapDown: () {
-                                            print("Botón presionado"); // Acción al presionar
+                                            print(
+                                                "Botón presionado"); // Acción al presionar
                                           },
                                           onTapUp: () {
-                                            print("Botón soltado"); // Acción al levantar
+                                            print(
+                                                "Botón soltado"); // Acción al levantar
                                           },
-                                          imagePath: 'assets/images/menos.png',
+                                          imagePath: 'assets/images/mas.png',
                                           size: 40.0,
                                         ),
                                       ],
@@ -2362,8 +3421,6 @@ class _PanelViewState extends State<PanelView>
   }
 }
 
-
-
 class CustomIconButton extends StatefulWidget {
   final VoidCallback onTap; // Acción al soltar el botón
   final VoidCallback? onTapDown; // Acción al presionar el botón
@@ -2395,7 +3452,8 @@ class _CustomIconButtonState extends State<CustomIconButton> {
           scaleFactor = 0.9; // Escala al presionar
         });
         if (widget.onTapDown != null) {
-          widget.onTapDown!(); // Llama a la acción de onTapDown si está definida
+          widget
+              .onTapDown!(); // Llama a la acción de onTapDown si está definida
         }
       },
       onTapUp: (_) {
@@ -2427,4 +3485,3 @@ class _CustomIconButtonState extends State<CustomIconButton> {
     );
   }
 }
-

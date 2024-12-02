@@ -174,6 +174,36 @@ flutter:
     - assets/images/isquioazul.png
     - assets/images/lumbarazul.png
     - assets/images/trapazul.png
+    - assets/images/trap_gris.png
+    - assets/images/trap_blanco.png
+    - assets/images/trap_naranja.png
+    - assets/images/lumbar_gris.png
+    - assets/images/lumbar_blanco.png
+    - assets/images/lumbar_naranja.png
+    - assets/images/abs_gris.png
+    - assets/images/abs_blanco.png
+    - assets/images/abs_naranja.png
+    - assets/images/pec_gris.png
+    - assets/images/pec_blanco.png
+    - assets/images/pec_naranja.png
+    - assets/images/biceps_blanco.png
+    - assets/images/biceps_gris.png
+    - assets/images/biceps_naranja.png
+    - assets/images/cua_gris.png
+    - assets/images/cua_blanco.png
+    - assets/images/cua_naranja.png
+    - assets/images/gemelos_gris.png
+    - assets/images/gemelos_blanco.png
+    - assets/images/gemelos_naranja.png
+    - assets/images/dorsal_gris.png
+    - assets/images/dorsal_blanco.png
+    - assets/images/dorsal_naranja.png
+    - assets/images/gluteo_blanco.png
+    - assets/images/gluteo_gris.png
+    - assets/images/gluteo_naranja.png
+    - assets/images/isquio_gris.png
+    - assets/images/isquio_blanco.png
+    - assets/images/isquio_naranja.png
     - assets/images/lumbar_pantalon_azul.png
     - assets/images/avatar_frontal.png
     - assets/images/avatar_post.png
@@ -188,6 +218,25 @@ flutter:
     - assets/images/RELOJ.png
     - assets/images/flecha-arriba.png
     - assets/images/flecha-abajo.png
+    - assets/images/capa_pecho_azul.png
+    - assets/images/capa_abs_azul.png
+    - assets/images/capa_trap_azul.png
+    - assets/images/capa_gem_azul.png
+    - assets/images/capa_biceps_azul.png
+    - assets/images/capa_cua_azul.png
+    - assets/images/capa_dorsal_azul.png
+    - assets/images/capa_gluteo_azul.png
+    - assets/images/capa_lumbar_azul.png
+    - assets/images/capa_isquio_azul.png
+    - assets/images/capa_isquio_azul_pantalon.png
+    - assets/images/capa_lumbar_azul_pantalon.png
+    - assets/images/capa_abs_inf_azul_pantalon.png
+    - assets/images/capa_abs_sup_azul_pantalon.png
+    - assets/images/capa_glut_sup_azul_pantalon.png
+    - assets/images/capa_glut_inf_azul_pantalon.png
+    - assets/images/capa_biceps_azul_pantalon.png
+    - assets/images/capa_cua_azul_pantalon.png
+    - assets/images/capa_gem_azul_pantalon.png
     - .env
     - assets/traducciones1.json
     - assets/videos/tutorial.mp4
