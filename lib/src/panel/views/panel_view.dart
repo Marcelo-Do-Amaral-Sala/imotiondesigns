@@ -1875,155 +1875,302 @@ class _PanelViewState extends State<PanelView>
                                             ),
                                             // Superposición de imágenes si `musculosTrajeSelected` es verdadero
                                             if (isSessionStarted) ...[
-                                              Positioned(
-                                                top: 0,
-                                                child: AnimatedBuilder(
-                                                  animation: _opacityAnimation,
-                                                  builder: (context, child) {
-                                                    return Opacity(
-                                                      opacity: _opacityAnimation
-                                                          .value,
-                                                      child: Image.asset(
-                                                        "assets/images/capa_trap_azul.png",
-                                                        height:
-                                                            screenHeight * 0.4,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    );
-                                                  },
+                                              if (_isMusculoTrajeBloqueado[
+                                                  5]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_trap_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-
-                                              // Capa de Dorsales
-                                              Positioned(
-                                                top: 0,
-                                                child: AnimatedBuilder(
-                                                  animation: _opacityAnimation,
-                                                  builder: (context, child) {
-                                                    return Opacity(
-                                                      opacity: _opacityAnimation
-                                                          .value,
-                                                      child: Image.asset(
-                                                        "assets/images/capa_dorsal_azul.png",
-                                                        height:
-                                                            screenHeight * 0.4,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    );
-                                                  },
+                                              ] else ...[
+                                                // Si el músculo no está bloqueado, muestra la capa animada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: AnimatedBuilder(
+                                                    animation:
+                                                        _opacityAnimation,
+                                                    builder: (context, child) {
+                                                      return Opacity(
+                                                        opacity:
+                                                            _opacityAnimation
+                                                                .value,
+                                                        child: Image.asset(
+                                                          "assets/images/capa_trap_azul.png",
+                                                          height: screenHeight *
+                                                              0.4,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
                                                 ),
-                                              ),
-
-                                              // Capa de Lumbares
-                                              Positioned(
-                                                top: 0,
-                                                child: AnimatedBuilder(
-                                                  animation: _opacityAnimation,
-                                                  builder: (context, child) {
-                                                    return Opacity(
-                                                      opacity: _opacityAnimation
-                                                          .value,
-                                                      child: Image.asset(
-                                                        "assets/images/capa_lumbar_azul.png",
-                                                        height:
-                                                            screenHeight * 0.4,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    );
-                                                  },
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  6]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_dorsal_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-
-                                              // Capa de Glúteos
-                                              Positioned(
-                                                top: 0,
-                                                child: AnimatedBuilder(
-                                                  animation: _opacityAnimation,
-                                                  builder: (context, child) {
-                                                    return Opacity(
-                                                      opacity: _opacityAnimation
-                                                          .value,
-                                                      child: Image.asset(
-                                                        "assets/images/capa_gluteo_azul.png",
-                                                        height:
-                                                            screenHeight * 0.4,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    );
-                                                  },
+                                              ] else ...[
+                                                // Si el músculo no está bloqueado, muestra la capa animada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: AnimatedBuilder(
+                                                    animation:
+                                                        _opacityAnimation,
+                                                    builder: (context, child) {
+                                                      return Opacity(
+                                                        opacity:
+                                                            _opacityAnimation
+                                                                .value,
+                                                        child: Image.asset(
+                                                          "assets/images/capa_dorsal_azul.png",
+                                                          height: screenHeight *
+                                                              0.4,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
                                                 ),
-                                              ),
-
-                                              // Capa de Isquiotibiales
-                                              Positioned(
-                                                top: 0,
-                                                child: AnimatedBuilder(
-                                                  animation: _opacityAnimation,
-                                                  builder: (context, child) {
-                                                    return Opacity(
-                                                      opacity: _opacityAnimation
-                                                          .value,
-                                                      child: Image.asset(
-                                                        "assets/images/capa_isquio_azul.png",
-                                                        height:
-                                                            screenHeight * 0.4,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    );
-                                                  },
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  7]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_lumbar_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
+                                              ] else ...[
+                                                // Si el músculo no está bloqueado, muestra la capa animada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: AnimatedBuilder(
+                                                    animation:
+                                                        _opacityAnimation,
+                                                    builder: (context, child) {
+                                                      return Opacity(
+                                                        opacity:
+                                                            _opacityAnimation
+                                                                .value,
+                                                        child: Image.asset(
+                                                          "assets/images/capa_lumbar_azul.png",
+                                                          height: screenHeight *
+                                                              0.4,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  8]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_gluteo_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ] else ...[
+                                                // Si el músculo no está bloqueado, muestra la capa animada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: AnimatedBuilder(
+                                                    animation:
+                                                        _opacityAnimation,
+                                                    builder: (context, child) {
+                                                      return Opacity(
+                                                        opacity:
+                                                            _opacityAnimation
+                                                                .value,
+                                                        child: Image.asset(
+                                                          "assets/images/capa_gluteo_azul.png",
+                                                          height: screenHeight *
+                                                              0.4,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  9]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_isquio_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ] else ...[
+                                                // Si el músculo no está bloqueado, muestra la capa animada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: AnimatedBuilder(
+                                                    animation:
+                                                        _opacityAnimation,
+                                                    builder: (context, child) {
+                                                      return Opacity(
+                                                        opacity:
+                                                            _opacityAnimation
+                                                                .value,
+                                                        child: Image.asset(
+                                                          "assets/images/capa_isquio_azul.png",
+                                                          height: screenHeight *
+                                                              0.4,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ] else if (!isSessionStarted) ...[
-                                              Positioned(
-                                                top: 0,
-                                                // Ajusta la posición de la superposición
-                                                child: Image.asset(
-                                                  "assets/images/capa_trap_blanco.png",
-                                                  // Reemplaza con la ruta de la imagen del músculo
-                                                  height: screenHeight * 0.4,
-                                                  fit: BoxFit.cover,
+                                              if (_isMusculoTrajeBloqueado[
+                                                  5]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_trap_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-                                              Positioned(
-                                                top: 0,
-                                                // Ajusta la posición de la superposición
-                                                child: Image.asset(
-                                                  "assets/images/capa_dorsal_blanco.png",
-                                                  // Reemplaza con la ruta de la imagen del músculo
-                                                  height: screenHeight * 0.4,
-                                                  fit: BoxFit.cover,
+                                              ] else ...[
+                                                Positioned(
+                                                  top: 0,
+                                                  // Ajusta la posición de la superposición
+                                                  child: Image.asset(
+                                                    "assets/images/capa_trap_blanco.png",
+                                                    // Reemplaza con la ruta de la imagen del músculo
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-                                              Positioned(
-                                                top: 0,
-                                                // Ajusta la posición de la superposición
-                                                child: Image.asset(
-                                                  "assets/images/capa_lumbar_blanco.png",
-                                                  // Reemplaza con la ruta de la imagen del músculo
-                                                  height: screenHeight * 0.4,
-                                                  fit: BoxFit.cover,
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  6]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_dorsal_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-                                              Positioned(
-                                                top: 0,
-                                                // Ajusta la posición de la superposición
-                                                child: Image.asset(
-                                                  "assets/images/capa_gluteo_blanco.png",
-                                                  // Reemplaza con la ruta de la imagen del músculo
-                                                  height: screenHeight * 0.4,
-                                                  fit: BoxFit.cover,
+                                              ] else ...[
+                                                Positioned(
+                                                  top: 0,
+                                                  // Ajusta la posición de la superposición
+                                                  child: Image.asset(
+                                                    "assets/images/capa_dorsal_blanco.png",
+                                                    // Reemplaza con la ruta de la imagen del músculo
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-                                              Positioned(
-                                                top: 0,
-                                                // Ajusta la posición de la superposición
-                                                child: Image.asset(
-                                                  "assets/images/capa_isquio_blanco.png",
-                                                  // Reemplaza con la ruta de la imagen del músculo
-                                                  height: screenHeight * 0.4,
-                                                  fit: BoxFit.cover,
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  7]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_lumbar_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
+                                              ] else ...[
+                                                Positioned(
+                                                  top: 0,
+                                                  // Ajusta la posición de la superposición
+                                                  child: Image.asset(
+                                                    "assets/images/capa_lumbar_blanco.png",
+                                                    // Reemplaza con la ruta de la imagen del músculo
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  8]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_gluteo_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ] else ...[
+                                                Positioned(
+                                                  top: 0,
+                                                  // Ajusta la posición de la superposición
+                                                  child: Image.asset(
+                                                    "assets/images/capa_gluteo_blanco.png",
+                                                    // Reemplaza con la ruta de la imagen del músculo
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ],
+                                              if (_isMusculoTrajeBloqueado[
+                                                  9]) ...[
+                                                // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                                Positioned(
+                                                  top: 0,
+                                                  child: Image.asset(
+                                                    "assets/images/capa_isquio_naranja.png",
+                                                    // Imagen para el estado bloqueado
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ] else ...[
+                                                Positioned(
+                                                  top: 0,
+                                                  // Ajusta la posición de la superposición
+                                                  child: Image.asset(
+                                                    "assets/images/capa_isquio_blanco.png",
+                                                    // Reemplaza con la ruta de la imagen del músculo
+                                                    height: screenHeight * 0.4,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ],
                                             ]
                                           ],
                                         ),
