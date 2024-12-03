@@ -84,6 +84,8 @@ class _PanelViewState extends State<PanelView>
     false, //GLUTEOS
     false //ISQUIOS
   ];
+  final List<int> porcentajesMusculoTraje = List.filled(10, 0);
+  final List<int> porcentajesMusculoPantalon = List.filled(7, 0);
 
   @override
   void initState() {
@@ -174,7 +176,7 @@ class _PanelViewState extends State<PanelView>
             width: screenWidth,
             height: screenHeight,
             padding: EdgeInsets.symmetric(
-                vertical: screenHeight * 0.04, horizontal: screenWidth * 0.02),
+                vertical: screenHeight * 0.02, horizontal: screenWidth * 0.02),
             child: Column(
               children: [
                 Expanded(
@@ -687,7 +689,7 @@ class _PanelViewState extends State<PanelView>
                 Expanded(
                   flex: 2,
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 20.0),
+                    padding: const EdgeInsets.only(top: 10.0),
                     child: Row(
                       children: [
                         Expanded(
@@ -699,774 +701,84 @@ class _PanelViewState extends State<PanelView>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     if (isSessionStarted) ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[0] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[0]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              0] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              0]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 0");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                0]
-                                                            ? 'assets/images/pec_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/pecazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      _buildMuscleRow(
+                                        index: 0,
+                                        imagePathEnabled:
+                                            'assets/images/pec_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/pecazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[1] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[1]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              1] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              1]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 1");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                1]
-                                                            ? 'assets/images/biceps_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/bicepsazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 1,
+                                        imagePathEnabled:
+                                            'assets/images/biceps_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/bicepsazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[2] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[2]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              2] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              2]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 2");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                2]
-                                                            ? 'assets/images/abs_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/absazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 2,
+                                        imagePathEnabled:
+                                            'assets/images/abs_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/absazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[3] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[3]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              3] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              3]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 3");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                3]
-                                                            ? 'assets/images/cua_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/cuazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 3,
+                                        imagePathEnabled:
+                                            'assets/images/cua_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/cuazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[4] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[4]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[4] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              4] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              4]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 4");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                4]
-                                                            ? 'assets/images/gemelos_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/gemelosazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[4] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 4,
+                                        imagePathEnabled:
+                                            'assets/images/gemelos_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gemelosazul.png',
                                       ),
                                     ] else if (!isSessionStarted) ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[0] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[0]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              0] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              0]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 0");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                0]
-                                                            ? 'assets/images/pec_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/pec_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      _buildMuscleRow(
+                                        index: 0,
+                                        imagePathEnabled:
+                                            'assets/images/pec_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/pec_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[1] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[1]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              1] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              1]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 1");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                1]
-                                                            ? 'assets/images/biceps_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/biceps_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 1,
+                                        imagePathEnabled:
+                                            'assets/images/biceps_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/biceps_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[2] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[2]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              2] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              2]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 2");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                2]
-                                                            ? 'assets/images/abs_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/abs_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 2,
+                                        imagePathEnabled:
+                                            'assets/images/abs_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/abs_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[3] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[3]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              3] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              3]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 3");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                3]
-                                                            ? 'assets/images/cua_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/cua_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 3,
+                                        imagePathEnabled:
+                                            'assets/images/cua_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/cua_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[4] es true
-                                          Container(
-                                            color: _isMusculoTrajeBloqueado[4]
-                                                ? Color(0xFFFFA500)
-                                                    .withOpacity(0.3)
-                                                : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[4] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoTrajeBloqueado[
-                                                              4] =
-                                                          !_isMusculoTrajeBloqueado[
-                                                              4]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 4");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoTrajeBloqueado[
-                                                                4]
-                                                            ? 'assets/images/gemelos_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/gemelos_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[4] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoTrajeBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 4,
+                                        imagePathEnabled:
+                                            'assets/images/gemelos_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gemelos_blanco.png',
                                       ),
                                     ]
                                   ],
@@ -2188,22 +1500,24 @@ class _PanelViewState extends State<PanelView>
                                     ),
                                     Row(
                                       children: [
+                                        // Botón "Menos"
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {});
-                                          },
-                                          onTapDown: () {
-                                            print(
-                                                "Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print(
-                                                "Botón soltado"); // Acción al levantar
+                                            setState(() {
+                                              // Disminuir el porcentaje de los músculos no bloqueados
+                                              for (int i = 0; i < _isMusculoTrajeBloqueado.length; i++) {
+                                                if (!_isMusculoTrajeBloqueado[i]) {
+                                                  porcentajesMusculoTraje[i] = (porcentajesMusculoTraje[i] - 1).clamp(0, 100);
+                                                }
+                                              }
+                                            });
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: screenHeight * 0.1,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
+
+                                        // Botón de control de sesión (Reproducir/Pausar)
                                         GestureDetector(
                                           onTap: () {
                                             setState(() {
@@ -2214,23 +1528,17 @@ class _PanelViewState extends State<PanelView>
                                                 // Inicia o reanuda el temporizador si está pausado
                                                 _startTimer();
                                               }
-
-                                              // Alterna el estado de la sesión
-                                              isSessionStarted =
-                                                  !isSessionStarted;
-                                              print(
-                                                  'isSessionStarted: $isSessionStarted');
+                                              isSessionStarted = !isSessionStarted;
+                                              print('isSessionStarted: $isSessionStarted');
                                             });
                                           },
                                           child: AnimatedScale(
                                             scale: scaleFactorBack,
-                                            duration: const Duration(
-                                                milliseconds: 100),
+                                            duration: const Duration(milliseconds: 100),
                                             child: SizedBox(
                                               child: ClipOval(
                                                 child: Image.asset(
                                                   height: screenHeight * 0.15,
-                                                  // Cambia la imagen según el estado de isRunning
                                                   'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
                                                   fit: BoxFit.scaleDown,
                                                 ),
@@ -2239,863 +1547,109 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
+
+                                        // Botón "Más"
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {});
-                                          },
-                                          onTapDown: () {
-                                            print(
-                                                "Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print(
-                                                "Botón soltado"); // Acción al levantar
+                                            setState(() {
+                                              // Aumentar el porcentaje de los músculos no bloqueados
+                                              for (int i = 0; i < _isMusculoTrajeBloqueado.length; i++) {
+                                                if (!_isMusculoTrajeBloqueado[i]) {
+                                                  porcentajesMusculoTraje[i] = (porcentajesMusculoTraje[i] + 1).clamp(0, 100);
+                                                }
+                                              }
+                                            });
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: screenHeight * 0.1,
                                         ),
                                       ],
                                     )
+
                                   ],
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     if (isSessionStarted) ...[
-                                      // Fila 1
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[5]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  5], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[5] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          5]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 0");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[5]
-                                                        ? 'assets/images/trap_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/trapazul.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  5], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      _buildMuscleRow(
+                                        index: 5,
+                                        imagePathEnabled:
+                                            'assets/images/trap_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/trapazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 2
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[6]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  6], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[6] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          6]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 1");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[6]
-                                                        ? 'assets/images/dorsal_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/dorsalazul.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  6], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 6,
+                                        imagePathEnabled:
+                                            'assets/images/dorsal_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/dorsalazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 3
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[7]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  7], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[7] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          7]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 2");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[7]
-                                                        ? 'assets/images/lumbar_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/lumbarazul.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  7], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 7,
+                                        imagePathEnabled:
+                                            'assets/images/lumbar_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/lumbarazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 4
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[8]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  8], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[8] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          8]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 3");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[8]
-                                                        ? 'assets/images/gluteo_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/gluteoazul.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  8], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 8,
+                                        imagePathEnabled:
+                                            'assets/images/gluteo_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gluteoazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 5
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[9]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  9], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[9] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          9]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 4");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[9]
-                                                        ? 'assets/images/isquio_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/isquioazul.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  9], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 9,
+                                        imagePathEnabled:
+                                            'assets/images/isquio_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/isquioazul.png',
                                       ),
                                     ] else if (!isSessionStarted) ...[
-                                      // Fila 1
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[5]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  5], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[5] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          5]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 0");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[5]
-                                                        ? 'assets/images/trap_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/trap_blanco.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  5], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      _buildMuscleRow(
+                                        index: 5,
+                                        imagePathEnabled:
+                                            'assets/images/trap_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/trap_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 2
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[6]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  6], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[6] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          6]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 1");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[6]
-                                                        ? 'assets/images/dorsal_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/dorsal_blanco.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  6], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 6,
+                                        imagePathEnabled:
+                                            'assets/images/dorsal_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/dorsal_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 3
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[7]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  7], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[7] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          7]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 2");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[7]
-                                                        ? 'assets/images/lumbar_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/lumbar_blanco.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  7], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 7,
+                                        imagePathEnabled:
+                                            'assets/images/lumbar_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/lumbar_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 4
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[8]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  8], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[8] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          8]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 3");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[8]
-                                                        ? 'assets/images/gluteo_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/gluteo_blanco.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  8], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 8,
+                                        imagePathEnabled:
+                                            'assets/images/gluteo_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gluteo_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      // Espaciado entre filas
-
-                                      // Fila 5
-                                      Container(
-                                        color: _isMusculoTrajeBloqueado[9]
-                                            ? Color(0xFFFFA500).withOpacity(0.3)
-                                            : Colors.transparent,
-                                        // Fondo anaranjado transparente si bloqueado
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/mas.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  9], // Deshabilitar si es true
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isMusculoTrajeBloqueado[9] =
-                                                      !_isMusculoTrajeBloqueado[
-                                                          9]; // Cambiar el estado al tocar
-                                                });
-                                                print(
-                                                    "Imagen tocada en índice 4");
-                                              },
-                                              onLongPress: () {
-                                                print(
-                                                    "Imagen presionada prolongadamente");
-                                              },
-                                              child: SizedBox(
-                                                width: 70.0,
-                                                height: 70.0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.asset(
-                                                    _isMusculoTrajeBloqueado[9]
-                                                        ? 'assets/images/isquio_naranja.png' // Imagen alternativa si bloqueado
-                                                        : 'assets/images/isquio_blanco.png',
-                                                    // Imagen original
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: screenWidth * 0.01),
-                                            CustomIconButton(
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                              onTapDown: () {
-                                                print(
-                                                    "Botón presionado"); // Acción al presionar
-                                              },
-                                              onTapUp: () {
-                                                print(
-                                                    "Botón soltado"); // Acción al levantar
-                                              },
-                                              imagePath:
-                                                  'assets/images/menos.png',
-                                              size: 40.0,
-                                              isDisabled: _isMusculoTrajeBloqueado[
-                                                  9], // Deshabilitar si es true
-                                            ),
-                                          ],
-                                        ),
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow(
+                                        index: 9,
+                                        imagePathEnabled:
+                                            'assets/images/isquio_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/isquio_blanco.png',
                                       ),
                                     ]
                                   ],
@@ -3105,628 +1659,68 @@ class _PanelViewState extends State<PanelView>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     if (isSessionStarted) ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[0] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[0]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              0] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              0]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 0");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                0]
-                                                            ? 'assets/images/biceps_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/bicepsazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      _buildMuscleRow2(
+                                        index: 0,
+                                        imagePathEnabled:
+                                            'assets/images/biceps_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/bicepsazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[1] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[1]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              1] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              1]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 1");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                1]
-                                                            ? 'assets/images/abs_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/absazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 1,
+                                        imagePathEnabled:
+                                            'assets/images/abs_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/absazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[2] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[2]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              2] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              2]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 2");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                2]
-                                                            ? 'assets/images/cua_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/cuazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 2,
+                                        imagePathEnabled:
+                                            'assets/images/cua_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/cuazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[3] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[3]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              3] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              3]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 3");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                3]
-                                                            ? 'assets/images/gemelos_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/gemelosazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 3,
+                                        imagePathEnabled:
+                                            'assets/images/gemelos_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gemelosazul.png',
                                       ),
                                     ] else if (!isSessionStarted) ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[0] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[0]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              0] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              0]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 0");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                0]
-                                                            ? 'assets/images/biceps_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/biceps_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          0], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      _buildMuscleRow2(
+                                        index: 0,
+                                        imagePathEnabled:
+                                            'assets/images/biceps_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/biceps_blanco_pantalon.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[1] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[1]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              1] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              1]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 1");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                1]
-                                                            ? 'assets/images/abs_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/abs_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          1], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 1,
+                                        imagePathEnabled:
+                                            'assets/images/abs_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/abs_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[2] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[2]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              2] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              2]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 2");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                2]
-                                                            ? 'assets/images/cua_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/cua_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          2], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 2,
+                                        imagePathEnabled:
+                                            'assets/images/cua_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/cua_blanco_pantalon.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[3] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[3]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              3] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              3]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 3");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                3]
-                                                            ? 'assets/images/gemelos_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/gemelos_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[3] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          3], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 3,
+                                        imagePathEnabled:
+                                            'assets/images/gemelos_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gemelo_blanco_pantalon.png',
                                       ),
                                     ]
                                   ],
@@ -4371,22 +2365,24 @@ class _PanelViewState extends State<PanelView>
                                     ),
                                     Row(
                                       children: [
+                                        // Botón "Menos"
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {});
-                                          },
-                                          onTapDown: () {
-                                            print(
-                                                "Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print(
-                                                "Botón soltado"); // Acción al levantar
+                                            setState(() {
+                                              // Disminuir el porcentaje de los músculos no bloqueados
+                                              for (int i = 0; i < _isMusculoPantalonBloqueado.length; i++) {
+                                                if (!_isMusculoPantalonBloqueado[i]) {
+                                                  porcentajesMusculoPantalon[i] = (porcentajesMusculoPantalon[i] - 1).clamp(0, 100);
+                                                }
+                                              }
+                                            });
                                           },
                                           imagePath: 'assets/images/menos.png',
                                           size: screenHeight * 0.1,
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
+
+                                        // Botón de control de sesión (Reproducir/Pausar)
                                         GestureDetector(
                                           onTap: () {
                                             setState(() {
@@ -4397,23 +2393,17 @@ class _PanelViewState extends State<PanelView>
                                                 // Inicia o reanuda el temporizador si está pausado
                                                 _startTimer();
                                               }
-
-                                              // Alterna el estado de la sesión
-                                              isSessionStarted =
-                                                  !isSessionStarted;
-                                              print(
-                                                  'isSessionStarted: $isSessionStarted');
+                                              isSessionStarted = !isSessionStarted;
+                                              print('isSessionStarted: $isSessionStarted');
                                             });
                                           },
                                           child: AnimatedScale(
                                             scale: scaleFactorBack,
-                                            duration: const Duration(
-                                                milliseconds: 100),
+                                            duration: const Duration(milliseconds: 100),
                                             child: SizedBox(
                                               child: ClipOval(
                                                 child: Image.asset(
                                                   height: screenHeight * 0.15,
-                                                  // Cambia la imagen según el estado de isRunning
                                                   'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
                                                   fit: BoxFit.scaleDown,
                                                 ),
@@ -4422,495 +2412,77 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
+
+                                        // Botón "Más"
                                         CustomIconButton(
                                           onTap: () {
-                                            setState(() {});
-                                          },
-                                          onTapDown: () {
-                                            print(
-                                                "Botón presionado"); // Acción al presionar
-                                          },
-                                          onTapUp: () {
-                                            print(
-                                                "Botón soltado"); // Acción al levantar
+                                            setState(() {
+                                              // Aumentar el porcentaje de los músculos no bloqueados
+                                              for (int i = 0; i < _isMusculoPantalonBloqueado.length; i++) {
+                                                if (!_isMusculoPantalonBloqueado[i]) {
+                                                  porcentajesMusculoPantalon[i] = (porcentajesMusculoPantalon[i] + 1).clamp(0, 100);
+                                                }
+                                              }
+                                            });
                                           },
                                           imagePath: 'assets/images/mas.png',
                                           size: screenHeight * 0.1,
                                         ),
                                       ],
                                     )
+
                                   ],
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     if (isSessionStarted) ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[0] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[4]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              4] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              4]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 0");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                4]
-                                                            ? 'assets/images/lumbar_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/lumbarazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      _buildMuscleRow2(
+                                        index: 4,
+                                        imagePathEnabled:
+                                            'assets/images/lumbar_naranja_pantalon.png',
+                                        imagePathDisabled:
+                                            'assets/images/lumbar_pantalon_azul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[1] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[5]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          5], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              5] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              5]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 1");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                5]
-                                                            ? 'assets/images/gluteo_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/gluteoazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          5], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 5,
+                                        imagePathEnabled:
+                                            'assets/images/gluteo_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gluteoazul.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[2] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[6]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          6], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              6] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              6]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 2");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                6]
-                                                            ? 'assets/images/isquio_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/isquioazul.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          6], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 6,
+                                        imagePathEnabled:
+                                            'assets/images/isquio_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/isquioazul.png',
                                       ),
                                     ] else if (!isSessionStarted) ...[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[0] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[4]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              4] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              4]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 0");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                4]
-                                                            ? 'assets/images/lumbar_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/lumbar_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[0] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          4], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      _buildMuscleRow2(
+                                        index: 4,
+                                        imagePathEnabled:
+                                            'assets/images/lumbar_naranja_pantalon.png',
+                                        imagePathDisabled:
+                                            'assets/images/lumbar_blanco_pantalon.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[1] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[5]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          5], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              5] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              5]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 1");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                5]
-                                                            ? 'assets/images/gluteo_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/gluteo_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[1] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          5], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 5,
+                                        imagePathEnabled:
+                                            'assets/images/gluteo_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gluteo_blanco.png',
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          // Contenedor con fondo anaranjado cuando _isMusculoTrajeBloqueado[2] es true
-                                          Container(
-                                            color:
-                                                _isMusculoPantalonBloqueado[6]
-                                                    ? Color(0xFFFFA500)
-                                                        .withOpacity(0.3)
-                                                    : Colors.transparent,
-                                            // Fondo anaranjado transparente
-                                            child: Row(
-                                              children: [
-                                                // Botón "Mas" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/mas.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          6], // Deshabilitar si es true
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Imagen a la que se le hace el GestureDetector
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isMusculoPantalonBloqueado[
-                                                              6] =
-                                                          !_isMusculoPantalonBloqueado[
-                                                              6]; // Cambia el estado
-                                                    });
-                                                    print(
-                                                        "Imagen tocada en índice 2");
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 70.0,
-                                                    height: 70.0,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.asset(
-                                                        _isMusculoPantalonBloqueado[
-                                                                6]
-                                                            ? 'assets/images/isquio_naranja.png' // Imagen alternativa cuando es true
-                                                            : 'assets/images/isquio_blanco.png',
-                                                        // Imagen original
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: screenWidth * 0.01),
-                                                // Botón "Menos" - se deshabilita si _isMusculoTrajeBloqueado[2] es true
-                                                CustomIconButton(
-                                                  onTap: () {
-                                                    setState(() {});
-                                                  },
-                                                  imagePath:
-                                                      'assets/images/menos.png',
-                                                  size: 40.0,
-                                                  isDisabled:
-                                                      _isMusculoPantalonBloqueado[
-                                                          6], // Deshabilitar si es true
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(height: screenHeight * 0.005),
+                                      _buildMuscleRow2(
+                                        index: 6,
+                                        imagePathEnabled:
+                                            'assets/images/isquio_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/isquio_blanco_pantalon.png',
                                       ),
                                     ]
                                   ],
@@ -5365,6 +2937,180 @@ class _PanelViewState extends State<PanelView>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMuscleRow({
+    required int index,
+    required String imagePathEnabled,
+    required String imagePathDisabled,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          color: _isMusculoTrajeBloqueado[index]
+              ? Color(0xFFFFA500).withOpacity(0.3)
+              : Colors.transparent,
+          child: Row(
+            children: [
+              // Botón "Más"
+              CustomIconButton(
+                onTap: () {
+                  setState(() {
+                    if (!_isMusculoTrajeBloqueado[index]) {
+                      porcentajesMusculoTraje[index] =
+                          (porcentajesMusculoTraje[index] + 1).clamp(0, 100);
+                    }
+                  });
+                },
+                imagePath: 'assets/images/mas.png',
+                size: 40.0,
+                isDisabled: _isMusculoTrajeBloqueado[index],
+              ),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+
+              // Columna que contiene el GestureDetector y el porcentaje
+              Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isMusculoTrajeBloqueado[index] =
+                            !_isMusculoTrajeBloqueado[index];
+                      });
+                    },
+                    child: SizedBox(
+                      width: 70.0,
+                      height: 70.0,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          _isMusculoTrajeBloqueado[index]
+                              ? imagePathEnabled
+                              : imagePathDisabled,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Texto que muestra el porcentaje
+                  Text(
+                    '${porcentajesMusculoTraje[index]}%',
+                    style: const TextStyle(
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2be4f3),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+              // Botón "Menos"
+              CustomIconButton(
+                onTap: () {
+                  setState(() {
+                    if (!_isMusculoTrajeBloqueado[index]) {
+                      porcentajesMusculoTraje[index] =
+                          (porcentajesMusculoTraje[index] - 1).clamp(0, 100);
+                    }
+                  });
+                },
+                imagePath: 'assets/images/menos.png',
+                size: 40.0,
+                isDisabled: _isMusculoTrajeBloqueado[index],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMuscleRow2({
+    required int index,
+    required String imagePathEnabled,
+    required String imagePathDisabled,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          color: _isMusculoPantalonBloqueado[index]
+              ? Color(0xFFFFA500).withOpacity(0.3)
+              : Colors.transparent,
+          child: Row(
+            children: [
+              // Botón "Más"
+              CustomIconButton(
+                onTap: () {
+                  setState(() {
+                    if (!_isMusculoPantalonBloqueado[index]) {
+                      porcentajesMusculoPantalon[index] =
+                          (porcentajesMusculoPantalon[index] + 1).clamp(0, 100);
+                    }
+                  });
+                },
+                imagePath: 'assets/images/mas.png',
+                size: 40.0,
+                isDisabled: _isMusculoPantalonBloqueado[index],
+              ),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+
+              // Columna que contiene el GestureDetector y el porcentaje
+              Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isMusculoPantalonBloqueado[index] =
+                            !_isMusculoPantalonBloqueado[index];
+                      });
+                    },
+                    child: SizedBox(
+                      width: 70.0,
+                      height: 70.0,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          _isMusculoPantalonBloqueado[index]
+                              ? imagePathEnabled
+                              : imagePathDisabled,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Texto que muestra el porcentaje
+                  Text(
+                    '${porcentajesMusculoPantalon[index]}%',
+                    style: const TextStyle(
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2be4f3),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+              // Botón "Menos"
+              CustomIconButton(
+                onTap: () {
+                  setState(() {
+                    if (!_isMusculoPantalonBloqueado[index]) {
+                      porcentajesMusculoPantalon[index] =
+                          (porcentajesMusculoPantalon[index] - 1).clamp(0, 100);
+                    }
+                  });
+                },
+                imagePath: 'assets/images/menos.png',
+                size: 40.0,
+                isDisabled: _isMusculoPantalonBloqueado[index],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
