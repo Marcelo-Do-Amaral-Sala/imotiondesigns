@@ -140,6 +140,7 @@ flutter:
     - assets/images/pantalon_front.png
     - assets/images/pantalon_post.png
     - assets/images/lumbar_pantalon.png
+    - assets/images/biceps_azul_pantalon.png
     - assets/images/isquios_pantalon.png
     - assets/images/gluteos_shape.png
     - assets/images/gluteoinf_pantalon.png
@@ -205,6 +206,11 @@ flutter:
     - assets/images/isquio_blanco.png
     - assets/images/isquio_naranja.png
     - assets/images/lumbar_pantalon_azul.png
+    - assets/images/biceps_blanco_pantalon.png
+    - assets/images/cua_blanco_pantalon.png
+    - assets/images/gemelo_blanco_pantalon.png
+    - assets/images/lumbar_blanco_pantalon.png
+    - assets/images/isquio_blanco_pantalon.png
     - assets/images/avatar_frontal.png
     - assets/images/avatar_post.png
     - assets/images/pantalon_frontal.png
@@ -237,6 +243,35 @@ flutter:
     - assets/images/capa_biceps_azul_pantalon.png
     - assets/images/capa_cua_azul_pantalon.png
     - assets/images/capa_gem_azul_pantalon.png
+    - assets/images/capa_pec_blanco.png
+    - assets/images/capa_biceps_blanco.png
+    - assets/images/capa_abs_blanco.png
+    - assets/images/capa_cua_blanco.png
+    - assets/images/capa_gemelo_blanco.png
+    - assets/images/capa_trap_blanco.png
+    - assets/images/capa_dorsal_blanco.png
+    - assets/images/capa_lumbar_blanco.png
+    - assets/images/capa_gluteo_blanco.png
+    - assets/images/capa_isquio_blanco.png
+    - assets/images/capa_isquio_blanco_pantalon.png
+    - assets/images/capa_biceps_blanco_pantalon.png
+    - assets/images/capa_abs_inf_blanco.png
+    - assets/images/capa_abs_sup_blanco.png
+    - assets/images/capa_glut_sup_blanco.png
+    - assets/images/capa_glut_inf_blanco.png
+    - assets/images/capa_cua_blanco_pantalon.png
+    - assets/images/capa_gem_blanco_pantalon.png
+    - assets/images/capa_lumbar_blanco_pantalon.png
+    - assets/images/capa_abs_naranja.png
+    - assets/images/capa_pec_naranja.png
+    - assets/images/capa_biceps_naranja.png
+    - assets/images/capa_cua_naranja.png
+    - assets/images/capa_gemelos_naranja.png
+    - assets/images/capa_trap_naranja.png
+    - assets/images/capa_dorsal_naranja.png
+    - assets/images/capa_lumbar_naranja.png
+    - assets/images/capa_gluteo_naranja.png
+    - assets/images/capa_isquio_naranja.png
     - .env
     - assets/traducciones1.json
     - assets/videos/tutorial.mp4
