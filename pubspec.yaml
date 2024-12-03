@@ -272,6 +272,15 @@ flutter:
     - assets/images/capa_lumbar_naranja.png
     - assets/images/capa_gluteo_naranja.png
     - assets/images/capa_isquio_naranja.png
+    - assets/images/capa_isquio_naranja_pantalon.png
+    - assets/images/capa_biceps_naranja_pantalon.png
+    - assets/images/capa_abs_inf_naranja_pantalon.png
+    - assets/images/capa_abs_sup_naranja_pantalon.png
+    - assets/images/capa_glut_inf_naranja_pantalon.png
+    - assets/images/capa_glut_sup_naranja_pantalon.png
+    - assets/images/capa_gemelos_naranja_pantalon.png
+    - assets/images/capa_lumbar_naranja_pantalon.png
+    - assets/images/capa_cua_naranja_pantalon.png
     - .env
     - assets/traducciones1.json
     - assets/videos/tutorial.mp4
