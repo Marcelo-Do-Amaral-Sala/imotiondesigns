@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:imotion_designs/src/ajustes/form/licencia_form.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
 import 'package:imotion_designs/src/panel/views/panel_view.dart';
@@ -96,6 +97,9 @@ class _AppState extends State<App> {
     }
 
     return MaterialApp(
+      theme: ThemeData(
+        textTheme: GoogleFonts.oswaldTextTheme(),
+      ),
       home: Scaffold(
         body: viewToDisplay,
       ),
