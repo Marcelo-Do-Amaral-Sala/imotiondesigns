@@ -179,6 +179,7 @@ flutter:
     - assets/images/trap_blanco.png
     - assets/images/trap_naranja.png
     - assets/images/lumbar_gris.png
+    - assets/images/lumbar_gris_pantalon.png
     - assets/images/lumbar_blanco.png
     - assets/images/lumbar_naranja.png
     - assets/images/lumbar_naranja_pantalon.png
@@ -273,6 +274,16 @@ flutter:
     - assets/images/capa_lumbar_naranja.png
     - assets/images/capa_gluteo_naranja.png
     - assets/images/capa_isquio_naranja.png
+    - assets/images/capa_abs_gris.png
+    - assets/images/capa_pec_gris.png
+    - assets/images/capa_biceps_gris.png
+    - assets/images/capa_cua_gris.png
+    - assets/images/capa_gemelos_gris.png
+    - assets/images/capa_trap_gris.png
+    - assets/images/capa_dorsal_gris.png
+    - assets/images/capa_lumbar_gris.png
+    - assets/images/capa_gluteos_gris.png
+    - assets/images/capa_isquio_gris.png
     - assets/images/capa_isquio_naranja_pantalon.png
     - assets/images/capa_biceps_naranja_pantalon.png
     - assets/images/capa_abs_inf_naranja_pantalon.png
@@ -282,6 +293,15 @@ flutter:
     - assets/images/capa_gemelos_naranja_pantalon.png
     - assets/images/capa_lumbar_naranja_pantalon.png
     - assets/images/capa_cua_naranja_pantalon.png
+    - assets/images/capa_cua_gris_pantalon.png
+    - assets/images/capa_abs_inf_gris_pantalon.png
+    - assets/images/capa_abs_sup_gris_pantalon.png
+    - assets/images/capa_biceps_gris_pantalon.png
+    - assets/images/capa_isquio_gris_pantalon.png
+    - assets/images/capa_lumbar_gris_pantalon.png
+    - assets/images/capa_gemelos_gris_pantalon.png
+    - assets/images/capa_glut_inf_gris_pantalon.png
+    - assets/images/capa_glut_sup_gris_pantalon.png
     - .env
     - assets/traducciones1.json
     - assets/videos/tutorial.mp4
