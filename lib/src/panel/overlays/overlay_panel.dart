@@ -972,7 +972,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'DESCRIPCIÓN:',
                       style: TextStyle(
                         color: Colors.white,
@@ -983,7 +983,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                     SizedBox(height: screenHeight * 0.01),
                     Text(
                       descripcion,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
@@ -996,7 +996,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'EQUIPAMIENTO:',
                       style: TextStyle(
                         color: Colors.white,
@@ -1007,7 +1007,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                     SizedBox(height: screenHeight * 0.01),
                     Text(
                       tipoEquipamiento,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
@@ -1040,7 +1040,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                           children: [
                             // Encabezado de la tabla
                             TableRow(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Color(0xFF2be4f3),
                               ),
                               children: [
