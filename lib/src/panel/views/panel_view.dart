@@ -269,6 +269,7 @@ class _PanelViewState extends State<PanelView>
         allAutomaticPrograms =
             groupedPrograms; // Asigna los programas obtenidos a la lista
       });
+
     } catch (e) {
       print('Error fetching programs: $e');
     }
@@ -787,105 +788,127 @@ class _PanelViewState extends State<PanelView>
                                                     ],
                                                   ),
 
-                                                // Condicional: Si el programa seleccionado es INDIVIDUAL, muestra el primer programa de la lista
                                                 if (globalSelectedProgram ==
                                                         'INDIVIDUAL' &&
                                                     allIndividualPrograms
                                                         .isNotEmpty)
                                                   Column(
                                                     children: [
-                                                      // Mostrar el nombre del primer programa de la lista
+                                                      // Mostrar el nombre del programa seleccionado o el primer programa por defecto
                                                       Text(
-                                                          allIndividualPrograms[
-                                                                      0]
-                                                                  ['nombre'] ??
-                                                              "NOMBRE PROGRAMA",
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Color(
-                                                                0xFF2be4f3),
-                                                            fontSize: 15,
-                                                          )),
-                                                      // Mostrar la imagen del primer programa
-                                                      Image.asset(
-                                                        allIndividualPrograms[0]
-                                                                ['imagen'] ??
-                                                            'assets/images/cliente.png',
-                                                        // Muestra la imagen del programa o una por defecto
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.1,
-                                                        fit: BoxFit.contain,
+                                                        selectedIndivProgram != null
+                                                            ? selectedIndivProgram!['nombre'] ?? "NOMBRE PROGRAMA"
+                                                            : allIndividualPrograms.isNotEmpty
+                                                            ? allIndividualPrograms[0]['nombre'] ?? "NOMBRE PROGRAMA"
+                                                            : "No hay programas disponibles",
+                                                        style: const TextStyle(
+                                                          color: Color(0xFF2be4f3),
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+
+                                                      // Imagen del programa seleccionado o la imagen del primer programa por defecto
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            toggleOverlay(1);
+                                                          });
+                                                        },
+                                                        child: Image.asset(
+                                                          selectedIndivProgram != null
+                                                              ? selectedIndivProgram!['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : allIndividualPrograms.isNotEmpty
+                                                              ? allIndividualPrograms[0]['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : 'assets/images/cliente.png', // Imagen por defecto
+                                                          height: MediaQuery.of(context).size.height * 0.1,
+                                                          fit: BoxFit.contain,
+                                                        ),
                                                       ),
                                                     ],
                                                   )
+
                                                 else if (globalSelectedProgram ==
                                                         'RECOVERY' &&
-                                                    allIndividualPrograms
+                                                    allRecoveryPrograms
                                                         .isNotEmpty)
                                                   Column(
                                                     children: [
-                                                      // Mostrar el nombre del primer programa de la lista
+                                                      // Mostrar el nombre del programa seleccionado o el primer programa por defecto
                                                       Text(
-                                                          allRecoveryPrograms[0]
-                                                                  ['nombre'] ??
-                                                              "NOMBRE PROGRAMA",
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Color(
-                                                                0xFF2be4f3),
-                                                            fontSize: 15,
-                                                          )),
-                                                      // Mostrar la imagen del primer programa
-                                                      Image.asset(
-                                                        allRecoveryPrograms[0]
-                                                                ['imagen'] ??
-                                                            'assets/images/cliente.png',
-                                                        // Muestra la imagen del programa o una por defecto
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.1,
-                                                        fit: BoxFit.contain,
+                                                        selectedRecoProgram != null
+                                                              ? selectedRecoProgram!['nombre'] ?? "NOMBRE PROGRAMA"
+                                                            : allRecoveryPrograms.isNotEmpty
+                                                            ? allRecoveryPrograms[0]['nombre'] ?? "NOMBRE PROGRAMA"
+                                                            : "No hay programas disponibles",
+                                                        style: const TextStyle(
+                                                          color: Color(0xFF2be4f3),
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+
+                                                      // Imagen del programa seleccionado o la imagen del primer programa por defecto
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            toggleOverlay(2);
+                                                          });
+                                                        },
+                                                        child: Image.asset(
+                                                          selectedRecoProgram != null
+                                                              ? selectedRecoProgram!['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : allRecoveryPrograms.isNotEmpty
+                                                              ? allRecoveryPrograms[0]['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : 'assets/images/cliente.png', // Imagen por defecto
+                                                          height: MediaQuery.of(context).size.height * 0.1,
+                                                          fit: BoxFit.contain,
+                                                        ),
                                                       ),
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
-                                                        'AUTOMÁTICOS' &&
-                                                    allAutomaticPrograms
-                                                        .isNotEmpty)
-                                                  Column(
-                                                    children: [
-                                                      // Mostrar el nombre del primer programa de la lista
-                                                      Text(
-                                                          allAutomaticPrograms[
-                                                                      0][
-                                                                  'nombre_programa_automatico'] ??
-                                                              "NOMBRE PROGRAMA",
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Color(
-                                                                0xFF2be4f3),
+                                                      'AUTOMÁTICOS' &&
+                                                      allAutomaticPrograms
+                                                          .isNotEmpty)
+                                                    Column(
+                                                      children: [
+                                                        // Mostrar el nombre del programa seleccionado o el primer programa por defecto
+                                                        Text(
+                                                          selectedAutoProgram != null
+                                                              ? selectedAutoProgram!['nombre_programa_automatico'] ?? "NOMBRE PROGRAMA"
+                                                              : allAutomaticPrograms.isNotEmpty
+                                                              ? allAutomaticPrograms[0]['nombre_programa_automatico'] ?? "NOMBRE PROGRAMA"
+                                                              : "No hay programas disponibles",
+                                                          style: const TextStyle(
+                                                            color: Color(0xFF2be4f3),
                                                             fontSize: 15,
-                                                          )),
-                                                      // Mostrar la imagen del primer programa
-                                                      Image.asset(
-                                                        allAutomaticPrograms[0]
-                                                                ['imagen'] ??
-                                                            'assets/images/cliente.png',
-                                                        // Muestra la imagen del programa o una por defecto
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.1,
-                                                        fit: BoxFit.contain,
-                                                      ),
-                                                    ],
-                                                  ),
+                                                          ),
+                                                        ),
+
+                                                        // Imagen del programa seleccionado o la imagen del primer programa por defecto
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              toggleOverlay(3);
+                                                            });
+                                                          },
+                                                          child: Image.asset(
+                                                            selectedAutoProgram != null
+                                                                ? selectedAutoProgram!['imagen'] ??
+                                                                'assets/images/cliente.png'
+                                                                : allAutomaticPrograms.isNotEmpty
+                                                                ? allAutomaticPrograms[0]['imagen'] ??
+                                                                'assets/images/cliente.png'
+                                                                : 'assets/images/cliente.png', // Imagen por defecto
+                                                            height: MediaQuery.of(context).size.height * 0.1,
+                                                            fit: BoxFit.contain,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
                                               ],
                                             ),
                                             SizedBox(
@@ -3969,7 +3992,7 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                   SizedBox(
                                                       height:
-                                                      screenHeight * 0.02),
+                                                          screenHeight * 0.02),
                                                   buildControlRow(
                                                     value: valuePause,
                                                     // Valor de pausa
@@ -4010,25 +4033,25 @@ class _PanelViewState extends State<PanelView>
                                                     value: valueRampa,
                                                     // Valor de pausa
                                                     imagePathIncrement:
-                                                    'assets/images/mas.png',
+                                                        'assets/images/mas.png',
                                                     // Imagen del botón de "Más"
                                                     imagePathDecrement:
-                                                    'assets/images/menos.png',
+                                                        'assets/images/menos.png',
                                                     // Imagen del botón de "Menos"
                                                     imagePathDisplay:
-                                                    'assets/images/RAMPA.png',
+                                                        'assets/images/RAMPA.png',
                                                     // Imagen que se muestra (Pausa)
                                                     onIncrement: () {
                                                       setState(() {
                                                         valueRampa +=
-                                                        1.0; // Lógica de incremento
+                                                            1.0; // Lógica de incremento
                                                       });
                                                     },
                                                     onDecrement: () {
                                                       setState(() {
                                                         if (valueRampa > 0) {
                                                           valueRampa -=
-                                                          1.0; // Lógica de decremento
+                                                              1.0; // Lógica de decremento
                                                         }
                                                       });
                                                     },
@@ -4037,7 +4060,7 @@ class _PanelViewState extends State<PanelView>
                                                     screenWidth: screenWidth,
                                                     // Ancho de pantalla
                                                     screenHeight:
-                                                    screenHeight, // Altura de pantalla
+                                                        screenHeight, // Altura de pantalla
                                                   ),
                                                 ],
                                               ),
@@ -4114,12 +4137,10 @@ class _PanelViewState extends State<PanelView>
           ),
           if (isOverlayVisible)
             Positioned(
-              // Aplica medidas personalizadas solo para el overlay 3
-              top: screenHeight * 0.3,
-              // Puedes ajustar estos valores como quieras
-              bottom: screenHeight * 0.3,
-              left: screenWidth * 0.3,
-              right: screenWidth * 0.3,
+              top: overlayIndex == 0 ?  screenHeight * 0.3 : 0,
+              bottom: overlayIndex == 0 ?  screenHeight * 0.3 : 0,
+              left: overlayIndex == 0 ? screenWidth * 0.3 : 0,
+              right: overlayIndex == 0 ?  screenWidth * 0.3 : 0,
               child: Align(
                 alignment: Alignment.center,
                 child: _getOverlayWidget(overlayIndex),
@@ -4135,6 +4156,15 @@ class _PanelViewState extends State<PanelView>
       case 0:
         return OverlayTipoPrograma(
           onClose: () => toggleOverlay(0),
+        );  case 1:
+        return OverlaySeleccionarProgramaIndividual(
+          onClose: () => toggleOverlay(1),
+        );case 2:
+        return OverlaySeleccionarProgramaRecovery(
+          onClose: () => toggleOverlay(2),
+        );case 3:
+        return OverlaySeleccionarProgramaAutomatic(
+          onClose: () => toggleOverlay(3),
         );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada
