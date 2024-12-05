@@ -16,16 +16,24 @@ class LinePainter extends CustomPainter {
       ..color = Colors.lightGreenAccent.shade400 // Color verde para el relleno
       ..style = PaintingStyle.fill;
 
+    double cornerRadius = strokeHeight / 5; // El radio de las esquinas redondeadas
+
     // Dibuja la barra de fondo (inicialmente vacía)
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
+        Radius.circular(cornerRadius),
+      ),
       backgroundPaint,
     );
 
     // Dibuja el progreso (barra verde)
     double progressWidth = size.width * progress; // Calcula el ancho basado en el progreso
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
+        Radius.circular(cornerRadius),
+      ),
       progressPaint,
     );
   }
@@ -49,19 +57,27 @@ class LinePainter2 extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     Paint progressPaint = Paint()
-      ..color = Colors.red// Color verde para el relleno
+      ..color = Colors.red // Color rojo para el relleno
       ..style = PaintingStyle.fill;
 
+    double cornerRadius = strokeHeight / 5; // El radio de las esquinas redondeadas
+
     // Dibuja la barra de fondo (inicialmente vacía)
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
+        Radius.circular(cornerRadius),
+      ),
       backgroundPaint,
     );
 
-    // Dibuja el progreso (barra verde)
+    // Dibuja el progreso (barra roja)
     double progressWidth = size.width * progress; // Calcula el ancho basado en el progreso
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
+        Radius.circular(cornerRadius),
+      ),
       progressPaint,
     );
   }
