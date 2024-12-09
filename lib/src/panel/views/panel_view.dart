@@ -23,7 +23,12 @@ class PanelView extends StatefulWidget {
 class _PanelViewState extends State<PanelView>
     with SingleTickerProviderStateMixin {
   late BleConnectionService bleConnectionService;
+
+  bool isDisconnected=true;
   bool isConnected = false;
+  bool isActive=false;
+  bool isTimeless=false;
+  String connectionStatus = "desconectado";
 
   String? selectedProgram;
   List<Map<String, dynamic>> allIndividualPrograms = [];
@@ -197,12 +202,15 @@ class _PanelViewState extends State<PanelView>
     _fetchAutoPrograms();
   }
 
-  void _clearGlobalProgram() {
+  void _clearGlobals() {
     setState(() {
       globalSelectedProgram = null;
+      selectedClientsGlobal = [];
     });
   }
-  
+
+
+
   Future<void> _fetchClients() async {
     final dbHelper = DatabaseHelper();
     try {
@@ -424,6 +432,10 @@ class _PanelViewState extends State<PanelView>
                                         onTap: () {
                                           bleConnectionService
                                               ._connectToDevice();
+                                          setState(() {
+                                            isConnected = !isConnected;  // Alterna entre conectado y desconectado
+                                            connectionStatus = isConnected ? 'conectado' : 'desconectado';
+                                          });
                                         },
                                         child: Padding(
                                           padding:
@@ -434,14 +446,9 @@ class _PanelViewState extends State<PanelView>
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                  color:
-                                                  const Color(0xFF28E2F5),
-                                                  width: 1,
+                                                  color: _getBorderColor(connectionStatus),
+                                                  width: 4,
                                                 ),
-                                                color: isConnected
-                                                    ? Colors.green
-                                                    : Colors.transparent,
-                                                // Cambia el color según la conexión
                                                 borderRadius:
                                                 BorderRadius.circular(7),
                                               ),
@@ -4716,7 +4723,7 @@ class _PanelViewState extends State<PanelView>
                     ),
                     OutlinedButton(
                       onPressed: () {
-                        _clearGlobalProgram();
+                        _clearGlobals();
                         bleConnectionService.dispose(); // Llamar al método dispose de tu servicio BLE
                         widget.onReset();
                         Navigator.of(context).pop();
@@ -4802,7 +4809,7 @@ class _PanelViewState extends State<PanelView>
                     ),
                     OutlinedButton(
                       onPressed: () {
-                        _clearGlobalProgram();
+                        _clearGlobals();
                         bleConnectionService.dispose();
                         widget.onBack();
                         Navigator.of(context).pop();
@@ -4826,6 +4833,21 @@ class _PanelViewState extends State<PanelView>
   }
   String formatNumber(double number) {
     return number % 1 == 0 ? number.toInt().toString() : number.toStringAsFixed(2);
+  }
+
+  Color _getBorderColor(String status) {
+    switch (status) {
+      case 'conectado':
+        return  Color(0xFF2be4f3); // Color para el estado "conectado"
+      case 'desconectado':
+        return Colors.grey; // Color para el estado "desconectado"
+      case 'inactivo':
+        return Colors.white; // Color para el estado "inactivo"
+      case 'sinTiempo':
+        return Colors.orange; // Color para el estado "sin tiempo"
+      default:
+        return Colors.grey; // Color predeterminado (gris si no coincide con ningún estado)
+    }
   }
 
 
@@ -5236,6 +5258,7 @@ class _CustomIconButtonState extends State<CustomIconButton> {
     );
   }
 }
+
 
 class BleConnectionService {
   // Variables de estado
