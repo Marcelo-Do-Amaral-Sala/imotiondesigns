@@ -4452,8 +4452,6 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
           'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
     }
 
-    // Imprime el tipo de equipamiento
-    print('Cronaxia para el tipo de equipamiento: $tipoEquipamiento');
 
     // Realiza la consulta en la base de datos
     List<Map<String, dynamic>> cronaxias = await db.query(
@@ -4462,13 +4460,10 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       whereArgs: [tipoEquipamiento], // Argumento del filtro
     );
 
-    // Imprime el resultado de la consulta
-    print('Grupos musculares obtenidos: ${cronaxias.length} elementos.');
 
     // Itera sobre los resultados e imprime cada grupo muscular y su tipo de equipamiento
     for (var grupo in cronaxias) {
-      print(
-          'INSERTADO "${grupo['nombre']}" TIPO "${grupo['tipo_equipamiento']}"');
+
     }
 
     return cronaxias;

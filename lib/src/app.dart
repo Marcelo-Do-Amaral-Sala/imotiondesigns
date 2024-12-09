@@ -20,10 +20,14 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   String currentView = 'mainMenu';
+  Key? panelViewKey = UniqueKey(); // Clave única solo para PanelView
 
   void navigateTo(String view) {
     setState(() {
       currentView = view;
+      if (view == 'panel') {
+        panelViewKey = UniqueKey(); // Generar una nueva clave si es PanelView
+      }
     });
   }
 
@@ -34,52 +38,43 @@ class _AppState extends State<App> {
     switch (currentView) {
       case 'panel':
         viewToDisplay = PanelView(
-          onBack: () =>
-              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+          key: panelViewKey, // Usar la clave única para PanelView
+          onBack: () => navigateTo('mainMenu'),
+          onReset: () => navigateTo('panel'), // Manejo de reinicio solo para Panel
         );
         break;
       case 'clients':
         viewToDisplay = ClientsView(
-          onBack: () =>
-              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+          onBack: () => navigateTo('mainMenu'),
         );
         break;
-
       case 'programs':
         viewToDisplay = ProgramsMenuView(
-          onBack: () =>
-              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+          onBack: () => navigateTo('mainMenu'),
         );
         break;
       case 'tutoriales':
         viewToDisplay = TutorialesMenuView(
-          onBack: () =>
-              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+          onBack: () => navigateTo('mainMenu'),
         );
         break;
       case 'ajustes':
         viewToDisplay = AjustesMenuView(
-          onBack: () =>
-              navigateTo('mainMenu'), // Callback para volver a MainMenuView
+          onBack: () => navigateTo('mainMenu'),
           onNavigatetoLicencia: () => navigateTo('licencia'),
           onNavigatetoGestion: () => navigateTo('gestion'),
         );
         break;
-
       case 'gestion':
         viewToDisplay = GestionMenuView(
-          onBack: () =>
-              navigateTo('ajustes'), // Callback para volver a MainMenuView
+          onBack: () => navigateTo('ajustes'),
         );
         break;
-
       case 'licencia':
         viewToDisplay = LicenciaFormView(
-          onBack: () =>
-              navigateTo('ajustes'), // Callback para volver a MainMenuView
+          onBack: () => navigateTo('ajustes'),
         );
         break;
-
       case 'mainMenu':
       default:
         viewToDisplay = MainMenuView(
@@ -90,10 +85,6 @@ class _AppState extends State<App> {
           onNavigateToTutoriales: () => navigateTo('tutoriales'),
         );
         break;
-      /* case 'json':
-      default:
-        viewToDisplay=UploadJsonView();
-        break;*/
     }
 
     return MaterialApp(
@@ -106,3 +97,4 @@ class _AppState extends State<App> {
     );
   }
 }
+

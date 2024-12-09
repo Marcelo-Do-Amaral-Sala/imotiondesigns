@@ -4,6 +4,7 @@ import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 
 String? globalSelectedProgram;
+String? globalSelectedClient;
 
 class OverlayTipoPrograma extends StatefulWidget {
   final VoidCallback onClose;
@@ -929,6 +930,7 @@ class _OverlaySeleccionarProgramaAutomaticState
 
   void _showProgramDetailsDialog(BuildContext context,
       Map<String, dynamic> program, double screenHeight, double screenWidth) {
+    var duracion = program['duracionTotal'] ?? 'Sin descripción';
     String descripcion =
         program['descripcion_programa_automatico'] ?? 'Sin descripción';
     String tipoEquipamiento =
@@ -947,7 +949,7 @@ class _OverlaySeleccionarProgramaAutomaticState
           ),
           backgroundColor: const Color(0xFF2E2E2E),
           child: Container(
-            width: screenWidth * 0.7,  // Ajusta el tamaño del contenedor
+            width: screenWidth * 0.7, // Ajusta el tamaño del contenedor
             constraints: BoxConstraints(
               maxHeight: screenHeight * 0.7, // Fijar altura máxima
             ),
@@ -969,6 +971,28 @@ class _OverlaySeleccionarProgramaAutomaticState
                 SizedBox(height: screenHeight * 0.03),
 
                 // Sección de DESCRIPCIÓN
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'DURACIÓN:',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.01),
+                    Text(
+                      '${formatNumber(duracion)} min',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: screenHeight * 0.02),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1027,7 +1051,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                 SizedBox(height: screenHeight * 0.02),
 
                 if (subprogramas.isNotEmpty)
-                // ScrollView para la tabla
+                  // ScrollView para la tabla
                   Expanded(
                     child: SingleChildScrollView(
                       child: Container(
@@ -1052,7 +1076,8 @@ class _OverlaySeleccionarProgramaAutomaticState
                             ),
                             // Filas de los subprogramas
                             ...subprogramas.map((subprograma) {
-                              String subnombre = subprograma['nombre'] ?? 'Sin nombre';
+                              String subnombre =
+                                  subprograma['nombre'] ?? 'Sin nombre';
                               double subduracion = subprograma['duracion'] ?? 0;
                               double subajuste = subprograma['ajuste'] ?? 0;
                               int suborden = subprograma['orden'] ?? 0;
@@ -1081,7 +1106,8 @@ class _OverlaySeleccionarProgramaAutomaticState
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.all(10.0),
-                      side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                      side: const BorderSide(
+                          width: 1.0, color: Color(0xFF2be4f3)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(7),
                       ),
@@ -1105,7 +1131,9 @@ class _OverlaySeleccionarProgramaAutomaticState
       },
     );
   }
-
+  String formatNumber(double number) {
+    return number % 1 == 0 ? number.toInt().toString() : number.toStringAsFixed(2);
+  }
   Widget _tableCell(String text) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -1119,5 +1147,297 @@ class _OverlaySeleccionarProgramaAutomaticState
       ),
     );
   }
+}
 
+Map<String, dynamic>?
+    selectedClient; // Variable global para el programa seleccionado
+// Lista global de clientes seleccionados
+List<Map<String, dynamic>> selectedClientsGlobal = [];
+
+class OverlaySeleccionarCliente extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlaySeleccionarCliente({super.key, required this.onClose});
+
+  @override
+  _OverlaySeleccionarClienteState createState() =>
+      _OverlaySeleccionarClienteState();
+}
+
+class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
+    with SingleTickerProviderStateMixin {
+  List<Map<String, dynamic>> allClients = [];
+  List<Map<String, dynamic>> filteredClients = []; // Lista filtrada
+  final TextEditingController _clientNameController = TextEditingController();
+  String selectedOption = 'Todos';
+  List<Map<String, dynamic>> selectedClients =
+      []; // Lista de clientes seleccionados
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClients();
+    _clientNameController.addListener(_filterClients);
+  }
+
+  Future<void> _fetchClients() async {
+    final dbHelper = DatabaseHelper();
+    try {
+      final clientData = await dbHelper.getClients();
+      setState(() {
+        allClients = clientData; // Asigna a la lista original
+        filteredClients = allClients; // Inicializa la lista filtrada
+      });
+      _filterClients(); // Filtra para mostrar todos los clientes
+    } catch (e) {
+      print('Error fetching clients: $e');
+    }
+  }
+
+  void _filterClients() {
+    setState(() {
+      String searchText = _clientNameController.text.toLowerCase();
+
+      filteredClients = allClients.where((client) {
+        final matchesName = client['name']!.toLowerCase().contains(searchText);
+        // Filtra por estado basado en la selección del dropdown
+        final matchesStatus =
+            selectedOption == 'Todos' || client['status'] == selectedOption;
+
+        return matchesName && matchesStatus;
+      }).toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return MainOverlay(
+      title: const Text(
+        "SELECCIONAR CLIENTE",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF2be4f3),
+        ),
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildTextField(
+                    'NOMBRE', _clientNameController, 'Ingrese nombre'),
+                SizedBox(width: screenWidth * 0.05),
+                _buildDropdown(),
+              ],
+            ),
+            SizedBox(height: screenHeight * 0.03),
+            _buildDataTable(screenHeight, screenWidth),
+          ],
+        ),
+      ),
+      onClose: widget.onClose,
+    );
+  }
+
+  Widget _buildTextField(
+      String label, TextEditingController controller, String hint) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF313030),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                filled: true,
+                fillColor: const Color(0xFF313030),
+                isDense: true,
+                hintText: hint,
+                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdown() {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('ESTADO',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF313030),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: DropdownButton<String>(
+              value: selectedOption,
+              items: const [
+                DropdownMenuItem(
+                    value: 'Todos',
+                    child: Text('Todos',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                DropdownMenuItem(
+                    value: 'Activo',
+                    child: Text('Activo',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                DropdownMenuItem(
+                    value: 'Inactivo',
+                    child: Text('Inactivo',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedOption = value!;
+                  _filterClients(); // Filtrar después de seleccionar
+                });
+              },
+              dropdownColor: const Color(0xFF313030),
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: Color(0xFF2be4f3), size: 30),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataTable(double screenHeight, double screenWidth) {
+    return Flexible(
+      child: Container(
+        width: screenWidth,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 46, 46, 46),
+          borderRadius: BorderRadius.circular(7.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              // Encabezado fijo
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildHeaderCell('ID'),
+                  _buildHeaderCell('NOMBRE'),
+                  _buildHeaderCell('TELÉFONO'),
+                  _buildHeaderCell('ESTADO'),
+                ],
+              ),
+              const SizedBox(height: 10), // Espaciado entre encabezado y filas
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: filteredClients.map((client) {
+                      return Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // Guardar el cliente seleccionado en la lista global
+                              setState(() {
+                                selectedClient = client;
+                              });
+
+                              // Agregar el cliente a la lista global
+                              if (!selectedClientsGlobal.contains(client)) {
+                                selectedClientsGlobal.add(client);
+                              }
+
+                              print('Cliente seleccionado: ${client['name']}');
+                              widget.onClose(); // Cerrar el overlay
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                border: Border.all(
+                                  color: const Color.fromARGB(255, 3, 236, 244),
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _buildDataCell(
+                                      client['id']?.toString() ?? ''),
+                                  _buildDataCell(client['name'] ?? ''),
+                                  _buildDataCell(
+                                      client['phone']?.toString() ?? ''),
+                                  _buildDataCell(client['status'] ?? ''),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20), // Espaciado entre filas
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderCell(String text) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDataCell(String text) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+        ),
+      ),
+    );
+  }
 }
