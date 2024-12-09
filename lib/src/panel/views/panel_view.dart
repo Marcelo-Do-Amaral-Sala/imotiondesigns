@@ -208,7 +208,7 @@ class _PanelViewState extends State<PanelView>
       selectedClientsGlobal = [];
     });
   }
-
+  
 
 
   Future<void> _fetchClients() async {
@@ -443,26 +443,22 @@ class _PanelViewState extends State<PanelView>
                                           child: SizedBox(
                                             width: screenWidth * 0.1,
                                             height: screenHeight * 0.1,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: _getBorderColor(connectionStatus),
-                                                  width: 4,
+                                            child: CustomPaint(
+                                              painter: NeonBorderPainter(neonColor: _getBorderColor(connectionStatus)),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.transparent, // Fondo transparente
+                                                  borderRadius: BorderRadius.circular(7), // Bordes redondeados
                                                 ),
-                                                borderRadius:
-                                                BorderRadius.circular(7),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  selectedClientsGlobal.isEmpty
-                                                      ? '' // Si la lista está vacía, mostrar un texto vacío
-                                                      : selectedClientsGlobal[0]
-                                                  ['name'] ??
-                                                      'No Name',
-                                                  // Si la lista tiene elementos, mostrar el nombre del primer cliente
-                                                  style: const TextStyle(
-                                                    fontSize: 17,
-                                                    color: Color(0xFF28E2F5),
+                                                child: Center(
+                                                  child: Text(
+                                                    selectedClientsGlobal.isEmpty
+                                                        ? '' // Si la lista está vacía, mostrar un texto vacío
+                                                        : selectedClientsGlobal[0]['name'] ?? 'No Name', // Si la lista tiene elementos, mostrar el nombre del primer cliente
+                                                    style: const TextStyle(
+                                                      fontSize: 17,
+                                                      color: Color(0xFF28E2F5), // Color del texto
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -5462,3 +5458,31 @@ class BleConnectionService {
 
   bool get isConnected => _connected;
 }
+
+
+class NeonBorderPainter extends CustomPainter {
+  final Color neonColor;
+
+  NeonBorderPainter({required this.neonColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = neonColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..maskFilter = MaskFilter.blur(BlurStyle.solid, 5); // Efecto de resplandor hacia afuera
+
+    final Rect rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final RRect roundedRect = RRect.fromRectAndRadius(rect, Radius.circular(7));
+
+    canvas.drawRRect(roundedRect, paint); // Dibuja el borde con resplandor
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+
