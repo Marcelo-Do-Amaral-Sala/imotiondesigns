@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:platform/platform.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../servicios/licencia_state.dart';
 import '../custom/licencia_table_widget.dart';
 
 class LicenciaFormView extends StatefulWidget {
@@ -26,15 +29,35 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   List<Map<String, dynamic>> allLicencias = []; // Lista original de clientes
-  List<String> licenciaData = [];
-  String mac = '';       // Para almacenar el valor de MAC
-  String macBle = '';    // Para almacenar el valor de MAC BLE
+  Map<String, dynamic> licenciaData =
+      {}; // Mapa para almacenar la respuesta de la licencia
+  List<String> macList = []; // Para almacenar las MACs
+  List<String> macBleList = []; // Para almacenar las MACs BLE
   String bloqueada = ''; // Para almacenar si la licencia está bloqueada
+  bool _isLicenciaValida = false;
 
   @override
   void initState() {
     super.initState();
+    // Cargar el estado desde AppState
+    AppState.instance.loadState().then((_) {
+      // Una vez cargado el estado, actualizamos la UI
+      setState(() {
+        // Los controladores ahora contienen los valores cargados desde SharedPreferences
+        _nLicenciaController.text = AppState.instance.nLicencia;
+        _nameController.text = AppState.instance.nombre;
+        _adressController.text = AppState.instance.direccion;
+        _cityController.text = AppState.instance.ciudad;
+        _provinciaController.text = AppState.instance.provincia;
+        _countryController.text = AppState.instance.pais;
+        _phoneController.text = AppState.instance.telefono;
+        _emailController.text = AppState.instance.email;
+      });
+    });
   }
+
+
+
 
   // Método para detectar el sistema operativo
   String detectarSO() {
@@ -129,47 +152,101 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     return wres;
   }
 
-  // Método para validar la licencia usando POST
   Future<void> _validarLicencia() async {
-    // 1. Generamos la cadena de licencia
+    // 1. Generar la cadena de licencia
     String cadenaLicencia = generarCadenaLicencia();
+    print("Cadena de licencia generada: $cadenaLicencia");
 
-    // 2. Encriptamos la cadena de licencia
+    // 2. Encriptar la cadena de licencia
     String cadenaEncriptada = encrip(cadenaLicencia);
+    print("Cadena encriptada: $cadenaEncriptada");
 
-    // 3. Codificamos la cadena encriptada para enviarla como parte de la URL
+    // 3. Codificar la cadena encriptada para enviarla como parte de la URL
     String cadenaCodificada = Uri.encodeFull(cadenaEncriptada);
-
-    // URL para la validación (con el parámetro 'a' directamente en la URL)
     String url = "https://imotionems.es/lic2.php?a=$cadenaCodificada";
-
-    print("Enviando solicitud POST a la URL: $url");
+    print("URL de validación enviada: $url");
 
     try {
-      final response = await http.post(
-        Uri.parse(url), // La URL con el parámetro 'a'
-      );
+      final response = await http.post(Uri.parse(url));
 
       if (response.statusCode == 200) {
         // Aquí procesamos la respuesta del servidor
         String respuesta = response.body;
-        print('Respuesta del servidor: $respuesta');
-        List<String> parsedData = respuesta.split('|');
+        print("Respuesta recibida del servidor: $respuesta");
 
-        // Actualizamos el estado con solo los datos relevantes
+        // Verificar si la respuesta está vacía o tiene datos válidos
+        if (respuesta.isEmpty) {
+          print("La respuesta del servidor está vacía.");
+          return;
+        }
+
+        // Dividimos la respuesta en partes
+        List<String> parsedData = respuesta.split('|');
+        print("Datos divididos (parsedData): $parsedData");
+
+        // Limpiar las listas antes de agregar nuevos datos
+        macList.clear();
+        macBleList.clear();
+        licenciaData.clear();
+
+        // Iteramos sobre los datos para extraer la información relevante
+        for (int i = 0; i < parsedData.length; i++) {
+          String entry = parsedData[i];
+          print("Procesando entrada $i: $entry");
+
+          if (entry.contains('=')) {
+            String key = entry.split('=')[0];
+            String value = entry.split('=')[1];
+            print("Clave: $key, Valor: $value");
+
+            // Añadir a las listas o mapas según el tipo de dato
+            if (key.contains("mac")) {
+              macList.add(value);
+              print("MAC encontrada: $value");
+            } else if (key.contains("macble")) {
+              macBleList.add(value);
+              print("MAC BLE encontrada: $value");
+            } else if (key == 'bloqueada') {
+              bloqueada = value == '1' ? 'Sí' : 'No';
+              print("Estado de bloqueada: $bloqueada");
+            } else {
+              licenciaData[key] = value;
+              print("Otro dato encontrado: $key = $value");
+            }
+          }
+        }
+
+        // Después de procesar los datos, actualizamos el estado
         setState(() {
-          mac = parsedData[1];             // MAC
-          macBle = parsedData[27];         // MAC BLE
-          bloqueada = parsedData[15] == '1' ? 'Sí' : 'No';  // Bloqueada (1 es sí, 0 es no)
+          _isLicenciaValida = true; // Marca la licencia como válida
         });
+
+        // Guardar el estado utilizando AppState
+        AppState.instance.nLicencia = _nLicenciaController.text;
+        AppState.instance.nombre = _nameController.text;
+        AppState.instance.direccion = _adressController.text;
+        AppState.instance.ciudad = _cityController.text;
+        AppState.instance.provincia = _provinciaController.text;
+        AppState.instance.pais = _countryController.text;
+        AppState.instance.telefono = _phoneController.text;
+        AppState.instance.email = _emailController.text;
+        AppState.instance.isLicenciaValida = _isLicenciaValida;
+        AppState.instance.macList = macList;
+        AppState.instance.macBleList = macBleList;
+        AppState.instance.bloqueada = bloqueada;
+        AppState.instance.licenciaData = licenciaData;
+
+        // Guardar los datos en SharedPreferences
+        await AppState.instance.saveState();
+
       } else {
-        print(
-            'Error al validar licencia. Código de estado: ${response.statusCode}');
+        print("Error al validar la licencia. Código de estado: ${response.statusCode}");
       }
     } catch (e) {
-      print('Excepción: $e');
+      print('Excepción al validar la licencia: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -444,27 +521,44 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                         SizedBox(height: screenHeight * 0.05),
                         // OutlinedButton debajo de los dos Expanded
                         Center(
-                          child: OutlinedButton(
-                            onPressed: _validarLicencia,
-                            // Mantener vacío para que InkWell funcione
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.all(10.0),
-                              side: const BorderSide(
-                                  width: 1.0, color: Color(0xFF2be4f3)),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              OutlinedButton(
+                                onPressed: _validarLicencia,
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.all(10.0),
+                                  side: const BorderSide(
+                                      width: 1.0, color: Color(0xFF2be4f3)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(7),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                ),
+                                child: const Text(
+                                  'VALIDAR LICENCIA',
+                                  style: TextStyle(
+                                    color: Color(0xFF2be4f3),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                              backgroundColor: Colors.transparent,
-                            ),
-                            child: const Text(
-                              'VALIDAR LICENCIA',
-                              style: TextStyle(
-                                color: Color(0xFF2be4f3),
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                              // Si la licencia es válida, mostrar el mensaje
+                              if (AppState.instance.isLicenciaValida)
+                                const Padding(
+                                  padding: const EdgeInsets.only(left: 20.0),
+                                  child: Text(
+                                    'LICENCIA VALIDADA',
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ],
@@ -487,16 +581,6 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                             color: Color(0xFF2be4f3),
                           ),
                           textAlign: TextAlign.center,
-                        ),
-                        mac.isEmpty
-                            ? CircularProgressIndicator()  // Muestra un indicador de carga si no hay datos
-                            : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('MAC: $mac', style: TextStyle(color:Colors.white),),
-                            Text('MAC BLE: $macBle',style: TextStyle(color:Colors.white)),
-                            Text('Licencia Bloqueada: $bloqueada',style: TextStyle(color:Colors.white)),
-                          ],
                         ),
                         Expanded(
                           // Asegura que el Container ocupe el espacio restante
