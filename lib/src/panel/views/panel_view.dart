@@ -183,7 +183,8 @@ class _PanelViewState extends State<PanelView>
     // Escuchar el estado de la conexión
     bleConnectionService.connectionStateStream.listen((connected) {
       setState(() {
-        isConnected = connected; // Actualiza el estado de la conexión
+        isConnected = connected;  // Actualiza si estamos conectados
+        connectionStatus = connected ? 'conectado' : 'desconectado'; // Actualiza el estado del texto
       });
     });
     // Crear el controlador de animación de opacidad
@@ -421,48 +422,37 @@ class _PanelViewState extends State<PanelView>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       GestureDetector(
-                                        onTap: () {
-                                          bleConnectionService
-                                              ._connectToDevice();
+                                        onTap: () async {
+                                          // Intenta conectar al dispositivo y espera el resultado
+                                          bool success = await bleConnectionService._connectToDevice();
+
+                                          // Si la conexión fue exitosa, cambia el estado
                                           setState(() {
-                                            isConnected =
-                                                !isConnected; // Alterna entre conectado y desconectado
-                                            connectionStatus = isConnected
-                                                ? 'conectado'
-                                                : 'desconectado';
+                                            isConnected = success;
+                                            connectionStatus = success ? 'conectado' : 'desconectado';
                                           });
                                         },
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 10),
+                                          padding: const EdgeInsets.only(right: 10),
                                           child: SizedBox(
                                             width: screenWidth * 0.1,
                                             height: screenHeight * 0.1,
                                             child: CustomPaint(
                                               painter: NeonBorderPainter(
-                                                  neonColor: _getBorderColor(
-                                                      connectionStatus)),
+                                                  neonColor: _getBorderColor(connectionStatus)),
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  color: Colors.transparent,
-                                                  // Fondo transparente
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          7), // Bordes redondeados
+                                                  color: Colors.transparent, // Fondo transparente
+                                                  borderRadius: BorderRadius.circular(7), // Bordes redondeados
                                                 ),
                                                 child: Center(
                                                   child: Text(
-                                                    selectedClientsGlobal
-                                                            .isEmpty
+                                                    selectedClientsGlobal.isEmpty
                                                         ? '' // Si la lista está vacía, mostrar un texto vacío
-                                                        : selectedClientsGlobal[
-                                                                0]['name'] ??
-                                                            'No Name',
-                                                    // Si la lista tiene elementos, mostrar el nombre del primer cliente
+                                                        : selectedClientsGlobal[0]['name'] ?? 'No Name',
                                                     style: const TextStyle(
                                                       fontSize: 17,
-                                                      color: Color(
-                                                          0xFF28E2F5), // Color del texto
+                                                      color: Color(0xFF28E2F5), // Color del texto
                                                     ),
                                                   ),
                                                 ),
@@ -471,6 +461,7 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                         ),
                                       ),
+
                                       const Spacer(),
                                       OutlinedButton(
                                         onPressed: () {
@@ -4918,17 +4909,19 @@ class BleConnectionService {
   bool _scanStarted = false;
   bool _scanFinished = false;
   bool _connected = false;
+  Timer? _connectionCheckTimer; // Timer para el chequeo periódico de conexión
+  bool _connectionCheckRunning = false;
 
   // Stream para notificar cambios en el estado de la conexión
   StreamController<bool> _connectionStateController =
-      StreamController<bool>.broadcast();
+  StreamController<bool>.broadcast();
 
   // Variables relacionadas con Bluetooth
   late DiscoveredDevice _ubiqueDevice;
   final flutterReactiveBle = FlutterReactiveBle();
   late StreamSubscription<DiscoveredDevice> _scanStream;
   late StreamSubscription<ConnectionStateUpdate>
-      _connectionStream; // Inicializado correctamente.
+  _connectionStream; // Inicializado correctamente.
 
   // Lista de UUIDs de servicios que queremos detectar
   List<Uuid> serviceUuids = [
@@ -5009,24 +5002,26 @@ class BleConnectionService {
   }
 
   // Conectar al dispositivo solo cuando el usuario lo decida
-  void _connectToDevice() async {
+  Future<bool> _connectToDevice() async {
     if (!_foundDeviceWaitingToConnect) {
       if (kDebugMode) {
         print("Esperando que se encuentre un dispositivo.");
       }
-      return;
+      return false; // Si no se encontró un dispositivo, retornamos false
     }
 
     if (kDebugMode) {
       print("Conectando al dispositivo...");
     }
 
+    bool success = false; // Variable para determinar si la conexión fue exitosa
+
     // Conectar al dispositivo BLE utilizando el ID
     _connectionStream = flutterReactiveBle.connectToAdvertisingDevice(
         id: _ubiqueDevice.id, // Usamos el ID del dispositivo
         prescanDuration: const Duration(seconds: 1),
         withServices: [] // Aquí puedes agregar los UUIDs de los servicios si es necesario
-        ).listen((event) async {
+    ).listen((event) async {
       if (kDebugMode) {
         print("Estado de la conexión: ${event.connectionState}");
       }
@@ -5037,12 +5032,17 @@ class BleConnectionService {
             print("Dispositivo conectado exitosamente.");
           }
           _connected = true;
+          success = true; // Se marca la conexión como exitosa
+
+          // Iniciar el chequeo periódico de la conexión
+          _startConnectionCheckTimer();
           break;
         case DeviceConnectionState.disconnected:
           if (kDebugMode) {
             print("Conexión desconectada.");
           }
           _connected = false;
+          success = false; // Se marca como desconectado
 
           // Reiniciar el escaneo si se pierde la conexión
           _restartScan();
@@ -5056,12 +5056,29 @@ class BleConnectionService {
 
       // Emitir el estado de la conexión a través del stream
       if (!_connectionStateController.isClosed) {
-        // Verificar si el stream está cerrado antes de emitir.
         _connectionStateController.add(_connected);
       }
     });
+
+    // Esperar a que se complete la conexión y devolver el resultado
+    await Future.delayed(const Duration(seconds: 2)); // Esperar un poco para que la conexión tenga tiempo de completarse
+    return success; // Retorna si la conexión fue exitosa o no
   }
 
+  // Iniciar el timer para el chequeo de la conexión
+  void _startConnectionCheckTimer() {
+    _connectionCheckTimer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
+        if (_connected) {
+          print("Chequeo de conexión: El dispositivo está conectado.");
+        } else {
+          print("Chequeo de conexión: El dispositivo está desconectado. Reiniciando escaneo...");
+          // Si la conexión está perdida, reiniciar el escaneo
+          _restartScan();
+        }
+      });
+  }
+
+  // Reiniciar el escaneo
   void _restartScan() async {
     // Solo reiniciar el escaneo si no estamos actualmente escaneando
     if (!_scanStarted) {
@@ -5093,6 +5110,12 @@ class BleConnectionService {
         _connectionStateController
             .add(_connected); // Emitir el estado actualizado.
       }
+
+      // Detener el chequeo periódico de la conexión
+      _connectionCheckTimer?.cancel();
+      _connectionCheckTimer = null;
+
+      _restartScan();
     } else {
       if (kDebugMode) {
         print("No hay dispositivo conectado.");
@@ -5113,6 +5136,7 @@ class BleConnectionService {
 
   bool get isConnected => _connected;
 }
+
 
 class NeonBorderPainter extends CustomPainter {
   final Color neonColor;
