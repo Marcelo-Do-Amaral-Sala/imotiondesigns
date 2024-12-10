@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:platform/platform.dart';
 
 import '../custom/licencia_table_widget.dart';
 
@@ -22,10 +26,149 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   List<Map<String, dynamic>> allLicencias = []; // Lista original de clientes
+  List<String> licenciaData = [];
+  String mac = '';       // Para almacenar el valor de MAC
+  String macBle = '';    // Para almacenar el valor de MAC BLE
+  String bloqueada = ''; // Para almacenar si la licencia está bloqueada
 
   @override
   void initState() {
     super.initState();
+  }
+
+  // Método para detectar el sistema operativo
+  String detectarSO() {
+    final Platform platform = LocalPlatform(); // Obtenemos la plataforma actual
+
+    if (platform.isWindows) {
+      print("Sistema Operativo: Windows");
+      return 'WIN';
+    } else if (platform.isIOS) {
+      print("Sistema Operativo: iOS");
+      return 'IOS';
+    } else if (platform.isAndroid) {
+      print("Sistema Operativo: Android");
+      return 'AND';
+    } else {
+      print("Sistema Operativo: Otro");
+      return 'OTRO'; // Para otros SO si es necesario
+    }
+  }
+
+// Método para generar la cadena de licencia
+  String generarCadenaLicencia() {
+    String licencia = _nLicenciaController.text;
+    String nombre = _nameController.text;
+    String direccion = _adressController.text;
+    String ciudad = _cityController.text;
+    String provincia = _provinciaController.text;
+    String pais = _countryController.text;
+    String telefono = _phoneController.text;
+    String email = _emailController.text;
+
+    String modulo = "imotion21"; // Valor fijo
+    String so = detectarSO(); // Detectamos el sistema operativo
+
+    // Imprimimos todos los valores para comprobar que están correctos
+    print("Generando cadena de licencia con los siguientes datos:");
+    print("Licencia: $licencia");
+    print("Nombre: $nombre");
+    print("Dirección: $direccion");
+    print("Ciudad: $ciudad");
+    print("Provincia: $provincia");
+    print("País: $pais");
+    print("Teléfono: $telefono");
+    print("Email: $email");
+    print("Módulo: $modulo");
+    print("Sistema Operativo: $so");
+
+    // Generamos la cadena de licencia
+    String cadenaLicencia =
+        "13<#>$licencia<#>$nombre<#>$direccion<#>$ciudad<#>$provincia<#>$pais<#>$telefono<#>$email<#>$modulo<#>$so";
+
+    print("CADENA LICENCIA: $cadenaLicencia");
+
+    return cadenaLicencia; // Aquí se devuelve la cadena codificada
+  }
+
+// Método de encriptación (sin cambios)
+  String encrip(String wcadena) {
+    String xkkk =
+        'ABCDE0FGHIJ1KLMNO2PQRST3UVWXY4Zabcd5efghi6jklmn7opqrs8tuvwx9yz(),-.:;@';
+    String xkk2 = '[]{}<>?¿!¡*#';
+    int wp = 0, wd = 0, we = 0, wr = 0;
+    String wa = '', wres = '';
+    int wl = xkkk.length;
+    var wcont = Random().nextInt(10);
+
+    if (wcadena != '') {
+      wres = xkkk.substring(wcont, wcont + 1);
+      for (int wx = 0; wx < wcadena.length; wx++) {
+        wa = wcadena.substring(wx, wx + 1);
+        wp = xkkk.indexOf(wa);
+        if (wp == -1) {
+          wd = wa.codeUnitAt(0);
+          we = wd ~/ wl;
+          wr = wd % wl;
+          wcont += wr;
+          if (wcont >= wl) {
+            wcont -= wl;
+          }
+          wres += xkk2.substring(we, we + 1) + xkkk.substring(wcont, wcont + 1);
+        } else {
+          wcont += wp;
+          if (wcont >= wl) {
+            wcont -= wl;
+          }
+          wres += xkkk.substring(wcont, wcont + 1);
+        }
+      }
+    }
+
+    print("Cadena encriptada: $wres"); // Imprime la cadena encriptada
+    return wres;
+  }
+
+  // Método para validar la licencia usando POST
+  Future<void> _validarLicencia() async {
+    // 1. Generamos la cadena de licencia
+    String cadenaLicencia = generarCadenaLicencia();
+
+    // 2. Encriptamos la cadena de licencia
+    String cadenaEncriptada = encrip(cadenaLicencia);
+
+    // 3. Codificamos la cadena encriptada para enviarla como parte de la URL
+    String cadenaCodificada = Uri.encodeFull(cadenaEncriptada);
+
+    // URL para la validación (con el parámetro 'a' directamente en la URL)
+    String url = "https://imotionems.es/lic2.php?a=$cadenaCodificada";
+
+    print("Enviando solicitud POST a la URL: $url");
+
+    try {
+      final response = await http.post(
+        Uri.parse(url), // La URL con el parámetro 'a'
+      );
+
+      if (response.statusCode == 200) {
+        // Aquí procesamos la respuesta del servidor
+        String respuesta = response.body;
+        print('Respuesta del servidor: $respuesta');
+        List<String> parsedData = respuesta.split('|');
+
+        // Actualizamos el estado con solo los datos relevantes
+        setState(() {
+          mac = parsedData[1];             // MAC
+          macBle = parsedData[27];         // MAC BLE
+          bloqueada = parsedData[15] == '1' ? 'Sí' : 'No';  // Bloqueada (1 es sí, 0 es no)
+        });
+      } else {
+        print(
+            'Error al validar licencia. Código de estado: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Excepción: $e');
+    }
   }
 
   @override
@@ -73,12 +216,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       fit: BoxFit.fill,
                                     ),
                                     const Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          const Expanded(
+                                          Expanded(
                                             child: Text(
                                               "LICENCIA",
                                               style: TextStyle(
@@ -185,11 +328,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                     decoration: _inputDecoration(),
                                     child: TextField(
                                       controller: _nLicenciaController,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        LengthLimitingTextInputFormatter(3),
-                                      ],
+                                      keyboardType: TextInputType.text,
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
                                           hintText: 'Introducir nº licencia'),
@@ -306,7 +445,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                         // OutlinedButton debajo de los dos Expanded
                         Center(
                           child: OutlinedButton(
-                            onPressed: () {},
+                            onPressed: _validarLicencia,
                             // Mantener vacío para que InkWell funcione
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.all(10.0),
@@ -349,6 +488,16 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                           ),
                           textAlign: TextAlign.center,
                         ),
+                        mac.isEmpty
+                            ? CircularProgressIndicator()  // Muestra un indicador de carga si no hay datos
+                            : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('MAC: $mac', style: TextStyle(color:Colors.white),),
+                            Text('MAC BLE: $macBle',style: TextStyle(color:Colors.white)),
+                            Text('Licencia Bloqueada: $bloqueada',style: TextStyle(color:Colors.white)),
+                          ],
+                        ),
                         Expanded(
                           // Asegura que el Container ocupe el espacio restante
                           child: SizedBox(
@@ -378,12 +527,6 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
       color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
 
   TextStyle get _inputTextStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
-
-  TextStyle get _dropdownHintStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
-
-  TextStyle get _dropdownItemStyle =>
       const TextStyle(color: Colors.white, fontSize: 14);
 
   InputDecoration _inputDecorationStyle(
