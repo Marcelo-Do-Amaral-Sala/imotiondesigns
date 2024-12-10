@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../clients/overlays/main_overlay.dart';
+import '../db/db_helper.dart';
 
 class OverlayBioimpedancia extends StatefulWidget {
   final VoidCallback onClose;
@@ -15,337 +16,596 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
     with SingleTickerProviderStateMixin {
   bool isBodyPro = true;
   String? selectedGender;
+  bool isOverlayVisible = false; // Controla la visibilidad del overlay
+  int overlayIndex = -1; // -1 indica que no hay overlay visible
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
   }
 
+  void updateClientData() {
+    if (selectedBioClient != null && selectedBioClient!.isNotEmpty) {
+      print("Cliente seleccionado: $selectedBioClient");
+      setState(() {
+        _nameController.text = selectedBioClient!['name'] ?? 'No Name';
+        _genderController.text = selectedBioClient!['gender'] ?? '';
+        _weightController.text = selectedBioClient!['weight']?.toString() ?? '';
+        _heightController.text = selectedBioClient!['height']?.toString() ?? '';
+        _emailController.text = selectedBioClient!['email'] ?? '';
+      });
+    } else {
+      print("No se seleccionó un cliente");
+    }
+  }
+
+  @override
+  void dispose() {
+    // Limpiamos los controladores al destruir el widget
+    _nameController.dispose();
+    _genderController.dispose();
+    _weightController.dispose();
+    _heightController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void toggleOverlay(int index) {
+    setState(() {
+      isOverlayVisible = !isOverlayVisible;
+      overlayIndex = isOverlayVisible ? index : -1;
+
+      if (!isOverlayVisible) {
+        updateClientData(); // Actualizar datos al cerrar el overlay
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    return isOverlayVisible
+        ? _getOverlayWidget(overlayIndex) // Muestra el overlay si es visible
+        : MainOverlay(
+            // Muestra el contenido principal si el overlay no es visible
+            title: const Text(
+              "BIOIMPEDANCIA",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2be4f3),
+              ),
+            ),
+            content: isBodyPro ? _buildBodyProContent() : _buildNonProContent(),
+            onClose: widget.onClose,
+          );
+  }
+
+  Widget _buildBodyProContent() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Primera columna
+        Expanded(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Image.asset(
+                    'assets/images/cliente.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      toggleOverlay(0);
+                    });
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: const Text(
+                    'SELECCIONAR CLIENTE',
+                    style: TextStyle(
+                      color: Color(0xFF2be4f3),
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildInputField('NOMBRE', _nameController),
+                      _buildInputField('GÉNERO', _genderController),
+                      _buildInputField('PESO (kg)', _weightController),
+                      _buildInputField('ALTURA (cm)', _heightController),
+                      _buildInputField('E-MAIL', _emailController),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const VerticalDivider(color: Color(0xFF28E2F5)),
+        Expanded(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Image.asset(
+                    'assets/images/leerbio.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: const Text(
+                    'LEER MEDIDA',
+                    style: TextStyle(
+                      color: Color(0xFF2be4f3),
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                const Text(
+                  "CÓMO OBTENER UNA BIOMEDIDA",
+                  style: TextStyle(
+                      color: Color(0xFF28E2F5),
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.2,
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  child: Image.asset(
+                    'assets/images/obtenerBio.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNonProContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
+      child: Column(
+        children: [
+          const Text(
+            "SÓLO PARA CLIENTES CON",
+            style: TextStyle(
+                color: Color(0xFF28E2F5),
+                fontSize: 25,
+                fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: Image.asset(
+              'assets/images/ibodyPro.png',
+              fit: BoxFit.contain,
+            ),
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+          const Text(
+            "CONTACTE CON NOSOTROS PARA OBTENER NUESTRO DISPOSITIVO DE ANÁLISIS DE LA COMPOSICIÓN CORPORAL",
+            style: TextStyle(
+                color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 46, 46, 46),
+              borderRadius: BorderRadius.circular(7.0),
+            ),
+            child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      "E-MAIL: info@i-motiongroup.com",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                    const Text(
+                      "WHATSAPP: (+34) 649 43 95 14",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputField(String label, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: _labelStyle), // Label tal cual
+        Container(
+          alignment: Alignment.center,
+          decoration: _inputDecoration(),
+          child: TextField(
+            controller: controller,
+            style: _inputTextStyle,
+            enabled: false,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0), // Padding agregado
+              border: InputBorder.none, // Elimina el borde por defecto
+            ),
+          ),
+        ),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+      ],
+    );
+  }
+
+  Widget _getOverlayWidget(int overlayIndex) {
+    switch (overlayIndex) {
+      case 0:
+        return OverlaySeleccionarClienteBio(
+          onClose: () => toggleOverlay(0),
+        );
+      default:
+        return Container();
+    }
+  }
+
+  // Ajustes de estilos para simplificar
+  TextStyle get _labelStyle => const TextStyle(
+      color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+
+  TextStyle get _inputTextStyle =>
+      const TextStyle(color: Colors.white, fontSize: 14);
+
+
+  BoxDecoration _inputDecoration() {
+    return BoxDecoration(
+        color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+  }
+}
+
+Map<String, dynamic>?
+    selectedBioClient; // Variable global para el programa seleccionado
+
+class OverlaySeleccionarClienteBio extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlaySeleccionarClienteBio({super.key, required this.onClose});
+
+  @override
+  _OverlaySeleccionarClienteBioState createState() =>
+      _OverlaySeleccionarClienteBioState();
+}
+
+class _OverlaySeleccionarClienteBioState
+    extends State<OverlaySeleccionarClienteBio>
+    with SingleTickerProviderStateMixin {
+  List<Map<String, dynamic>> allClients = [];
+  List<Map<String, dynamic>> filteredClients = []; // Lista filtrada
+  final TextEditingController _clientNameController = TextEditingController();
+  String selectedOption = 'Todos';
+  List<Map<String, dynamic>> selectedClients =
+      []; // Lista de clientes seleccionados
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClients();
+    _clientNameController.addListener(_filterClients);
+  }
+
+  Future<void> _fetchClients() async {
+    final dbHelper = DatabaseHelper();
+    try {
+      final clientData = await dbHelper.getClients();
+      setState(() {
+        allClients = clientData; // Asigna a la lista original
+        filteredClients = allClients; // Inicializa la lista filtrada
+      });
+      _filterClients(); // Filtra para mostrar todos los clientes
+    } catch (e) {
+      print('Error fetching clients: $e');
+    }
+  }
+
+  void _filterClients() {
+    setState(() {
+      String searchText = _clientNameController.text.toLowerCase();
+
+      filteredClients = allClients.where((client) {
+        final matchesName = client['name']!.toLowerCase().contains(searchText);
+        // Filtra por estado basado en la selección del dropdown
+        final matchesStatus =
+            selectedOption == 'Todos' || client['status'] == selectedOption;
+
+        return matchesName && matchesStatus;
+      }).toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return MainOverlay(
       title: const Text(
-        "BIOIMPEDANCIA",
+        "SELECCIONAR CLIENTE",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 28,
           fontWeight: FontWeight.bold,
           color: Color(0xFF2be4f3),
         ),
       ),
-      content: isBodyPro
-          ? Row(
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Column(
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Primera columna
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20.0, horizontal: 40.0),
-                    // Puedes ajustar el valor de padding según sea necesario
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: Image.asset(
-                            'assets/images/cliente.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02),
-                        // OutlinedButton
-                        OutlinedButton(
-                          onPressed: () {},
-                          // Mantener vacío para que InkWell funcione
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(10.0),
-                            side: const BorderSide(
-                                width: 1.0, color: Color(0xFF2be4f3)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            backgroundColor: Colors.transparent,
-                          ),
-                          child: const Text(
-                            'SELECCIONAR CLIENTE',
-                            style: TextStyle(
-                              color: Color(0xFF2be4f3),
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('NOMBRE', style: _labelStyle),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: _inputDecoration(),
-                                child: TextField(
-                                  //controller: _nameController,
-                                  style: _inputTextStyle,
-                                  decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir nombre',
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.02),
-                              Text('GÉNERO', style: _labelStyle),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: _inputDecoration(),
-                                child: DropdownButton<String>(
-                                  hint: Text('Seleccione',
-                                      style: _dropdownHintStyle),
-                                  value: selectedGender,
-                                  items: [
-                                    DropdownMenuItem(
-                                        value: 'Hombre',
-                                        child: Text('Hombre',
-                                            style: _dropdownItemStyle)),
-                                    DropdownMenuItem(
-                                        value: 'Mujer',
-                                        child: Text('Mujer',
-                                            style: _dropdownItemStyle)),
-                                  ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedGender = value;
-                                    });
-                                  },
-                                  dropdownColor: const Color(0xFF313030),
-                                  icon: const Icon(Icons.arrow_drop_down,
-                                      color: Color(0xFF2be4f3), size: 30),
-                                ),
-                              ),
-                              SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.02),
-                              Text('PESO (kg)', style: _labelStyle),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: _inputDecoration(),
-                                child: TextField(
-                                  //controller: _nameController,
-                                  style: _inputTextStyle,
-                                  decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir peso',
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.02),
-                              Text('ALTURA (cm)', style: _labelStyle),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: _inputDecoration(),
-                                child: TextField(
-                                  //controller: _nameController,
-                                  style: _inputTextStyle,
-                                  decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir altura',
-                                  ),
-                                ),
-                              ),
-                              Text('E-MAIL', style: _labelStyle),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: _inputDecoration(),
-                                child: TextField(
-                                  //controller: _nameController,
-                                  style: _inputTextStyle,
-                                  decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir email',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Vertical Divider
-                const VerticalDivider(color: Color(0xFF28E2F5)),
-
-                // Segunda columna
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20.0, horizontal: 40.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        // Imagen centrada en la segunda columna
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: Image.asset(
-                            'assets/images/leerbio.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02),
-                        // OutlinedButton
-                        OutlinedButton(
-                          onPressed:
-                              () {}, // Mantener vacío para que InkWell funcione
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(10.0),
-                            side: const BorderSide(
-                                width: 1.0, color: Color(0xFF2be4f3)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            backgroundColor: Colors.transparent,
-                          ),
-                          child: const Text(
-                            'LEER MEDIDA',
-                            style: TextStyle(
-                              color: Color(0xFF2be4f3),
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.2),
-                        const Text(
-                          "CÓMO OBTENER UNA BIOMEDIDA",
-                          style: TextStyle(
-                              color: Color(0xFF28E2F5),
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.2,
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          child: Image.asset(
-                            'assets/images/obtenerBio.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                _buildTextField(
+                    'NOMBRE', _clientNameController, 'Ingrese nombre'),
+                SizedBox(width: screenWidth * 0.05),
+                _buildDropdown(),
               ],
-            )
-          : Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
-              child: Column(
-                children: [
-                  const Text(
-                    "SÓLO PARA CLIENTES CON",
-                    style: TextStyle(
-                        color: Color(0xFF28E2F5),
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.1,
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: Image.asset(
-                      'assets/images/ibodyPro.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                  const Text(
-                    "CONTACTE CON NOSOTROS PARA OBTENER NUESTRO DISPOSITIVO DE ANÁLISIS DE LA COMPOSICIÓN CORPORAL",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 46, 46, 46),
-                      borderRadius: BorderRadius.circular(7.0),
-                    ),
-                    child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          children: [
-                            const Text(
-                              "E-MAIL: info@i-motiongroup.com",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.normal),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.05),
-                            const Text(
-                              "WHATSAPP: (+34) 649 43 95 14",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.normal),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        )),
-                  ),
-                ],
-              ),
             ),
+            SizedBox(height: screenHeight * 0.03),
+            _buildDataTable(screenHeight, screenWidth),
+          ],
+        ),
+      ),
       onClose: widget.onClose,
     );
   }
-}
 
-// Ajustes de estilos para simplificar
-TextStyle get _labelStyle => const TextStyle(
-    color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+  Widget _buildTextField(
+      String label, TextEditingController controller, String hint) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF313030),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                filled: true,
+                fillColor: const Color(0xFF313030),
+                isDense: true,
+                hintText: hint,
+                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-TextStyle get _inputTextStyle =>
-    const TextStyle(color: Colors.white, fontSize: 14);
+  Widget _buildDropdown() {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('ESTADO',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold)),
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF313030),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: DropdownButton<String>(
+              value: selectedOption,
+              items: const [
+                DropdownMenuItem(
+                    value: 'Todos',
+                    child: Text('Todos',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                DropdownMenuItem(
+                    value: 'Activo',
+                    child: Text('Activo',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                DropdownMenuItem(
+                    value: 'Inactivo',
+                    child: Text('Inactivo',
+                        style: TextStyle(color: Colors.white, fontSize: 14))),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedOption = value!;
+                  _filterClients(); // Filtrar después de seleccionar
+                });
+              },
+              dropdownColor: const Color(0xFF313030),
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: Color(0xFF2be4f3), size: 30),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-TextStyle get _dropdownHintStyle =>
-    const TextStyle(color: Colors.white, fontSize: 14);
+  Widget _buildDataTable(double screenHeight, double screenWidth) {
+    return Flexible(
+      child: Container(
+        width: screenWidth,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 46, 46, 46),
+          borderRadius: BorderRadius.circular(7.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              // Encabezado fijo
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildHeaderCell('ID'),
+                  _buildHeaderCell('NOMBRE'),
+                  _buildHeaderCell('TELÉFONO'),
+                  _buildHeaderCell('ESTADO'),
+                ],
+              ),
+              const SizedBox(height: 10), // Espaciado entre encabezado y filas
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: filteredClients.map((client) {
+                      return Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // Guardar el cliente seleccionado en la lista global
+                              setState(() {
+                                selectedBioClient = client;
+                              });
+                              print('Cliente seleccionado: ${client['name']}');
+                              widget.onClose(); // Cerrar el overlay
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                border: Border.all(
+                                  color: const Color.fromARGB(255, 3, 236, 244),
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _buildDataCell(
+                                      client['id']?.toString() ?? ''),
+                                  _buildDataCell(client['name'] ?? ''),
+                                  _buildDataCell(
+                                      client['phone']?.toString() ?? ''),
+                                  _buildDataCell(client['status'] ?? ''),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20), // Espaciado entre filas
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-TextStyle get _dropdownItemStyle =>
-    const TextStyle(color: Colors.white, fontSize: 14);
+  Widget _buildHeaderCell(String text) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
 
-InputDecoration _inputDecorationStyle(
-    {String hintText = '', bool enabled = true}) {
-  return InputDecoration(
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
-    filled: true,
-    fillColor: const Color(0xFF313030),
-    isDense: true,
-    hintText: hintText,
-    hintStyle: const TextStyle(color: Colors.grey),
-    enabled: enabled,
-  );
-}
-
-BoxDecoration _inputDecoration() {
-  return BoxDecoration(
-      color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+  Widget _buildDataCell(String text) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+        ),
+      ),
+    );
+  }
 }

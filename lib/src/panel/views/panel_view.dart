@@ -177,7 +177,7 @@ class _PanelViewState extends State<PanelView>
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(Duration(seconds: 1), (_) {});
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {});
     bleConnectionService = BleConnectionService();
     // Escuchar el estado de la conexión
     bleConnectionService.connectionStateStream.listen((connected) {
@@ -187,7 +187,7 @@ class _PanelViewState extends State<PanelView>
     });
     // Crear el controlador de animación de opacidad
     _opacityController = AnimationController(
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
       vsync: this,
     )
       ..repeat(reverse: true); // Hace que la animación repita y reverse
@@ -332,7 +332,7 @@ class _PanelViewState extends State<PanelView>
     setState(() {
       isRunning = true;
       startTime = DateTime.now();
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {
           elapsedTime = pausedTime +
               DateTime
@@ -3539,19 +3539,14 @@ class _PanelViewState extends State<PanelView>
                                                 Stack(
                                                   alignment: Alignment.center,
                                                   children: [
+                                                    // Muestra las imágenes a partir del índice de tiempo
                                                     ...imagePaths
-                                                        .sublist(
-                                                        _currentImageIndex)
+                                                        .sublist(_currentImageIndex)
                                                         .reversed
                                                         .map((imagePath) {
                                                       return Image.asset(
                                                         imagePath,
-                                                        height:
-                                                        MediaQuery
-                                                            .of(context)
-                                                            .size
-                                                            .height *
-                                                            0.25,
+                                                        height: MediaQuery.of(context).size.height * 0.25,
                                                         fit: BoxFit.cover,
                                                       );
                                                     }).toList(),
@@ -3564,33 +3559,23 @@ class _PanelViewState extends State<PanelView>
                                                               : () {
                                                             setState(() {
                                                               time++; // Aumenta el tiempo (en minutos)
-                                                              totalTime = time *
-                                                                  60; // Actualiza el tiempo total en segundos
+                                                              totalTime = time * 60; // Actualiza el tiempo total en segundos
+                                                              _currentImageIndex = time; // Actualiza el índice de la imagen
                                                             });
                                                           },
                                                           child: Image.asset(
                                                             'assets/images/flecha-arriba.png',
-                                                            height: screenHeight *
-                                                                0.04,
-                                                            fit: BoxFit
-                                                                .scaleDown,
+                                                            height: screenHeight * 0.04,
+                                                            fit: BoxFit.scaleDown,
                                                           ),
                                                         ),
                                                         Text(
-                                                          "${time.toString()
-                                                              .padLeft(
-                                                              2, '0')}:${seconds
-                                                              .toInt()
-                                                              .toString()
-                                                              .padLeft(
-                                                              2, '0')}",
+                                                          "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
                                                           // Convierte seconds a entero y usa padLeft para formato mm:ss
                                                           style: const TextStyle(
                                                             fontSize: 25,
-                                                            fontWeight:
-                                                            FontWeight.bold,
-                                                            color: const Color(
-                                                                0xFF2be4f3), // Color para la sección seleccionada
+                                                            fontWeight: FontWeight.bold,
+                                                            color: Color(0xFF2be4f3), // Color para la sección seleccionada
                                                           ),
                                                         ),
                                                         GestureDetector(
@@ -3598,27 +3583,24 @@ class _PanelViewState extends State<PanelView>
                                                               ? null
                                                               : () {
                                                             setState(() {
-                                                              if (time >
-                                                                  1) {
+                                                              if (time > 1) {
                                                                 time--; // Disminuye el tiempo si es mayor que 1
-                                                                totalTime =
-                                                                    time *
-                                                                        60; // Actualiza el tiempo total en segundos
+                                                                totalTime = time * 60; // Actualiza el tiempo total en segundos
+                                                                _currentImageIndex = time; // Actualiza el índice de la imagen
                                                               }
                                                             });
                                                           },
                                                           child: Image.asset(
                                                             'assets/images/flecha-abajo.png',
-                                                            height: screenHeight *
-                                                                0.04,
-                                                            fit: BoxFit
-                                                                .scaleDown,
+                                                            height: screenHeight * 0.04,
+                                                            fit: BoxFit.scaleDown,
                                                           ),
                                                         ),
                                                       ],
                                                     ),
                                                   ],
                                                 ),
+
                                                 SizedBox(
                                                     height: screenHeight *
                                                         0.01),
@@ -5421,7 +5403,7 @@ class BleConnectionService {
 
   // Desconectar del dispositivo
   void disconnect() async {
-    if (_connected && _ubiqueDevice != null) {
+    if (_connected) {
       if (kDebugMode) {
         print("Desconectando del dispositivo: ${_ubiqueDevice.id}");
       }
@@ -5470,11 +5452,11 @@ class NeonBorderPainter extends CustomPainter {
     final Paint paint = Paint()
       ..color = neonColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..maskFilter = MaskFilter.blur(BlurStyle.solid, 5); // Efecto de resplandor hacia afuera
+      ..strokeWidth = 3
+      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 2); // Efecto de resplandor hacia afuera
 
     final Rect rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final RRect roundedRect = RRect.fromRectAndRadius(rect, Radius.circular(7));
+    final RRect roundedRect = RRect.fromRectAndRadius(rect,  const Radius.circular(7));
 
     canvas.drawRRect(roundedRect, paint); // Dibuja el borde con resplandor
   }
