@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class LicenciaTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> data; // Mantener el tipo como dynamic
+  final Function(Map<String, dynamic>) onRowTap; // Callback con el tipo correcto
 
-  const LicenciaTableWidget({super.key, required this.data});
+  const LicenciaTableWidget({super.key, required this.data, required this.onRowTap});
 
   @override
   _LicenciaTableWidgetState createState() => _LicenciaTableWidgetState();
@@ -28,6 +29,9 @@ class _LicenciaTableWidgetState extends State<LicenciaTableWidget> {
                       mci: (row['mci'] is int) ? row['mci'] : int.tryParse(row['mci'].toString()) ?? 0,
                       type: row['type'] ?? '',
                       status: row['status'] ?? '',
+                      onTap: () {
+                        widget.onRowTap(row); // Pasar el mapa completo
+                      },
                     ),
                     const SizedBox(height: 20), // Espaciado entre filas
                   ],
@@ -73,13 +77,14 @@ class DataRowWidget extends StatefulWidget {
   final int? mci; // Cambiar a int
   final String type;
   final String status;
+  final VoidCallback onTap;
 
 
   const DataRowWidget({
     super.key,
     required this.mci,
     required this.type,
-    required this.status,
+    required this.status, required this.onTap,
   });
 
   @override
@@ -100,6 +105,18 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        widget.onTap();
+        setState(() {
+          isPressed = true;
+        });
+
+        _timer = Timer(const Duration(milliseconds: 200), () {
+          if (mounted) {
+            setState(() {
+              isPressed = false;
+            });
+          }
+        });
       },
       child: Container(
         decoration: BoxDecoration(

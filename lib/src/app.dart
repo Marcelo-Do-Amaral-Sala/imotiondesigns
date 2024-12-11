@@ -4,7 +4,6 @@ import 'package:imotion_designs/src/ajustes/form/licencia_form.dart';
 import 'package:imotion_designs/src/mainviews/main_menu.dart';
 import 'package:imotion_designs/src/panel/views/panel_view.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
-import 'package:imotion_designs/src/servicios/simulacion_ia.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
 
 import 'ajustes/menus/ajustes_menu.dart';
@@ -21,6 +20,13 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   String currentView = 'mainMenu';
   Key? panelViewKey = UniqueKey(); // Clave única solo para PanelView
+  Map<String, dynamic>? selectedMciData;
+
+  void selectMCI(Map<String, dynamic> mciData) {
+    setState(() {
+      selectedMciData = mciData;
+    });
+  }
 
   void navigateTo(String view) {
     setState(() {
@@ -40,7 +46,8 @@ class _AppState extends State<App> {
         viewToDisplay = PanelView(
           key: panelViewKey, // Usar la clave única para PanelView
           onBack: () => navigateTo('mainMenu'),
-          onReset: () => navigateTo('panel'), // Manejo de reinicio solo para Panel
+          onReset: () =>
+              navigateTo('panel'), // Manejo de reinicio solo para Panel
         );
         break;
       case 'clients':
@@ -73,6 +80,9 @@ class _AppState extends State<App> {
       case 'licencia':
         viewToDisplay = LicenciaFormView(
           onBack: () => navigateTo('ajustes'),
+          onMciTap: (mciData) {
+            selectMCI(mciData);
+          },
         );
         break;
       case 'mainMenu':
@@ -97,4 +107,3 @@ class _AppState extends State<App> {
     );
   }
 }
-

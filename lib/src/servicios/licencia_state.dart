@@ -17,6 +17,7 @@ class AppState {
   String bloqueada = '';
   Map<String, dynamic> licenciaData = {};
   List<Map<String, dynamic>> allLicencias = [];
+  List<Map<String, dynamic>> mcis = []; // Lista de MCIs
 
   // Constructor privado para el patrón Singleton
   AppState._privateConstructor();
@@ -55,6 +56,12 @@ class AppState {
     if (allLicenciasJson != null) {
       allLicencias = List<Map<String, dynamic>>.from(jsonDecode(allLicenciasJson));
     }
+
+    // Cargar la lista de MCIs desde SharedPreferences
+    String? mcisJson = prefs.getString('mcis');
+    if (mcisJson != null) {
+      mcis = List<Map<String, dynamic>>.from(jsonDecode(mcisJson));
+    }
   }
 
   // Función para guardar el estado en SharedPreferences
@@ -80,5 +87,8 @@ class AppState {
     // Guardar los mapas y listas como JSON
     await prefs.setString('licenciaData', jsonEncode(licenciaData));
     await prefs.setString('allLicencias', jsonEncode(allLicencias));
+
+    // Guardar la lista de MCIs como JSON
+    await prefs.setString('mcis', jsonEncode(mcis));
   }
 }

@@ -1,18 +1,18 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:platform/platform.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../servicios/licencia_state.dart';
-import '../custom/licencia_table_widget.dart';
 
 class LicenciaFormView extends StatefulWidget {
+  final Function(Map<String, dynamic>) onMciTap;
   final Function() onBack; // Callback para navegar de vuelta
-  const LicenciaFormView({super.key, required this.onBack});
+  const LicenciaFormView(
+      {super.key, required this.onBack, required this.onMciTap});
 
   @override
   State<LicenciaFormView> createState() => _LicenciaFormViewState();
@@ -28,13 +28,22 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
   final _cityController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
-  List<Map<String, dynamic>> allLicencias = []; // Lista original de clientes
+  List<Map<String, dynamic>> allMcis = []; // Lista original de clientes
   Map<String, dynamic> licenciaData =
       {}; // Mapa para almacenar la respuesta de la licencia
   List<String> macList = []; // Para almacenar las MACs
   List<String> macBleList = []; // Para almacenar las MACs BLE
   String bloqueada = ''; // Para almacenar si la licencia está bloqueada
   bool _isLicenciaValida = false;
+  String cadenaLicencia = '';
+  String cadenaEncriptada = '';
+  String cadenaCodificada = '';
+  String url = '';
+  String respuestaServidor = '';
+  String estadoBloqueada = '';
+  List<String> parsedData = [];
+  String licenciaMac = '';
+  List<Map<String, dynamic>> mcis = [];
 
   @override
   void initState() {
@@ -56,8 +65,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     });
   }
 
+  void _tapMci(Map<String, dynamic> mciData) {
+    // Asegúrate de que los datos se pasen correctamente como Map<String, String>
+    final mciStringData =
+        mciData.map((key, value) => MapEntry(key, value.toString()));
 
-
+    debugPrint(
+        'MCI Data: ${mciStringData.toString()}'); // Imprime todos los datos del cliente
+  }
 
   // Método para detectar el sistema operativo
   String detectarSO() {
@@ -154,16 +169,25 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
 
   Future<void> _validarLicencia() async {
     // 1. Generar la cadena de licencia
-    String cadenaLicencia = generarCadenaLicencia();
+    String generatedCadenaLicencia = generarCadenaLicencia();
+    setState(() {
+      cadenaLicencia = generatedCadenaLicencia;
+    });
     print("Cadena de licencia generada: $cadenaLicencia");
 
     // 2. Encriptar la cadena de licencia
-    String cadenaEncriptada = encrip(cadenaLicencia);
+    String encryptedCadena = encrip(generatedCadenaLicencia);
+    setState(() {
+      cadenaEncriptada = encryptedCadena;
+    });
     print("Cadena encriptada: $cadenaEncriptada");
 
     // 3. Codificar la cadena encriptada para enviarla como parte de la URL
-    String cadenaCodificada = Uri.encodeFull(cadenaEncriptada);
-    String url = "https://imotionems.es/lic2.php?a=$cadenaCodificada";
+    String encodedCadena = Uri.encodeFull(encryptedCadena);
+    setState(() {
+      cadenaCodificada = encodedCadena;
+      url = "https://imotionems.es/lic2.php?a=$cadenaCodificada";
+    });
     print("URL de validación enviada: $url");
 
     try {
@@ -172,81 +196,132 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
       if (response.statusCode == 200) {
         // Aquí procesamos la respuesta del servidor
         String respuesta = response.body;
+        setState(() {
+          respuestaServidor = respuesta;
+        });
         print("Respuesta recibida del servidor: $respuesta");
 
-        // Verificar si la respuesta está vacía o tiene datos válidos
-        if (respuesta.isEmpty) {
-          print("La respuesta del servidor está vacía.");
+        Map<String, dynamic> licenciaData = procesarRespuesta(respuesta);
+
+        // Verificar que los datos procesados no estén vacíos
+        if (licenciaData.isEmpty) {
+          print("Los datos de la licencia son inválidos o insuficientes.");
           return;
         }
 
-        // Dividimos la respuesta en partes
-        List<String> parsedData = respuesta.split('|');
-        print("Datos divididos (parsedData): $parsedData");
+        // Extraer las MCIs del mapa de datos procesados
+        List<Map<String, dynamic>> mcis = licenciaData["mcis"];
 
-        // Limpiar las listas antes de agregar nuevos datos
-        macList.clear();
-        macBleList.clear();
-        licenciaData.clear();
+        // Filtrar las MCIs para eliminar las que tienen la MAC vacía
+        mcis = mcis.where((mci) => mci['mac'].isNotEmpty).toList();
 
-        // Iteramos sobre los datos para extraer la información relevante
-        for (int i = 0; i < parsedData.length; i++) {
-          String entry = parsedData[i];
-          print("Procesando entrada $i: $entry");
+        // Verificar que mcis no esté vacío y procesarlo
+        if (mcis.isNotEmpty) {
+          allMcis = mcis;
+          // Actualizar el estado con las MCIs procesadas
+          setState(() {
+            macList = mcis.map((mci) => mci['mac'] as String).toList();
+            macBleList = mcis
+                .where((mci) =>
+                    mci['macBle'] as bool) // Asegurarse de que sea un bool
+                .map((mci) => mci['mac'] as String)
+                .toList();
+            estadoBloqueada = licenciaData['bloqueada']
+                ? "1"
+                : "0"; // Convertir bool a String
+          });
 
-          if (entry.contains('=')) {
-            String key = entry.split('=')[0];
-            String value = entry.split('=')[1];
-            print("Clave: $key, Valor: $value");
+          print("Información procesada:");
+          print(
+              "Estado de la licencia: ${estadoBloqueada == '1' ? 'Bloqueada' : 'Activa'}");
+          print("Limite semanal: ${licenciaData['limiteSemana']}");
+          print("Estado del biomac: ${licenciaData['biomac']}");
+          print("Nivel en la nube: ${licenciaData['nivelNube']}");
+          print("Sesiones en la nube: ${licenciaData['nubeSesiones']}");
+          print("EMS activo: ${licenciaData['emsActivo']}");
+          print("MCIs procesadas:");
+          mcis.forEach((mci) {
+            print(
+                "MCI - MAC: ${mci['mac']}, MAC BLOQUEADA: ${mci['macBloqueo'] ? 'Bloqueada' : 'Activa'}, BLE: ${mci['macBle'] ? 'BLE' : 'BT'}, Nombre: ${mci['nombre']}");
+          });
 
-            // Añadir a las listas o mapas según el tipo de dato
-            if (key.contains("mac")) {
-              macList.add(value);
-              print("MAC encontrada: $value");
-            } else if (key.contains("macble")) {
-              macBleList.add(value);
-              print("MAC BLE encontrada: $value");
-            } else if (key == 'bloqueada') {
-              bloqueada = value == '1' ? 'Sí' : 'No';
-              print("Estado de bloqueada: $bloqueada");
-            } else {
-              licenciaData[key] = value;
-              print("Otro dato encontrado: $key = $value");
-            }
-          }
+          // Marcar la licencia como válida
+          setState(() {
+            _isLicenciaValida = true;
+          });
+
+          // Guardar el estado utilizando AppState
+          AppState.instance.nLicencia = _nLicenciaController.text;
+          AppState.instance.nombre = _nameController.text;
+          AppState.instance.direccion = _adressController.text;
+          AppState.instance.ciudad = _cityController.text;
+          AppState.instance.provincia = _provinciaController.text;
+          AppState.instance.pais = _countryController.text;
+          AppState.instance.telefono = _phoneController.text;
+          AppState.instance.email = _emailController.text;
+          AppState.instance.isLicenciaValida = _isLicenciaValida;
+          AppState.instance.macList = macList;
+          AppState.instance.macBleList = macBleList;
+          AppState.instance.bloqueada = estadoBloqueada;
+          AppState.instance.licenciaData = licenciaData;
+
+          // Guardar la lista de MCIs en AppState
+          AppState.instance.mcis = mcis;
+
+          // Guardar los datos en SharedPreferences
+          await AppState.instance.saveState();
+        } else {
+          print("Las MCIs están vacías o son inválidas.");
         }
-
-        // Después de procesar los datos, actualizamos el estado
-        setState(() {
-          _isLicenciaValida = true; // Marca la licencia como válida
-        });
-
-        // Guardar el estado utilizando AppState
-        AppState.instance.nLicencia = _nLicenciaController.text;
-        AppState.instance.nombre = _nameController.text;
-        AppState.instance.direccion = _adressController.text;
-        AppState.instance.ciudad = _cityController.text;
-        AppState.instance.provincia = _provinciaController.text;
-        AppState.instance.pais = _countryController.text;
-        AppState.instance.telefono = _phoneController.text;
-        AppState.instance.email = _emailController.text;
-        AppState.instance.isLicenciaValida = _isLicenciaValida;
-        AppState.instance.macList = macList;
-        AppState.instance.macBleList = macBleList;
-        AppState.instance.bloqueada = bloqueada;
-        AppState.instance.licenciaData = licenciaData;
-
-        // Guardar los datos en SharedPreferences
-        await AppState.instance.saveState();
-
       } else {
-        print("Error al validar la licencia. Código de estado: ${response.statusCode}");
+        print(
+            "Error al validar la licencia. Código de estado: ${response.statusCode}");
       }
     } catch (e) {
       print('Excepción al validar la licencia: $e');
     }
   }
 
+  Map<String, dynamic> procesarRespuesta(String respuesta) {
+    // Dividimos la respuesta en partes
+    List<String> datos = respuesta.split('|');
+
+    // Validación para evitar errores si la respuesta no tiene suficientes elementos
+    if (datos.length < 33) {
+      print("La respuesta no contiene datos suficientes.");
+      return {};
+    }
+
+    // Extraer propiedades generales de la licencia
+    Map<String, dynamic> licenciaInfo = {
+      "limiteSemana": int.tryParse(datos[15]) ?? 0, // Límite semanal
+      "bloqueada": datos[16] == "1", // Si la licencia está bloqueada
+      "biomac": datos[17], // MAC del lector de bioimpedancia
+      "nivelNube": int.tryParse(datos[18]) ?? 0, // Nivel de nube
+      "nubeSesiones": int.tryParse(datos[19]) ?? 0, // Sesiones en la nube
+      "emsActivo": datos[32] == "1", // Si el EMS está activo
+    };
+
+    // Crear una lista para almacenar las MCIs con sus características
+    List<Map<String, dynamic>> mcis = [];
+
+    // Iteramos sobre las MCIs (índices 1 al 7 para las MACs)
+    for (int i = 0; i < 7; i++) {
+      Map<String, dynamic> mci = {
+        "mac": datos[1 + i], // MAC del MCI
+        "macBloqueo": datos[8 + i] == "1", // Estado de bloqueo (true/false)
+        "macBle": datos[20 + i] == "1", // Si es BLE (true/false)
+        "nombre": datos[27 + i], // Nombre del MCI
+      };
+      mcis.add(mci);
+    }
+
+    // Añadir las MCIs al mapa de información de la licencia
+    licenciaInfo["mcis"] = mcis;
+
+    // Retornamos la información de la licencia procesada
+    return licenciaInfo;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -566,7 +641,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                   ),
                   SizedBox(width: screenWidth * 0.05),
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       // Ajusta el tamaño del Column a su contenido
@@ -583,13 +658,65 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                           textAlign: TextAlign.center,
                         ),
                         Expanded(
-                          // Asegura que el Container ocupe el espacio restante
                           child: SizedBox(
-                            width: double.infinity, // Ancho completo
+                            width: double.infinity,
                             child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: LicenciaTableWidget(
-                                data: allLicencias,
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  // Encabezado de la tabla
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      buildCell('MAC'),
+                                      buildCell('TIPO'),
+                                      buildCell('ESTADO'),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.01),
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children:
+                                            AppState.instance.mcis.map((row) {
+                                          // Obtenemos los valores necesarios de la fila de "row"
+                                          String mac = row['mac'] ?? ''; // MAC
+                                          bool macBle = row['macBle'] ??
+                                              false; // macBle (booleano)
+                                          String estado = AppState
+                                                      .instance.bloqueada ==
+                                                  '1'
+                                              ? 'Bloqueada'
+                                              : 'Activa'; // Estado basado en la propiedad bloqueada de AppState
+
+                                          // Construir y retornar las filas de la tabla
+                                          return Column(
+                                            children: [
+                                              DataRowWidget(
+                                                mac: mac,
+                                                macBle: macBle,
+                                                estado: estado,
+                                                onTap: () {
+                                                  _tapMci(
+                                                      row); // Método para manejar el tap en la fila
+                                                },
+                                              ),
+                                              SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -606,28 +733,128 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     );
   }
 
-  // Ajustes de estilos para simplificar
-  TextStyle get _labelStyle => const TextStyle(
-      color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+  // Función para crear las celdas de la tabla
+  Widget buildCell(String text) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-  TextStyle get _inputTextStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
+class DataRowWidget extends StatefulWidget {
+  final String mac;
+  final bool macBle;
+  final String estado;
+  final VoidCallback onTap;
 
-  InputDecoration _inputDecorationStyle(
-      {String hintText = '', bool enabled = true}) {
-    return InputDecoration(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
-      filled: true,
-      fillColor: const Color(0xFF313030),
-      isDense: true,
-      hintText: hintText,
-      hintStyle: const TextStyle(color: Colors.grey),
-      enabled: enabled,
+  const DataRowWidget({
+    super.key,
+    required this.mac,
+    required this.macBle,
+    required this.estado,
+    required this.onTap,
+  });
+
+  @override
+  _DataRowWidgetState createState() => _DataRowWidgetState();
+}
+
+class _DataRowWidgetState extends State<DataRowWidget> {
+  bool isPressed = false;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        widget.onTap();
+        setState(() {
+          isPressed = true;
+        });
+
+        _timer = Timer(const Duration(milliseconds: 200), () {
+          if (mounted) {
+            setState(() {
+              isPressed = false;
+            });
+          }
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: isPressed ? Colors.blue.withOpacity(0.1) : Colors.transparent,
+          border: Border.all(
+            color: const Color.fromARGB(255, 3, 236, 244),
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            buildCell(widget.mac),
+            // Mostrar la MAC
+            buildCell(widget.macBle ? 'BLE' : 'BT'),
+            // Mostrar el tipo de conexión
+            buildCell(widget.estado),
+            // Mostrar el estado
+          ],
+        ),
+      ),
     );
   }
 
-  BoxDecoration _inputDecoration() {
-    return BoxDecoration(
-        color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+  Widget buildCell(String text) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+        ),
+      ),
+    );
   }
+}
+
+// Ajustes de estilos para simplificar
+TextStyle get _labelStyle => const TextStyle(
+    color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+
+TextStyle get _inputTextStyle =>
+    const TextStyle(color: Colors.white, fontSize: 14);
+
+InputDecoration _inputDecorationStyle(
+    {String hintText = '', bool enabled = true}) {
+  return InputDecoration(
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+    filled: true,
+    fillColor: const Color(0xFF313030),
+    isDense: true,
+    hintText: hintText,
+    hintStyle: const TextStyle(color: Colors.grey),
+    enabled: enabled,
+  );
+}
+
+BoxDecoration _inputDecoration() {
+  return BoxDecoration(
+      color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
 }
