@@ -168,21 +168,44 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
   }
 
   Future<void> _validarLicencia() async {
-    // 1. Generar la cadena de licencia
+    // Validar que los campos no estén vacíos
+    if (_nLicenciaController.text.isEmpty ||
+        _nameController.text.isEmpty ||
+        _adressController.text.isEmpty ||
+        _cityController.text.isEmpty ||
+        _provinciaController.text.isEmpty ||
+        _countryController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "DEBES RELLENAR TODOS LOS CAMPOS",
+            style: TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return; // Salir de la función si hay campos vacíos
+    }
+
+    // Si todos los campos están llenos, procedemos con la validación de la licencia
+    // Generar la cadena de licencia
     String generatedCadenaLicencia = generarCadenaLicencia();
     setState(() {
       cadenaLicencia = generatedCadenaLicencia;
     });
     print("Cadena de licencia generada: $cadenaLicencia");
 
-    // 2. Encriptar la cadena de licencia
+    // Encriptar la cadena de licencia
     String encryptedCadena = encrip(generatedCadenaLicencia);
     setState(() {
       cadenaEncriptada = encryptedCadena;
     });
     print("Cadena encriptada: $cadenaEncriptada");
 
-    // 3. Codificar la cadena encriptada para enviarla como parte de la URL
+    // Codificar la cadena encriptada para enviarla como parte de la URL
     String encodedCadena = Uri.encodeFull(encryptedCadena);
     setState(() {
       cadenaCodificada = encodedCadena;
@@ -201,13 +224,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
         });
         print("Respuesta recibida del servidor: $respuesta");
 
+        // Procesar la respuesta del servidor
         Map<String, dynamic> licenciaData = procesarRespuesta(respuesta);
-
-        // Verificar que los datos procesados no estén vacíos
-        if (licenciaData.isEmpty) {
-          print("Los datos de la licencia son inválidos o insuficientes.");
-          return;
-        }
 
         // Extraer las MCIs del mapa de datos procesados
         List<Map<String, dynamic>> mcis = licenciaData["mcis"];
@@ -250,6 +268,17 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
             _isLicenciaValida = true;
           });
 
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "LICENCIA ACTIVADA",
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+
           // Guardar el estado utilizando AppState
           AppState.instance.nLicencia = _nLicenciaController.text;
           AppState.instance.nombre = _nameController.text;
@@ -279,6 +308,16 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
       }
     } catch (e) {
       print('Excepción al validar la licencia: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "LICENCIA NO VÁLIDA",
+            style: TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -620,7 +659,6 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                              // Si la licencia es válida, mostrar el mensaje
                               if (AppState.instance.isLicenciaValida)
                                 const Padding(
                                   padding: const EdgeInsets.only(left: 20.0),
