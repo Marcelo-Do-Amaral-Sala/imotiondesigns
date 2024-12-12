@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
 
 import '../../db/db_helper.dart';
@@ -101,11 +102,6 @@ class _ClientListViewState extends State<ClientListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ElevatedButton(
-                onPressed: _deleteDatabase,
-                // Llama al método que elimina la base de datos
-                child: Text('Eliminar Base de Datos'),
-              ),
               _buildTextField(
                   'NOMBRE', _clientNameController, 'Ingrese nombre'),
               SizedBox(width: screenWidth * 0.05),
@@ -126,9 +122,9 @@ class _ClientListViewState extends State<ClientListView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style:  TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -161,10 +157,10 @@ class _ClientListViewState extends State<ClientListView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('ESTADO',
+           Text('ESTADO',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -174,19 +170,19 @@ class _ClientListViewState extends State<ClientListView> {
             ),
             child: DropdownButton<String>(
               value: selectedOption,
-              items: const [
+              items:  [
                 DropdownMenuItem(
                     value: 'Todos',
                     child: Text('Todos',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Activo',
                     child: Text('Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Inactivo',
                     child: Text('Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
               onChanged: (value) {
                 setState(() {

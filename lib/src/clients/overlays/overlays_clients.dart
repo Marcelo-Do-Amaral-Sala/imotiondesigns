@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../forms/clients_form.dart';
 import '../forms/clients_form_groups.dart';
 import '../forms/clients_forms_bonos.dart';
@@ -52,13 +53,13 @@ class _OverlayInfoState extends State<OverlayInfo>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "LISTADO DE CLIENTES",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: isInfoVisible && selectedClientData != null
@@ -80,7 +81,8 @@ class _OverlayInfoState extends State<OverlayInfo>
 
   Widget _buildTabBar() {
     return Container(
-      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
+      height: MediaQuery.of(context).size.height *
+          0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
       child: TabBar(
         controller: _tabController,
@@ -103,8 +105,8 @@ class _OverlayInfoState extends State<OverlayInfo>
         ),
         dividerColor: Colors.black,
         labelColor: const Color(0xFF2be4f3),
-        labelStyle: const TextStyle(
-          fontSize: 15,
+        labelStyle:  TextStyle(
+          fontSize: 16.sp,
           fontWeight: FontWeight.bold,
         ),
         unselectedLabelColor: Colors.white,
@@ -274,13 +276,13 @@ class _OverlayCrearState extends State<OverlayCrear>
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "CREAR CLIENTE",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Column(
@@ -304,15 +306,17 @@ class _OverlayCrearState extends State<OverlayCrear>
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF494949),
-          title: const Text(
+          title: Text(
             '¡ALERTA!',
             style: TextStyle(
-                color: Colors.red, fontSize: 28, fontWeight: FontWeight.bold),
+                color: Colors.red,
+                fontSize: 30.sp,
+                fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
-          content: const Text(
+          content: Text(
             'Debes completar el formulario para continuar',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            style: TextStyle(color: Colors.white, fontSize: 25.sp),
             textAlign: TextAlign.center,
           ),
           actions: [
@@ -324,11 +328,24 @@ class _OverlayCrearState extends State<OverlayCrear>
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF2be4f3)),
+                    padding: const EdgeInsets.all(10.0),
+                    side: const BorderSide(
+                      width: 1.0,
+                      color: Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
                   ),
-                  child: const Text(
-                    '¡Entendido!',
-                    style: TextStyle(color: Color(0xFF2be4f3)),
+                  child: Text(
+                    '¡ENTENDIDO!',
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -341,7 +358,8 @@ class _OverlayCrearState extends State<OverlayCrear>
 
   Widget _buildTabBar() {
     return Container(
-      height: MediaQuery.of(context).size.height*0.1, // Ajusta la altura según lo necesites
+      height: MediaQuery.of(context).size.height *
+          0.1, // Ajusta la altura según lo necesites
       color: Colors.black,
       child: GestureDetector(
         onTap: () {
@@ -373,8 +391,7 @@ class _OverlayCrearState extends State<OverlayCrear>
             ),
             dividerColor: Colors.black,
             labelColor: const Color(0xFF2be4f3),
-            labelStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            labelStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             unselectedLabelColor: Colors.white,
           ),
         ),

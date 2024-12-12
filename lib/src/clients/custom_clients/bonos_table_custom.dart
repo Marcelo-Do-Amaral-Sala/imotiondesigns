@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BonosTableWidget extends StatefulWidget {
   final List<Map<String, String>> bonosData;
   final bool showHour; // Parámetro para mostrar u ocultar la columna "HORA"
 
-  const BonosTableWidget({super.key, required this.bonosData, this.showHour = true});
+  const BonosTableWidget(
+      {super.key, required this.bonosData, this.showHour = true});
 
   @override
   _BonosTableWidgetState createState() => _BonosTableWidgetState();
@@ -16,7 +18,7 @@ class _BonosTableWidgetState extends State<BonosTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
-        const SizedBox(height: 5),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.005),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -26,10 +28,10 @@ class _BonosTableWidgetState extends State<BonosTableWidget> {
                     DataRowWidget(
                       date: row['date'] ?? '',
                       hour: widget.showHour ? (row['hour'] ?? '') : '',
-                      quantity: row['quantity']?? '',
+                      quantity: row['quantity'] ?? '',
                       showHour: widget.showHour, // Pasar el estado de showHour
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   ],
                 );
               }).toList(),
@@ -58,8 +60,9 @@ class _BonosTableWidgetState extends State<BonosTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
+            fontSize: 17.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -112,7 +115,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
+          style: TextStyle(color: Colors.white, fontSize: 14.sp),
         ),
       ),
     );

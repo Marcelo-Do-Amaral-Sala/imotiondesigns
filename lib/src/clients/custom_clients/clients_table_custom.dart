@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DataTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> data; // Mantener el tipo como dynamic
@@ -17,7 +18,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
-        const SizedBox(height: 10), // Espaciado entre encabezado y filas
+        SizedBox(height: MediaQuery.of(context).size.height*0.01), // Espaciado entre encabezado y filas
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -33,7 +34,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                         widget.onRowTap(row); // Pasar el mapa completo
                       },
                     ),
-                    const SizedBox(height: 20), // Espaciado entre filas
+                     SizedBox(height: MediaQuery.of(context).size.height*0.02), // Espaciado entre filas
                   ],
                 );
               }).toList(),
@@ -63,10 +64,10 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(
+          style:  TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 17.sp,
           ),
         ),
       ),
@@ -149,7 +150,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style:  TextStyle(color: Colors.white, fontSize: 15.sp),
         ),
       ),
     );

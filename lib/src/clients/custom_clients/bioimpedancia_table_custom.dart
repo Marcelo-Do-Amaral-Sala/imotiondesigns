@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BioimpedanciaTableWidget extends StatefulWidget {
   final List<Map<String, String>> dataRegister;
@@ -24,7 +25,7 @@ class _BioimpedanciaTableWidgetState extends State<BioimpedanciaTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
-        const SizedBox(height: 20),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.005),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -41,7 +42,7 @@ class _BioimpedanciaTableWidgetState extends State<BioimpedanciaTableWidget> {
                         widget.onRowTap(row);
                       },
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   ],
                 );
               }).toList(),
@@ -69,8 +70,9 @@ class _BioimpedanciaTableWidgetState extends State<BioimpedanciaTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
+            fontSize: 17.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -148,7 +150,10 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14.sp,
+          ),
         ),
       ),
     );
