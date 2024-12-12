@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/programs/overlays/overlays_programs.dart';
 
 class ProgramsMenuView extends StatefulWidget {
@@ -94,12 +95,12 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                               fit: BoxFit.contain,
                                             ),
                                           ),
-                                          const Expanded(
+                                           Expanded(
                                             child: Text(
                                               "PROGRAMAS",
                                               style: TextStyle(
-                                                color: Color(0xFF28E2F5),
-                                                fontSize: 30,
+                                                color: const Color(0xFF28E2F5),
+                                                fontSize: 33.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
@@ -288,9 +289,9 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style: const TextStyle(
-                      color: Color(0xFF28E2F5),
-                      fontSize: 20,
+                    style:  TextStyle(
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,

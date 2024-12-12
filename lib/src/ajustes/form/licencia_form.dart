@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:platform/platform.dart';
 
@@ -406,8 +407,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       'assets/images/recuadro.png',
                                       fit: BoxFit.fill,
                                     ),
-                                    const Padding(
-                                      padding: EdgeInsets.all(8.0),
+                                     Padding(
+                                      padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -416,8 +417,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                             child: Text(
                                               "LICENCIA",
                                               style: TextStyle(
-                                                color: Color(0xFF28E2F5),
-                                                fontSize: 30,
+                                                color: const Color(0xFF28E2F5),
+                                                fontSize: 34.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
