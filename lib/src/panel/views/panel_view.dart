@@ -1937,12 +1937,18 @@ _currentImageIndex= imagePaths.length - time;
                                                       GestureDetector(
                                                         onTap: isRunning
                                                             ? null
-                                                            : () setState({if(time < 30){)
-    if (time < 30) {
-    time++; // Aumenta el tiempo (en minutos)
-    totalTime = time * 60; // Actualiza el tiempo total en segundos
-    _currentImageIndex = imagePaths.length - time; // Actualiza el índice de la imagen
-    }
+                                                            : () {
+                                                                setState(() {
+                                                                  if (time <
+                                                                      30) {
+                                                                    time++; // Disminuye el tiempo si es mayor que 1
+                                                                    totalTime =
+                                                                        time *
+                                                                            60; // Actualiza el tiempo total en segundos
+                                                                    _currentImageIndex = imagePaths.length - time;
+                                                                  }
+                                                                });
+                                                              },
                                                         child: Image.asset(
                                                           'assets/images/flecha-arriba.png',
                                                           height: screenHeight *
@@ -3322,22 +3328,16 @@ _currentImageIndex= imagePaths.length - time;
                                               Stack(
                                                 alignment: Alignment.center,
                                                 children: [
-                                                  // Mostrar las imágenes según el índice ajustado
-                                                  ...imagePaths
-                                                      .sublist(
-                                                          _currentImageIndex)
-                                                      .reversed
-                                                      .map((imagePath) {
-                                                    return Image.asset(
-                                                      imagePath,
-                                                      height:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .height *
-                                                              0.25,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  }).toList(),
+                                                  Image.asset(
+                                                    imagePaths[
+                                                        _currentImageIndex],
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.25,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                   Column(
                                                     children: [
                                                       // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
@@ -3346,9 +3346,14 @@ _currentImageIndex= imagePaths.length - time;
                                                             ? null
                                                             : () {
                                                                 setState(() {
-                                                                  time++; // Aumenta el tiempo (en minutos)
-                                                                  totalTime = time *
-                                                                      60; // Actualiza el tiempo total en segundos
+                                                                  if (time <
+                                                                      31) {
+                                                                    time++; // Disminuye el tiempo si es mayor que 1
+                                                                    totalTime =
+                                                                        time *
+                                                                            60; // Actualiza el tiempo total en segundos
+                                                                    _currentImageIndex = imagePaths.length - time;
+                                                                  }
                                                                 });
                                                               },
                                                         child: Image.asset(
@@ -3360,7 +3365,6 @@ _currentImageIndex= imagePaths.length - time;
                                                       ),
                                                       Text(
                                                         "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
-                                                        // Convierte seconds a entero y usa padLeft para formato mm:ss
                                                         style: const TextStyle(
                                                           fontSize: 25,
                                                           fontWeight:
@@ -3380,6 +3384,7 @@ _currentImageIndex= imagePaths.length - time;
                                                                     totalTime =
                                                                         time *
                                                                             60; // Actualiza el tiempo total en segundos
+                                                                    _currentImageIndex = imagePaths.length - time;
                                                                   }
                                                                 });
                                                               },
@@ -3394,6 +3399,7 @@ _currentImageIndex= imagePaths.length - time;
                                                   ),
                                                 ],
                                               ),
+
 
                                               SizedBox(
                                                   height: screenHeight * 0.01),

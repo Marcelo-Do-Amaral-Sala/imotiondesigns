@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/bio/overlay_bio.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -272,7 +273,7 @@ class _MainMenuViewState extends State<MainMenuView> {
           scale: scale,
           duration: const Duration(milliseconds: 100),
           child: SizedBox(
-            width: screenWidth * 0.2,
+            width: screenWidth * 0.25,
             height: screenHeight * 0.1,
             child: Stack(
               alignment: Alignment.center,
@@ -287,7 +288,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.only(left:20.0),
                         width: screenWidth * 0.05,
                         height: screenHeight * 0.1,
                         child: Image.asset(
@@ -298,9 +299,9 @@ class _MainMenuViewState extends State<MainMenuView> {
                       Expanded(
                         child: Text(
                           text,
-                          style: const TextStyle(
-                            color: Color(0xFF28E2F5),
-                            fontSize: 20,
+                          style:  TextStyle(
+                            color: const Color(0xFF28E2F5),
+                            fontSize: 22.sp,
                             fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,

@@ -2,6 +2,7 @@ import 'dart:io'; // Importante para detectar la plataforma (Android/iOS vs PC)
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../db/db_helper.dart';
@@ -135,12 +136,12 @@ class _ClientsViewState extends State<ClientsView> {
                                               fit: BoxFit.contain,
                                             ),
                                           ),
-                                          const Expanded(
+                                           Expanded(
                                             child: Text(
                                               "CLIENTES",
                                               style: TextStyle(
-                                                color: Color(0xFF28E2F5),
-                                                fontSize: 30,
+                                                color: const Color(0xFF28E2F5),
+                                                fontSize: 33.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
@@ -277,9 +278,9 @@ class _ClientsViewState extends State<ClientsView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style: const TextStyle(
-                      color: Color(0xFF28E2F5),
-                      fontSize: 20,
+                    style:  TextStyle(
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,

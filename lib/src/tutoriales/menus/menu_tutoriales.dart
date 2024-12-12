@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
-import 'package:imotion_designs/src/programs/overlays/overlays_programs.dart';
 
 import '../overlays/overlays_tuto.dart';
 
@@ -95,12 +95,12 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                                               fit: BoxFit.contain,
                                             ),
                                           ),
-                                          const Expanded(
+                                           Expanded(
                                             child: Text(
                                               "TUTORIALES",
-                                              style: TextStyle(
-                                                color: Color(0xFF28E2F5),
-                                                fontSize: 26,
+                                              style:  TextStyle(
+                                                color: const Color(0xFF28E2F5),
+                                                fontSize: 34.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
@@ -265,9 +265,9 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style: const TextStyle(
-                      color: Color(0xFF28E2F5),
-                      fontSize: 20,
+                    style:  TextStyle(
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/app.dart';
 import 'package:imotion_designs/src/servicios/connectivity.dart';
 import 'package:imotion_designs/src/servicios/sync.dart';
@@ -46,7 +47,13 @@ void main() async {
           },
         ),
       ],
-      child: App(), // Aquí colocamos el widget raíz como child de MultiProvider
+       child: ScreenUtilInit(
+        designSize: const Size(1200, 1920),  // Tamaño base de la tablet Galaxy A8 (1200x1920 píxeles)
+        builder: (context, child) {
+          return App(); // Aquí colocamos el widget raíz como child de MultiProvider
+        },
+      ),
     ),
   );
 }
+

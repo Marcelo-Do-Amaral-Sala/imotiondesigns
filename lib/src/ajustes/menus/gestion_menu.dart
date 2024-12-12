@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
-import 'package:imotion_designs/src/programs/overlays/overlays_programs.dart';
 
 class GestionMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
@@ -77,18 +77,18 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                                       'assets/images/recuadro.png',
                                       fit: BoxFit.fill,
                                     ),
-                                    const Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                     Padding(
+                                      padding:  const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
                                         MainAxisAlignment.center,
                                         children: [
-                                          const Expanded(
+                                           Expanded(
                                             child: Text(
                                               "GESTIÓN DE CENTROS",
                                               style: TextStyle(
-                                                color: Color(0xFF28E2F5),
-                                                fontSize: 26,
+                                                color:  const Color(0xFF28E2F5),
+                                                fontSize: 30.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
@@ -238,9 +238,9 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style: const TextStyle(
-                      color: Color(0xFF28E2F5),
-                      fontSize: 20,
+                    style:  TextStyle(
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
