@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../db/db_helper.dart';
-
 
 class PersonalDataForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
@@ -183,11 +183,18 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedOption,
                                 items: [
-                                  DropdownMenuItem(value: 'Activo', child: Text('Activo', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'Inactivo', child: Text('Inactivo', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Activo',
+                                      child: Text('Activo',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Inactivo',
+                                      child: Text('Inactivo',
+                                          style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -195,7 +202,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
                           ],
@@ -217,11 +225,18 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedGender,
                                 items: [
-                                  DropdownMenuItem(value: 'Hombre', child: Text('Hombre', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'Mujer', child: Text('Mujer', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Hombre',
+                                      child: Text('Hombre',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Mujer',
+                                      child: Text('Mujer',
+                                          style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -229,21 +244,24 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
-                            SizedBox(height: screenHeight * 0.05),
+                            SizedBox(height: screenHeight * 0.03),
                             Text('FECHA DE NACIMIENTO', style: _labelStyle),
                             GestureDetector(
                               onTap: () => _selectDate(context),
                               child: Container(
                                 alignment: Alignment.center,
                                 decoration: _inputDecoration(),
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                                child: Text(_birthDate ?? 'DD/MM/YYYY', style: _inputTextStyle),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                child: Text(_birthDate ?? 'DD/MM/YYYY',
+                                    style: _inputTextStyle),
                               ),
                             ),
-                            SizedBox(height: screenHeight * 0.05),
+                            SizedBox(height: screenHeight * 0.03),
                             Text('TELÉFONO', style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
@@ -255,13 +273,14 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: 'Introducir teléfono'),
+                                decoration: _inputDecorationStyle(
+                                    hintText: 'Introducir teléfono'),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.02),
+                      SizedBox(width: screenWidth * 0.1),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,26 +297,31 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   LengthLimitingTextInputFormatter(3),
                                 ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: 'Introducir altura'),
+                                decoration: _inputDecorationStyle(
+                                    hintText: 'Introducir altura'),
                               ),
                             ),
-                            SizedBox(height: screenHeight * 0.05),
+                            SizedBox(height: screenHeight * 0.03),
                             Text('PESO (kg)', style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _weightController,
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')), // Permite números enteros y decimales
-                                    LengthLimitingTextInputFormatter(3),
-                                  ],
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(
+                                      r'^\d*\.?\d*$')), // Permite números enteros y decimales
+                                  LengthLimitingTextInputFormatter(3),
+                                ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: 'Introducir peso'),
+                                decoration: _inputDecorationStyle(
+                                    hintText: 'Introducir peso'),
                               ),
                             ),
-                            SizedBox(height: screenHeight * 0.05),
+                            SizedBox(height: screenHeight * 0.03),
                             Text('E-MAIL', style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
@@ -306,10 +330,12 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                                  FilteringTextInputFormatter.deny(
+                                      RegExp(r'\s')),
                                 ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: 'Introducir e-mail'),
+                                decoration: _inputDecorationStyle(
+                                    hintText: 'Introducir e-mail'),
                               ),
                             ),
                           ],
@@ -354,12 +380,17 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   }
 
 // Ajustes de estilos para simplificar
-  TextStyle get _labelStyle => const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
-  TextStyle get _inputTextStyle => const TextStyle(color: Colors.white, fontSize: 14);
-  TextStyle get _dropdownHintStyle => const TextStyle(color: Colors.white, fontSize: 14);
-  TextStyle get _dropdownItemStyle => const TextStyle(color: Colors.white, fontSize: 14);
+  TextStyle get _labelStyle => TextStyle(
+      color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
+  TextStyle get _inputTextStyle =>
+      TextStyle(color: Colors.white, fontSize: 14.sp);
+  TextStyle get _dropdownHintStyle =>
+      TextStyle(color: Colors.white, fontSize: 14.sp);
+  TextStyle get _dropdownItemStyle =>
+      TextStyle(color: Colors.white, fontSize: 15.sp);
 
-  InputDecoration _inputDecorationStyle({String hintText = '', bool enabled = true}) {
+  InputDecoration _inputDecorationStyle(
+      {String hintText = '', bool enabled = true}) {
     return InputDecoration(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
       filled: true,
@@ -372,10 +403,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   }
 
   BoxDecoration _inputDecoration() {
-    return BoxDecoration(color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+    return BoxDecoration(
+        color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
   }
-
-
 }
-
-

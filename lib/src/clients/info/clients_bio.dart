@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/bioimpedancia_table_custom.dart';
 
 class ClientsBio extends StatefulWidget {
@@ -166,9 +167,9 @@ class _ClientsBioState extends State<ClientsBio> {
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          color: Color(0xFF2be4f3),
-          fontSize: 16,
+        style:  TextStyle(
+          color: const Color(0xFF2be4f3),
+          fontSize: 17.sp,
           fontWeight: FontWeight.bold,
         ),
         textAlign: TextAlign.center,
@@ -184,9 +185,9 @@ class _ClientsBioState extends State<ClientsBio> {
         // Etiqueta del campo de texto
         Text(
           label,
-          style: const TextStyle(
+          style:  TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -222,9 +223,9 @@ class _ClientsBioState extends State<ClientsBio> {
         // Etiqueta del dropdown
         Text(
           label,
-          style: const TextStyle(
+          style:  TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -239,24 +240,24 @@ class _ClientsBioState extends State<ClientsBio> {
             absorbing: !enabled,
             // Si no está habilitado, se bloquea la interacción
             child: DropdownButton<String>(
-              hint: const Text(
+              hint:  Text(
                 'Seleccione',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: Colors.white, fontSize: 14.sp),
               ),
               value: value,
-              items: const [
+              items:  [
                 DropdownMenuItem(
                   value: 'Activo',
                   child: Text(
                     'Activo',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),
                 DropdownMenuItem(
                   value: 'Inactivo',
                   child: Text(
                     'Inactivo',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),
               ],

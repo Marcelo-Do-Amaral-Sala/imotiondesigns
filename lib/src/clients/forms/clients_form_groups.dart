@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../db/db_helper.dart';
@@ -192,10 +193,10 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('NOMBRE',
+                               Text('NOMBRE',
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 12,
+                                      fontSize: 15.sp,
                                       fontWeight: FontWeight.bold)),
                               Container(
                                 alignment: Alignment.center,
@@ -204,8 +205,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                     borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _nameController,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 14),
+                                  style:  TextStyle(
+                                      color: Colors.white, fontSize: 14.sp),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(7)),
@@ -224,11 +225,11 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                               Text(
                                 'ESTADO',
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 12,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.bold),
                               ),
                               Container(
@@ -240,20 +241,20 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                   absorbing: true,
                                   // Esto deshabilita la interacción con el DropdownButton
                                   child: DropdownButton<String>(
-                                    hint: const Text(
+                                    hint:  Text(
                                       'Seleccione',
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 14),
+                                          color: Colors.white, fontSize: 14.sp),
                                     ),
                                     value: selectedOption,
-                                    items: const [
+                                    items:  [
                                       DropdownMenuItem(
                                         value: 'Activo',
                                         child: Text(
                                           'Activo',
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 14),
+                                              fontSize: 14.sp),
                                         ),
                                       ),
                                       DropdownMenuItem(
@@ -262,7 +263,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                           'Inactivo',
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 14),
+                                              fontSize: 14.sp),
                                         ),
                                       ),
                                     ],
@@ -301,7 +302,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               'Isquiotibiales',
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -318,16 +319,16 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                                 borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
-                                                style: const TextStyle(
+                                                style:  TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 14,
+                                                  fontSize: 14.sp,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 14,
+                                                    fontSize: 14.sp,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(7),
@@ -465,7 +466,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               'Gemelos',
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -482,16 +483,16 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                                 borderRadius: BorderRadius.circular(7),
                                               ),
                                               child: TextField(
-                                                style: const TextStyle(
+                                                style:  TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 14,
+                                                  fontSize: 14.sp,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 14,
+                                                    fontSize: 14.sp,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius: BorderRadius.circular(7),
@@ -520,7 +521,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                 ],
               ),
             ),
-            // Botón de acción
+            SizedBox(height: screenHeight * 0.01),
             SizedBox(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -561,6 +562,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                         );
                       }
                     },
+
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),

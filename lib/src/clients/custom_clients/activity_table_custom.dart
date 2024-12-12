@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ActivityTableWidget extends StatefulWidget {
   final List<Map<String, String>> activityData;
@@ -15,7 +16,7 @@ class _ActivityTableWidgetState extends State<ActivityTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
-        const SizedBox(height: 10),
+        SizedBox(height: MediaQuery.of(context).size.height*0.01),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -29,7 +30,7 @@ class _ActivityTableWidgetState extends State<ActivityTableWidget> {
                       points: row['points'] ?? '',
                       ekal: row['ekal'] ?? '',
                     ),
-                    const SizedBox(height: 5),
+                     SizedBox(height: MediaQuery.of(context).size.height*0.01),
                   ],
                 );
               }).toList(),
@@ -60,8 +61,9 @@ class _ActivityTableWidgetState extends State<ActivityTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(
+          style:  TextStyle(
             color: Colors.white,
+            fontSize: 17.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -117,7 +119,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(color: Colors.white),
+          style:  TextStyle(color: Colors.white, fontSize: 14.sp,),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BioSessionTableWidget extends StatefulWidget {
   final List<Map<String, String>> bioimpedanceData;
@@ -11,7 +12,6 @@ class BioSessionTableWidget extends StatefulWidget {
 }
 
 class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -19,7 +19,7 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado de columnas
-        const SizedBox(height: 10),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.005),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -33,10 +33,12 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
                       ref: row['ref'] ?? '',
                       result: row['result'] ?? '',
                       backgroundColor: (index % 2 == 0)
-                          ? const Color.fromARGB(255, 46, 46, 46) // Color para filas impares
+                          ? const Color.fromARGB(
+                              255, 46, 46, 46) // Color para filas impares
                           : Colors.transparent, // Color para filas pares
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.005),
                   ],
                 );
               }),
@@ -66,10 +68,10 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: 17.sp,
           ),
         ),
       ),
@@ -123,10 +125,10 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white, // Cambia el color según tu diseño
             fontWeight: FontWeight.bold,
-            fontSize: 14, // Tamaño de fuente personalizado
+            fontSize: 17.sp, // Tamaño de fuente personalizado
           ),
         ),
       ),
@@ -140,9 +142,9 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 14.sp,
           ),
         ),
       ),
