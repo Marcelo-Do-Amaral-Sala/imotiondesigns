@@ -178,7 +178,7 @@ class _PanelViewState extends State<PanelView>
   @override
   void initState() {
     super.initState();
-    _updateImageIndex();
+_currentImageIndex= imagePaths.length - time;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {});
     bleConnectionService = BleConnectionService([]);
 
@@ -350,8 +350,6 @@ class _PanelViewState extends State<PanelView>
   }
 
   void _startTimer() {
-    _updateImageIndex();
-
     setState(() {
       isRunning = true;
       startTime = DateTime.now();
@@ -359,25 +357,19 @@ class _PanelViewState extends State<PanelView>
       // Inicia el temporizador con un intervalo de 1 segundo
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {
-          // Calcula el tiempo transcurrido
+          // Calcula el tiempo transcurrido y el progreso
           elapsedTime = pausedTime +
               DateTime.now().difference(startTime).inSeconds.toDouble();
+          progress = 1.0 - (elapsedTime / totalTime); // Reducir el progreso
 
-          // Progreso del tiempo restante
-          progress = 1.0 - (elapsedTime / totalTime).clamp(0.0, 1.0);
+          // Actualiza los minutos y segundos
+          seconds = (totalTime - elapsedTime).toInt() % 60;
+          time = (totalTime - elapsedTime).toInt() ~/ 60;
 
-          // Actualizar tiempo restante en minutos y segundos
-          int remainingTime = (totalTime - elapsedTime).toInt();
-          seconds = remainingTime % 60;
-          time = remainingTime ~/ 60;
-
-          // Calcular índice de la imagen basado en el tiempo restante
-          int maxIndex = imagePaths.length - time; // Índice máximo de imágenes
-          if (elapsedTime >= 60) {
-            // Actualizar el índice basado en el tiempo transcurrido (por minutos completos)
-            _currentImageIndex = ((elapsedTime - 60) / (totalTime - 60) * maxIndex).floor().clamp(0, maxIndex);
+          if ((totalTime - elapsedTime) % 60 == 0) {
+            _currentImageIndex = time; // Cambia el índice de la imagen según el minuto restante
           }
-          // Pausa el temporizador si el tiempo ha terminado
+          // Pausa el temporizador cuando se alcanza el tiempo total
           if (elapsedTime >= totalTime) {
             _pauseTimer();
           }
@@ -1929,36 +1921,28 @@ class _PanelViewState extends State<PanelView>
                                               Stack(
                                                 alignment: Alignment.center,
                                                 children: [
-                                                  // Mostrar las imágenes según el índice ajustado
-                                                  ...imagePaths
-                                                      .sublist(
-                                                          _currentImageIndex)
-                                                      .reversed
-                                                      .map((imagePath) {
-                                                    return Image.asset(
-                                                      imagePath,
-                                                      height:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .height *
-                                                              0.25,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  }).toList(),
+                                                  Image.asset(
+                                                    imagePaths[
+                                                        _currentImageIndex],
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.25,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                   Column(
                                                     children: [
                                                       // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
                                                       GestureDetector(
                                                         onTap: isRunning
                                                             ? null
-                                                            : () {
-                                                                setState(() {
-                                                                  time++; // Aumenta el tiempo (en minutos)
-                                                                  totalTime = time *
-                                                                      60; // Actualiza el tiempo total en segundos
-                                                                  _updateImageIndex(); // Actualiza el índice de la imagen según el tiempo
-                                                                });
-                                                              },
+                                                            : () setState({if(time < 30){)
+    if (time < 30) {
+    time++; // Aumenta el tiempo (en minutos)
+    totalTime = time * 60; // Actualiza el tiempo total en segundos
+    _currentImageIndex = imagePaths.length - time; // Actualiza el índice de la imagen
+    }
                                                         child: Image.asset(
                                                           'assets/images/flecha-arriba.png',
                                                           height: screenHeight *
@@ -1987,7 +1971,7 @@ class _PanelViewState extends State<PanelView>
                                                                     totalTime =
                                                                         time *
                                                                             60; // Actualiza el tiempo total en segundos
-                                                                    _updateImageIndex(); // Actualiza el índice de la imagen según el tiempo
+                                                                    _currentImageIndex = imagePaths.length - time;
                                                                   }
                                                                 });
                                                               },
@@ -3365,7 +3349,6 @@ class _PanelViewState extends State<PanelView>
                                                                   time++; // Aumenta el tiempo (en minutos)
                                                                   totalTime = time *
                                                                       60; // Actualiza el tiempo total en segundos
-                                                                  _updateImageIndex(); // Actualiza el índice de la imagen según el tiempo
                                                                 });
                                                               },
                                                         child: Image.asset(
@@ -3397,7 +3380,6 @@ class _PanelViewState extends State<PanelView>
                                                                     totalTime =
                                                                         time *
                                                                             60; // Actualiza el tiempo total en segundos
-                                                                    _updateImageIndex(); // Actualiza el índice de la imagen según el tiempo
                                                                   }
                                                                 });
                                                               },
@@ -4536,19 +4518,6 @@ class _PanelViewState extends State<PanelView>
     return number % 1 == 0
         ? number.toInt().toString()
         : number.toStringAsFixed(2);
-  }
-
-  void _updateImageIndex() {
-    int maxIndex = imagePaths.length - 1; // Último índice
-    int index = maxIndex -
-        (time * maxIndex ~/ 30); // Calcula el índice en función del tiempo
-
-    // Nos aseguramos de que el índice esté dentro del rango
-    if (index >= 0 && index < imagePaths.length) {
-      setState(() {
-        _currentImageIndex = index; // Actualizamos el índice de la imagen
-      });
-    }
   }
 
   Color _getBorderColor(String status) {

@@ -88,8 +88,14 @@ class _MainMenuViewState extends State<MainMenuView> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Scaffold(
       body: Stack(
@@ -127,10 +133,10 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'PANEL DE CONTROL',
                                 scaleFactorPanel,
                                     () {
-                                      scaleFactorPanel = 1;
+                                  scaleFactorPanel = 1;
                                   widget.onNavigateToPanel();
                                 },
-                                () => setState(() => scaleFactorPanel = 0.90),
+                                    () => setState(() => scaleFactorPanel = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -138,11 +144,11 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/cliente.png',
                                 'CLIENTES',
                                 scaleFactorClient,
-                                () {
+                                    () {
                                   scaleFactorClient = 1;
                                   widget.onNavigateToClients();
                                 },
-                                () => setState(() => scaleFactorClient = 0.90),
+                                    () => setState(() => scaleFactorClient = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -150,13 +156,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/programas.png',
                                 'PROGRAMAS',
                                 scaleFactorProgram,
-                                () {
+                                    () {
                                   setState(() {
                                     scaleFactorProgram = 1;
                                     widget.onNavigateToPrograms();
                                   });
                                 },
-                                () => setState(() => scaleFactorProgram = 0.90),
+                                    () => setState(() => scaleFactorProgram = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -164,13 +170,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/bio.png',
                                 'BIOIMPEDANCIA',
                                 scaleFactorBio,
-                                () {
+                                    () {
                                   setState(() {
                                     scaleFactorBio = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                () => setState(() => scaleFactorBio = 0.90),
+                                    () => setState(() => scaleFactorBio = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -178,13 +184,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/tutoriales.png',
                                 'TUTORIALES',
                                 scaleFactorTuto,
-                                () {
+                                    () {
                                   setState(() {
                                     scaleFactorTuto = 1;
                                     widget.onNavigateToTutoriales();
                                   });
                                 },
-                                () => setState(() => scaleFactorTuto = 0.90),
+                                    () => setState(() => scaleFactorTuto = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
@@ -192,13 +198,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/ajustes.png',
                                 'AJUSTES',
                                 scaleFactorAjustes,
-                                () {
+                                    () {
                                   setState(() {
                                     scaleFactorAjustes = 1;
                                     widget.onNavigateToAjustes();
                                   });
                                 },
-                                () => setState(() => scaleFactorAjustes = 0.90),
+                                    () => setState(() => scaleFactorAjustes = 0.90),
                               ),
                             ],
                           ),
@@ -248,8 +254,14 @@ class _MainMenuViewState extends State<MainMenuView> {
 
   Widget buildButton(BuildContext context, String imagePath, String text,
       double scale, VoidCallback onTapUp, VoidCallback onTapDown) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Align(
       alignment: Alignment.centerRight,
