@@ -457,7 +457,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                         ),
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.03),
-                        ElevatedButton(
+                        OutlinedButton(
                           onPressed: () async {
                             final cantidadBonos =
                                 int.tryParse(_bonosController.text);

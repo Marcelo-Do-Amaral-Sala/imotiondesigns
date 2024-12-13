@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../db/db_helper.dart';
 
@@ -138,7 +139,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       // Si el programa se insertó correctamente, ahora insertamos los subprogramas
       List<Map<String, dynamic>> subprogramas = secuencias.map((sec) {
         // Obtener el ID del programa seleccionado desde el dropdown
-        int? idProgramaSeleccionado = sec['id_programa']; // Asumiendo que en sec tienes el id del programa
+        int? idProgramaSeleccionado = sec[
+            'id_programa']; // Asumiendo que en sec tienes el id del programa
 
         var subprograma = {
           'id_programa_automatico': programaId,
@@ -148,7 +150,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
           'duracion': double.tryParse(sec['duracion'].toString()) ?? 0.0,
         };
 
-        print("Subprograma creado: $subprograma"); // Mostrar cada subprograma creado
+        print(
+            "Subprograma creado: $subprograma"); // Mostrar cada subprograma creado
         return subprograma;
       }).toList();
 
@@ -156,7 +159,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       print("Lista de subprogramas:");
       print(subprogramas);
 
-      bool success = await dbHelper.insertAutomaticProgram(programaId, subprogramas);
+      bool success =
+          await dbHelper.insertAutomaticProgram(programaId, subprogramas);
 
       // Notificar al usuario sobre el resultado
       if (mounted) {
@@ -170,7 +174,6 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       print("Error al insertar el programa automático.");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +214,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                           ],
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.02),
+                      SizedBox(width: screenWidth * 0.05),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +243,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                           ],
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.02),
+                      SizedBox(width: screenWidth * 0.05),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,65 +313,70 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                       // 20% del ancho para la cuarta columna
                                       4: FractionColumnWidth(0.15),
                                     },
-                                    children: const [
+                                    children: [
                                       TableRow(
                                         children: [
                                           Padding(
-                                            padding: EdgeInsets.all(8.0),
+                                            padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
                                                 'ORDEN',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 17.sp,
                                                 ),
                                               ),
                                             ),
                                           ),
                                           Padding(
-                                            padding: EdgeInsets.all(8.0),
+                                            padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
                                                 'PROGRAMA',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 17.sp,
                                                 ),
                                               ),
                                             ),
                                           ),
                                           Padding(
-                                            padding: EdgeInsets.all(8.0),
+                                            padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
                                                 'DURACIÓN',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 17.sp,
                                                 ),
                                               ),
                                             ),
                                           ),
                                           Padding(
-                                            padding: EdgeInsets.all(8.0),
+                                            padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
                                                 'AJUSTE',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 17.sp,
                                                 ),
                                               ),
                                             ),
                                           ),
                                           Padding(
-                                            padding: EdgeInsets.all(8.0),
+                                            padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
                                                 'ACCIÓN',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
+                                                  fontSize: 17.sp,
                                                 ),
                                               ),
                                             ),
@@ -405,11 +413,11 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['orden']}',
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                             color: Colors.white,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .bold),
+                                                                FontWeight.bold,
+                                                            fontSize: 15.sp),
                                                       ),
                                                     ),
                                                   ),
@@ -420,9 +428,9 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['programa']}',
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.white),
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 15.sp),
                                                       ),
                                                     ),
                                                   ),
@@ -433,9 +441,9 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['duracion']}',
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.white),
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 15.sp),
                                                       ),
                                                     ),
                                                   ),
@@ -446,9 +454,9 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['ajuste']}',
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.white),
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 15.sp),
                                                       ),
                                                     ),
                                                   ),
@@ -499,11 +507,11 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                             ),
                             backgroundColor: Colors.transparent,
                           ),
-                          child: const Text(
+                          child: Text(
                             'CREAR SECUENCIA',
                             style: TextStyle(
-                              color: Color(0xFF2be4f3),
-                              fontSize: 20,
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,
@@ -515,6 +523,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                 ],
               ),
             ),
+            SizedBox(width: screenWidth * 0.01),
             SizedBox(
               child: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
@@ -607,7 +616,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
           ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.6,
+              maxHeight: screenHeight * 0.65,
               maxWidth: screenWidth * 0.6,
             ),
             child: StatefulBuilder(
@@ -628,14 +637,14 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                       ),
                       child: Stack(
                         children: [
-                          const Center(
+                          Center(
                             child: Text(
                               "AGREGAR PROGRAMA AUTOMÁTICO",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 30,
+                                fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF2be4f3),
+                                color: const Color(0xFF2be4f3),
                               ),
                             ),
                           ),
@@ -668,10 +677,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                           children: [
                             Title(
                               color: Colors.white,
-                              child: const Text(
+                              child:  Text(
                                 "¡Estás a un paso de terminar!\nSolo falta añadir una descripción para guardar tu programa.",
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 25.sp,
                                   // Tamaño de la fuente
                                   fontWeight: FontWeight.bold,
                                   // Estilo de la fuente
@@ -730,7 +739,9 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                       const SnackBar(
                                         content: Text(
                                           "Programa automático creado correctamente",
-                                          style: TextStyle(color: Colors.white, fontSize: 17),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17),
                                         ),
                                         backgroundColor: Colors.green,
                                         duration: Duration(seconds: 2),
@@ -810,14 +821,14 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                       ),
                       child: Stack(
                         children: [
-                          const Center(
+                           Center(
                             child: Text(
                               "CREAR SECUENCIA",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 30,
+                                fontSize: 30.sp,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF2be4f3),
+                                color: const Color(0xFF2be4f3),
                               ),
                             ),
                           ),
@@ -1057,17 +1068,17 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
     );
   }
 
-  TextStyle get _labelStyle => const TextStyle(
-      color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+  TextStyle get _labelStyle => TextStyle(
+      color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
 
   TextStyle get _inputTextStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
+      TextStyle(color: Colors.white, fontSize: 14.sp);
 
   TextStyle get _dropdownHintStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
+      TextStyle(color: Colors.white, fontSize: 14.sp);
 
   TextStyle get _dropdownItemStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
+      TextStyle(color: Colors.white, fontSize: 15.sp);
 
   InputDecoration _inputDecorationStyle(
       {String hintText = '', bool enabled = true}) {
@@ -1077,7 +1088,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       fillColor: const Color(0xFF313030),
       isDense: true,
       hintText: hintText,
-      hintStyle: const TextStyle(color: Colors.grey),
+      hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
       enabled: enabled,
     );
   }
