@@ -103,7 +103,7 @@ class _AdminsActivityState extends State<AdminsActivity> {
                   ),
                   SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
                   // Campo ESTADO
-                  Flexible(
+                  Flexible(             
                     child: _buildDropdownField(
                       'ESTADO',
                       selectedOption,
