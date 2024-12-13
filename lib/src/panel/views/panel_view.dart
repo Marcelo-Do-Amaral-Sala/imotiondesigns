@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -178,7 +179,7 @@ class _PanelViewState extends State<PanelView>
   @override
   void initState() {
     super.initState();
-_currentImageIndex= imagePaths.length - time;
+    _currentImageIndex = imagePaths.length - time;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {});
     bleConnectionService = BleConnectionService([]);
 
@@ -367,7 +368,8 @@ _currentImageIndex= imagePaths.length - time;
           time = (totalTime - elapsedTime).toInt() ~/ 60;
 
           if ((totalTime - elapsedTime) % 60 == 0) {
-            _currentImageIndex = time; // Cambia el índice de la imagen según el minuto restante
+            _currentImageIndex =
+                time; // Cambia el índice de la imagen según el minuto restante
           }
           // Pausa el temporizador cuando se alcanza el tiempo total
           if (elapsedTime >= totalTime) {
@@ -484,9 +486,9 @@ _currentImageIndex= imagePaths.length - time;
                                                           : selectedClientsGlobal[
                                                                   0]['name'] ??
                                                               'No Name',
-                                                      style: const TextStyle(
-                                                        fontSize: 17,
-                                                        color: Color(
+                                                      style: TextStyle(
+                                                        fontSize: 17.sp,
+                                                        color: const Color(
                                                             0xFF28E2F5), // Color del texto
                                                       ),
                                                     ),
@@ -517,11 +519,11 @@ _currentImageIndex= imagePaths.length - time;
                                           ),
                                           backgroundColor: Colors.transparent,
                                         ),
-                                        child: const Text(
+                                        child: Text(
                                           'DEFINIR GRUPOS',
                                           style: TextStyle(
-                                            color: Color(0xFF2be4f3),
-                                            fontSize: 17,
+                                            color: const Color(0xFF2be4f3),
+                                            fontSize: 17.sp,
                                             fontWeight: FontWeight.bold,
                                           ),
                                           textAlign: TextAlign.center,
@@ -806,9 +808,9 @@ _currentImageIndex= imagePaths.length - time;
                                               child: Text(
                                                 globalSelectedProgram ??
                                                     'PROGRAMAS',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 14,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                                 textAlign: TextAlign.center,
@@ -824,12 +826,12 @@ _currentImageIndex= imagePaths.length - time;
                                                   Column(
                                                     children: [
                                                       // Texto predeterminado si no se ha seleccionado ningún programa
-                                                      const Text(
+                                                      Text(
                                                         "NOMBRE PROGRAMA",
                                                         style: TextStyle(
-                                                          color:
-                                                              Color(0xFF2be4f3),
-                                                          fontSize: 15,
+                                                          color: const Color(
+                                                              0xFF2be4f3),
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
                                                       // Imagen predeterminada si no se ha seleccionado ningún programa
@@ -866,10 +868,10 @@ _currentImageIndex= imagePaths.length - time;
                                                                         'nombre'] ??
                                                                     "NOMBRE PROGRAMA"
                                                                 : "No hay programas disponibles",
-                                                        style: const TextStyle(
-                                                          color:
-                                                              Color(0xFF2be4f3),
-                                                          fontSize: 15,
+                                                        style: TextStyle(
+                                                          color: const Color(
+                                                              0xFF2be4f3),
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
 
@@ -925,10 +927,10 @@ _currentImageIndex= imagePaths.length - time;
                                                                         'nombre'] ??
                                                                     "NOMBRE PROGRAMA"
                                                                 : "No hay programas disponibles",
-                                                        style: const TextStyle(
-                                                          color:
-                                                              Color(0xFF2be4f3),
-                                                          fontSize: 15,
+                                                        style: TextStyle(
+                                                          color: const Color(
+                                                              0xFF2be4f3),
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
 
@@ -984,10 +986,10 @@ _currentImageIndex= imagePaths.length - time;
                                                                         'nombre_programa_automatico'] ??
                                                                     "NOMBRE PROGRAMA"
                                                                 : "No hay programas disponibles",
-                                                        style: const TextStyle(
-                                                          color:
-                                                              Color(0xFF2be4f3),
-                                                          fontSize: 15,
+                                                        style: TextStyle(
+                                                          color: const Color(
+                                                              0xFF2be4f3),
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
 
@@ -1033,12 +1035,12 @@ _currentImageIndex= imagePaths.length - time;
                                               children: [
                                                 if (globalSelectedProgram ==
                                                     null)
-                                                  const Column(
+                                                  Column(
                                                     children: [
                                                       Text(
                                                         "",
                                                         style: TextStyle(
-                                                          fontSize: 15,
+                                                          fontSize: 15.sp,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color: Colors.white,
@@ -1047,7 +1049,7 @@ _currentImageIndex= imagePaths.length - time;
                                                       Text(
                                                         "",
                                                         style: TextStyle(
-                                                          fontSize: 15,
+                                                          fontSize: 15.sp,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color: Colors.white,
@@ -1069,9 +1071,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     .isNotEmpty
                                                                 ? "${formatNumber(allIndividualPrograms[0]['frecuencia'] as double)} Hz"
                                                                 : " N/A",
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: 15,
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
                                                       Text(
@@ -1082,9 +1084,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     .isNotEmpty
                                                                 ? "${formatNumber(allIndividualPrograms[0]['pulso'] as double)} ms"
                                                                 : "N/A",
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: 15,
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
                                                     ],
@@ -1103,9 +1105,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     .isNotEmpty
                                                                 ? "${formatNumber(allRecoveryPrograms[0]['frecuencia'] as double)} Hz"
                                                                 : "N/A",
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: 15,
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
                                                       Text(
@@ -1116,9 +1118,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     .isNotEmpty
                                                                 ? "${formatNumber(allRecoveryPrograms[0]['pulso'] as double)} ms"
                                                                 : "N/A",
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: 15,
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
                                                     ],
@@ -1137,9 +1139,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     .isNotEmpty
                                                                 ? "${formatNumber(allAutomaticPrograms[0]['duracionTotal'] as double)} min"
                                                                 : "N/A",
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: 15,
+                                                          fontSize: 15.sp,
                                                         ),
                                                       ),
                                                     ],
@@ -1163,11 +1165,12 @@ _currentImageIndex= imagePaths.length - time;
                                                 backgroundColor:
                                                     Colors.transparent,
                                               ),
-                                              child: const Text(
+                                              child: Text(
                                                 'CICLOS',
                                                 style: TextStyle(
-                                                  color: Color(0xFF2be4f3),
-                                                  fontSize: 15,
+                                                  color:
+                                                      const Color(0xFF2be4f3),
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                                 textAlign: TextAlign.center,
@@ -1183,10 +1186,11 @@ _currentImageIndex= imagePaths.length - time;
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              const Text("VIRTUAL TRAINER",
+                                              Text("VIRTUAL TRAINER",
                                                   style: TextStyle(
-                                                    color: Color(0xFF2be4f3),
-                                                    fontSize: 13,
+                                                    color:
+                                                        const Color(0xFF2be4f3),
+                                                    fontSize: 15.sp,
                                                   )),
                                               GestureDetector(
                                                 onTapDown: (_) => setState(() =>
@@ -1945,7 +1949,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     totalTime =
                                                                         time *
                                                                             60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex = imagePaths.length - time;
+                                                                    _currentImageIndex =
+                                                                        imagePaths.length -
+                                                                            time;
                                                                   }
                                                                 });
                                                               },
@@ -1958,11 +1964,11 @@ _currentImageIndex= imagePaths.length - time;
                                                       ),
                                                       Text(
                                                         "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
-                                                        style: const TextStyle(
-                                                          fontSize: 25,
+                                                        style: TextStyle(
+                                                          fontSize: 25.sp,
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          color: Color(
+                                                          color: const Color(
                                                               0xFF2be4f3), // Color para la sección seleccionada
                                                         ),
                                                       ),
@@ -1977,7 +1983,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     totalTime =
                                                                         time *
                                                                             60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex = imagePaths.length - time;
+                                                                    _currentImageIndex =
+                                                                        imagePaths.length -
+                                                                            time;
                                                                   }
                                                                 });
                                                               },
@@ -2015,7 +2023,7 @@ _currentImageIndex= imagePaths.length - time;
                                                         .padLeft(1, '0'),
                                                     // Convierte seconds a entero y usa padLeft para formato mm:ss
                                                     style: TextStyle(
-                                                        fontSize: 20,
+                                                        fontSize: 20.sp,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors
@@ -2048,8 +2056,8 @@ _currentImageIndex= imagePaths.length - time;
                                                         .toString()
                                                         .padLeft(1, '0'),
                                                     // Convierte seconds a entero y usa padLeft para formato mm:ss
-                                                    style: const TextStyle(
-                                                        fontSize: 20,
+                                                    style: TextStyle(
+                                                        fontSize: 20.sp,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors
@@ -3352,7 +3360,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     totalTime =
                                                                         time *
                                                                             60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex = imagePaths.length - time;
+                                                                    _currentImageIndex =
+                                                                        imagePaths.length -
+                                                                            time;
                                                                   }
                                                                 });
                                                               },
@@ -3384,7 +3394,9 @@ _currentImageIndex= imagePaths.length - time;
                                                                     totalTime =
                                                                         time *
                                                                             60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex = imagePaths.length - time;
+                                                                    _currentImageIndex =
+                                                                        imagePaths.length -
+                                                                            time;
                                                                   }
                                                                 });
                                                               },
@@ -3399,7 +3411,6 @@ _currentImageIndex= imagePaths.length - time;
                                                   ),
                                                 ],
                                               ),
-
 
                                               SizedBox(
                                                   height: screenHeight * 0.01),
@@ -3423,7 +3434,7 @@ _currentImageIndex= imagePaths.length - time;
                                                         .padLeft(1, '0'),
                                                     // Convierte seconds a entero y usa padLeft para formato mm:ss
                                                     style: TextStyle(
-                                                        fontSize: 20,
+                                                        fontSize: 20.sp,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors
@@ -3456,8 +3467,8 @@ _currentImageIndex= imagePaths.length - time;
                                                         .toString()
                                                         .padLeft(1, '0'),
                                                     // Convierte seconds a entero y usa padLeft para formato mm:ss
-                                                    style: const TextStyle(
-                                                        fontSize: 20,
+                                                    style: TextStyle(
+                                                        fontSize: 20.sp,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Colors
@@ -4298,12 +4309,12 @@ _currentImageIndex= imagePaths.length - time;
                                                 fit: BoxFit.scaleDown,
                                               ),
                                             ),
-                                            const Text(
+                                            Text(
                                               "AVERAGE",
                                               style: TextStyle(
-                                                fontSize: 13,
+                                                fontSize: 13.sp,
                                                 fontWeight: FontWeight.bold,
-                                                color: Color(
+                                                color: const Color(
                                                     0xFF2be4f3), // Color para la sección seleccionada
                                               ),
                                             )
@@ -4351,8 +4362,8 @@ _currentImageIndex= imagePaths.length - time;
             Positioned(
               top: overlayIndex == 1 ? screenHeight * 0.3 : 0,
               bottom: overlayIndex == 1 ? screenHeight * 0.3 : 0,
-              left: overlayIndex == 1 ? screenWidth * 0.3 : 0,
-              right: overlayIndex == 1 ? screenWidth * 0.3 : 0,
+              left: overlayIndex == 1 ? screenWidth * 0.2 : 0,
+              right: overlayIndex == 1 ? screenWidth * 0.2 : 0,
               child: Align(
                 alignment: Alignment.center,
                 child: _getOverlayWidget(overlayIndex),
@@ -4384,18 +4395,18 @@ _currentImageIndex= imagePaths.length - time;
             ),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'AVISO',
                   style: TextStyle(
-                      color: Color(0xFF2be4f3),
-                      fontSize: 28,
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 30.sp,
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   '¿QUIERES RESETEAR TODO?',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
@@ -4410,10 +4421,10 @@ _currentImageIndex= imagePaths.length - time;
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF2be4f3)),
                       ),
-                      child: const Text(
+                      child: Text(
                         'CANCELAR',
-                        style:
-                            TextStyle(color: Color(0xFF2be4f3), fontSize: 20),
+                        style: TextStyle(
+                            color: const Color(0xFF2be4f3), fontSize: 17.sp),
                       ),
                     ),
                     OutlinedButton(
@@ -4427,9 +4438,9 @@ _currentImageIndex= imagePaths.length - time;
                       style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.red),
                           backgroundColor: Colors.red),
-                      child: const Text(
+                      child: Text(
                         '¡SÍ, QUIERO RESETEAR!',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        style: TextStyle(color: Colors.white, fontSize: 17.sp),
                       ),
                     ),
                   ],
@@ -4463,18 +4474,18 @@ _currentImageIndex= imagePaths.length - time;
             ),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'AVISO',
                   style: TextStyle(
-                      color: Color(0xFF2be4f3),
-                      fontSize: 28,
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 30.sp,
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   '¿QUIERES SALIR DEL PANEL?',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
@@ -4489,10 +4500,10 @@ _currentImageIndex= imagePaths.length - time;
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF2be4f3)),
                       ),
-                      child: const Text(
+                      child: Text(
                         'CANCELAR',
-                        style:
-                            TextStyle(color: Color(0xFF2be4f3), fontSize: 20),
+                        style: TextStyle(
+                            color: const Color(0xFF2be4f3), fontSize: 17.sp),
                       ),
                     ),
                     OutlinedButton(
@@ -4505,9 +4516,9 @@ _currentImageIndex= imagePaths.length - time;
                       style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.red),
                           backgroundColor: Colors.red),
-                      child: const Text(
+                      child: Text(
                         'SALIR DEL PANEL',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        style: TextStyle(color: Colors.white, fontSize: 17.sp),
                       ),
                     ),
                   ],
@@ -4583,7 +4594,7 @@ _currentImageIndex= imagePaths.length - time;
               ? Colors.grey.withOpacity(0.5) // Color gris cuando inactivo
               : _isMusculoTrajeBloqueado[
                       index] // Si está bloqueado, color naranja
-                  ? Color(0xFFFFA500).withOpacity(0.3)
+                  ? const Color(0xFFFFA500).withOpacity(0.3)
                   : Colors.transparent,
           // Si no está bloqueado ni inactivo, fondo transparente
           child: Row(
@@ -4652,9 +4663,9 @@ _currentImageIndex= imagePaths.length - time;
                   Text(
                     '${porcentajesMusculoTraje[index]}%',
                     style: TextStyle(
-                      fontSize: _isFullScreen ? 15.0 : 13.0,
+                      fontSize: _isFullScreen ? 15.0.sp : 13.0.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2be4f3),
+                      color: const Color(0xFF2be4f3),
                     ),
                   ),
                 ],
@@ -4768,7 +4779,7 @@ _currentImageIndex= imagePaths.length - time;
                   Text(
                     '${porcentajesMusculoPantalon[index]}%',
                     style: TextStyle(
-                      fontSize: _isFullScreen ? 15.0 : 13,
+                      fontSize: _isFullScreen ? 15.0.sp : 13.sp,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF2be4f3),
                     ),
@@ -4836,8 +4847,8 @@ _currentImageIndex= imagePaths.length - time;
         // Texto con el valor y el sufijo
         Text(
           "$value$suffix",
-          style: const TextStyle(
-            fontSize: 15,
+          style: TextStyle(
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),

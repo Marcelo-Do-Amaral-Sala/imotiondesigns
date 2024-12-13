@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
@@ -22,13 +23,13 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SELECCIONAR TIPO DE PROGRAMA",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 28,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -70,11 +71,11 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
                     ),
                     backgroundColor: Color(0xFF2be4f3),
                   ),
-                  child: const Text(
+                  child: Text(
                     'SELECCIONAR',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 25.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -94,9 +95,9 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
       leading: customCheckbox(option),
       title: Text(
         option,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 22,
+          fontSize: 22.sp,
           fontWeight: FontWeight.normal,
         ),
       ),
@@ -200,13 +201,13 @@ class _OverlaySeleccionarProgramaIndividualState
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SELECCIONAR PROGRAMA",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 28,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -276,10 +277,10 @@ class _OverlaySeleccionarProgramaIndividualState
                         Text(
                           nombre,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Color(0xFF2be4f3),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 20.sp,
                           ),
                         ),
                         Image.asset(
@@ -324,7 +325,7 @@ class _OverlaySeleccionarProgramaIndividualState
           child: Container(
             width: screenWidth * 0.3,
             constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.5, // Fijar altura máxima
+              maxHeight: screenHeight * 0.55, // Fijar altura máxima
             ),
             padding: const EdgeInsets.all(25.0),
             child: Column(
@@ -336,14 +337,14 @@ class _OverlaySeleccionarProgramaIndividualState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'DATOS',
                           style: TextStyle(
-                              color: Color(0xFF2be4f3),
-                              fontSize: 30,
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 30.sp,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
-                              decorationColor: Color(0xFF2be4f3)),
+                              decorationColor: const Color(0xFF2be4f3)),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.03),
@@ -375,11 +376,11 @@ class _OverlaySeleccionarProgramaIndividualState
                       ),
                       backgroundColor: Colors.transparent,
                     ),
-                    child: const Text(
+                    child: Text(
                       'CERRAR',
                       style: TextStyle(
-                        color: Color(0xFF2be4f3),
-                        fontSize: 15,
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -401,23 +402,23 @@ class _OverlaySeleccionarProgramaIndividualState
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
         Text(
           value.toString(),
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: 18.sp,
             color: Colors.white,
           ),
         ),
         Text(
           suffix,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: 18.sp,
             color: Colors.white,
           ),
         ),
@@ -508,13 +509,13 @@ class _OverlaySeleccionarProgramaRecoveryState
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SELECCIONAR PROGRAMA",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 28,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -584,10 +585,10 @@ class _OverlaySeleccionarProgramaRecoveryState
                         Text(
                           nombre,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Color(0xFF2be4f3),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 20.sp,
                           ),
                         ),
                         Image.asset(
@@ -632,7 +633,7 @@ class _OverlaySeleccionarProgramaRecoveryState
           child: Container(
             width: screenWidth * 0.3,
             constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.5, // Fijar altura máxima
+              maxHeight: screenHeight * 0.55, // Fijar altura máxima
             ),
             padding: const EdgeInsets.all(25.0),
             child: Column(
@@ -644,14 +645,14 @@ class _OverlaySeleccionarProgramaRecoveryState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'DATOS',
                           style: TextStyle(
-                              color: Color(0xFF2be4f3),
-                              fontSize: 30,
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 30.sp,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
-                              decorationColor: Color(0xFF2be4f3)),
+                              decorationColor: const Color(0xFF2be4f3)),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.03),
@@ -683,11 +684,11 @@ class _OverlaySeleccionarProgramaRecoveryState
                       ),
                       backgroundColor: Colors.transparent,
                     ),
-                    child: const Text(
+                    child: Text(
                       'CERRAR',
                       style: TextStyle(
-                        color: Color(0xFF2be4f3),
-                        fontSize: 15,
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -709,23 +710,23 @@ class _OverlaySeleccionarProgramaRecoveryState
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
         Text(
           value.toString(),
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: 18.sp,
             color: Colors.white,
           ),
         ),
         Text(
           suffix,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: 18.sp,
             color: Colors.white,
           ),
         ),
@@ -822,13 +823,13 @@ class _OverlaySeleccionarProgramaAutomaticState
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SELECCIONAR PROGRAMA",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 28,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -904,10 +905,10 @@ class _OverlaySeleccionarProgramaAutomaticState
                         Text(
                           nombre,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Color(0xFF2be4f3),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 20.sp,
                           ),
                         ),
                         Image.asset(
@@ -951,104 +952,104 @@ class _OverlaySeleccionarProgramaAutomaticState
           child: Container(
             width: screenWidth * 0.7, // Ajusta el tamaño del contenedor
             constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.7, // Fijar altura máxima
+              maxHeight: screenHeight * 0.8, // Fijar altura máxima
             ),
             padding: const EdgeInsets.all(25.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'DATOS',
                   style: TextStyle(
-                    color: Color(0xFF2be4f3),
-                    fontSize: 30,
+                    color: const Color(0xFF2be4f3),
+                    fontSize: 30.sp,
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
-                    decorationColor: Color(0xFF2be4f3),
+                    decorationColor: const Color(0xFF2be4f3),
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: screenHeight * 0.03),
+                SizedBox(height: screenHeight * 0.02),
 
                 // Sección de DESCRIPCIÓN
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'DURACIÓN:',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18.sp,
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.01),
                     Text(
                       '${formatNumber(duracion)} min',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 14,
+                        fontSize: 16.sp,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight * 0.02),
+                SizedBox(height: screenHeight * 0.01),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'DESCRIPCIÓN:',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18.sp,
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.01),
                     Text(
                       descripcion,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 14,
+                        fontSize: 16.sp,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight * 0.02),
+                SizedBox(height: screenHeight * 0.01),
 
                 // Sección de EQUIPAMIENTO
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'EQUIPAMIENTO:',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18.sp,
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.01),
                     Text(
                       tipoEquipamiento,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 14,
+                        fontSize: 16.sp,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight * 0.02),
+                SizedBox(height: screenHeight * 0.01),
 
-                const Text(
+                Text(
                   'SUBPROGRAMAS:',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.02),
+                SizedBox(height: screenHeight * 0.01),
 
                 if (subprogramas.isNotEmpty)
                   // ScrollView para la tabla
@@ -1096,7 +1097,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                       ),
                     ),
                   ),
-
+                SizedBox(height: screenHeight * 0.01),
                 // Botón de Cerrar
                 Align(
                   alignment: Alignment.bottomRight,
@@ -1113,11 +1114,11 @@ class _OverlaySeleccionarProgramaAutomaticState
                       ),
                       backgroundColor: Colors.transparent,
                     ),
-                    child: const Text(
+                    child: Text(
                       'CERRAR',
                       style: TextStyle(
-                        color: Color(0xFF2be4f3),
-                        fontSize: 15,
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -1131,17 +1132,21 @@ class _OverlaySeleccionarProgramaAutomaticState
       },
     );
   }
+
   String formatNumber(double number) {
-    return number % 1 == 0 ? number.toInt().toString() : number.toStringAsFixed(2);
+    return number % 1 == 0
+        ? number.toInt().toString()
+        : number.toStringAsFixed(2);
   }
+
   Widget _tableCell(String text) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 14,
+          fontSize: 15.sp,
         ),
         textAlign: TextAlign.center,
       ),
@@ -1215,13 +1220,13 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SELECCIONAR CLIENTE",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 28,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -1253,9 +1258,9 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -1265,7 +1270,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
             ),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(7),
@@ -1274,7 +1279,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                 fillColor: const Color(0xFF313030),
                 isDense: true,
                 hintText: hint,
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),
           ),
@@ -1288,10 +1293,10 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('ESTADO',
+          Text('ESTADO',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -1301,19 +1306,22 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
             ),
             child: DropdownButton<String>(
               value: selectedOption,
-              items: const [
+              items: [
                 DropdownMenuItem(
                     value: 'Todos',
                     child: Text('Todos',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Activo',
                     child: Text('Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Inactivo',
                     child: Text('Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
               onChanged: (value) {
                 setState(() {
@@ -1418,10 +1426,10 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 17.sp,
           ),
         ),
       ),
@@ -1435,7 +1443,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style: TextStyle(color: Colors.white, fontSize: 15.sp),
         ),
       ),
     );
