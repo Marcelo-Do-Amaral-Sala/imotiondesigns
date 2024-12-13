@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/form/user_form_bonos.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_activity.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
@@ -174,13 +175,13 @@ class _OverlayBackupState extends State<OverlayBackup>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "COPIA DE SEGURIDAD",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -209,11 +210,11 @@ class _OverlayBackupState extends State<OverlayBackup>
                     ),
                     backgroundColor: Colors.transparent,
                   ),
-                  child: const Text(
+                  child: Text(
                     'HACER COPIA',
                     style: TextStyle(
-                      color: Color(0xFF2be4f3),
-                      fontSize: 17,
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -235,11 +236,11 @@ class _OverlayBackupState extends State<OverlayBackup>
                     ),
                     backgroundColor: const Color(0xFF2be4f3),
                   ),
-                  child: const Text(
+                  child: Text(
                     'RECUPERAR COPIA',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 17,
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -265,8 +266,8 @@ class _OverlayBackupState extends State<OverlayBackup>
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Text(
                 confirmationMessage, // Mostramos el mensaje dinámico
-                style: const TextStyle(
-                  fontSize: 30,
+                style: TextStyle(
+                  fontSize: 30.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.green,
                 ),
@@ -277,16 +278,16 @@ class _OverlayBackupState extends State<OverlayBackup>
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 Text(
                   actionMessage, // Mostramos el mismo mensaje dinámico
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: TextStyle(
+                    fontSize: 25.sp,
                     color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   subActionMessage, // Mostramos el mismo mensaje dinámico
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: TextStyle(
+                    fontSize: 25.sp,
                     color: Colors.orange,
                     decoration: TextDecoration.underline,
                     decorationColor: Colors.orange,
@@ -330,11 +331,11 @@ class _OverlayBackupState extends State<OverlayBackup>
                         ),
                         backgroundColor: Colors.green,
                       ),
-                      child: const Text(
+                      child: Text(
                         'SÍ',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -354,11 +355,11 @@ class _OverlayBackupState extends State<OverlayBackup>
                         ),
                         backgroundColor: Colors.red,
                       ),
-                      child: const Text(
+                      child: Text(
                         'NO',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -456,13 +457,13 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
     ];
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SELECCIONAR IDIOMA",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -507,8 +508,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                         ),
                         Text(
                           countries[0]['name']!,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -548,8 +549,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                         ),
                         Text(
                           countries[1]['name']!,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -589,8 +590,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                         ),
                         Text(
                           countries[2]['name']!,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -630,8 +631,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                         ),
                         Text(
                           countries[3]['name']!,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -671,8 +672,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                         ),
                         Text(
                           countries[4]['name']!,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -713,32 +714,32 @@ class _OverlayServicioState extends State<OverlayServicio>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SERVICIO TÉCNICO",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
         child: Column(
           children: [
-            const Text(
+            Text(
               "CONTACTO",
               style: TextStyle(
-                  color: Color(0xFF28E2F5),
-                  fontSize: 25,
+                  color: const Color(0xFF28E2F5),
+                  fontSize: 25.sp,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-            const Text(
+            Text(
               "Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional",
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.normal),
               textAlign: TextAlign.center,
             ),
@@ -754,20 +755,20 @@ class _OverlayServicioState extends State<OverlayServicio>
                     horizontal: 20.0, vertical: 20.0),
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       "E-MAIL: technical_service@i-motiongroup.com",
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.normal),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                    const Text(
+                    Text(
                       "WHATSAPP: (+34) 618 112 271",
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.normal),
                       textAlign: TextAlign.center,
                     ),
@@ -820,13 +821,13 @@ class _OverlayAdminsState extends State<OverlayAdmins>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "ADMINISTRADORES",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: isInfoVisible && selectedAdminData != null
@@ -867,8 +868,8 @@ class _OverlayAdminsState extends State<OverlayAdmins>
         ),
         dividerColor: Colors.black,
         labelColor: const Color(0xFF2be4f3),
-        labelStyle: const TextStyle(
-          fontSize: 15,
+        labelStyle: TextStyle(
+          fontSize: 16.sp,
           fontWeight: FontWeight.bold,
         ),
         unselectedLabelColor: Colors.white,
@@ -944,13 +945,13 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "CREAR NUEVO",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Column(
@@ -974,15 +975,17 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF494949),
-          title: const Text(
+          title: Text(
             '¡ALERTA!',
             style: TextStyle(
-                color: Colors.red, fontSize: 28, fontWeight: FontWeight.bold),
+                color: Colors.red,
+                fontSize: 30.sp,
+                fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
-          content: const Text(
+          content: Text(
             'Debes completar el formulario para continuar',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            style: TextStyle(color: Colors.white, fontSize: 25.sp),
             textAlign: TextAlign.center,
           ),
           actions: [
@@ -994,11 +997,24 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF2be4f3)),
+                    padding: const EdgeInsets.all(10.0),
+                    side: const BorderSide(
+                      width: 1.0,
+                      color: Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
                   ),
-                  child: const Text(
-                    '¡Entendido!',
-                    style: TextStyle(color: Color(0xFF2be4f3)),
+                  child: Text(
+                    '¡ENTENDIDO!',
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -1043,8 +1059,7 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
             ),
             dividerColor: Colors.black,
             labelColor: const Color(0xFF2be4f3),
-            labelStyle:
-                const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            labelStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             unselectedLabelColor: Colors.white,
           ),
         ),
@@ -1916,480 +1931,469 @@ class _OverlayVitaState extends State<OverlayVita>
           color: Color(0xFF2be4f3),
         ),
       ),
-      content:  Padding(
+      content: Padding(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         // Padding añadido aquí
         child: Row(
           children: [
-            Expanded(child:  Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 2),
-                color: Colors.white,
-              ),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 2),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  children: [
+                    // Barra superior del chat
+                    Container(
+                        decoration: const BoxDecoration(
+                          border: Border(
+                              bottom:
+                                  BorderSide(color: Colors.black, width: 2)),
+                          color: Colors.blueAccent,
+                        ),
+                        height: screenHeight * 0.1,
+                        width: screenWidth,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 10.0),
+                        child: const Text(
+                          "VITA",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic),
+                          textAlign: TextAlign.center,
+                        )),
+                    // Lista de mensajes
+                    Expanded(
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: _messages.length,
+                        itemBuilder: (context, index) {
+                          final message = _messages[index];
+                          final sender = message["sender"]!;
+                          final messageText = message["message"]!;
 
-              child: Column(
-                children: [
-                  // Barra superior del chat
-                  Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                            bottom:
-                            BorderSide(color: Colors.black, width: 2)),
-                        color: Colors.blueAccent,
-                      ),
-                      height: screenHeight * 0.1,
-                      width: screenWidth,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 10.0),
-                      child: const Text(
-                        "VITA",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic),
-                        textAlign: TextAlign.center,
-                      )),
-                  // Lista de mensajes
-                  Expanded(
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: _messages.length,
-                      itemBuilder: (context, index) {
-                        final message = _messages[index];
-                        final sender = message["sender"]!;
-                        final messageText = message["message"]!;
+                          Color messageColor = sender == "ai"
+                              ? Colors.green[500]!
+                              : Colors.blue[500]!;
+                          Color textColor =
+                              sender == "ai" ? Colors.white : Colors.white;
 
-                        Color messageColor = sender == "ai"
-                            ? Colors.green[500]!
-                            : Colors.blue[500]!;
-                        Color textColor =
-                        sender == "ai" ? Colors.white : Colors.white;
-
-                        return Align(
-                          alignment: sender == "ai"
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                          child: Column(
-                            crossAxisAlignment: sender == "ai"
-                                ? CrossAxisAlignment.start
-                                : CrossAxisAlignment.end,
-                            children: [
-                              // Imagen fuera del contenedor del mensaje
-                              if (sender == "ai")
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.only(left: 10.0),
-                                  // Ajusta el espaciado a la izquierda
-                                  child: Image.asset(
-                                    'assets/images/mujer.png',
-                                    // Ruta de la imagen para la IA
-                                    width: 50,
-                                    height: 50,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              if (sender != "ai")
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.only(right: 10.0),
-                                  // Ajusta el espaciado a la derecha
-                                  child: Image.asset(
-                                    'assets/images/hombre.png',
-                                    // Ruta de la imagen para el usuario
-                                    width: 50,
-                                    height: 50,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-
-                              // Contenedor del mensaje
-                              Container(
-                                padding: const EdgeInsets.all(15.0),
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 5.0, horizontal: 20.0),
-                                decoration: BoxDecoration(
-                                  color: messageColor,
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.white.withOpacity(0.1),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 4),
+                          return Align(
+                            alignment: sender == "ai"
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight,
+                            child: Column(
+                              crossAxisAlignment: sender == "ai"
+                                  ? CrossAxisAlignment.start
+                                  : CrossAxisAlignment.end,
+                              children: [
+                                // Imagen fuera del contenedor del mensaje
+                                if (sender == "ai")
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    // Ajusta el espaciado a la izquierda
+                                    child: Image.asset(
+                                      'assets/images/mujer.png',
+                                      // Ruta de la imagen para la IA
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.contain,
                                     ),
+                                  ),
+                                if (sender != "ai")
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 10.0),
+                                    // Ajusta el espaciado a la derecha
+                                    child: Image.asset(
+                                      'assets/images/hombre.png',
+                                      // Ruta de la imagen para el usuario
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+
+                                // Contenedor del mensaje
+                                Container(
+                                  padding: const EdgeInsets.all(15.0),
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 20.0),
+                                  decoration: BoxDecoration(
+                                    color: messageColor,
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.white.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.7, // Limitar el ancho
+                                    ),
+                                    child: Text(
+                                      messageText,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            textColor, // Establecer color de texto
+                                      ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Área de botones con padding
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            top: BorderSide(color: Colors.black, width: 1),
+                          ),
+                          color: Color(0xFF494949),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 40.0),
+                        alignment: Alignment.topCenter,
+                        height: screenHeight * 0.25,
+                        width: screenWidth,
+                        child: Column(
+                          children: [
+                            // El texto permanece fijo
+                            const Text(
+                              "¿Qué opción te interesa más?",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                            // SingleChildScrollView para permitir desplazamiento solo para los botones
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: GridView.count(
+                                  childAspectRatio: 3.5,
+                                  crossAxisCount: 2,
+                                  // Define cuántas columnas tendrá la cuadrícula
+                                  crossAxisSpacing: 4.0,
+                                  // Espacio entre las columnas
+                                  mainAxisSpacing: 4.0,
+                                  // Espacio entre las filas
+                                  shrinkWrap: true,
+                                  // Evita que el GridView ocupe más espacio del necesario
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  // Desactiva el desplazamiento en el GridView
+                                  children: [
+                                    // Botón "Ver más opciones"
+                                    if (information.containsKey(currentStage) &&
+                                        previousStages.isNotEmpty)
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          padding: WidgetStateProperty.all<
+                                              EdgeInsets>(
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 6.0, vertical: 6.0),
+                                          ),
+                                          backgroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                  Colors.blueAccent),
+                                          shape: WidgetStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                          ),
+                                          minimumSize:
+                                              WidgetStateProperty.all<Size>(
+                                                  const Size(0, 36)),
+                                        ),
+                                        onPressed: conversationEnded
+                                            ? null
+                                            : _volverAlPasoAnterior,
+                                        // Deshabilitar si conversationEnded es true
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/more.png',
+                                                width: 20,
+                                                height: 20),
+                                            // Imagen personalizada
+                                            const SizedBox(width: 5),
+                                            // Espacio entre el icono y el texto
+                                            const Text(
+                                              "Ver más opciones",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                    // Botón "Volver dos pasos atrás"
+                                    if (information.containsKey(currentStage) &&
+                                        previousStages.isNotEmpty &&
+                                        stageName != "bio")
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          padding: WidgetStateProperty.all<
+                                              EdgeInsets>(
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 6.0, vertical: 6.0),
+                                          ),
+                                          backgroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                  Colors.blueAccent),
+                                          shape: WidgetStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                          ),
+                                          minimumSize:
+                                              WidgetStateProperty.all<Size>(
+                                                  const Size(0, 36)),
+                                        ),
+                                        onPressed: conversationEnded
+                                            ? null
+                                            : _volverDosPasosAtras,
+                                        // Deshabilitar si conversationEnded es true
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/previous.png',
+                                                width: 20,
+                                                height: 20),
+                                            // Imagen personalizada
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              obtenerTextoBoton(),
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                    // Botón "Realizar otra consulta"
+                                    if (information.containsKey(currentStage))
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          padding: WidgetStateProperty.all<
+                                              EdgeInsets>(
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 6.0, vertical: 6.0),
+                                          ),
+                                          backgroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                  Colors.blueAccent),
+                                          shape: WidgetStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                          ),
+                                          minimumSize:
+                                              WidgetStateProperty.all<Size>(
+                                                  const Size(0, 36)),
+                                        ),
+                                        onPressed: conversationEnded
+                                            ? null
+                                            : _volverAlInicio,
+                                        // Deshabilitar si conversationEnded es true
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/restart.png',
+                                                width: 20,
+                                                height: 20),
+                                            // Imagen personalizada
+                                            const SizedBox(width: 5),
+                                            const Text(
+                                              "Realizar otra consulta",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                    // Botón "Finalizar conversación"
+                                    if (information.containsKey(currentStage))
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          padding: WidgetStateProperty.all<
+                                              EdgeInsets>(
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 6.0, vertical: 6.0),
+                                          ),
+                                          backgroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                  Colors.blueAccent),
+                                          shape: WidgetStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                          ),
+                                          minimumSize:
+                                              WidgetStateProperty.all<Size>(
+                                                  const Size(0, 36)),
+                                        ),
+                                        onPressed: conversationEnded
+                                            ? null
+                                            : _finalizarConversacion,
+                                        // Deshabilitar si conversationEnded es true
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/close.png',
+                                                width: 20,
+                                                height: 20),
+                                            // Imagen personalizada
+                                            const SizedBox(width: 5),
+                                            const Text(
+                                              "Finalizar conversación",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                    // Botón "Iniciar nueva conversación" (solo cuando el estado es 'fin')
+                                    if (currentStage == "fin")
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                          padding: WidgetStateProperty.all<
+                                              EdgeInsets>(
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 6.0, vertical: 6.0),
+                                          ),
+                                          backgroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                  Colors.blueAccent),
+                                          shape: WidgetStateProperty.all<
+                                              RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                          ),
+                                          minimumSize:
+                                              WidgetStateProperty.all<Size>(
+                                                  const Size(0, 36)),
+                                        ),
+                                        onPressed: () {
+                                          _iniciarNuevaConversacion(); // Llamar a la función para reiniciar la conversación
+                                        },
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/chat.png',
+                                                width: 20,
+                                                height: 20),
+                                            // Imagen personalizada
+                                            const SizedBox(width: 5),
+                                            const Text(
+                                              "Nueva conversación",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                    if (decisionTree[currentStage] != null)
+                                      ...decisionTree[currentStage]!.map(
+                                        (option) {
+                                          // Crear el ElevatedButton con solo el texto correspondiente
+                                          return ElevatedButton(
+                                            style: ButtonStyle(
+                                              padding: WidgetStateProperty.all<
+                                                  EdgeInsets>(
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 10.0,
+                                                    vertical: 6.0),
+                                              ),
+                                              backgroundColor:
+                                                  WidgetStateProperty.all<
+                                                      Color>(Colors.blueAccent),
+                                              shape: WidgetStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            7)),
+                                              ),
+                                              minimumSize:
+                                                  WidgetStateProperty.all<Size>(
+                                                      const Size(0, 36)),
+                                            ),
+                                            onPressed: conversationEnded
+                                                ? null
+                                                : () {
+                                                    _procesarRespuesta(
+                                                        option["text"]!,
+                                                        option["next"]!);
+                                                  },
+                                            // Deshabilitar si conversationEnded es true
+                                            child: Text(
+                                              option["text"]!,
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                            ),
+                                          );
+                                        },
+                                      ),
                                   ],
                                 ),
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                    MediaQuery.of(context).size.width *
-                                        0.7, // Limitar el ancho
-                                  ),
-                                  child: Text(
-                                    messageText,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                      textColor, // Establecer color de texto
-                                    ),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  // Área de botones con padding
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          top: BorderSide(color: Colors.black, width: 1),
-                        ),
-                        color: Color(0xFF494949),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 40.0),
-                      alignment: Alignment.topCenter,
-                      height: screenHeight * 0.25,
-                      width: screenWidth,
-                      child: Column(
-                        children: [
-                          // El texto permanece fijo
-                          const Text(
-                            "¿Qué opción te interesa más?",
-                            style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                          // SingleChildScrollView para permitir desplazamiento solo para los botones
-                          Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: GridView.count(
-                                childAspectRatio: 3.5,
-                                crossAxisCount: 2,
-                                // Define cuántas columnas tendrá la cuadrícula
-                                crossAxisSpacing: 4.0,
-                                // Espacio entre las columnas
-                                mainAxisSpacing: 4.0,
-                                // Espacio entre las filas
-                                shrinkWrap: true,
-                                // Evita que el GridView ocupe más espacio del necesario
-                                physics:
-                                const NeverScrollableScrollPhysics(),
-                                // Desactiva el desplazamiento en el GridView
-                                children: [
-                                  // Botón "Ver más opciones"
-                                  if (information
-                                      .containsKey(currentStage) &&
-                                      previousStages.isNotEmpty)
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                        padding: WidgetStateProperty.all<
-                                            EdgeInsets>(
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 6.0,
-                                              vertical: 6.0),
-                                        ),
-                                        backgroundColor:
-                                        WidgetStateProperty.all<Color>(
-                                            Colors.blueAccent),
-                                        shape: WidgetStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(7)),
-                                        ),
-                                        minimumSize:
-                                        WidgetStateProperty.all<Size>(
-                                            const Size(0, 36)),
-                                      ),
-                                      onPressed: conversationEnded
-                                          ? null
-                                          : _volverAlPasoAnterior,
-                                      // Deshabilitar si conversationEnded es true
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: [
-                                          Image.asset(
-                                              'assets/images/more.png',
-                                              width: 20,
-                                              height: 20),
-                                          // Imagen personalizada
-                                          const SizedBox(width: 5),
-                                          // Espacio entre el icono y el texto
-                                          const Text(
-                                            "Ver más opciones",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                  // Botón "Volver dos pasos atrás"
-                                  if (information
-                                      .containsKey(currentStage) &&
-                                      previousStages.isNotEmpty &&
-                                      stageName != "bio")
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                        padding: WidgetStateProperty.all<
-                                            EdgeInsets>(
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 6.0,
-                                              vertical: 6.0),
-                                        ),
-                                        backgroundColor:
-                                        WidgetStateProperty.all<Color>(
-                                            Colors.blueAccent),
-                                        shape: WidgetStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(7)),
-                                        ),
-                                        minimumSize:
-                                        WidgetStateProperty.all<Size>(
-                                            const Size(0, 36)),
-                                      ),
-                                      onPressed: conversationEnded
-                                          ? null
-                                          : _volverDosPasosAtras,
-                                      // Deshabilitar si conversationEnded es true
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: [
-                                          Image.asset(
-                                              'assets/images/previous.png',
-                                              width: 20,
-                                              height: 20),
-                                          // Imagen personalizada
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            obtenerTextoBoton(),
-                                            style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                  // Botón "Realizar otra consulta"
-                                  if (information.containsKey(currentStage))
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                        padding: WidgetStateProperty.all<
-                                            EdgeInsets>(
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 6.0,
-                                              vertical: 6.0),
-                                        ),
-                                        backgroundColor:
-                                        WidgetStateProperty.all<Color>(
-                                            Colors.blueAccent),
-                                        shape: WidgetStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(7)),
-                                        ),
-                                        minimumSize:
-                                        WidgetStateProperty.all<Size>(
-                                            const Size(0, 36)),
-                                      ),
-                                      onPressed: conversationEnded
-                                          ? null
-                                          : _volverAlInicio,
-                                      // Deshabilitar si conversationEnded es true
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: [
-                                          Image.asset(
-                                              'assets/images/restart.png',
-                                              width: 20,
-                                              height: 20),
-                                          // Imagen personalizada
-                                          const SizedBox(width: 5),
-                                          const Text(
-                                            "Realizar otra consulta",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                  // Botón "Finalizar conversación"
-                                  if (information.containsKey(currentStage))
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                        padding: WidgetStateProperty.all<
-                                            EdgeInsets>(
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 6.0,
-                                              vertical: 6.0),
-                                        ),
-                                        backgroundColor:
-                                        WidgetStateProperty.all<Color>(
-                                            Colors.blueAccent),
-                                        shape: WidgetStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(7)),
-                                        ),
-                                        minimumSize:
-                                        WidgetStateProperty.all<Size>(
-                                            const Size(0, 36)),
-                                      ),
-                                      onPressed: conversationEnded
-                                          ? null
-                                          : _finalizarConversacion,
-                                      // Deshabilitar si conversationEnded es true
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: [
-                                          Image.asset(
-                                              'assets/images/close.png',
-                                              width: 20,
-                                              height: 20),
-                                          // Imagen personalizada
-                                          const SizedBox(width: 5),
-                                          const Text(
-                                            "Finalizar conversación",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                  // Botón "Iniciar nueva conversación" (solo cuando el estado es 'fin')
-                                  if (currentStage == "fin")
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                        padding: WidgetStateProperty.all<
-                                            EdgeInsets>(
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 6.0,
-                                              vertical: 6.0),
-                                        ),
-                                        backgroundColor:
-                                        WidgetStateProperty.all<Color>(
-                                            Colors.blueAccent),
-                                        shape: WidgetStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(7)),
-                                        ),
-                                        minimumSize:
-                                        WidgetStateProperty.all<Size>(
-                                            const Size(0, 36)),
-                                      ),
-                                      onPressed: () {
-                                        _iniciarNuevaConversacion(); // Llamar a la función para reiniciar la conversación
-                                      },
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: [
-                                          Image.asset(
-                                              'assets/images/chat.png',
-                                              width: 20,
-                                              height: 20),
-                                          // Imagen personalizada
-                                          const SizedBox(width: 5),
-                                          const Text(
-                                            "Nueva conversación",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                  if (decisionTree[currentStage] != null)
-                                    ...decisionTree[currentStage]!.map(
-                                          (option) {
-                                        // Crear el ElevatedButton con solo el texto correspondiente
-                                        return ElevatedButton(
-                                          style: ButtonStyle(
-                                            padding: WidgetStateProperty
-                                                .all<EdgeInsets>(
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 10.0,
-                                                  vertical: 6.0),
-                                            ),
-                                            backgroundColor:
-                                            WidgetStateProperty.all<
-                                                Color>(
-                                                Colors.blueAccent),
-                                            shape: WidgetStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                              RoundedRectangleBorder(
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                      7)),
-                                            ),
-                                            minimumSize: WidgetStateProperty
-                                                .all<Size>(
-                                                const Size(0, 36)),
-                                          ),
-                                          onPressed: conversationEnded
-                                              ? null
-                                              : () {
-                                            _procesarRespuesta(
-                                                option["text"]!,
-                                                option["next"]!);
-                                          },
-                                          // Deshabilitar si conversationEnded es true
-                                          child: Text(
-                                            option["text"]!,
-                                            style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                ],
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-            ),),// Contenedor para el chat pegado a la izquierda
-
+            ), // Contenedor para el chat pegado a la izquierda
           ],
         ),
       ),

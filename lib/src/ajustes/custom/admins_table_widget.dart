@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AdminsTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> data; // Mantener el tipo como dynamic
-  final Function(Map<String, dynamic>) onRowTap; // Callback con el tipo correcto
+  final Function(Map<String, dynamic>)
+      onRowTap; // Callback con el tipo correcto
 
-  const AdminsTableWidget({super.key, required this.data, required this.onRowTap});
+  const AdminsTableWidget(
+      {super.key, required this.data, required this.onRowTap});
 
   @override
   _AdminsTableWidgetState createState() => _AdminsTableWidgetState();
@@ -17,14 +20,18 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
     // Ordenar la lista de datos por el id de menor a mayor
     List<Map<String, dynamic>> sortedData = List.from(widget.data);
     sortedData.sort((a, b) {
-      int idA = a['id'] is int ? a['id'] : int.tryParse(a['id'].toString()) ?? 0;
-      int idB = b['id'] is int ? b['id'] : int.tryParse(b['id'].toString()) ?? 0;
+      int idA =
+          a['id'] is int ? a['id'] : int.tryParse(a['id'].toString()) ?? 0;
+      int idB =
+          b['id'] is int ? b['id'] : int.tryParse(b['id'].toString()) ?? 0;
       return idA.compareTo(idB); // Ordenar de menor a mayor
     });
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
-        const SizedBox(height: 10), // Espaciado entre encabezado y filas
+        SizedBox(
+            height: MediaQuery.of(context).size.height *
+                0.01), // Espaciado entre encabezado y filas
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -32,15 +39,19 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
                 return Column(
                   children: [
                     DataRowWidget(
-                      id: (row['id'] is int) ? row['id'] : int.tryParse(row['id'].toString()) ?? 0,
+                      id: (row['id'] is int)
+                          ? row['id']
+                          : int.tryParse(row['id'].toString()) ?? 0,
                       name: row['name'] ?? '',
-                      phone: (row['phone'] is int) ? row['phone'] : int.tryParse(row['phone'].toString()) ?? 0,
+                      phone: (row['phone'] is int)
+                          ? row['phone']
+                          : int.tryParse(row['phone'].toString()) ?? 0,
                       status: row['status'] ?? '',
                       onTap: () {
                         widget.onRowTap(row); // Pasar el mapa completo
                       },
                     ),
-                    const SizedBox(height: 20), // Espaciado entre filas
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   ],
                 );
               }).toList(),
@@ -70,10 +81,10 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 17.sp,
           ),
         ),
       ),
@@ -139,9 +150,11 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            buildCell(widget.id.toString()), // Convertir a String solo para mostrar
+            buildCell(
+                widget.id.toString()), // Convertir a String solo para mostrar
             buildCell(widget.name),
-            buildCell(widget.phone.toString()), // Convertir a String para mostrar
+            buildCell(
+                widget.phone.toString()), // Convertir a String para mostrar
             buildCell(widget.status),
           ],
         ),
@@ -156,7 +169,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style: TextStyle(color: Colors.white, fontSize: 15.sp),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/activity_table_custom.dart';
 
 class AdminsActivity extends StatefulWidget {
@@ -106,7 +107,7 @@ class _AdminsActivityState extends State<AdminsActivity> {
                     child: _buildDropdownField(
                       'ESTADO',
                       selectedOption,
-                          (value) {
+                      (value) {
                         setState(() {
                           selectedOption = value;
                         });
@@ -147,9 +148,9 @@ class _AdminsActivityState extends State<AdminsActivity> {
         // Etiqueta del campo
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -162,10 +163,10 @@ class _AdminsActivityState extends State<AdminsActivity> {
           ),
           child: TextField(
             controller: controller,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: TextStyle(color: Colors.white, fontSize: 14.sp),
             decoration: InputDecoration(
               border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
               filled: true,
               fillColor: const Color(0xFF313030),
               isDense: true,
@@ -185,9 +186,9 @@ class _AdminsActivityState extends State<AdminsActivity> {
         // Etiqueta del dropdown
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -201,24 +202,24 @@ class _AdminsActivityState extends State<AdminsActivity> {
           child: AbsorbPointer(
             absorbing: !enabled, // Deshabilitar interacción
             child: DropdownButton<String>(
-              hint: const Text(
+              hint: Text(
                 'Seleccione',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: Colors.white, fontSize: 14.sp),
               ),
               value: value,
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'Activo',
                   child: Text(
                     'Activo',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),
                 DropdownMenuItem(
                   value: 'Inactivo',
                   child: Text(
                     'Inactivo',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),
               ],

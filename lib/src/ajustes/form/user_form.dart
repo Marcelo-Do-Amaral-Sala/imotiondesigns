@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../db/db_helper.dart';
-
 
 class UserDataForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
@@ -49,7 +49,7 @@ class UserDataFormState extends State<UserDataForm> {
 
     // Restar 18 años a la fecha actual para obtener la fecha límite
     DateTime eighteenYearsAgo =
-    DateTime(today.year - 18, today.month, today.day);
+        DateTime(today.year - 18, today.month, today.day);
 
     final DateTime? picked = await showDatePicker(
         context: context,
@@ -58,8 +58,8 @@ class UserDataFormState extends State<UserDataForm> {
         firstDate: DateTime(1900),
         // Establecemos un límite inferior para la selección (por ejemplo, 1900).
         lastDate:
-        eighteenYearsAgo // La última fecha seleccionable debe ser hace 18 años.
-    );
+            eighteenYearsAgo // La última fecha seleccionable debe ser hace 18 años.
+        );
 
     if (picked != null) {
       // Aquí procesas la fecha seleccionada
@@ -72,13 +72,13 @@ class UserDataFormState extends State<UserDataForm> {
 
   Future<void> _selectAltaDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        // Puedes poner cualquier fecha válida aquí, por ejemplo, hoy.
-        firstDate: DateTime(1900),
-        // Establecemos un límite inferior para la selección (por ejemplo, 1900).
-        lastDate:
-        DateTime(2050), // La última fecha seleccionable debe ser hace 18 años.
+      context: context,
+      initialDate: DateTime.now(),
+      // Puedes poner cualquier fecha válida aquí, por ejemplo, hoy.
+      firstDate: DateTime(1900),
+      // Establecemos un límite inferior para la selección (por ejemplo, 1900).
+      lastDate: DateTime(
+          2050), // La última fecha seleccionable debe ser hace 18 años.
     );
 
     if (picked != null) {
@@ -166,9 +166,9 @@ class UserDataFormState extends State<UserDataForm> {
     );
 
     // Llama a la función onDataChanged para informar de los datos
-    widget.onDataChanged(clientData); // Aquí notificamos que los datos fueron guardados
+    widget.onDataChanged(
+        clientData); // Aquí notificamos que los datos fueron guardados
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -222,11 +222,18 @@ class UserDataFormState extends State<UserDataForm> {
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedOption,
                                 items: [
-                                  DropdownMenuItem(value: 'Activo', child: Text('Activo', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'Inactivo', child: Text('Inactivo', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Activo',
+                                      child: Text('Activo',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Inactivo',
+                                      child: Text('Inactivo',
+                                          style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -234,7 +241,8 @@ class UserDataFormState extends State<UserDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
                           ],
@@ -247,17 +255,18 @@ class UserDataFormState extends State<UserDataForm> {
                         }, // Mantener vacío para que InkWell funcione
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.all(10.0),
-                          side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                          side: const BorderSide(
+                              width: 1.0, color: Color(0xFF2be4f3)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(7),
                           ),
                           backgroundColor: Colors.transparent,
                         ),
-                        child: const Text(
+                        child: Text(
                           'RESET PASSWORD',
                           style: TextStyle(
-                            color: Color(0xFF2be4f3),
-                            fontSize: 17,
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -279,11 +288,18 @@ class UserDataFormState extends State<UserDataForm> {
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedGender,
                                 items: [
-                                  DropdownMenuItem(value: 'Hombre', child: Text('Hombre', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'Mujer', child: Text('Mujer', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Hombre',
+                                      child: Text('Hombre',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Mujer',
+                                      child: Text('Mujer',
+                                          style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -291,7 +307,8 @@ class UserDataFormState extends State<UserDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
@@ -301,8 +318,10 @@ class UserDataFormState extends State<UserDataForm> {
                               child: Container(
                                 alignment: Alignment.center,
                                 decoration: _inputDecoration(),
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                                child: Text(_birthDate ?? 'DD/MM/YYYY', style: _inputTextStyle),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                child: Text(_birthDate ?? 'DD/MM/YYYY',
+                                    style: _inputTextStyle),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
@@ -317,7 +336,8 @@ class UserDataFormState extends State<UserDataForm> {
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: 'Introducir teléfono'),
+                                decoration: _inputDecorationStyle(
+                                    hintText: 'Introducir teléfono'),
                               ),
                             ),
                           ],
@@ -336,10 +356,12 @@ class UserDataFormState extends State<UserDataForm> {
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                                  FilteringTextInputFormatter.deny(
+                                      RegExp(r'\s')),
                                 ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: 'Introducir e-mail'),
+                                decoration: _inputDecorationStyle(
+                                    hintText: 'Introducir e-mail'),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
@@ -349,8 +371,10 @@ class UserDataFormState extends State<UserDataForm> {
                               child: Container(
                                 alignment: Alignment.center,
                                 decoration: _inputDecoration(),
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                                child: Text(_altaDate ?? 'DD/MM/YYYY', style: _inputTextStyle),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                child: Text(_altaDate ?? 'DD/MM/YYYY',
+                                    style: _inputTextStyle),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
@@ -359,12 +383,22 @@ class UserDataFormState extends State<UserDataForm> {
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedTipoPerfil,
                                 items: [
-                                  DropdownMenuItem(value: 'Administrador', child: Text('Administrador', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'Entrenador', child: Text('Entrenador', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'Ambos', child: Text('Ambos', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Administrador',
+                                      child: Text('Administrador',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Entrenador',
+                                      child: Text('Entrenador',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Ambos',
+                                      child: Text('Ambos',
+                                          style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -372,13 +406,16 @@ class UserDataFormState extends State<UserDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(width: screenWidth*0.05,),
+                      SizedBox(
+                        width: screenWidth * 0.05,
+                      ),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,11 +425,18 @@ class UserDataFormState extends State<UserDataForm> {
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedControlSesiones,
                                 items: [
-                                  DropdownMenuItem(value: 'Sí', child: Text('Sí', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'No', child: Text('No', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Sí',
+                                      child: Text('Sí',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'No',
+                                      child: Text('No',
+                                          style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -400,7 +444,8 @@ class UserDataFormState extends State<UserDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
@@ -409,11 +454,18 @@ class UserDataFormState extends State<UserDataForm> {
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione', style: _dropdownHintStyle),
+                                hint: Text('Seleccione',
+                                    style: _dropdownHintStyle),
                                 value: selectedControlTiempo,
                                 items: [
-                                  DropdownMenuItem(value: 'Sí', child: Text('Sí', style: _dropdownItemStyle)),
-                                  DropdownMenuItem(value: 'No', child: Text('No', style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'Sí',
+                                      child: Text('Sí',
+                                          style: _dropdownItemStyle)),
+                                  DropdownMenuItem(
+                                      value: 'No',
+                                      child: Text('No',
+                                          style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -421,7 +473,8 @@ class UserDataFormState extends State<UserDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: 30),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: 30),
                               ),
                             ),
                           ],
@@ -466,28 +519,30 @@ class UserDataFormState extends State<UserDataForm> {
   }
 
 // Ajustes de estilos para simplificar
-  TextStyle get _labelStyle => const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
-  TextStyle get _inputTextStyle => const TextStyle(color: Colors.white, fontSize: 14);
-  TextStyle get _dropdownHintStyle => const TextStyle(color: Colors.white, fontSize: 14);
-  TextStyle get _dropdownItemStyle => const TextStyle(color: Colors.white, fontSize: 14);
+  TextStyle get _labelStyle => TextStyle(
+      color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
+  TextStyle get _inputTextStyle =>
+      TextStyle(color: Colors.white, fontSize: 14.sp);
+  TextStyle get _dropdownHintStyle =>
+      TextStyle(color: Colors.white, fontSize: 14.sp);
+  TextStyle get _dropdownItemStyle =>
+      TextStyle(color: Colors.white, fontSize: 15.sp);
 
-  InputDecoration _inputDecorationStyle({String hintText = '', bool enabled = true}) {
+  InputDecoration _inputDecorationStyle(
+      {String hintText = '', bool enabled = true}) {
     return InputDecoration(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
       filled: true,
       fillColor: const Color(0xFF313030),
       isDense: true,
       hintText: hintText,
-      hintStyle: const TextStyle(color: Colors.grey),
+      hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
       enabled: enabled,
     );
   }
 
   BoxDecoration _inputDecoration() {
-    return BoxDecoration(color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+    return BoxDecoration(
+        color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
   }
-
-
 }
-
-

@@ -407,7 +407,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       'assets/images/recuadro.png',
                                       fit: BoxFit.fill,
                                     ),
-                                     Padding(
+                                    Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
@@ -497,12 +497,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
+                         Text(
                           'DATOS LICENCIA', // Texto fijo
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2be4f3),
+                            color: const Color(0xFF2be4f3),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -650,24 +650,24 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                   ),
                                   backgroundColor: Colors.transparent,
                                 ),
-                                child: const Text(
+                                child:  Text(
                                   'VALIDAR LICENCIA',
                                   style: TextStyle(
-                                    color: Color(0xFF2be4f3),
-                                    fontSize: 17,
+                                    color: const Color(0xFF2be4f3),
+                                    fontSize: 17.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                               if (AppState.instance.isLicenciaValida)
-                                const Padding(
-                                  padding: const EdgeInsets.only(left: 20.0),
+                                 Padding(
+                                  padding:  const EdgeInsets.only(left: 20.0),
                                   child: Text(
                                     'LICENCIA VALIDADA',
                                     style: TextStyle(
                                       color: Colors.green,
-                                      fontSize: 22,
+                                      fontSize: 22.sp,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -687,12 +687,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       // Alinea el texto y el contenedor al inicio
                       children: [
-                        const Text(
+                         Text(
                           'Nº DE LICENCIA', // Texto fijo
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2be4f3),
+                            color: const Color(0xFF2be4f3),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -780,10 +780,10 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style:  TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 15.sp,
           ),
         ),
       ),
@@ -866,7 +866,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style:  TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
       ),
     );
@@ -874,11 +874,11 @@ class _DataRowWidgetState extends State<DataRowWidget> {
 }
 
 // Ajustes de estilos para simplificar
-TextStyle get _labelStyle => const TextStyle(
-    color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+TextStyle get _labelStyle => TextStyle(
+    color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
 
 TextStyle get _inputTextStyle =>
-    const TextStyle(color: Colors.white, fontSize: 14);
+    TextStyle(color: Colors.white, fontSize: 14.sp);
 
 InputDecoration _inputDecorationStyle(
     {String hintText = '', bool enabled = true}) {
@@ -888,7 +888,7 @@ InputDecoration _inputDecorationStyle(
     fillColor: const Color(0xFF313030),
     isDense: true,
     hintText: hintText,
-    hintStyle: const TextStyle(color: Colors.grey),
+    hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
     enabled: enabled,
   );
 }

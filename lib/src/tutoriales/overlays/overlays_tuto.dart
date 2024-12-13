@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../clients/overlays/main_overlay.dart';
 import '../info/videos_tutoriales.dart';
@@ -22,13 +23,13 @@ class _OverlayPPState extends State<OverlayPP>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title:  Text(
         "PRIMEROS PASOS",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: const VideoTutorialesListView(),
