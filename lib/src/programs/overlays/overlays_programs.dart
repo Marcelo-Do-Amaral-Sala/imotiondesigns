@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/programs/customs_programs/automatic_table_widget.dart';
 import 'package:imotion_designs/src/programs/form_programs/individual_program_form.dart';
 import 'package:imotion_designs/src/programs/form_programs/recovery_program_form.dart';
@@ -39,13 +40,13 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title:  Text(
         "INDIVIDUALES",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: isInfoVisible && selectedProgram != null
@@ -82,13 +83,13 @@ class _OverlayAutoState extends State<OverlayAuto> {
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title:  Text(
         "AUTOMÁTICOS",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: isInfoVisible && selectedProgram != null
@@ -145,18 +146,18 @@ class _OverlayAutoState extends State<OverlayAuto> {
                                   TextSpan(
                                     text:
                                         'Nº${program['id_programa_automatico']}  ${program['nombre_programa_automatico']} - ',
-                                    style: const TextStyle(
-                                      fontSize: 24,
+                                    style:  TextStyle(
+                                      fontSize: 25.sp,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(
+                                      color: const Color(
                                           0xFF2be4f3), // Color del nombre del programa
                                     ),
                                   ),
                                   TextSpan(
                                     text:
                                         '${(program['duracionTotal'] as double).toInt()} min', // Convertir a entero
-                                    style: const TextStyle(
-                                      fontSize: 24,
+                                    style:  TextStyle(
+                                      fontSize: 25.sp,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white, // Duración en blanco
                                     ),
@@ -173,8 +174,8 @@ class _OverlayAutoState extends State<OverlayAuto> {
                               '${program['descripcion_programa_automatico'] ?? 'No disponible'}',
                               softWrap: true,
                               overflow: TextOverflow.visible,
-                              style: const TextStyle(
-                                fontSize: 18,
+                              style:  TextStyle(
+                                fontSize: 20.sp,
                                 fontWeight: FontWeight.normal,
                                 color: Colors.white, // Color del nuevo texto
                               ),
@@ -265,13 +266,13 @@ class _OverlayRecoveryState extends State<OverlayRecovery>
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title: const Text(
+      title:  Text(
         "RECOVERY",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: isInfoVisible && selectedProgram != null
@@ -314,13 +315,13 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title:  Text(
         "CREAR PROGRAMA",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 30,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Column(
@@ -358,8 +359,8 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
         ),
         dividerColor: Colors.black,
         labelColor: const Color(0xFF2be4f3),
-        labelStyle: const TextStyle(
-          fontSize: 15,
+        labelStyle:  TextStyle(
+          fontSize: 16.sp,
           fontWeight: FontWeight.bold,
         ),
         unselectedLabelColor: Colors.white,

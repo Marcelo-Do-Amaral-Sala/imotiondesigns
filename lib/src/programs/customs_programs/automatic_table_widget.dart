@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SubprogramTableWidget extends StatelessWidget {
   final List<Map<String, dynamic>> subprogramData; // Datos de los subprogramas
@@ -11,6 +12,7 @@ class SubprogramTableWidget extends StatelessWidget {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado de la tabla
+          SizedBox(height: MediaQuery.of(context).size.height*0.01),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -33,7 +35,7 @@ class SubprogramTableWidget extends StatelessWidget {
                           ? subprograma['ajuste']
                           : double.tryParse(subprograma['ajuste'].toString()) ?? 0.0,
                     ),
-                    const SizedBox(height: 10), // Espaciado entre filas
+                     SizedBox(height: MediaQuery.of(context).size.height*0.01),
                   ],
                 );
               }).toList(),
@@ -72,7 +74,7 @@ class SubprogramTableWidget extends StatelessWidget {
                   ? const Color.fromARGB(255, 3, 236, 244) // Color específico para la columna de nombre
                   : Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 15, // Ajuste del tamaño de la fuente
+              fontSize: 17.sp, // Ajuste del tamaño de la fuente
             ),
           ),
         ),
@@ -124,7 +126,7 @@ class DataRowWidget extends StatelessWidget {
             color: isNameColumn
                 ? const Color.fromARGB(255, 3, 236, 244) // Color para la columna de nombre
                 : Colors.white,
-            fontSize: 15,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold, // Ajuste del tamaño del texto
           ),
         ),

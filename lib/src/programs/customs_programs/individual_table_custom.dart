@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class IndividualTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> programData; // Mantener el tipo como dynamic
@@ -16,6 +17,7 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
+          SizedBox(height: MediaQuery.of(context).size.height*0.01),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -41,7 +43,7 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
                           ? row['pausa']
                           : double.tryParse(row['pausa'].toString()) ?? 0.0,
                     ),
-                    const SizedBox(height: 10), // Espaciado entre filas
+                      SizedBox(height: MediaQuery.of(context).size.height*0.01),
                   ],
                 );
               }).toList(),
@@ -83,7 +85,7 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
                   244) // Color específico para la columna de nombre
                   : Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 15, // Ajuste del tamaño de la fuente
+              fontSize: 17.sp, // Ajuste del tamaño de la fuente
             ),
           ),
         ),
@@ -160,7 +162,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
             color: isNameColumn
                 ? const Color.fromARGB(255, 3, 236, 244)
                 : Colors.white, // Texto negro solo para la columna de nombre
-            fontSize: 15,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold, // Ajuste del tamaño del texto
           ),
         ),
