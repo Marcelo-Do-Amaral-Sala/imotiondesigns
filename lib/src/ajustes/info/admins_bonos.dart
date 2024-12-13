@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import '../../clients/custom_clients/bonos_table_custom.dart';
 import '../../db/db_helper.dart';
-
 
 class AdminsBonos extends StatefulWidget {
   final Map<String, dynamic> userDataBonos;
@@ -25,8 +25,6 @@ class _AdminsBonosState extends State<AdminsBonos> {
   List<Map<String, String>> availableBonos = []; // Cambiar el tipo aquí
   List<Map<String, String>> consumedBonos = [];
   int totalBonosAvailables = 0; // Total de bonos disponibles
-
-
 
   @override
   void initState() {
@@ -132,7 +130,8 @@ class _AdminsBonosState extends State<AdminsBonos> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildTextField('ID', _indexController, enabled: false), // Deshabilitar
+          _buildTextField('ID', _indexController,
+              enabled: false), // Deshabilitar
           SizedBox(width: screenWidth * 0.02),
           _buildTextField('NOMBRE', _nameController, enabled: false),
           SizedBox(width: screenWidth * 0.02),
@@ -229,7 +228,8 @@ class _AdminsBonosState extends State<AdminsBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildTotalContainer(screenHeight, "TOTAL", totalBonosAvailables.toString(), Colors.green),
+        _buildTotalContainer(screenHeight, "TOTAL",
+            totalBonosAvailables.toString(), Colors.green),
         SizedBox(width: screenWidth * 0.02),
         _buildTotalContainer(screenHeight, "TOTAL", "456", Colors.red),
       ],
@@ -274,23 +274,23 @@ class _AdminsBonosState extends State<AdminsBonos> {
   }
 
 // Reutilizando la creación de campos de texto
-  Widget _buildTextField(
-      String label, TextEditingController controller, {bool enabled = true}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool enabled = true}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
             decoration: _inputDecoration(),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
               decoration: _inputDecorationStyle(enabled: enabled),
               enabled: enabled,
             ),
@@ -302,15 +302,16 @@ class _AdminsBonosState extends State<AdminsBonos> {
 
 // Reutilizando la creación de dropdown
   Widget _buildDropdownField(
-      String label, String? value, Function(String?) onChanged, {bool enabled = true}) {
+      String label, String? value, Function(String?) onChanged,
+      {bool enabled = true}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -318,18 +319,20 @@ class _AdminsBonosState extends State<AdminsBonos> {
             child: AbsorbPointer(
               absorbing: !enabled,
               child: DropdownButton<String>(
-                hint: const Text('Seleccione',
-                    style: TextStyle(color: Colors.white, fontSize: 14)),
+                hint: Text('Seleccione',
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp)),
                 value: value,
-                items: const [
+                items: [
                   DropdownMenuItem(
                       value: 'Activo',
                       child: Text('Activo',
-                          style: TextStyle(color: Colors.white, fontSize: 14))),
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 14.sp))),
                   DropdownMenuItem(
                       value: 'Inactivo',
                       child: Text('Inactivo',
-                          style: TextStyle(color: Colors.white, fontSize: 14))),
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 14.sp))),
                 ],
                 onChanged: enabled ? onChanged : null,
                 dropdownColor: const Color(0xFF313030),
@@ -345,7 +348,8 @@ class _AdminsBonosState extends State<AdminsBonos> {
 
 // Métodos de estilo reutilizados
   BoxDecoration _inputDecoration() {
-    return BoxDecoration(color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+    return BoxDecoration(
+        color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
   }
 
   InputDecoration _inputDecorationStyle({bool enabled = true}) {
@@ -359,6 +363,7 @@ class _AdminsBonosState extends State<AdminsBonos> {
       enabled: enabled,
     );
   }
+
   Future<void> _addBonos(BuildContext context) async {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -390,14 +395,14 @@ class _AdminsBonosState extends State<AdminsBonos> {
                   ),
                   child: Stack(
                     children: [
-                      const Center(
+                      Center(
                         child: Text(
                           "COMPRAR BONOS",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 30.sp,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2be4f3),
+                            color: const Color(0xFF2be4f3),
                           ),
                         ),
                       ),
@@ -419,11 +424,12 @@ class _AdminsBonosState extends State<AdminsBonos> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 5.0, vertical: 5.0),
                     child: Column(
                       children: [
                         Container(
@@ -440,21 +446,24 @@ class _AdminsBonosState extends State<AdminsBonos> {
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly
                             ],
-                            style: const TextStyle(color: Colors.white, fontSize: 20),
-                            decoration: const InputDecoration(
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 17.sp),
+                            decoration: InputDecoration(
                               border: InputBorder.none,
                               filled: true,
-                              fillColor: Color(0xFF313030),
+                              fillColor: const Color(0xFF313030),
                               hintText: 'Introduzca los bonos',
-                              hintStyle: TextStyle(color: Colors.grey, fontSize: 20),
+                              hintStyle: TextStyle(
+                                  color: Colors.grey, fontSize: 17.sp),
                               isDense: true,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
+                        SizedBox(height: screenHeight * 0.03),
+                        OutlinedButton(
                           onPressed: () async {
-                            final cantidadBonos = int.tryParse(_bonosController.text);
+                            final cantidadBonos =
+                                int.tryParse(_bonosController.text);
                             if (cantidadBonos == null || cantidadBonos <= 0) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -489,16 +498,25 @@ class _AdminsBonosState extends State<AdminsBonos> {
                               ),
                             );
                           },
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.green),
-                            foregroundColor: MaterialStateProperty.all(Colors.white),
-                            padding: MaterialStateProperty.all(
-                              const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.all(10.0),
+                            side: const BorderSide(
+                              width: 1.0,
+                              color: Color(0xFF2be4f3),
                             ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            backgroundColor: Colors.transparent,
                           ),
-                          child: const Text(
-                            'AÑADIR',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          child: Text(
+                            '¡AÑADIR!',
+                            style: TextStyle(
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
@@ -512,5 +530,4 @@ class _AdminsBonosState extends State<AdminsBonos> {
       },
     );
   }
-
 }

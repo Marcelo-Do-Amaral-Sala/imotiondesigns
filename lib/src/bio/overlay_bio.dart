@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../clients/overlays/main_overlay.dart';
 import '../db/db_helper.dart';
@@ -72,13 +73,13 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
         ? _getOverlayWidget(overlayIndex) // Muestra el overlay si es visible
         : MainOverlay(
             // Muestra el contenido principal si el overlay no es visible
-            title: const Text(
+            title: Text(
               "BIOIMPEDANCIA",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 30,
+                fontSize: 34.sp,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2be4f3),
+                color: const Color(0xFF2be4f3),
               ),
             ),
             content: isBodyPro ? _buildBodyProContent() : _buildNonProContent(),
@@ -122,11 +123,11 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                     ),
                     backgroundColor: Colors.transparent,
                   ),
-                  child: const Text(
+                  child: Text(
                     'SELECCIONAR CLIENTE',
                     style: TextStyle(
-                      color: Color(0xFF2be4f3),
-                      fontSize: 17,
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -177,22 +178,22 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                     ),
                     backgroundColor: Colors.transparent,
                   ),
-                  child: const Text(
+                  child: Text(
                     'LEER MEDIDA',
                     style: TextStyle(
-                      color: Color(0xFF2be4f3),
-                      fontSize: 17,
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-                const Text(
+                Text(
                   "CÓMO OBTENER UNA BIOMEDIDA",
                   style: TextStyle(
-                      color: Color(0xFF28E2F5),
-                      fontSize: 25,
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 25.sp,
                       fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -216,12 +217,13 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             "SÓLO PARA CLIENTES CON",
             style: TextStyle(
-                color: Color(0xFF28E2F5),
-                fontSize: 25,
+                color: const Color(0xFF28E2F5),
+                fontSize: 30.sp,
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.05),
@@ -233,11 +235,13 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
               fit: BoxFit.contain,
             ),
           ),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-          const Text(
+          SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+          Text(
             "CONTACTE CON NOSOTROS PARA OBTENER NUESTRO DISPOSITIVO DE ANÁLISIS DE LA COMPOSICIÓN CORPORAL",
             style: TextStyle(
-                color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: 25.sp,
+                fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.05),
@@ -251,20 +255,20 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       "E-MAIL: info@i-motiongroup.com",
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.normal),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                    const Text(
+                    Text(
                       "WHATSAPP: (+34) 649 43 95 14",
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.normal),
                       textAlign: TextAlign.center,
                     ),
@@ -289,7 +293,8 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
             style: _inputTextStyle,
             enabled: false,
             decoration: const InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0), // Padding agregado
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: 10.0, vertical: 10.0), // Padding agregado
               border: InputBorder.none, // Elimina el borde por defecto
             ),
           ),
@@ -311,12 +316,11 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
   }
 
   // Ajustes de estilos para simplificar
-  TextStyle get _labelStyle => const TextStyle(
-      color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+  TextStyle get _labelStyle => TextStyle(
+      color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
 
   TextStyle get _inputTextStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
-
+      TextStyle(color: Colors.white, fontSize: 14.sp);
 
   BoxDecoration _inputDecoration() {
     return BoxDecoration(
@@ -389,13 +393,13 @@ class _OverlaySeleccionarClienteBioState
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title: const Text(
+      title: Text(
         "SELECCIONAR CLIENTE",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 28,
+          fontSize: 34.sp,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF2be4f3),
+          color: const Color(0xFF2be4f3),
         ),
       ),
       content: Padding(
@@ -427,9 +431,9 @@ class _OverlaySeleccionarClienteBioState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -439,7 +443,7 @@ class _OverlaySeleccionarClienteBioState
             ),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(7),
@@ -448,7 +452,7 @@ class _OverlaySeleccionarClienteBioState
                 fillColor: const Color(0xFF313030),
                 isDense: true,
                 hintText: hint,
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),
           ),
@@ -462,10 +466,10 @@ class _OverlaySeleccionarClienteBioState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('ESTADO',
+          Text('ESTADO',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -475,19 +479,22 @@ class _OverlaySeleccionarClienteBioState
             ),
             child: DropdownButton<String>(
               value: selectedOption,
-              items: const [
+              items: [
                 DropdownMenuItem(
                     value: 'Todos',
                     child: Text('Todos',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Activo',
                     child: Text('Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Inactivo',
                     child: Text('Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
               onChanged: (value) {
                 setState(() {
@@ -586,10 +593,10 @@ class _OverlaySeleccionarClienteBioState
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 17.sp,
           ),
         ),
       ),
@@ -603,7 +610,7 @@ class _OverlaySeleccionarClienteBioState
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style: TextStyle(color: Colors.white, fontSize: 15.sp),
         ),
       ),
     );

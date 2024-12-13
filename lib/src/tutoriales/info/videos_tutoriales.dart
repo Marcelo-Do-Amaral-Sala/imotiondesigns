@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../db/db_helper.dart';
@@ -111,10 +112,10 @@ class _VideoTutorialesListViewState extends State<VideoTutorialesListView> {
                         Text(
                           nombre,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Color(0xFF2be4f3),
+                          style:  TextStyle(
+                            color: const Color(0xFF2be4f3),
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 20.sp,
                           ),
                         ),
                         Image.asset(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/custom/admins_table_widget.dart';
 import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
 
@@ -137,9 +138,9 @@ class _AdminsListViewState extends State<AdminsListView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(
+              style:  TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -158,7 +159,7 @@ class _AdminsListViewState extends State<AdminsListView> {
                 fillColor: const Color(0xFF313030),
                 isDense: true,
                 hintText: hint,
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                hintStyle:  TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),
           ),
@@ -172,10 +173,10 @@ class _AdminsListViewState extends State<AdminsListView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('ESTADO',
+           Text('ESTADO',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -185,19 +186,19 @@ class _AdminsListViewState extends State<AdminsListView> {
             ),
             child: DropdownButton<String>(
               value: selectedAdminOption,
-              items: const [
+              items:  [
                 DropdownMenuItem(
                     value: 'Todos',
                     child: Text('Todos',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Activo',
                     child: Text('Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Inactivo',
                     child: Text('Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
               onChanged: (value) {
                 setState(() {
@@ -219,10 +220,10 @@ class _AdminsListViewState extends State<AdminsListView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('TIPO',
+           Text('TIPO',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
           Container(
             alignment: Alignment.center,
@@ -232,19 +233,19 @@ class _AdminsListViewState extends State<AdminsListView> {
             ),
             child: DropdownButton<String>(
               value: selectedTipo,
-              items: const [
+              items:  [
                 DropdownMenuItem(
                     value: 'Ambos',
                     child: Text('Ambos',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Administrador',
                     child: Text('Administrador',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Entrenador',
                     child: Text('Entrenador',
-                        style: TextStyle(color: Colors.white, fontSize: 14))),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
               onChanged: (value) {
                 setState(() {

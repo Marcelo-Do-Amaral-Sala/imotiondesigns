@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import '../../db/db_helper.dart';
@@ -209,7 +210,6 @@ class AdminsDataState extends State<AdminsData> {
     );
   }
 
-
   Future<void> _deleteUsers(BuildContext context, int userId) async {
     showDialog(
       context: context,
@@ -218,17 +218,17 @@ class AdminsDataState extends State<AdminsData> {
         return AlertDialog(
           backgroundColor: const Color(0xFF494949),
           // Color de fondo del diálogo
-          title: const Text(
+          title: Text(
             'Confirmar Borrado',
             style: TextStyle(
                 color: Color(0xFF2be4f3),
-                fontSize: 28,
+                fontSize: 30.sp,
                 fontWeight: FontWeight.bold),
             textAlign: TextAlign.center, // Color del texto
           ),
-          content: const Text(
+          content: Text(
             '¿Estás seguro de que quieres borrar este cliente?',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            style: TextStyle(color: Colors.white, fontSize: 25.sp),
             textAlign: TextAlign.center, // Color del texto
           ),
           actions: [
@@ -237,17 +237,27 @@ class AdminsDataState extends State<AdminsData> {
               children: [
                 OutlinedButton(
                   onPressed: () {
-                    Navigator.of(context)
-                        .pop(); // Cierra el diálogo sin hacer nada
+                    Navigator.of(context).pop(); // Close the dialog
                   },
                   style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
                     side: const BorderSide(
-                        color: Color(0xFF2be4f3)), // Color del borde
+                      width: 1.0,
+                      color: Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
                   ),
-                  child: const Text(
+                  child: Text(
                     'CANCELAR',
-                    style:
-                        TextStyle(color: Color(0xFF2be4f3)), // Color del texto
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
                 OutlinedButton(
@@ -271,12 +281,24 @@ class AdminsDataState extends State<AdminsData> {
                     widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
-                    side:
-                        const BorderSide(color: Colors.red), // Color del borde
+                    padding: const EdgeInsets.all(10.0),
+                    side: const BorderSide(
+                      width: 1.0,
+                      color: Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
                   ),
-                  child: const Text(
+                  child: Text(
                     '¡SÍ, ESTOY SEGURO!',
-                    style: TextStyle(color: Colors.red), // Color del texto
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -379,11 +401,11 @@ class AdminsDataState extends State<AdminsData> {
                           ),
                           backgroundColor: Colors.transparent,
                         ),
-                        child: const Text(
+                        child: Text(
                           'RESET PASSWORD',
                           style: TextStyle(
-                            color: Color(0xFF2be4f3),
-                            fontSize: 17,
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -654,17 +676,17 @@ class AdminsDataState extends State<AdminsData> {
   }
 
 // Ajustes de estilos para simplificar
-  TextStyle get _labelStyle => const TextStyle(
-      color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+  TextStyle get _labelStyle => TextStyle(
+      color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
 
   TextStyle get _inputTextStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
+      TextStyle(color: Colors.white, fontSize: 14.sp);
 
   TextStyle get _dropdownHintStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
+      TextStyle(color: Colors.white, fontSize: 14.sp);
 
   TextStyle get _dropdownItemStyle =>
-      const TextStyle(color: Colors.white, fontSize: 14);
+      TextStyle(color: Colors.white, fontSize: 14.sp);
 
   InputDecoration _inputDecorationStyle(
       {String hintText = '', bool enabled = true}) {
@@ -674,7 +696,7 @@ class AdminsDataState extends State<AdminsData> {
       fillColor: const Color(0xFF313030),
       isDense: true,
       hintText: hintText,
-      hintStyle: const TextStyle(color: Colors.grey),
+      hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
       enabled: enabled,
     );
   }
