@@ -5044,6 +5044,7 @@ class BleConnectionService {
   bool _connected = false;
   Timer? _connectionCheckTimer; // Timer para el chequeo periódico de conexión
   List<String> targetDeviceIds = []; // Lista para almacenar las direcciones MAC
+  List<String> disconnectedDevices = [];
   bool isWidgetActive = true;
 
   // Mapa para almacenar los StreamControllers de conexión por dispositivo
@@ -5088,7 +5089,7 @@ class BleConnectionService {
   }
 
   // Iniciar el escaneo (escaneo automático al iniciar)
-  void _startScan() async {
+  Future<void> _startScan() async {
     if (kDebugMode) {
       print("Iniciando el escaneo...");
     }
@@ -5160,6 +5161,8 @@ class BleConnectionService {
     Duration retryDelay = const Duration(
         seconds: 3); // Tiempo de espera entre intentos de reconexión
 
+    await Future.delayed(const Duration(seconds: 1));
+
     // Función interna para manejar la conexión con reconexión
     Future<void> tryConnect() async {
       if (!isWidgetActive) {
@@ -5203,7 +5206,7 @@ class BleConnectionService {
             success = false; // Se marca como desconectado
             _deviceConnectionStateControllers[macAddress]
                 ?.add(false); // Desconectado
-            _restartScan();
+            _onDeviceDisconnected(macAddress);
             break;
           default:
             if (kDebugMode) {
@@ -5238,31 +5241,63 @@ class BleConnectionService {
     // Solo iniciar el chequeo si el escaneo ha terminado
     _connectionCheckTimer ??=
         Timer.periodic(const Duration(seconds: 5), (timer) {
-      // Recorrer todas las direcciones MAC registradas
-      _deviceConnectionStateControllers.forEach((macAddress, controller) {
-        // Comprobar si hay algún cambio en el estado de la conexión del dispositivo
-        controller.stream.listen((_connected) {
-          if (_connected) {
-            print(
-                "Chequeo de conexión: El dispositivo con la MAC $macAddress está conectado.");
-          } else {
-            print(
-                "Chequeo de conexión: El dispositivo con la MAC $macAddress está desconectado.");
-            _restartScan();
-          }
-        });
-      });
+      if (_connected) {
+        print("Chequeo de conexión: El dispositivo está conectado.");
+      } else {
+        print(
+            "Chequeo de conexión: El dispositivo está desconectado. Reiniciando escaneo...");
+        _restartScan(); // Reiniciar el escaneo si el dispositivo está desconectado
+      }
     });
   }
 
-// Método para reiniciar el escaneo
+  void _onDeviceDisconnected(String macAddress) {
+    if (!disconnectedDevices.contains(macAddress)) {
+      disconnectedDevices
+          .add(macAddress); // Agregar a la lista de desconectados
+    }
+    print("Dispositivo desconectado: $macAddress");
+  }
+
   void _restartScan() async {
     if (!_scanStarted) {
       if (kDebugMode) {
         print("Reiniciando el escaneo...");
       }
       _scanStarted = true;
-      _startScan(); // Llamar al método _startScan para comenzar nuevamente
+
+      // Agregar un pequeño retraso antes de intentar el escaneo nuevamente
+      await Future.delayed(Duration(seconds: 2)); // Espera 2 segundos
+
+      await _startScan(); // Llamar al método _startScan para comenzar nuevamente
+
+      // Lista temporal para almacenar las MACs que fueron reconectadas exitosamente
+      List<String> successfullyReconnectedDevices = [];
+
+      // Solo intentar reconectar con los dispositivos desconectados
+      for (var macAddress in List.from(disconnectedDevices)) {
+        // Copiar la lista para evitar problemas de modificación mientras iteras
+        print("Intentando reconectar a la MAC: $macAddress");
+
+        bool success = await _connectToDeviceByMac(macAddress);
+
+        // Aquí puedes enviar el estado de la conexión al stream correspondiente
+        if (_deviceConnectionStateControllers.containsKey(macAddress)) {
+          _deviceConnectionStateControllers[macAddress]?.add(success);
+        }
+
+        if (success) {
+          successfullyReconnectedDevices
+              .add(macAddress); // Agregar a la lista temporal
+          print("Reconexión exitosa con la MAC: $macAddress");
+        } else {
+          print("Falló la reconexión con la MAC: $macAddress");
+        }
+      }
+
+      // Eliminar las MACs reconectadas de la lista de dispositivos desconectados
+      disconnectedDevices.removeWhere(
+          (macAddress) => successfullyReconnectedDevices.contains(macAddress));
     }
   }
 
@@ -5275,11 +5310,6 @@ class BleConnectionService {
       // Cancelar la suscripción del stream de conexión
       await _connectionStreams?[macAddress]
           ?.cancel(); // Cancelar la suscripción de ese dispositivo.
-
-      // Deinitialize para liberar los recursos BLE
-      flutterReactiveBle
-          .deinitialize(); // Liberar los recursos BLE globalmente.
-
       // Verificar si el StreamController no está cerrado antes de agregar un evento
       final controller = _deviceConnectionStateControllers[macAddress];
       if (controller != null && !controller.isClosed) {
