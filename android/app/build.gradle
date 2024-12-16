@@ -1,10 +1,10 @@
 plugins {
     id "com.android.application"
     // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
+    id 'com.google.gms.google-services' // Asegúrate de que este plugin esté aquí
     // END: FlutterFire Configuration
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // El plugin de Flutter Gradle debe aplicarse después de los plugins de Android y Kotlin.
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -23,10 +23,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.imotion_designs"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        applicationId = "com.example.imotion_designs" // Asegúrate de que este ID coincida con el de tu app
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -35,13 +32,9 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Configuración de firma para la build de release
             signingConfig = signingConfigs.debug
         }
     }
 }
 
-flutter {
-    source = "../.."
-}
