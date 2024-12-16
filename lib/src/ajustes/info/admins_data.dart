@@ -114,7 +114,7 @@ class AdminsDataState extends State<AdminsData> {
         // Actualizar los campos del formulario con los datos del usuario
         _nameController.text = updatedAdminData['name'] ?? '';
         _emailController.text = updatedAdminData['email'] ?? '';
-        _phoneController.text = updatedAdminData['phone'].toString() ?? '';
+        _phoneController.text = updatedAdminData['phone'].toString();
         selectedGender = updatedAdminData['gender'];
         selectedTipoPerfil =
             tipoPerfil ?? ''; // Actualiza con el tipo de perfil obtenido
