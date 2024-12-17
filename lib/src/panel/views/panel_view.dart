@@ -213,60 +213,73 @@ class _PanelViewState extends State<PanelView>
     bleConnectionService = BleConnectionService([]);
     bleConnectionService.isWidgetActive = true;
 
-    // Cargar los datos de AppState y actualizar el servicio BLE cuando estén disponibles
+    // Cargar los datos de AppState y actualizar el servicio BLE
     await AppState.instance.loadState();
 
     // Obtener las direcciones MAC desde el AppState
     List<String> macAddresses =
-        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
-    // Imprimir las direcciones MAC obtenidas
-    print("Direcciones MAC obtenidas: $macAddresses");
+    print("🔍 Direcciones MAC obtenidas: $macAddresses");
 
     // Actualizar la lista de direcciones MAC en el servicio BLE
     setState(() {
       bleConnectionService.updateMacAddresses(macAddresses);
     });
 
-    // Inicializar el mapa de estados de conexión
+    // Inicializar el estado inicial de cada dispositivo
     macAddresses.forEach((macAddress) {
       deviceConnectionStatus[macAddress] = 'desconectado'; // Estado inicial
     });
 
-    // Recorrer cada dirección MAC para intentar conectar
-    for (var macAddress in macAddresses) {
-      print("Intentando conectar a la MAC: $macAddress");
+    // Conectar a los dispositivos en paralelo y actualizar la UI al completar cada conexión
+    bleConnectionService.connectedDevices.clear();
+    List<Future<void>> connectionTasks = [];
 
-      // Intentar conectarse al dispositivo por su dirección MAC y esperar el resultado
-      bool success =
-          await bleConnectionService._connectToDeviceByMac(macAddress);
+    for (String macAddress in macAddresses) {
+      connectionTasks.add(() async {
+        print("🔗 Intentando conectar a la MAC: $macAddress");
 
-      // Actualizar el estado de conexión final
-      setState(() {
-        deviceConnectionStatus[macAddress] =
-            success ? 'conectado' : 'desconectado';
-      });
+        bool success =
+        await bleConnectionService._connectToDeviceByMac(macAddress);
 
-      if (success) {
-        print("Conexión exitosa con la MAC: $macAddress");
-      } else {
-        print("Falló la conexión con la MAC: $macAddress");
-      }
-
-      // Suscribirse al stream del estado de conexión
-      bleConnectionService
-          .connectionStateStream(macAddress)
-          .listen((connected) {
+        // Actualizar el estado de conexión en la UI
         setState(() {
           deviceConnectionStatus[macAddress] =
-              connected ? 'conectado' : 'desconectado';
+          success ? 'conectado' : 'desconectado';
+        });
+
+        if (success) {
+          print("✅ Conexión exitosa con la MAC: $macAddress");
+        } else {
+          print("❌ Falló la conexión con la MAC: $macAddress");
+        }
+      }());
+    }
+
+    // Esperar a que todas las conexiones se completen
+    await Future.wait(connectionTasks);
+
+    // Iniciar procesos post-conexión solo para dispositivos conectados
+    for (String macAddress in bleConnectionService.connectedDevices) {
+      await bleConnectionService._startPostConnectionProtocols(macAddress);
+    }
+
+    // Suscribirse a los streams de conexión para reflejar los cambios en tiempo real
+    for (String macAddress in macAddresses) {
+      bleConnectionService.connectionStateStream(macAddress).listen((connected) {
+        setState(() {
+          deviceConnectionStatus[macAddress] =
+          connected ? 'conectado' : 'desconectado';
         });
       });
     }
 
-    // Recargar la UI después de cargar el estado
+    // Refrescar la UI después de completar todo el proceso
     setState(() {});
+    print("🔄 Proceso de conexión BLE finalizado.");
   }
+
 
   Future<void> _preloadImages() async {
     for (String path in imagePaths) {
@@ -559,11 +572,12 @@ class _PanelViewState extends State<PanelView>
                                                   neonColor: _getBorderColor(
                                                       deviceConnectionStatus[
                                                           macAddress]),
-                                                ), // Color dinámico según el estado
+                                                ),
+                                                // Color dinámico según el estado
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Colors
-                                                        .transparent, // Fondo transparente
+                                                    color: Colors.transparent,
+                                                    // Fondo transparente
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             7), // Bordes redondeados
@@ -575,7 +589,8 @@ class _PanelViewState extends State<PanelView>
                                                           ? '' // Si la lista está vacía, mostrar texto vacío
                                                           : selectedClientsGlobal[
                                                                   0]['name'] ??
-                                                              'No Name', // Nombre del dispositivo
+                                                              'No Name',
+                                                      // Nombre del dispositivo
                                                       style: TextStyle(
                                                         fontSize: 17.sp,
                                                         color: const Color(
@@ -5048,6 +5063,9 @@ class BleConnectionService {
   List<String> disconnectedDevices = [];
   bool isWidgetActive = true;
   final Set<String> _connectedDevices = {};
+  final Map<String, QualifiedCharacteristic> _deviceCharacteristics = {};
+  StreamSubscription<List<int>>? subscription;
+
   // Mapa para almacenar los StreamControllers de conexión por dispositivo
   final Map<String, StreamController<bool>> _deviceConnectionStateControllers =
       {};
@@ -5058,28 +5076,16 @@ class BleConnectionService {
   StreamSubscription<DiscoveredDevice>? _scanStream;
   final Map<String, StreamSubscription<ConnectionStateUpdate>>?
       _connectionStreams = {};
-
-  // Lista de UUIDs de servicios que queremos detectar
-  final  SERVICE_UUID =
-      Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
-  final  CHARACTERISTIC_UUID_RX =
-      Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
-  final  CHARACTERISTIC_UUID_TX =
-      Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
-
-  // Variables para los retos y respuestas
-  List<int> challenge = [0x00, 0x00, 0x00, 0x00]; // Valor inicial de los retos
-  List<int> response = [0x00, 0x00, 0x00, 0x00]; // Respuesta a los retos
-
-// Función para generar el reto
-  List<int> generateChallengeResponse(List<int> challenge) {
-    return [
-      challenge[0] ^ 0x2A, // R-H1 = H1 xor 0x2A
-      challenge[1] ^ 0x55, // R-H2 = H2 xor 0x55
-      challenge[2] ^ 0xAA, // R-H3 = H3 xor 0xAA
-      challenge[3] ^ 0xA2, // R-H4 = H4 xor 0xA2
-    ];
-  }
+  final List<String> connectedDevices = []; // Lista de MACs conectadas
+  bool _allTargetsConnected = false;
+  final serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
+  final characteristicUuid = Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
+  bool _isLoggedIn = false; // Estado de seguridad
+  List<int> _currentChallenge = [0, 0, 0, 0]; // Reto actual
+  // XOR keys para el cálculo de R-H
+  final List<int> _xorKeys = [0x2A, 0x55, 0xAA, 0xA2];
+  static const int FUN_INFO = 2;
+  static const int FUN_INFO_R = 3;
 
   BleConnectionService(List<String> macAddresses) {
     targetDeviceIds =
@@ -5161,99 +5167,87 @@ class BleConnectionService {
 
   Future<bool> _connectToDeviceByMac(String macAddress) async {
     if (macAddress.isEmpty) {
-      if (kDebugMode) {
-        print("Dirección MAC vacía.");
-      }
+      if (kDebugMode) print("Dirección MAC vacía.");
       return false;
     }
 
-    if (kDebugMode) {
-      print("Conectando al dispositivo con la MAC: $macAddress...");
-    }
+    if (kDebugMode)
+      print("🔗 Conectando al dispositivo con la MAC: $macAddress...");
 
     bool success = false;
-    int attemptCount = 0; // Contador para los intentos de reconexión
-    const maxAttempts = 5; // Número máximo de intentos de reconexión
-    Duration retryDelay = const Duration(
-        seconds: 3); // Tiempo de espera entre intentos de reconexión
+    int attemptCount = 0;
+    const maxAttempts = 5;
+    Duration retryDelay = const Duration(seconds: 3);
 
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Función interna para manejar la conexión con reconexión
     Future<void> tryConnect() async {
-      if (!isWidgetActive) {
-        print("WIDGET CERRADO: Deteniendo intentos de conexión.");
-        return; // Detener el proceso si el widget está cerrado
-      }
-
-      // Intentar conectar al dispositivo BLE utilizando la MAC proporcionada
       _connectionStreams?[macAddress] =
           flutterReactiveBle.connectToAdvertisingDevice(
         id: macAddress,
         prescanDuration: const Duration(seconds: 1),
-        withServices: [], // Agregar UUIDs de servicios si es necesario
+        withServices: [], // Agregar UUIDs si es necesario
       ).listen((event) async {
-        if (!isWidgetActive) {
-          print("WIDGET CERRADO: Abortando dentro del listener.");
-          return; // Evitar procesamiento adicional si el widget está cerrado
-        }
-
-        if (kDebugMode) {
-          print("Estado de la conexión: ${event.connectionState}");
-        }
-
         switch (event.connectionState) {
           case DeviceConnectionState.connected:
-            if (kDebugMode) {
-              print("Dispositivo conectado exitosamente.");
-            }
-            _connected = true;
-            success = true; // Se marca la conexión como exitosa
-            _deviceConnectionStateControllers[macAddress]
-                ?.add(true); // Conectado
-            _startConnectionCheckTimer();
-
-            await Future.delayed(Duration(seconds: 20));
-
-            await initiateCommunication(macAddress);
+            if (kDebugMode) print("✅ Dispositivo $macAddress conectado.");
+            connectedDevices.add(macAddress);
+            success = true;
             break;
+
           case DeviceConnectionState.disconnected:
-            if (kDebugMode) {
-              print("Conexión desconectada.");
-            }
-            _connected = false;
-            success = false; // Se marca como desconectado
-            _deviceConnectionStateControllers[macAddress]
-                ?.add(false); // Desconectado
+            if (kDebugMode) print("🔌 Dispositivo $macAddress desconectado.");
             _onDeviceDisconnected(macAddress);
             break;
+
           default:
-            if (kDebugMode) {
-              print("Estado de la conexión desconocido.");
-            }
+            if (kDebugMode) print("⏳ Estado desconocido para $macAddress.");
             break;
         }
       });
 
-      // Esperar un poco para que la conexión tenga tiempo de completarse
       await Future.delayed(const Duration(seconds: 1));
 
-      // Si no se ha logrado la conexión, intentamos reconectar
       if (!success && attemptCount < maxAttempts) {
         attemptCount++;
         if (kDebugMode) {
-          print(
-              "Intento ${attemptCount} fallido. Reintentando en ${retryDelay.inSeconds} segundos...");
+          print("🔄 Reintento $attemptCount para $macAddress...");
         }
-        await Future.delayed(retryDelay); // Esperamos antes de reintentar
-        await tryConnect(); // Intentamos reconectar
+        await Future.delayed(retryDelay);
+        await tryConnect();
       }
     }
 
-    // Llamamos a la función para intentar conectar
     await tryConnect();
+    return success;
+  }
 
-    return success; // Retorna si la conexión fue exitosa o no
+  Future<void> _startPostConnectionProtocols(String macAddress) async {
+    if (kDebugMode)
+      print("🚀 Iniciando protocolos posteriores para $macAddress...");
+    try {
+      await executeSecurityProcess(macAddress, serviceUuid, characteristicUuid);
+      if (kDebugMode) print("🔒 Seguridad completada para $macAddress.");
+
+      await Future.delayed(const Duration(seconds: 5));
+
+      await _sendRequestInfo(macAddress, serviceUuid, characteristicUuid);
+      if (kDebugMode)
+        print("📩 Solicitud de información completada para $macAddress.");
+
+      await Future.delayed(const Duration(seconds: 5));
+
+      await _subscribeToDeviceNotifications(
+          macAddress, serviceUuid, characteristicUuid);
+      if (kDebugMode) print("🔔 Suscripción activa para $macAddress.");
+    } catch (e) {
+      if (kDebugMode) print("❌ Error en los protocolos posteriores: $e");
+    }
+  }
+
+  void _onDeviceDisconnected(String macAddress) {
+    if (kDebugMode) print("🔌 Dispositivo $macAddress desconectado.");
+    connectedDevices.remove(macAddress);
+    _connectionStreams?[macAddress]?.cancel();
+    _connectionStreams?.remove(macAddress);
   }
 
   void _startConnectionCheckTimer() {
@@ -5268,14 +5262,6 @@ class BleConnectionService {
         _restartScan(); // Reiniciar el escaneo si el dispositivo está desconectado
       }
     });
-  }
-
-  void _onDeviceDisconnected(String macAddress) {
-    if (!disconnectedDevices.contains(macAddress)) {
-      disconnectedDevices
-          .add(macAddress); // Agregar a la lista de desconectados
-    }
-    print("Dispositivo desconectado: $macAddress");
   }
 
   void _restartScan() async {
@@ -5379,66 +5365,238 @@ class BleConnectionService {
 
   bool get isConnected => _connected;
 
-  // Función para escribir en la característica RX
-  Future<void> writeToDevice(String macAddress, List<int> data) async {
+  Future<void> writeData(String macAddress, Uuid serviceUuid,
+      Uuid characteristicUuid, List<int> data) async {
     try {
-      QualifiedCharacteristic rxCharacteristic = QualifiedCharacteristic(
-        serviceId: SERVICE_UUID,
-        characteristicId: CHARACTERISTIC_UUID_RX,
+      final characteristic = QualifiedCharacteristic(
         deviceId: macAddress,
+        serviceId: serviceUuid,
+        characteristicId: characteristicUuid,
       );
-      await flutterReactiveBle.writeCharacteristicWithResponse(
-        rxCharacteristic,
-        value: data,
-      );
-      if (kDebugMode) {
-        print("Escrito al dispositivo $macAddress: $data");
-      }
+
+      await flutterReactiveBle.writeCharacteristicWithResponse(characteristic,
+          value: data);
+      if (kDebugMode) print("Datos escritos a $macAddress: $data");
     } catch (e) {
-      if (kDebugMode) {
-        print("Error escribiendo al dispositivo $macAddress: $e");
-      }
+      if (kDebugMode) print("Error al escribir datos en $macAddress: $e");
     }
   }
 
-  // Método para leer desde la característica TX (notificaciones)
-  Future<void> _subscribeToNotifications(String macAddress) async {
-    QualifiedCharacteristic txCharacteristic = QualifiedCharacteristic(
-      serviceId: SERVICE_UUID,
-      characteristicId: CHARACTERISTIC_UUID_TX,
+  /// Lectura de datos desde una característica BLE
+  Future<List<int>> readData(
+      String macAddress, Uuid serviceUuid, Uuid characteristicUuid) async {
+    try {
+      final characteristic = QualifiedCharacteristic(
+        deviceId: macAddress,
+        serviceId: serviceUuid,
+        characteristicId: characteristicUuid,
+      );
+
+      final data = await flutterReactiveBle.readCharacteristic(characteristic);
+      if (kDebugMode) print("Datos leídos desde $macAddress: $data");
+      return data;
+    } catch (e) {
+      if (kDebugMode) print("Error al leer datos de $macAddress: $e");
+      return [];
+    }
+  }
+
+  /// Escucha de datos en una característica BLE (notificaciones)
+  Stream<List<int>> subscribeToCharacteristic(
+      String macAddress, Uuid serviceUuid, Uuid characteristicUuid) {
+    final characteristic = QualifiedCharacteristic(
       deviceId: macAddress,
+      serviceId: serviceUuid,
+      characteristicId: characteristicUuid,
     );
 
-    flutterReactiveBle.subscribeToCharacteristic(txCharacteristic).listen(
-  (data) {
-    // Si se recibe algún dato de la notificación, lo mostramos
-    if (kDebugMode) {
-      print("Notificación recibida: $data");
-    }
-
-    // Procesar la notificación recibida
-    // Por ejemplo, convertir los datos en texto si es necesario
-    String notificationData = String.fromCharCodes(data);
-    if (kDebugMode) {
-      print("Datos de la notificación procesados: $notificationData");
-    }
-  },
-  onError: (error) {
-    // Si ocurre un error al suscribirse a la notificación, lo registramos
-    if (kDebugMode) {
-      print("Error en las notificaciones: $error");
-    }
-  },
-);
-
+    return flutterReactiveBle
+        .subscribeToCharacteristic(characteristic)
+        .map((data) {
+      if (kDebugMode) print("Notificación recibida desde $macAddress: $data");
+      return data;
+    });
   }
 
-  Future<void> initiateCommunication(String macAddress) async {
-    // Primero, escribimos un mensaje al dispositivo
-    List<int> messageToSend = [0x01, 0x02, 0x03, 0x04]; // Ejemplo de mensaje
-    await writeToDevice(macAddress, messageToSend);
+  Future<List<int>> handleSecurityInitialization(String macAddress,
+      Uuid serviceUuid, Uuid characteristicUuid, List<int> inputData) async {
+    final int functionCode = inputData[0];
+    final int p = inputData[1];
 
-    // Luego, nos suscribimos a las notificaciones
-    await _subscribeToNotifications(macAddress);
+    if (functionCode != 0) {
+      return [1, 0, 0, 0, 0]; // Comando no permitido hasta FUN_INIT
+    }
+
+    if (p == 0) {
+      // Envío de nuevo reto
+      _generateNewChallenge();
+      return [1, 0, ..._currentChallenge];
+    } else if (p == 1) {
+      // Verificar reto
+      if (_checkChallengeResponse(inputData.sublist(2))) {
+        _isLoggedIn = true;
+        _clearChallenge();
+        return [1, 1, 0, 0, 0, 0]; // R=1, reto correcto
+      } else {
+        _generateNewChallenge();
+        return [1, 0, ..._currentChallenge]; // R=0, reto incorrecto
+      }
+    }
+
+    // Si ya logado
+    if (_isLoggedIn) {
+      return [1, 2, 0, 0, 0, 0]; // R=2, ya logado
+    }
+
+    // Estado por defecto
+    _generateNewChallenge();
+    return [1, 0, ..._currentChallenge];
+  }
+
+  /// Generar nuevo reto aleatorio
+  void _generateNewChallenge() {
+    final random = Random();
+    _currentChallenge = List<int>.generate(4, (_) => random.nextInt(256));
+  }
+
+  /// Limpiar el reto después de una verificación exitosa
+  void _clearChallenge() {
+    _currentChallenge = [0, 0, 0, 0];
+  }
+
+  /// Verificar el contra-reto (R-H) recibido
+  bool _checkChallengeResponse(List<int> response) {
+    if (response.length != 4) return false;
+    for (int i = 0; i < 4; i++) {
+      if ((response[i] ^ _xorKeys[i]) != _currentChallenge[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Generar contra-reto para enviar al dispositivo
+  List<int> generateResponse() {
+    return List<int>.generate(
+        4, (i) => _currentChallenge[i] ^ _xorKeys[i]); // H1 ^ XOR_KEY
+  }
+
+  Future<void> executeSecurityProcess(
+      String macAddress, Uuid serviceUuid, Uuid characteristicUuid) async {
+    print("Iniciando proceso de seguridad...");
+
+    try {
+      // Paso 1: Solicitar nuevo reto
+      final initialResponse = await handleSecurityInitialization(
+          macAddress, serviceUuid, characteristicUuid, [0, 0, 0, 0, 0, 0]);
+
+      if (initialResponse[1] == 2) {
+        print("El dispositivo ya está logado.");
+        return;
+      }
+
+      if (initialResponse[1] == 0) {
+        print("Reto recibido: ${initialResponse.sublist(2)}");
+
+        // Paso 2: Generar contra-reto usando el reto recibido
+        final challengeResponse = generateResponse();
+
+        print("Enviando contra-reto: $challengeResponse");
+
+        // Paso 3: Enviar contra-reto al dispositivo
+        final verificationResponse = await handleSecurityInitialization(
+            macAddress,
+            serviceUuid,
+            characteristicUuid,
+            [0, 1, ...challengeResponse]);
+
+        if (verificationResponse[1] == 1) {
+          print("Seguridad establecida correctamente.");
+        } else if (verificationResponse[1] == 2) {
+          print("El dispositivo ya estaba logado.");
+        } else {
+          print(
+              "Error en la verificación de seguridad. Nuevo reto recibido: ${verificationResponse.sublist(2)}");
+        }
+      } else {
+        print("Error inesperado en la inicialización de seguridad.");
+      }
+    } catch (e) {
+      print("Error durante el proceso de seguridad: $e");
+    }
+  }
+
+  Future<void> _sendRequestInfo(
+    String macAddress,
+    Uuid serviceUuid,
+    Uuid characteristicUuidRx,
+  ) async {
+    if (kDebugMode) print("🚀 Iniciando solicitud de información...");
+
+    try {
+      // Construir comando: FUN_INFO + 19 bytes de relleno
+      List<int> command = [FUN_INFO] + List.filled(19, 0);
+
+      if (kDebugMode) {
+        print(
+            "🛠️ Comando construido: ${command.map((e) => e.toRadixString(16)).toList()}");
+      }
+
+      // Escribir en RX
+      final characteristic = QualifiedCharacteristic(
+        deviceId: macAddress,
+        serviceId: serviceUuid,
+        characteristicId: characteristicUuidRx,
+      );
+
+      await flutterReactiveBle.writeCharacteristicWithResponse(characteristic,
+          value: command);
+
+      if (kDebugMode) print("✅ Solicitud enviada correctamente en RX.");
+    } catch (e) {
+      if (kDebugMode) print("❌ Error al enviar solicitud: $e");
+    }
+  }
+
+  Future<void> _subscribeToDeviceNotifications(
+    String macAddress,
+    Uuid serviceUuid,
+    Uuid characteristicUuidTx,
+  ) async {
+    if (kDebugMode)
+      print("🔔 Iniciando suscripción a TX para recibir respuesta...");
+
+    try {
+      final characteristic = QualifiedCharacteristic(
+        deviceId: macAddress,
+        serviceId: serviceUuid,
+        characteristicId: characteristicUuidTx,
+      );
+
+      // Cancelar suscripción previa si existe
+      await subscription?.cancel();
+
+      subscription =
+          flutterReactiveBle.subscribeToCharacteristic(characteristic).listen(
+        (data) {
+          if (data.isNotEmpty) {
+            if (kDebugMode) {
+              print(
+                  "📩 Datos recibidos: ${data.map((e) => e.toRadixString(16)).toList()}");
+            }
+            // Aquí procesaremos la respuesta después
+          } else {
+            if (kDebugMode) print("⚠️ Respuesta vacía recibida.");
+          }
+        },
+        onError: (error) {
+          if (kDebugMode) print("❌ Error durante la suscripción: $error");
+        },
+      );
+
+      if (kDebugMode) print("✅ Suscripción activa, esperando respuesta...");
+    } catch (e) {
+      if (kDebugMode) print("❌ Error al suscribirse a TX: $e");
+    }
   }
 }
