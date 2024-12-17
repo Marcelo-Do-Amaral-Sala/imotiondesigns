@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
@@ -5058,12 +5059,27 @@ class BleConnectionService {
   final Map<String, StreamSubscription<ConnectionStateUpdate>>?
       _connectionStreams = {};
 
-// UUIDs para el servicio y las características
-  static String SERVICE_UUID = "49535343-FE7D-4AE5-8FA9-9FAFD205E455";
-  static String CHARACTERISTIC_UUID_RX =
-      "49535343-8841-43F4-A8D4-ECBE34729BB4"; // Característica de escritura
-  static String CHARACTERISTIC_UUID_TX =
-      "49535343-1E4D-4BD9-BA61-23C647249617"; // Característica de lectura y notificación
+  // Lista de UUIDs de servicios que queremos detectar
+  List<Uuid> serviceUuids = [
+    Uuid.parse(
+        "49535343-FE7D-4AE5-8FA9-9FAFD205E455"), // Ejemplo de UUID de servicio
+    Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4"), // Otro UUID de servicio
+    Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617"), // Otro UUID de servicio
+  ];
+
+  // Variables para los retos y respuestas
+  List<int> challenge = [0x00, 0x00, 0x00, 0x00]; // Valor inicial de los retos
+  List<int> response = [0x00, 0x00, 0x00, 0x00]; // Respuesta a los retos
+
+// Función para generar el reto
+  List<int> generateChallengeResponse(List<int> challenge) {
+    return [
+      challenge[0] ^ 0x2A, // R-H1 = H1 xor 0x2A
+      challenge[1] ^ 0x55, // R-H2 = H2 xor 0x55
+      challenge[2] ^ 0xAA, // R-H3 = H3 xor 0xAA
+      challenge[3] ^ 0xA2, // R-H4 = H4 xor 0xA2
+    ];
+  }
 
   BleConnectionService(List<String> macAddresses) {
     targetDeviceIds =
@@ -5196,32 +5212,10 @@ class BleConnectionService {
             _deviceConnectionStateControllers[macAddress]
                 ?.add(true); // Conectado
             _startConnectionCheckTimer();
-            sendSecurityInit(macAddress);
-            listenSecurityResponse(macAddress);
 
-            // Obtener la información del dispositivo
-            sendInfoRequest(macAddress);
-            listenDeviceInfo(macAddress);
+            await Future.delayed(Duration(seconds: 20));
 
-            // Obtener el nombre del Bluetooth
-            sendGetBluetoothNameRequest(macAddress);
-            listenBluetoothName(macAddress);
-
-            // Descubrir los servicios del dispositivo
-            List<DiscoveredService> services =
-                await flutterReactiveBle.discoverServices(macAddress);
-            if (kDebugMode) {
-              print(
-                  "\n\n--- Servicios y características de la MAC: $macAddress ---");
-              print("Servicios descubiertos: ${services.length}");
-              for (var service in services) {
-                print("Servicio: ${service.serviceId}");
-                for (var characteristic in service.characteristics) {
-                  print("Característica: ${characteristic.characteristicId}");
-                }
-              }
-            }
-
+            await initiateCommunication(macAddress);
             break;
           case DeviceConnectionState.disconnected:
             if (kDebugMode) {
@@ -5385,138 +5379,190 @@ class BleConnectionService {
 
   bool get isConnected => _connected;
 
-  Future<void> sendSecurityInit(String macAddress) async {
-    final characteristic = QualifiedCharacteristic(
-      serviceId: Uuid.parse(SERVICE_UUID),
-      characteristicId: Uuid.parse(CHARACTERISTIC_UUID_RX),
+  Future<void> writeToDevice(String macAddress, List<int> data) async {
+  try {
+    // Definir el servicio y la característica donde vamos a escribir
+    Uuid serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
+    Uuid characteristicUuidRx = Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
+
+    // Crear la instancia de la característica (para escritura)
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: characteristicUuidRx,
       deviceId: macAddress,
     );
 
-    // Paquete con la estructura de seguridad (si es necesario ajusta los valores aquí)
-    final packet = [
-      0x00, // FUN_INIT
-      0x00, // P
-      0x00, 0x00, 0x00, 0x00, // R-H1, R-H2, R-H3, R-H4 (inicialmente 0)
+    // Escribir los datos en la característica
+    await flutterReactiveBle.writeCharacteristicWithResponse(characteristicRx, value: data);
+    if (kDebugMode) {
+      print("Datos escritos correctamente: $data en $characteristicUuidRx");
+    }
+  } catch (e) {
+    print("Error escribiendo en la característica: $e");
+  }
+}
+
+
+Future<void> subscribeToDeviceNotifications(String macAddress) async {
+  try {
+    // Definir el servicio y la característica donde vamos a recibir notificaciones
+    Uuid serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
+    Uuid characteristicUuidTx = Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
+
+    // Crear la instancia de la característica (para notificaciones)
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: characteristicUuidTx,
+      deviceId: macAddress,
+    );
+
+    // Suscribirse a las notificaciones de la característica
+    flutterReactiveBle.subscribeToCharacteristic(characteristicTx).listen(
+      (data) {
+        if (kDebugMode) {
+          print("Notificación recibida desde $characteristicUuidTx: $data");
+        }
+        // Aquí puedes manejar la notificación recibida
+      },
+      onError: (error) {
+        print("Error al recibir notificación: $error");
+      },
+    );
+  } catch (e) {
+    print("Error al suscribirse a notificaciones: $e");
+  }
+}
+
+
+  // Función para generar un reto (challenge)
+  List<int> generateChallenge() {
+    List<int> challenge = [
+      0x01,
+      0x02,
+      0x03,
+      0x04
+    ]; // Reto inicial (puede ser generado dinámicamente)
+    return [
+      challenge[0] ^ 0x2A, // R-H1 = H1 xor 0x2A
+      challenge[1] ^ 0x55, // R-H2 = H2 xor 0x55
+      challenge[2] ^ 0xAA, // R-H3 = H3 xor 0xAA
+      challenge[3] ^ 0xA2 // R-H4 = H4 xor 0xA2
+    ];
+  }
+
+  Future<void> sendSecurityChallenge(String macAddress) async {
+  if (_connected) {
+    // Generar un nuevo reto
+    List<int> challenge = generateChallenge();
+    List<int> message = [
+      0x00, // FUNCION_INIT (Host a dispositivo)
+      0x00, // P (Indicar si es un nuevo reto o verificar)
+      challenge[0], // R-H1
+      challenge[1], // R-H2
+      challenge[2], // R-H3
+      challenge[3], // R-H4
     ];
 
-    try {
-      await flutterReactiveBle.writeCharacteristicWithResponse(characteristic,
-          value: packet);
-      print("Reto de seguridad enviado");
-    } catch (e) {
-      print("Error al enviar reto de seguridad: $e");
+    // Escribir el reto en la característica RX del dispositivo
+    await writeToDevice(macAddress, message);
+    print("Reto enviado al dispositivo: $message");
+  }
+}
+
+Future<void> handleSecurityResponse(String macAddress, List<int> response) async {
+  if (_connected) {
+    if (response.isEmpty) {
+      print("Respuesta vacía recibida, intentaremos de nuevo.");
+      await sendSecurityChallenge(macAddress); // Volver a enviar el reto si la respuesta está vacía
+      return;
+    }
+
+    int responseCode = response[0]; // Respuesta del dispositivo
+    int h1 = response[1]; // H1
+    int h2 = response[2]; // H2
+    int h3 = response[3]; // H3
+    int h4 = response[4]; // H4
+
+    print("Respuesta recibida del dispositivo: R=$responseCode, H1=$h1, H2=$h2, H3=$h3, H4=$h4");
+
+    switch (responseCode) {
+      case 0: // No logado, generar un nuevo reto
+        print("No registrado, se genera un nuevo reto.");
+        await sendSecurityChallenge(macAddress);
+        break;
+
+      case 1: // Respuesta correcta, seguridad establecida
+        print("Seguridad establecida con éxito.");
+        break;
+
+      case 2: // Ya está logado, no es necesario hacer más
+        print("Ya está logado, puede proceder.");
+        break;
+
+      default:
+        print("Respuesta no válida, generando nuevo reto.");
+        await sendSecurityChallenge(macAddress); // Generar nuevo reto
+        break;
     }
   }
+}
 
-  void listenSecurityResponse(String macAddress) {
-    final characteristic = QualifiedCharacteristic(
-      serviceId: Uuid.parse(SERVICE_UUID),
-      characteristicId: Uuid.parse(CHARACTERISTIC_UUID_TX),
-      deviceId: macAddress,
-    );
 
-    flutterReactiveBle.subscribeToCharacteristic(characteristic).listen(
-      (response) {
-        final R = response[0]; // Reto de seguridad recibido
+ Future<void> initiateCommunication(String macAddress) async {
+  await sendSecurityChallenge(macAddress);
 
-        if (R == 2) {
-          print('Ya está logado');
-        } else if (R == 1) {
-          print('Reto correcto');
-        } else {
-          print('Reto incorrecto, generando nuevo reto');
-          sendSecurityInit(
-              macAddress); // Si el reto es incorrecto, generamos uno nuevo
-        }
-      },
-      onError: (e) {
-        print('Error al recibir respuesta de seguridad: $e');
-      },
-    );
-  }
-
-  Future<void> sendInfoRequest(String macAddress) async {
-    final characteristic = QualifiedCharacteristic(
-      serviceId: Uuid.parse(SERVICE_UUID),
-      characteristicId: Uuid.parse(CHARACTERISTIC_UUID_RX),
-      deviceId: macAddress,
-    );
-
-    // Paquete con la solicitud de información (ajustar si es necesario)
-    final packet = [0x02, 0x00, 0x00, 0x00, 0x00]; // FUN_INFO
-
+  int retries = 3; // Intentos de reintento
+  while (retries > 0) {
     try {
-      await flutterReactiveBle.writeCharacteristicWithResponse(characteristic,
-          value: packet);
-      print('Solicitud de información enviada');
+      List<int> response = await readCharacteristic(macAddress); // Leer la característica RX
+      if (response.isNotEmpty) {
+        await handleSecurityResponse(macAddress, response);
+        break; // Si la respuesta es válida, salir del ciclo
+      } else {
+        print("Respuesta vacía del dispositivo, reintentando...");
+      }
     } catch (e) {
-      print('Error al enviar solicitud de información: $e');
+      print("Error al leer la característica: $e");
+    }
+
+    retries--;
+    if (retries > 0) {
+      print("Reintentando lectura...");
+      await Future.delayed(Duration(seconds: 2)); // Espera antes de reintentar
+    } else {
+      print("No se pudo obtener respuesta después de varios intentos.");
     }
   }
+}
 
-  void listenDeviceInfo(String macAddress) {
-    final characteristic = QualifiedCharacteristic(
-      serviceId: Uuid.parse(SERVICE_UUID),
-      characteristicId: Uuid.parse(CHARACTERISTIC_UUID_TX),
-      deviceId: macAddress,
-    );
-
-    flutterReactiveBle.subscribeToCharacteristic(characteristic).listen(
-      (response) {
-        final macAddressResp =
-            '${response[1]}${response[2]}${response[3]}${response[4]}${response[5]}${response[6]}';
-        final tarifa = response[7];
-        final tipoAlimentacion = response[8];
-        final versionHw = '${response[9]}';
-        final versionSw = '${response[10]}';
-
-        print('MAC Address: $macAddressResp');
-        print('Tarifa: $tarifa');
-        print('Tipo de Alimentación: $tipoAlimentacion');
-        print('Versión HW: $versionHw');
-        print('Versión SW: $versionSw');
-      },
-      onError: (e) {
-        print('Error al recibir la información del dispositivo: $e');
-      },
-    );
-  }
-
-  Future<void> sendGetBluetoothNameRequest(String macAddress) async {
-    final characteristic = QualifiedCharacteristic(
-      serviceId: Uuid.parse(SERVICE_UUID),
-      characteristicId: Uuid.parse(CHARACTERISTIC_UUID_RX),
-      deviceId: macAddress,
-    );
-
-    // Paquete para solicitar el nombre del Bluetooth
-    final packet = [0x04, 0x00, 0x00, 0x00, 0x00]; // FUN_GET_NAMEBT
-
+  // Función para leer una característica (TX)
+  Future<List<int>> readCharacteristic(String macAddress) async {
     try {
-      await flutterReactiveBle.writeCharacteristicWithResponse(characteristic,
-          value: packet);
-      print('Solicitud de nombre de Bluetooth enviada');
+      // Definir el servicio y la característica en la que se leerá
+      Uuid serviceUuid = Uuid.parse(
+          "49535343-FE7D-4AE5-8FA9-9FAFD205E455"); // UUID del servicio
+      Uuid characteristicUuidTx = Uuid.parse(
+          "49535343-1E4D-4BD9-BA61-23C647249617"); // UUID de la característica TX
+
+      // Crear la instancia de QualifiedCharacteristic
+      final characteristic = QualifiedCharacteristic(
+        serviceId: serviceUuid,
+        characteristicId: characteristicUuidTx,
+        deviceId: macAddress,
+      );
+
+      // Leer la característica TX
+      List<int> value =
+          await flutterReactiveBle.readCharacteristic(characteristic);
+      if (kDebugMode) {
+        print("Lectura exitosa desde $characteristicUuidTx: $value");
+      }
+      return value;
     } catch (e) {
-      print('Error al enviar solicitud de nombre de Bluetooth: $e');
+      if (kDebugMode) {
+        print("Error leyendo la característica TX: $e");
+      }
+      return [];
     }
-  }
-
-  void listenBluetoothName(String macAddress) {
-    final characteristic = QualifiedCharacteristic(
-      serviceId: Uuid.parse(SERVICE_UUID),
-      characteristicId: Uuid.parse(CHARACTERISTIC_UUID_TX),
-      deviceId: macAddress,
-    );
-
-    flutterReactiveBle.subscribeToCharacteristic(characteristic).listen(
-      (response) {
-        final bluetoothName =
-            String.fromCharCodes(response.sublist(1, 20)).trim();
-        print('Nombre del Bluetooth: $bluetoothName');
-      },
-      onError: (e) {
-        print('Error al recibir el nombre del Bluetooth: $e');
-      },
-    );
   }
 }
