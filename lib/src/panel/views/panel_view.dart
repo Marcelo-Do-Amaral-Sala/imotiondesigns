@@ -5060,12 +5060,12 @@ class BleConnectionService {
       _connectionStreams = {};
 
   // Lista de UUIDs de servicios que queremos detectar
-  List<Uuid> serviceUuids = [
-    Uuid.parse(
-        "49535343-FE7D-4AE5-8FA9-9FAFD205E455"), // Ejemplo de UUID de servicio
-    Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4"), // Otro UUID de servicio
-    Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617"), // Otro UUID de servicio
-  ];
+  final  SERVICE_UUID =
+      Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
+  final  CHARACTERISTIC_UUID_RX =
+      Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
+  final  CHARACTERISTIC_UUID_TX =
+      Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
 
   // Variables para los retos y respuestas
   List<int> challenge = [0x00, 0x00, 0x00, 0x00]; // Valor inicial de los retos
@@ -5379,190 +5379,66 @@ class BleConnectionService {
 
   bool get isConnected => _connected;
 
+  // Función para escribir en la característica RX
   Future<void> writeToDevice(String macAddress, List<int> data) async {
-  try {
-    // Definir el servicio y la característica donde vamos a escribir
-    Uuid serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
-    Uuid characteristicUuidRx = Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
-
-    // Crear la instancia de la característica (para escritura)
-    final characteristicRx = QualifiedCharacteristic(
-      serviceId: serviceUuid,
-      characteristicId: characteristicUuidRx,
-      deviceId: macAddress,
-    );
-
-    // Escribir los datos en la característica
-    await flutterReactiveBle.writeCharacteristicWithResponse(characteristicRx, value: data);
-    if (kDebugMode) {
-      print("Datos escritos correctamente: $data en $characteristicUuidRx");
-    }
-  } catch (e) {
-    print("Error escribiendo en la característica: $e");
-  }
-}
-
-
-Future<void> subscribeToDeviceNotifications(String macAddress) async {
-  try {
-    // Definir el servicio y la característica donde vamos a recibir notificaciones
-    Uuid serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
-    Uuid characteristicUuidTx = Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
-
-    // Crear la instancia de la característica (para notificaciones)
-    final characteristicTx = QualifiedCharacteristic(
-      serviceId: serviceUuid,
-      characteristicId: characteristicUuidTx,
-      deviceId: macAddress,
-    );
-
-    // Suscribirse a las notificaciones de la característica
-    flutterReactiveBle.subscribeToCharacteristic(characteristicTx).listen(
-      (data) {
-        if (kDebugMode) {
-          print("Notificación recibida desde $characteristicUuidTx: $data");
-        }
-        // Aquí puedes manejar la notificación recibida
-      },
-      onError: (error) {
-        print("Error al recibir notificación: $error");
-      },
-    );
-  } catch (e) {
-    print("Error al suscribirse a notificaciones: $e");
-  }
-}
-
-
-  // Función para generar un reto (challenge)
-  List<int> generateChallenge() {
-    List<int> challenge = [
-      0x01,
-      0x02,
-      0x03,
-      0x04
-    ]; // Reto inicial (puede ser generado dinámicamente)
-    return [
-      challenge[0] ^ 0x2A, // R-H1 = H1 xor 0x2A
-      challenge[1] ^ 0x55, // R-H2 = H2 xor 0x55
-      challenge[2] ^ 0xAA, // R-H3 = H3 xor 0xAA
-      challenge[3] ^ 0xA2 // R-H4 = H4 xor 0xA2
-    ];
-  }
-
-  Future<void> sendSecurityChallenge(String macAddress) async {
-  if (_connected) {
-    // Generar un nuevo reto
-    List<int> challenge = generateChallenge();
-    List<int> message = [
-      0x00, // FUNCION_INIT (Host a dispositivo)
-      0x00, // P (Indicar si es un nuevo reto o verificar)
-      challenge[0], // R-H1
-      challenge[1], // R-H2
-      challenge[2], // R-H3
-      challenge[3], // R-H4
-    ];
-
-    // Escribir el reto en la característica RX del dispositivo
-    await writeToDevice(macAddress, message);
-    print("Reto enviado al dispositivo: $message");
-  }
-}
-
-Future<void> handleSecurityResponse(String macAddress, List<int> response) async {
-  if (_connected) {
-    if (response.isEmpty) {
-      print("Respuesta vacía recibida, intentaremos de nuevo.");
-      await sendSecurityChallenge(macAddress); // Volver a enviar el reto si la respuesta está vacía
-      return;
-    }
-
-    int responseCode = response[0]; // Respuesta del dispositivo
-    int h1 = response[1]; // H1
-    int h2 = response[2]; // H2
-    int h3 = response[3]; // H3
-    int h4 = response[4]; // H4
-
-    print("Respuesta recibida del dispositivo: R=$responseCode, H1=$h1, H2=$h2, H3=$h3, H4=$h4");
-
-    switch (responseCode) {
-      case 0: // No logado, generar un nuevo reto
-        print("No registrado, se genera un nuevo reto.");
-        await sendSecurityChallenge(macAddress);
-        break;
-
-      case 1: // Respuesta correcta, seguridad establecida
-        print("Seguridad establecida con éxito.");
-        break;
-
-      case 2: // Ya está logado, no es necesario hacer más
-        print("Ya está logado, puede proceder.");
-        break;
-
-      default:
-        print("Respuesta no válida, generando nuevo reto.");
-        await sendSecurityChallenge(macAddress); // Generar nuevo reto
-        break;
-    }
-  }
-}
-
-
- Future<void> initiateCommunication(String macAddress) async {
-  await sendSecurityChallenge(macAddress);
-
-  int retries = 3; // Intentos de reintento
-  while (retries > 0) {
     try {
-      List<int> response = await readCharacteristic(macAddress); // Leer la característica RX
-      if (response.isNotEmpty) {
-        await handleSecurityResponse(macAddress, response);
-        break; // Si la respuesta es válida, salir del ciclo
-      } else {
-        print("Respuesta vacía del dispositivo, reintentando...");
-      }
-    } catch (e) {
-      print("Error al leer la característica: $e");
-    }
-
-    retries--;
-    if (retries > 0) {
-      print("Reintentando lectura...");
-      await Future.delayed(Duration(seconds: 2)); // Espera antes de reintentar
-    } else {
-      print("No se pudo obtener respuesta después de varios intentos.");
-    }
-  }
-}
-
-  // Función para leer una característica (TX)
-  Future<List<int>> readCharacteristic(String macAddress) async {
-    try {
-      // Definir el servicio y la característica en la que se leerá
-      Uuid serviceUuid = Uuid.parse(
-          "49535343-FE7D-4AE5-8FA9-9FAFD205E455"); // UUID del servicio
-      Uuid characteristicUuidTx = Uuid.parse(
-          "49535343-1E4D-4BD9-BA61-23C647249617"); // UUID de la característica TX
-
-      // Crear la instancia de QualifiedCharacteristic
-      final characteristic = QualifiedCharacteristic(
-        serviceId: serviceUuid,
-        characteristicId: characteristicUuidTx,
+      QualifiedCharacteristic rxCharacteristic = QualifiedCharacteristic(
+        serviceId: SERVICE_UUID,
+        characteristicId: CHARACTERISTIC_UUID_RX,
         deviceId: macAddress,
       );
-
-      // Leer la característica TX
-      List<int> value =
-          await flutterReactiveBle.readCharacteristic(characteristic);
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        rxCharacteristic,
+        value: data,
+      );
       if (kDebugMode) {
-        print("Lectura exitosa desde $characteristicUuidTx: $value");
+        print("Escrito al dispositivo $macAddress: $data");
       }
-      return value;
     } catch (e) {
       if (kDebugMode) {
-        print("Error leyendo la característica TX: $e");
+        print("Error escribiendo al dispositivo $macAddress: $e");
       }
-      return [];
     }
+  }
+
+  // Método para leer desde la característica TX (notificaciones)
+  Future<void> _subscribeToNotifications(String macAddress) async {
+    QualifiedCharacteristic txCharacteristic = QualifiedCharacteristic(
+      serviceId: SERVICE_UUID,
+      characteristicId: CHARACTERISTIC_UUID_TX,
+      deviceId: macAddress,
+    );
+
+    flutterReactiveBle.subscribeToCharacteristic(txCharacteristic).listen(
+  (data) {
+    // Si se recibe algún dato de la notificación, lo mostramos
+    if (kDebugMode) {
+      print("Notificación recibida: $data");
+    }
+
+    // Procesar la notificación recibida
+    // Por ejemplo, convertir los datos en texto si es necesario
+    String notificationData = String.fromCharCodes(data);
+    if (kDebugMode) {
+      print("Datos de la notificación procesados: $notificationData");
+    }
+  },
+  onError: (error) {
+    // Si ocurre un error al suscribirse a la notificación, lo registramos
+    if (kDebugMode) {
+      print("Error en las notificaciones: $error");
+    }
+  },
+);
+
+  }
+
+  Future<void> initiateCommunication(String macAddress) async {
+    // Primero, escribimos un mensaje al dispositivo
+    List<int> messageToSend = [0x01, 0x02, 0x03, 0x04]; // Ejemplo de mensaje
+    await writeToDevice(macAddress, messageToSend);
+
+    // Luego, nos suscribimos a las notificaciones
+    await _subscribeToNotifications(macAddress);
   }
 }
