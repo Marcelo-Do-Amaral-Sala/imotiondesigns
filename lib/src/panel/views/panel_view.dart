@@ -218,14 +218,16 @@ class _PanelViewState extends State<PanelView>
 
     // Obtener las direcciones MAC desde el AppState
     List<String> macAddresses =
-    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
     print("🔍 Direcciones MAC obtenidas: $macAddresses");
 
     // Actualizar la lista de direcciones MAC en el servicio BLE
-    setState(() {
-      bleConnectionService.updateMacAddresses(macAddresses);
-    });
+    if (mounted) {
+      setState(() {
+        bleConnectionService.updateMacAddresses(macAddresses);
+      });
+    }
 
     // Inicializar el estado inicial de cada dispositivo
     macAddresses.forEach((macAddress) {
@@ -241,13 +243,14 @@ class _PanelViewState extends State<PanelView>
         print("🔗 Intentando conectar a la MAC: $macAddress");
 
         bool success =
-        await bleConnectionService._connectToDeviceByMac(macAddress);
+            await bleConnectionService._connectToDeviceByMac(macAddress);
 
-        // Actualizar el estado de conexión en la UI
-        setState(() {
-          deviceConnectionStatus[macAddress] =
-          success ? 'conectado' : 'desconectado';
-        });
+        if (mounted) {
+          setState(() {
+            deviceConnectionStatus[macAddress] =
+                success ? 'conectado' : 'desconectado';
+          });
+        }
 
         if (success) {
           print("✅ Conexión exitosa con la MAC: $macAddress");
@@ -267,19 +270,32 @@ class _PanelViewState extends State<PanelView>
 
     // Suscribirse a los streams de conexión para reflejar los cambios en tiempo real
     for (String macAddress in macAddresses) {
-      bleConnectionService.connectionStateStream(macAddress).listen((connected) {
-        setState(() {
-          deviceConnectionStatus[macAddress] =
-          connected ? 'conectado' : 'desconectado';
-        });
+      bleConnectionService
+          .connectionStateStream(macAddress)
+          .listen((connected) {
+        if (mounted) {
+          setState(() {
+            deviceConnectionStatus[macAddress] =
+                connected ? 'conectado' : 'desconectado';
+          });
+        }
       });
     }
-
     // Refrescar la UI después de completar todo el proceso
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
     print("🔄 Proceso de conexión BLE finalizado.");
-  }
 
+    bleConnectionService.startMonitoring(macAddresses, (macAddress, status) {
+      if (mounted) {
+        setState(() {
+          deviceConnectionStatus[macAddress] =
+              status ? 'conectado' : 'desconectado';
+        });
+      }
+    });
+  }
 
   Future<void> _preloadImages() async {
     for (String path in imagePaths) {
@@ -5062,10 +5078,8 @@ class BleConnectionService {
   List<String> targetDeviceIds = []; // Lista para almacenar las direcciones MAC
   List<String> disconnectedDevices = [];
   bool isWidgetActive = true;
-  final Set<String> _connectedDevices = {};
-  final Map<String, QualifiedCharacteristic> _deviceCharacteristics = {};
   StreamSubscription<List<int>>? subscription;
-
+  final Set<String> _securityCompletedDevices = {};
   // Mapa para almacenar los StreamControllers de conexión por dispositivo
   final Map<String, StreamController<bool>> _deviceConnectionStateControllers =
       {};
@@ -5086,6 +5100,7 @@ class BleConnectionService {
   final List<int> _xorKeys = [0x2A, 0x55, 0xAA, 0xA2];
   static const int FUN_INFO = 2;
   static const int FUN_INFO_R = 3;
+  Timer? _reconnectionTimer;
 
   BleConnectionService(List<String> macAddresses) {
     targetDeviceIds =
@@ -5176,7 +5191,7 @@ class BleConnectionService {
 
     bool success = false;
     int attemptCount = 0;
-    const maxAttempts = 5;
+    const maxAttempts = 10;
     Duration retryDelay = const Duration(seconds: 3);
 
     Future<void> tryConnect() async {
@@ -5191,6 +5206,7 @@ class BleConnectionService {
             if (kDebugMode) print("✅ Dispositivo $macAddress conectado.");
             connectedDevices.add(macAddress);
             success = true;
+
             break;
 
           case DeviceConnectionState.disconnected:
@@ -5220,12 +5236,72 @@ class BleConnectionService {
     return success;
   }
 
+  Future<void> _monitorAndReconnectDevices(
+      List<String> macAddresses, Function(String macAddress, bool status) onStatusChange) async {
+    const Duration checkInterval = Duration(seconds: 5);
+
+    while (isWidgetActive) {
+      await Future.delayed(checkInterval);
+
+      for (String macAddress in macAddresses) {
+        if (!isWidgetActive) break; // Salir si el widget ya no está activo
+
+        bool isConnected = connectedDevices.contains(macAddress);
+
+        if (!isConnected) {
+          connectedDevices.remove(macAddress);
+          _connectionStreams?[macAddress]?.cancel();
+          _connectionStreams?.remove(macAddress);
+
+          await _startScan();
+
+          if (!isWidgetActive) break; // Verificar nuevamente antes de intentar conectar
+
+          if (_foundDeviceWaitingToConnect) {
+            bool success = await _connectToDeviceByMac(macAddress);
+            if (success) {
+              connectedDevices.add(macAddress);
+              onStatusChange(macAddress, true); // Notificar conexión exitosa
+            } else {
+              onStatusChange(macAddress, false); // Notificar falla de conexión
+            }
+          } else {
+            onStatusChange(macAddress,
+                false); // Notificar que no se encontró el dispositivo
+          }
+        } else {
+          onStatusChange(
+              macAddress, true); // Confirmar que el dispositivo sigue conectado
+        }
+      }
+    }
+  }
+
+
+  void startMonitoring(
+      List<String> macAddresses, Function(String, bool) onStatusChange) {
+    _monitorAndReconnectDevices(macAddresses, onStatusChange);
+  }
+
   Future<void> _startPostConnectionProtocols(String macAddress) async {
     if (kDebugMode)
       print("🚀 Iniciando protocolos posteriores para $macAddress...");
+
+    // Verificar si ya se ejecutó el proceso de seguridad
+    if (_securityCompletedDevices.contains(macAddress)) {
+      if (kDebugMode) {
+        print("⏭️ Seguridad ya completada para $macAddress. Saltando...");
+      }
+      return;
+    }
+
     try {
+      // Ejecutar solo una vez por cada MAC
       await executeSecurityProcess(macAddress, serviceUuid, characteristicUuid);
       if (kDebugMode) print("🔒 Seguridad completada para $macAddress.");
+
+      // Registrar que la seguridad fue completada
+      _securityCompletedDevices.add(macAddress);
 
       await Future.delayed(const Duration(seconds: 5));
 
@@ -5246,63 +5322,15 @@ class BleConnectionService {
   void _onDeviceDisconnected(String macAddress) {
     if (kDebugMode) print("🔌 Dispositivo $macAddress desconectado.");
     connectedDevices.remove(macAddress);
+
+    // Cancelar el stream asociado a la MAC
     _connectionStreams?[macAddress]?.cancel();
     _connectionStreams?.remove(macAddress);
-  }
 
-  void _startConnectionCheckTimer() {
-    // Solo iniciar el chequeo si el escaneo ha terminado
-    _connectionCheckTimer ??=
-        Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (_connected) {
-        print("Chequeo de conexión: El dispositivo está conectado.");
-      } else {
-        print(
-            "Chequeo de conexión: El dispositivo está desconectado. Reiniciando escaneo...");
-        _restartScan(); // Reiniciar el escaneo si el dispositivo está desconectado
-      }
-    });
-  }
-
-  void _restartScan() async {
-    if (!_scanStarted) {
-      if (kDebugMode) {
-        print("Reiniciando el escaneo...");
-      }
-      _scanStarted = true;
-
-      // Agregar un pequeño retraso antes de intentar el escaneo nuevamente
-      await Future.delayed(Duration(seconds: 2)); // Espera 2 segundos
-
-      await _startScan(); // Llamar al método _startScan para comenzar nuevamente
-
-      // Lista temporal para almacenar las MACs que fueron reconectadas exitosamente
-      List<String> successfullyReconnectedDevices = [];
-
-      // Solo intentar reconectar con los dispositivos desconectados
-      for (var macAddress in List.from(disconnectedDevices)) {
-        // Copiar la lista para evitar problemas de modificación mientras iteras
-        print("Intentando reconectar a la MAC: $macAddress");
-
-        bool success = await _connectToDeviceByMac(macAddress);
-
-        // Aquí puedes enviar el estado de la conexión al stream correspondiente
-        if (_deviceConnectionStateControllers.containsKey(macAddress)) {
-          _deviceConnectionStateControllers[macAddress]?.add(success);
-        }
-
-        if (success) {
-          successfullyReconnectedDevices
-              .add(macAddress); // Agregar a la lista temporal
-          print("Reconexión exitosa con la MAC: $macAddress");
-        } else {
-          print("Falló la reconexión con la MAC: $macAddress");
-        }
-      }
-
-      // Eliminar las MACs reconectadas de la lista de dispositivos desconectados
-      disconnectedDevices.removeWhere(
-          (macAddress) => successfullyReconnectedDevices.contains(macAddress));
+    // Actualizar el estado en los StreamControllers
+    final controller = _deviceConnectionStateControllers[macAddress];
+    if (controller != null && !controller.isClosed) {
+      controller.add(false); // Estado desconectado
     }
   }
 
@@ -5313,8 +5341,9 @@ class BleConnectionService {
       }
 
       // Cancelar la suscripción del stream de conexión
-      await _connectionStreams?[macAddress]
-          ?.cancel(); // Cancelar la suscripción de ese dispositivo.
+      await _connectionStreams?[macAddress]?.cancel();
+      _connectionStreams?.remove(macAddress);
+
       // Verificar si el StreamController no está cerrado antes de agregar un evento
       final controller = _deviceConnectionStateControllers[macAddress];
       if (controller != null && !controller.isClosed) {
@@ -5335,21 +5364,18 @@ class BleConnectionService {
     }
   }
 
-// Método para cerrar todos los recursos al destruir el widget
   void dispose() {
     isWidgetActive = false;
+
     // Llamar a disconnect() para desconectar todos los dispositivos si están conectados
     for (var macAddress in _deviceConnectionStateControllers.keys) {
-      // Desconectar cada dispositivo de forma sincrónica
-      disconnect(macAddress); // Desconectar todos los dispositivos
+      disconnect(macAddress); // Desconectar cada dispositivo
     }
 
     // Cerrar todos los StreamControllers de forma segura
     _deviceConnectionStateControllers.forEach((macAddress, controller) {
-      // Verificamos si el StreamController no está cerrado antes de cerrarlo
       if (!controller.isClosed) {
-        controller
-            .close(); // Cerrar el StreamController solo si no está cerrado
+        controller.close();
         if (kDebugMode) {
           print("Stream controller para el dispositivo $macAddress cerrado.");
         }
