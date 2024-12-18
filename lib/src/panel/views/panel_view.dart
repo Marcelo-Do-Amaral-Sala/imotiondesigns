@@ -5080,6 +5080,7 @@ class BleConnectionService {
   bool isWidgetActive = true;
   StreamSubscription<List<int>>? subscription;
   final Set<String> _securityCompletedDevices = {};
+
   // Mapa para almacenar los StreamControllers de conexión por dispositivo
   final Map<String, StreamController<bool>> _deviceConnectionStateControllers =
       {};
@@ -5092,8 +5093,12 @@ class BleConnectionService {
       _connectionStreams = {};
   final List<String> connectedDevices = []; // Lista de MACs conectadas
   bool _allTargetsConnected = false;
-  final serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
-  final characteristicUuid = Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
+  final Uuid serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
+  final Uuid rxCharacteristicUuid =
+      Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
+  final Uuid txCharacteristicUuid =
+      Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
+
   bool _isLoggedIn = false; // Estado de seguridad
   List<int> _currentChallenge = [0, 0, 0, 0]; // Reto actual
   // XOR keys para el cálculo de R-H
@@ -5125,13 +5130,20 @@ class BleConnectionService {
     return _deviceConnectionStateControllers[macAddress]!.stream;
   }
 
-  // Iniciar el escaneo (escaneo automático al iniciar)
   Future<void> _startScan() async {
     if (kDebugMode) {
       print("Iniciando el escaneo...");
     }
 
     bool permGranted = false;
+
+    // Comprobar si el widget está activo
+    if (!isWidgetActive) {
+      if (kDebugMode) {
+        print("El widget no está activo. Escaneo cancelado.");
+      }
+      return;
+    }
 
     // Solicitar permisos de ubicación en Android/iOS
     if (Platform.isAndroid || Platform.isIOS) {
@@ -5157,8 +5169,17 @@ class BleConnectionService {
       if (kDebugMode) {
         print("Iniciando escaneo BLE...");
       }
+
       _scanStream = flutterReactiveBle.scanForDevices(
           withServices: [], scanMode: ScanMode.lowLatency).listen((device) {
+        if (!isWidgetActive) {
+          if (kDebugMode) {
+            print("El widget no está activo. Escaneo detenido.");
+          }
+          _scanStream?.cancel();
+          return;
+        }
+
         if (kDebugMode) {
           print("Dispositivo encontrado: ${device.name}, ID: ${device.id}");
         }
@@ -5199,13 +5220,45 @@ class BleConnectionService {
           flutterReactiveBle.connectToAdvertisingDevice(
         id: macAddress,
         prescanDuration: const Duration(seconds: 1),
-        withServices: [], // Agregar UUIDs si es necesario
+        withServices: [serviceUuid], // Agregar UUIDs si es necesario
       ).listen((event) async {
         switch (event.connectionState) {
           case DeviceConnectionState.connected:
             if (kDebugMode) print("✅ Dispositivo $macAddress conectado.");
-            connectedDevices.add(macAddress);
-            success = true;
+            final discoveredServices =
+                await flutterReactiveBle.discoverServices(macAddress);
+            bool hasRequiredService = false;
+
+            for (final service in discoveredServices) {
+              if (service.serviceId == serviceUuid) {
+                hasRequiredService = true;
+
+                if (kDebugMode)
+                  print("🔍 Servicio principal encontrado: $serviceUuid");
+
+                final characteristicIds = service.characteristics
+                    .map((c) => c.characteristicId)
+                    .toList();
+                if (characteristicIds.contains(rxCharacteristicUuid) &&
+                    characteristicIds.contains(txCharacteristicUuid)) {
+                  if (kDebugMode) {
+                    print("🛠️ Características RX y TX disponibles.");
+                  }
+                  success = true;
+                } else {
+                  if (kDebugMode) {
+                    print("❌ Características RX o TX no encontradas.");
+                  }
+                }
+                break;
+              }
+            }
+
+            if (!hasRequiredService) {
+              if (kDebugMode) print("❌ Servicio principal no encontrado.");
+            }
+
+            if (success) connectedDevices.add(macAddress);
 
             break;
 
@@ -5236,8 +5289,8 @@ class BleConnectionService {
     return success;
   }
 
-  Future<void> _monitorAndReconnectDevices(
-      List<String> macAddresses, Function(String macAddress, bool status) onStatusChange) async {
+  Future<void> _monitorAndReconnectDevices(List<String> macAddresses,
+      Function(String macAddress, bool status) onStatusChange) async {
     const Duration checkInterval = Duration(seconds: 5);
 
     while (isWidgetActive) {
@@ -5255,7 +5308,8 @@ class BleConnectionService {
 
           await _startScan();
 
-          if (!isWidgetActive) break; // Verificar nuevamente antes de intentar conectar
+          if (!isWidgetActive)
+            break; // Verificar nuevamente antes de intentar conectar
 
           if (_foundDeviceWaitingToConnect) {
             bool success = await _connectToDeviceByMac(macAddress);
@@ -5277,7 +5331,6 @@ class BleConnectionService {
     }
   }
 
-
   void startMonitoring(
       List<String> macAddresses, Function(String, bool) onStatusChange) {
     _monitorAndReconnectDevices(macAddresses, onStatusChange);
@@ -5297,7 +5350,8 @@ class BleConnectionService {
 
     try {
       // Ejecutar solo una vez por cada MAC
-      await executeSecurityProcess(macAddress, serviceUuid, characteristicUuid);
+      await executeSecurityProcess(
+          macAddress, serviceUuid, txCharacteristicUuid);
       if (kDebugMode) print("🔒 Seguridad completada para $macAddress.");
 
       // Registrar que la seguridad fue completada
@@ -5305,14 +5359,14 @@ class BleConnectionService {
 
       await Future.delayed(const Duration(seconds: 5));
 
-      await _sendRequestInfo(macAddress, serviceUuid, characteristicUuid);
+      await _sendRequestInfo(macAddress, serviceUuid, txCharacteristicUuid);
       if (kDebugMode)
         print("📩 Solicitud de información completada para $macAddress.");
 
       await Future.delayed(const Duration(seconds: 5));
 
       await _subscribeToDeviceNotifications(
-          macAddress, serviceUuid, characteristicUuid);
+          macAddress, serviceUuid, txCharacteristicUuid);
       if (kDebugMode) print("🔔 Suscripción activa para $macAddress.");
     } catch (e) {
       if (kDebugMode) print("❌ Error en los protocolos posteriores: $e");
@@ -5391,55 +5445,52 @@ class BleConnectionService {
 
   bool get isConnected => _connected;
 
-  Future<void> writeData(String macAddress, Uuid serviceUuid,
-      Uuid characteristicUuid, List<int> data) async {
+  Future<void> writeData(String macAddress, List<int> data) async {
     try {
       final characteristic = QualifiedCharacteristic(
         deviceId: macAddress,
         serviceId: serviceUuid,
-        characteristicId: characteristicUuid,
+        characteristicId: rxCharacteristicUuid,
       );
 
       await flutterReactiveBle.writeCharacteristicWithResponse(characteristic,
           value: data);
-      if (kDebugMode) print("Datos escritos a $macAddress: $data");
+      if (kDebugMode) print("✅ Datos escritos a $macAddress: $data");
     } catch (e) {
-      if (kDebugMode) print("Error al escribir datos en $macAddress: $e");
+      if (kDebugMode) print("❌ Error al escribir datos en $macAddress: $e");
     }
   }
 
   /// Lectura de datos desde una característica BLE
-  Future<List<int>> readData(
-      String macAddress, Uuid serviceUuid, Uuid characteristicUuid) async {
+  Future<List<int>> readData(String macAddress) async {
     try {
       final characteristic = QualifiedCharacteristic(
         deviceId: macAddress,
         serviceId: serviceUuid,
-        characteristicId: characteristicUuid,
+        characteristicId: txCharacteristicUuid,
       );
 
       final data = await flutterReactiveBle.readCharacteristic(characteristic);
-      if (kDebugMode) print("Datos leídos desde $macAddress: $data");
+      if (kDebugMode) print("✅ Datos leídos desde $macAddress: $data");
       return data;
     } catch (e) {
-      if (kDebugMode) print("Error al leer datos de $macAddress: $e");
+      if (kDebugMode) print("❌ Error al leer datos de $macAddress: $e");
       return [];
     }
   }
 
   /// Escucha de datos en una característica BLE (notificaciones)
-  Stream<List<int>> subscribeToCharacteristic(
-      String macAddress, Uuid serviceUuid, Uuid characteristicUuid) {
+  Stream<List<int>> subscribeToNotifications(String macAddress) {
     final characteristic = QualifiedCharacteristic(
       deviceId: macAddress,
       serviceId: serviceUuid,
-      characteristicId: characteristicUuid,
+      characteristicId: txCharacteristicUuid,
     );
 
     return flutterReactiveBle
         .subscribeToCharacteristic(characteristic)
         .map((data) {
-      if (kDebugMode) print("Notificación recibida desde $macAddress: $data");
+      if (kDebugMode) print("📩 Notificación recibida de $macAddress: $data");
       return data;
     });
   }
@@ -5509,7 +5560,7 @@ class BleConnectionService {
 
   Future<void> executeSecurityProcess(
       String macAddress, Uuid serviceUuid, Uuid characteristicUuid) async {
-    print("Iniciando proceso de seguridad...");
+    print("🔐 Iniciando proceso de seguridad...");
 
     try {
       // Paso 1: Solicitar nuevo reto
@@ -5517,17 +5568,17 @@ class BleConnectionService {
           macAddress, serviceUuid, characteristicUuid, [0, 0, 0, 0, 0, 0]);
 
       if (initialResponse[1] == 2) {
-        print("El dispositivo ya está logado.");
+        print("🔓 El dispositivo ya está logado.");
         return;
       }
 
       if (initialResponse[1] == 0) {
-        print("Reto recibido: ${initialResponse.sublist(2)}");
+        print("🛡️ Reto recibido: ${initialResponse.sublist(2)}");
 
         // Paso 2: Generar contra-reto usando el reto recibido
         final challengeResponse = generateResponse();
 
-        print("Enviando contra-reto: $challengeResponse");
+        print("📤 Enviando contra-reto: $challengeResponse");
 
         // Paso 3: Enviar contra-reto al dispositivo
         final verificationResponse = await handleSecurityInitialization(
@@ -5537,18 +5588,18 @@ class BleConnectionService {
             [0, 1, ...challengeResponse]);
 
         if (verificationResponse[1] == 1) {
-          print("Seguridad establecida correctamente.");
+          print("✅ Seguridad establecida correctamente.");
         } else if (verificationResponse[1] == 2) {
-          print("El dispositivo ya estaba logado.");
+          print("🔓 El dispositivo ya estaba logado.");
         } else {
           print(
-              "Error en la verificación de seguridad. Nuevo reto recibido: ${verificationResponse.sublist(2)}");
+              "⚠️ Error en la verificación de seguridad. Nuevo reto recibido: ${verificationResponse.sublist(2)}");
         }
       } else {
-        print("Error inesperado en la inicialización de seguridad.");
+        print("❌ Error inesperado en la inicialización de seguridad.");
       }
     } catch (e) {
-      print("Error durante el proceso de seguridad: $e");
+      print("❌ Error durante el proceso de seguridad: $e");
     }
   }
 
@@ -5587,7 +5638,7 @@ class BleConnectionService {
   Future<void> _subscribeToDeviceNotifications(
     String macAddress,
     Uuid serviceUuid,
-    Uuid characteristicUuidTx,
+    Uuid characteristicUuidRx,
   ) async {
     if (kDebugMode)
       print("🔔 Iniciando suscripción a TX para recibir respuesta...");
@@ -5596,27 +5647,35 @@ class BleConnectionService {
       final characteristic = QualifiedCharacteristic(
         deviceId: macAddress,
         serviceId: serviceUuid,
-        characteristicId: characteristicUuidTx,
+        characteristicId: characteristicUuidRx,
       );
-
+// Habilitar notificaciones escribiendo en el descriptor CCCD
+      await flutterReactiveBle.writeCharacteristicWithoutResponse(
+        characteristic,
+        value: [0x01, 0x00], // Habilitar notificaciones
+      );
+      if (kDebugMode) {
+        print("✅ Notificaciones habilitadas en CCCD para TX.");
+      }
       // Cancelar suscripción previa si existe
       await subscription?.cancel();
 
       subscription =
           flutterReactiveBle.subscribeToCharacteristic(characteristic).listen(
         (data) {
+          print("Evento recibido del Stream: $data");
           if (data.isNotEmpty) {
-            if (kDebugMode) {
-              print(
-                  "📩 Datos recibidos: ${data.map((e) => e.toRadixString(16)).toList()}");
-            }
-            // Aquí procesaremos la respuesta después
+            print(
+                "📩 Datos recibidos: ${data.map((e) => e.toRadixString(16)).toList()}");
           } else {
-            if (kDebugMode) print("⚠️ Respuesta vacía recibida.");
+            print("⚠️ Respuesta vacía recibida.");
           }
         },
         onError: (error) {
-          if (kDebugMode) print("❌ Error durante la suscripción: $error");
+          print("❌ Error durante la suscripción: $error");
+        },
+        onDone: () {
+          print("🔚 Suscripción terminada.");
         },
       );
 
@@ -5624,5 +5683,50 @@ class BleConnectionService {
     } catch (e) {
       if (kDebugMode) print("❌ Error al suscribirse a TX: $e");
     }
+  }
+
+  void processDeviceInfo(List<int> data) {
+    if (data.length < 19) {
+      print("⚠️ Respuesta incompleta recibida: $data");
+      return;
+    }
+
+    print("📩 Procesando respuesta de información del dispositivo...");
+
+    // Parsear la información
+    final mac = data
+        .sublist(1, 7)
+        .map((e) => e.toRadixString(16).padLeft(2, '0'))
+        .join(":");
+    final tarifa = data[7];
+    final tipoAlimentacion = data[8];
+    final versionHw = data[9];
+    final versionSwCom = data[10];
+
+    final endpoints = List.generate(4, (i) {
+      final tipo = data[11 + i * 2];
+      final version = data[12 + i * 2];
+      return {
+        "tipo": tipo,
+        "version": version,
+      };
+    });
+
+    // Formatear e imprimir la información
+    final deviceInfo = {
+      "MAC": mac,
+      "Tarifa": tarifa == 0
+          ? "Sin tarifa"
+          : tarifa == 1
+              ? "Con tarifa"
+              : "Con tarifa agotada",
+      "Tipo de alimentación":
+          tipoAlimentacion == 0 ? "Fuente externa" : "Batería Litio 8.4V",
+      "Versión HW": versionHw,
+      "Versión SW Comunicaciones": versionSwCom,
+      "Endpoints": endpoints
+    };
+
+    print("📋 Información del dispositivo: $deviceInfo");
   }
 }
