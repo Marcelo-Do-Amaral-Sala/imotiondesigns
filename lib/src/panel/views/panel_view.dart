@@ -31,13 +31,15 @@ class _PanelViewState extends State<PanelView>
   bool isTimeless = false;
   String connectionStatus = "desconectado";
   bool _isConnecting = false;
-
+  List<String> successfullyConnectedDevices = [];
   String? selectedProgram;
   List<Map<String, dynamic>> allIndividualPrograms = [];
   List<Map<String, dynamic>> allRecoveryPrograms = [];
   List<Map<String, dynamic>> allAutomaticPrograms = [];
   List<Map<String, dynamic>> allClients = []; // Lista original de clientes
   List<Map<String, dynamic>> selectedClients = [];
+  Map<String, String> bluetoothNames = {};
+  Map<String, int> batteryStatuses = {};
 
   double scaleFactorBack = 1.0;
   double scaleFactorFull = 1.0;
@@ -61,7 +63,6 @@ class _PanelViewState extends State<PanelView>
   int selectedIndexEquip = 0;
   bool _isFullScreen = false;
   bool isPantalonSelected = false;
-
   Color selectedColor =
       const Color(0xFF2be4f3); // Color para la sección seleccionada
   Color unselectedColor = const Color(0xFF494949);
@@ -218,7 +219,7 @@ class _PanelViewState extends State<PanelView>
 
     // Obtener las direcciones MAC desde el AppState
     List<String> macAddresses =
-    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
     debugPrint("🔍--->>>Direcciones MAC obtenidas: $macAddresses");
 
@@ -232,17 +233,18 @@ class _PanelViewState extends State<PanelView>
     // Esperar un breve espacio de tiempo para procesar las conexiones actuales
     await Future.delayed(const Duration(seconds: 2));
 
-    // Intentar conectar a cada dispositivo de la lista actualizada
-    List<String> successfullyConnectedDevices = [];
+    successfullyConnectedDevices.clear();
+
+    // Intentar conectar a los dispositivos
     for (final macAddress in macAddresses) {
       bool success =
-      await bleConnectionService._connectToDeviceByMac(macAddress);
+          await bleConnectionService._connectToDeviceByMac(macAddress);
 
       if (mounted) {
         setState(() {
           // Actualizar el estado de conexión en la UI
           deviceConnectionStatus[macAddress] =
-          success ? 'conectado' : 'desconectado';
+              success ? 'conectado' : 'desconectado';
         });
       }
 
@@ -259,44 +261,170 @@ class _PanelViewState extends State<PanelView>
 
     debugPrint("🔚--->>>Proceso de conexión BLE finalizado.");
 
-    await Future.delayed(const Duration(seconds: 1));
-    if (successfullyConnectedDevices.length == macAddresses.length) {
-      debugPrint(
-          "✅--->>>Todos los dispositivos se conectaron correctamente. Iniciando inicialización de seguridad.");
+    await Future.delayed(const Duration(seconds: 5));
 
+    // Continuar solo si al menos un dispositivo se conectó exitosamente
+    if (successfullyConnectedDevices.isNotEmpty) {
+      debugPrint(
+          "✅--->>>Al menos 1 dispositivo se conectó correctamente. Iniciando inicialización de seguridad.");
+      await Future.delayed(const Duration(seconds: 1));
+      // Inicialización de seguridad para dispositivos conectados
       for (final macAddress in successfullyConnectedDevices) {
-        await bleConnectionService._initializeSecurity(macAddress);
+        try {
+          await bleConnectionService._initializeSecurity(macAddress);
+          debugPrint(
+              "🔒--->>>Fase de inicialización de seguridad completada para $macAddress.");
+        } catch (e) {
+          debugPrint(
+              "❌--->>>Error en la inicialización de seguridad para $macAddress: $e");
+        }
       }
 
-      debugPrint(
-          "🔒--->>>Fase de inicialización de seguridad completada para todos los dispositivos.");
-
-      // Verificar comunicación solicitando FUN_INFO a cada dispositivo
+      // Recopilar información y realizar operaciones para los dispositivos conectados
       for (final macAddress in successfullyConnectedDevices) {
-        final deviceInfo = await bleConnectionService.getDeviceInfo(macAddress);
+        try {
+          // Obtener la información del dispositivo (FUN_INFO)
+          final deviceInfo = await bleConnectionService
+              .getDeviceInfo(macAddress)
+              .timeout(const Duration(seconds: 15));
+          final parsedInfo = bleConnectionService.parseDeviceInfo(deviceInfo);
+          debugPrint(parsedInfo);
 
-        // Formatear la información del dispositivo
-        final parsedInfo = bleConnectionService.parseDeviceInfo(deviceInfo);
-        debugPrint(parsedInfo); // Mostrar información en formato legible
+          // Obtener el nombre del Bluetooth (FUN_GET_NAMEBT)
+          final nameBt =
+              await bleConnectionService.getBluetoothName(macAddress);
+          debugPrint("🅱️ Nombre del Bluetooth ($macAddress): $nameBt");
+          setState(() {
+            bluetoothNames[macAddress] =
+                nameBt.isNotEmpty ? nameBt : "No disponible";
+          });
+
+          // Obtener los parámetros de la batería (FUN_GET_PARAMBAT)
+          final batteryParameters =
+              await bleConnectionService.getBatteryParameters(macAddress);
+          final parsedBattery =
+              bleConnectionService.parseBatteryParameters(batteryParameters);
+          debugPrint(parsedBattery);
+          setState(() {
+            batteryStatuses[macAddress] = batteryParameters['batteryStatusRaw'] ?? -1;
+          });
+
+          // Obtener contadores de tarifa
+          final counters =
+              await bleConnectionService.getTariffCounters(macAddress);
+          final parsedCounters =
+              bleConnectionService.parseTariffCounters(counters);
+          debugPrint(parsedCounters);
+
+          // Operaciones con electroestimulador
+          for (int mode = 0; mode < 3; mode++) {
+            final state = await bleConnectionService.getElectrostimulatorState(
+                macAddress, 1, mode); // Endpoint 1 como ejemplo
+            final parsedState =
+                bleConnectionService.parseElectrostimulatorState(state, mode);
+            debugPrint(parsedState);
+          }
+
+          // Ejecutar sesión de electroestimulación
+          final runSuccess =
+              await bleConnectionService.runElectrostimulationSession(
+            macAddress: macAddress,
+            endpoint: 1,
+            limitador: 0,
+            rampa: 30,
+            frecuencia: 50,
+            deshabilitaElevador: 0,
+            nivelCanales: 100,
+            anchuraPulsoComun: 0,
+            anchuraPulsosPorCanal: List.generate(
+                10, (index) => 20), // Ancho de pulso para cada canal
+          );
+
+          if (runSuccess) {
+            debugPrint(
+                "✅ Sesión de electroestimulación iniciada correctamente en $macAddress.");
+          } else {
+            debugPrint(
+                "❌ Error al iniciar la sesión de electroestimulación en $macAddress.");
+          }
+
+          // Controlar canales individuales
+          final response =
+              await bleConnectionService.controlElectrostimulatorChannel(
+            macAddress: macAddress,
+            endpoint: 1,
+            canal: 1,
+            modo: 0,
+            valor: 50, // Fijar el nivel en 50%
+          );
+
+          final parsedResponse =
+              bleConnectionService.parseChannelControlResponse(response);
+          debugPrint(parsedResponse);
+
+          // Controlar todos los canales
+          final response2 =
+              await bleConnectionService.controlAllElectrostimulatorChannels(
+            macAddress: macAddress,
+            endpoint: 1,
+            modo: 0,
+            valoresCanales: [
+              50,
+              60,
+              70,
+              80,
+              90,
+              50,
+              60,
+              70,
+              80,
+              90
+            ], // Valores para todos los canales
+          );
+
+          final parsedResponse2 =
+              bleConnectionService.parseAllChannelsResponse(response2);
+          debugPrint(parsedResponse2);
+
+          // Detener la sesión después de 5 segundos
+          await Future.delayed(const Duration(seconds: 5));
+
+          final stopSuccess =
+              await bleConnectionService.stopElectrostimulationSession(
+            macAddress: macAddress,
+            endpoint: 1,
+          );
+
+          if (stopSuccess) {
+            debugPrint(
+                "✅ Sesión de electroestimulación detenida correctamente en $macAddress.");
+          } else {
+            debugPrint(
+                "❌ Error al detener la sesión de electroestimulación en $macAddress.");
+          }
+        } catch (e) {
+          debugPrint("❌--->>>Error al procesar el dispositivo $macAddress: $e");
+        }
       }
+
+      await Future.delayed(const Duration(seconds: 4));
+
+      // Iniciar la verificación periódica de conexión
+      debugPrint("⌚--->>>Iniciando verificación de conexión periódica");
+      bleConnectionService
+          .startPeriodicConnectionCheck((macAddress, isConnected) {
+        if (mounted) {
+          setState(() {
+            // Actualizar el estado de conexión en la UI
+            deviceConnectionStatus[macAddress] =
+                isConnected ? 'conectado' : 'desconectado';
+          });
+        }
+      });
     } else {
       debugPrint(
-          "⚠️--->>>No todos los dispositivos pudieron conectarse. Saltando inicialización de seguridad.");
+          "⚠️--->>>Ningún dispositivo fue conectado exitosamente. Saltando inicialización de seguridad y operaciones.");
     }
-
-    // Iniciar la verificación periódica de conexión
-    await Future.delayed(const Duration(seconds: 5));
-    debugPrint("⌚--->>>Iniciando verificación de conexión periódica");
-    bleConnectionService
-        .startPeriodicConnectionCheck((macAddress, isConnected) {
-      if (mounted) {
-        setState(() {
-          // Actualizar el estado de conexión en la UI
-          deviceConnectionStatus[macAddress] =
-          isConnected ? 'conectado' : 'desconectado';
-        });
-      }
-    });
   }
 
   Future<void> _preloadImages() async {
@@ -432,6 +560,8 @@ class _PanelViewState extends State<PanelView>
     });
   }
 
+
+
   void _startTimer() {
     setState(() {
       isRunning = true;
@@ -473,6 +603,7 @@ class _PanelViewState extends State<PanelView>
   @override
   void dispose() {
     debugPrint("dispose() ejecutado");
+
     // Detener el timer
     _timer.cancel();
     debugPrint("Timer cancelado.");
@@ -481,9 +612,10 @@ class _PanelViewState extends State<PanelView>
     _opacityController.dispose();
     debugPrint("Controlador de animación liberado.");
 
-    // Llamar a dispose del servicio BLE
-    bleConnectionService.dispose();
-    debugPrint("Servicios BLE liberados.");
+    // Liberar recursos BLE si aún no se han liberado
+
+    bleConnectionService.disposeBleResources();
+    debugPrint("Servicios BLE liberados desde dispose().");
 
     super.dispose();
   }
@@ -555,20 +687,52 @@ class _PanelViewState extends State<PanelView>
                                                             7), // Bordes redondeados
                                                   ),
                                                   child: Center(
-                                                    child: Text(
-                                                      selectedClientsGlobal
-                                                              .isEmpty
-                                                          ? '' // Si la lista está vacía, mostrar texto vacío
-                                                          : selectedClientsGlobal[
-                                                                  0]['name'] ??
-                                                              'No Name',
-                                                      style: TextStyle(
-                                                        fontSize: 17.sp,
-                                                        color: const Color(
-                                                            0xFF28E2F5), // Color del texto
+                                                      child: Column(
+                                                    children: [
+                                                      Text(
+                                                        selectedClientsGlobal
+                                                                .isEmpty
+                                                            ? '' // Si la lista está vacía, mostrar texto vacío
+                                                            : selectedClientsGlobal[
+                                                                        0]
+                                                                    ['name'] ??
+                                                                'No Name',
+                                                        style: TextStyle(
+                                                          fontSize: 14.sp,
+                                                          color: const Color(
+                                                              0xFF28E2F5), // Color del texto
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
+                                                      Text(
+                                                        bluetoothNames[
+                                                                macAddress] ??
+                                                            "",
+                                                        style: TextStyle(
+                                                          fontSize: 14.sp,
+                                                          color: const Color(
+                                                              0xFF28E2F5), // Color del texto
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: List.generate(
+                                                          5, // Siempre 5 niveles posibles de batería
+                                                              (index) {
+                                                            return Padding(
+                                                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                                                              child: Container(
+                                                                width: 10, // Ancho de cada raya
+                                                                height: 4, // Altura de cada raya
+                                                                color: index <= (batteryStatuses[macAddress] ?? -1)
+                                                                    ? _lineColor(macAddress) // Color si el nivel es válido
+                                                                    : Colors.grey, // Color gris si no alcanza ese nivel
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )),
                                                 ),
                                               ),
                                             ),
@@ -653,7 +817,7 @@ class _PanelViewState extends State<PanelView>
                                           width: _isExpanded1
                                               ? screenWidth * 0.25
                                               : 0,
-                                          height: screenHeight * 0.1,
+                                          height: screenHeight * 0.2,
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
                                             color:
@@ -4543,7 +4707,6 @@ class _PanelViewState extends State<PanelView>
         return Dialog(
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
-            // Aquí defines el ancho del diálogo
             height: MediaQuery.of(context).size.height * 0.3,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             decoration: BoxDecoration(
@@ -4559,9 +4722,10 @@ class _PanelViewState extends State<PanelView>
                 Text(
                   'AVISO',
                   style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold),
+                    color: const Color(0xFF2be4f3),
+                    fontSize: 30.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -4588,26 +4752,62 @@ class _PanelViewState extends State<PanelView>
                       child: Text(
                         'CANCELAR',
                         style: TextStyle(
-                            color: const Color(0xFF2be4f3), fontSize: 17.sp),
+                          color: const Color(0xFF2be4f3),
+                          fontSize: 17.sp,
+                        ),
                       ),
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        // Limpiar variables globales y notificar a la UI
+                        try {
+                          debugPrint("⚙️ Iniciando operaciones de salida...");
+
+                          for (final macAddress
+                              in successfullyConnectedDevices) {
+                            try {
+                              // Enviar comando de shutdown
+                              debugPrint("🔄 Enviando comando de shutdown...");
+                              final shutdownSuccess =
+                                  await bleConnectionService.performShutdown(
+                                macAddress: macAddress,
+                                temporizado: 0, // Apagado inmediato
+                              );
+
+                              if (shutdownSuccess) {
+                                debugPrint(
+                                    "✅ Shutdown completo para $macAddress.");
+                                debugPrint(
+                                    "🚪 Cerrando el panel y liberando recursos...");
+                              } else {
+                                debugPrint(
+                                    "❌ Fallo en el comando de shutdown para $macAddress.");
+                              }
+                            } catch (e) {
+                              debugPrint(
+                                  "❌ Error durante el shutdown de $macAddress: $e");
+                            }
+                          }
+                        } catch (e) {
+                          debugPrint("❌ Error en el flujo de salida: $e");
+                        }
                         _clearGlobals();
-                        // Ejecutar el callback y cerrar la página
                         widget.onBack();
-                        Navigator.of(context).pop();
+                        Navigator.of(context)
+                            .pop(); // Cierra el diálogo de confirmación
                       },
                       style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.red),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          backgroundColor: Colors.red),
+                        side: const BorderSide(color: Colors.red),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
                       child: Text(
                         'SALIR DEL PANEL',
-                        style: TextStyle(color: Colors.white, fontSize: 17.sp),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17.sp,
+                        ),
                       ),
                     ),
                   ],
@@ -4625,6 +4825,28 @@ class _PanelViewState extends State<PanelView>
         ? number.toInt().toString()
         : number.toStringAsFixed(2);
   }
+
+  Color _lineColor(String? macAddress) {
+    // Obtener el estado de la batería de la dirección MAC proporcionada
+    final int? batteryStatus = batteryStatuses[macAddress];
+
+    // Determinar el color basado en el estado de la batería
+    switch (batteryStatus) {
+      case 0: // Muy baja
+        return Colors.red;
+      case 1: // Baja
+        return Colors.orange;
+      case 2: // Media
+        return Colors.yellow;
+      case 3: // Alta
+        return Colors.lightGreen;
+      case 4: // Llena
+        return Colors.green;
+      default: // Desconocido o no disponible
+        return Colors.grey;
+    }
+  }
+
 
   Color _getBorderColor(String? status) {
     switch (status) {
@@ -5043,6 +5265,7 @@ class BleConnectionService {
   final bool _connected = false;
   Timer? _connectionCheckTimer; // Timer para el chequeo periódico de conexión
   List<String> targetDeviceIds = []; // Lista para almacenar las direcciones MAC
+  final List<String> foundDevices = [];
   List<String> disconnectedDevices = [];
   bool isWidgetActive = true;
   StreamSubscription<List<int>>? subscription;
@@ -5115,9 +5338,7 @@ class BleConnectionService {
     }
 
     if (!isWidgetActive) {
-      if (kDebugMode) {
-        print("El widget no está activo. Escaneo cancelado.");
-      }
+      if (kDebugMode) print("El widget no está activo. Escaneo cancelado.");
       return;
     }
 
@@ -5130,57 +5351,108 @@ class BleConnectionService {
         if (kDebugMode) print("Permiso de ubicación concedido.");
       } else {
         if (kDebugMode) print("Permiso de ubicación denegado.");
-        return; // Salir si no hay permisos
+        return;
       }
     }
 
     if (!permGranted) return;
 
-    // Lista de dispositivos encontrados
     final Set<String> discoveredDevices = {};
+    foundDevices.clear(); // Reiniciar lista de dispositivos encontrados
 
     print("🔍 Iniciando escaneo BLE...");
+
+    // Usar Completer para controlar cuándo termina el escaneo
+    final Completer<void> scanCompleter = Completer<void>();
+
     try {
       _scanStream = flutterReactiveBle.scanForDevices(
-          withServices: [], scanMode: ScanMode.lowLatency).listen((device) {
+        withServices: [],
+        scanMode: ScanMode.lowLatency,
+      ).listen((device) {
         if (!isWidgetActive) {
           if (kDebugMode) print("El widget no está activo. Escaneo detenido.");
           _scanStream?.cancel();
+          if (!scanCompleter.isCompleted) {
+            scanCompleter
+                .complete(); // Completar si el escaneo se detiene manualmente
+          }
           return;
         }
 
-        if (kDebugMode)
+        if (kDebugMode) {
           print("Dispositivo encontrado: ${device.name}, ID: ${device.id}");
+        }
 
-        // Evitar duplicados y verificar si es un dispositivo objetivo
         if (targetDeviceIds.contains(device.id) &&
             !discoveredDevices.contains(device.id)) {
           discoveredDevices.add(device.id);
+          foundDevices
+              .add(device.id); // Agregar a la lista de dispositivos encontrados
           print("▶️--->>>Dispositivo objetivo encontrado: ${device.id}");
 
-          // Si todos los dispositivos objetivo han sido encontrados, detener el escaneo
           if (discoveredDevices.containsAll(targetDeviceIds)) {
             print(
                 "✅--->>>Todos los dispositivos objetivo encontrados. Deteniendo escaneo...");
             _scanStream?.cancel();
+            if (!scanCompleter.isCompleted) {
+              scanCompleter
+                  .complete(); // Completar si se encontraron todos los dispositivos
+            }
           }
         }
       }, onError: (error) {
         if (kDebugMode) print("❌ Error durante el escaneo: $error");
+        if (!scanCompleter.isCompleted) {
+          scanCompleter.complete(); // Completar en caso de error
+        }
       });
+
+      // Esperar a que termine el escaneo o que pase el tiempo máximo
+      await Future.any([
+        scanCompleter.future,
+        Future.delayed(const Duration(seconds: 10), () async {
+          if (_scanStream != null) {
+            await _scanStream?.cancel();
+            _scanStream = null;
+            print(
+                "⏳ Escaneo BLE cancelado automáticamente después de 10 segundos.");
+          }
+          if (!scanCompleter.isCompleted) {
+            scanCompleter.complete(); // Completar al final del timeout
+          }
+        }),
+      ]);
+
+      // Validar si se encontraron todos los dispositivos objetivo
+      if (!foundDevices.toSet().containsAll(targetDeviceIds)) {
+        print(
+            "⚠️ No se encontraron todos los dispositivos objetivo. Encontrados: $foundDevices, Faltan: ${targetDeviceIds.where((id) => !foundDevices.contains(id))}");
+      } else {
+        print("✅ Todos los dispositivos objetivo fueron encontrados.");
+      }
     } catch (e) {
       if (kDebugMode) print("❌ Error inesperado al iniciar el escaneo: $e");
     }
   }
 
   Future<bool> _connectToDeviceByMac(String macAddress) async {
-    if (macAddress.isEmpty) {
-      if (kDebugMode) print("Dirección MAC vacía.");
+    if (!foundDevices.contains(macAddress)) {
+      if (kDebugMode) {
+        print(
+            "⚠️ No se puede conectar a $macAddress porque no se encontró durante el escaneo.");
+      }
       return false;
     }
 
-    if (kDebugMode)
+    if (macAddress.isEmpty) {
+      if (kDebugMode) print("⚠️ Dirección MAC vacía.");
+      return false;
+    }
+
+    if (kDebugMode) {
       print("🚩--->>>Conectando al dispositivo con la MAC: $macAddress...");
+    }
 
     bool success = false;
     int attemptCount = 0;
@@ -5192,13 +5464,14 @@ class BleConnectionService {
           flutterReactiveBle.connectToAdvertisingDevice(
         id: macAddress,
         prescanDuration: const Duration(seconds: 1),
-        withServices: [serviceUuid], // Agregar UUIDs si es necesario
+        withServices: [serviceUuid],
       ).listen((event) async {
         switch (event.connectionState) {
           case DeviceConnectionState.connected:
             if (kDebugMode)
               print("🔗--->>> Dispositivo $macAddress conectado.");
             success = true;
+
             final discoveredServices =
                 await flutterReactiveBle.discoverServices(macAddress);
             bool hasRequiredService = false;
@@ -5207,12 +5480,14 @@ class BleConnectionService {
               if (service.serviceId == serviceUuid) {
                 hasRequiredService = true;
 
-                if (kDebugMode)
+                if (kDebugMode) {
                   print("🔍--->>>Servicio principal encontrado: $serviceUuid");
+                }
 
                 final characteristicIds = service.characteristics
                     .map((c) => c.characteristicId)
                     .toList();
+
                 if (characteristicIds.contains(rxCharacteristicUuid) &&
                     characteristicIds.contains(txCharacteristicUuid)) {
                   if (kDebugMode) {
@@ -5237,15 +5512,17 @@ class BleConnectionService {
             break;
 
           case DeviceConnectionState.disconnected:
-            if (kDebugMode)
+            if (kDebugMode) {
               print("⛓️‍💥--->>>Dispositivo $macAddress desconectado.");
+            }
             _onDeviceDisconnected(macAddress);
             _updateDeviceConnectionState(macAddress, false);
             break;
 
           default:
-            if (kDebugMode)
+            if (kDebugMode) {
               print("⏳--->>>Estado desconocido para $macAddress.");
+            }
             break;
         }
       });
@@ -5375,12 +5652,24 @@ class BleConnectionService {
     }
   }
 
-  void dispose() {
+  void disposeBleResources() {
+    if (kDebugMode) {
+      debugPrint("🧹 Liberando recursos BLE...");
+    }
+
     isWidgetActive = false;
 
-    // Llamar a disconnect() para desconectar todos los dispositivos si están conectados
+    // Cancelar el Timer periódico de verificación de conexión
+    if (_connectionCheckTimer != null && _connectionCheckTimer!.isActive) {
+      _connectionCheckTimer?.cancel();
+      _connectionCheckTimer = null;
+      if (kDebugMode) {
+        debugPrint("⏲️ Timer de verificación de conexión cancelado.");
+      }
+    }
+    // Desconectar todos los dispositivos si están conectados
     for (var macAddress in _deviceConnectionStateControllers.keys) {
-      disconnect(macAddress); // Desconectar cada dispositivo
+      disconnect(macAddress);
     }
 
     // Cerrar todos los StreamControllers de forma segura
@@ -5388,15 +5677,16 @@ class BleConnectionService {
       if (!controller.isClosed) {
         controller.close();
         if (kDebugMode) {
-          print("Stream controller para el dispositivo $macAddress cerrado.");
+          debugPrint(
+              "Stream controller para el dispositivo $macAddress cerrado.");
         }
       }
     });
 
-    // Deinitialize para liberar los recursos BLE globalmente
+    // Liberar recursos BLE globalmente
     flutterReactiveBle.deinitialize();
     if (kDebugMode) {
-      print("Recursos BLE globalmente liberados.");
+      debugPrint("Recursos BLE globalmente liberados.");
     }
   }
 
@@ -5536,7 +5826,7 @@ class BleConnectionService {
 
       // Tiempo máximo de espera para la respuesta
       final deviceInfo =
-          await completer.future.timeout(const Duration(seconds: 5));
+          await completer.future.timeout(const Duration(seconds: 10));
       notificationSubscription?.cancel();
       return deviceInfo;
     } catch (e) {
@@ -5554,8 +5844,8 @@ class BleConnectionService {
     final tariff = deviceInfo['tariff'] == 0
         ? "Sin tarifa"
         : deviceInfo['tariff'] == 1
-        ? "Con tarifa"
-        : "Con tarifa agotada";
+            ? "Con tarifa"
+            : "Con tarifa agotada";
 
     final powerType = deviceInfo['powerType'] == 0
         ? "Fuente de alimentación"
@@ -5574,10 +5864,10 @@ class BleConnectionService {
       final type = endpoint['type'] == 0
           ? "Ninguno"
           : endpoint['type'] == 1
-          ? "Electroestimulador (10 canales normal)"
-          : endpoint['type'] == 2
-          ? "Electroestimulador (10 canales + Ctrl Input)"
-          : "Desconocido";
+              ? "Electroestimulador (10 canales normal)"
+              : endpoint['type'] == 2
+                  ? "Electroestimulador (10 canales + Ctrl Input)"
+                  : "Desconocido";
 
       final swVersion = endpoint['swVersion'];
 
@@ -5593,5 +5883,1013 @@ class BleConnectionService {
 - Versión SW de comunicaciones: $swCommsVersion
 $endpoints
 ''';
+  }
+
+  Future<String> getBluetoothName(String macAddress) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Crear el paquete de solicitud FUN_GET_NAMEBT
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x04; // FUN_GET_NAMEBT
+
+    try {
+      // Enviar la solicitud FUN_GET_NAMEBT
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint("📤 FUN_GET_NAMEBT enviado a $macAddress.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<String>();
+
+      // Suscribirse a las notificaciones para recibir FUN_GET_NAMEBT_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x05) {
+          // FUN_GET_NAMEBT_R recibido
+          final nameBytes = data.sublist(1, 20); // Extraer los bytes del nombre
+          final name = String.fromCharCodes(nameBytes)
+              .split('\x00')
+              .first; // Convertir a string y eliminar caracteres nulos
+          completer.complete(name);
+          debugPrint("📥 FUN_GET_NAMEBT_R recibido desde $macAddress: $name");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final bluetoothName =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return bluetoothName;
+    } catch (e) {
+      debugPrint(
+          "❌ Error al obtener el nombre del Bluetooth de $macAddress: $e");
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getBatteryParameters(String macAddress) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Crear el paquete de solicitud FUN_GET_PARAMBAT
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x08; // FUN_GET_PARAMBAT
+
+    try {
+      // Enviar la solicitud FUN_GET_PARAMBAT
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint("📤 FUN_GET_PARAMBAT enviado a $macAddress.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<Map<String, dynamic>>();
+
+      // Suscribirse a las notificaciones para recibir FUN_GET_PARAMBAT_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x09) {
+          // FUN_GET_PARAMBAT_R recibido
+          final batteryParameters = {
+            'batteryStatusRaw': data[3],
+            'powerType':
+                data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
+            'batteryModel': data[2] == 0 ? "Por defecto" : "Desconocido",
+            'batteryStatus': data[3] == 0
+                ? "Muy baja"
+                : data[3] == 1
+                    ? "Baja"
+                    : data[3] == 2
+                        ? "Media"
+                        : data[3] == 3
+                            ? "Alta"
+                            : "Llena",
+            'temperature': "Sin implementar",
+            'compensation': (data[6] << 8) | data[7],
+            'voltages': {
+              'V1': (data[8] << 8) | data[9],
+              'V2': (data[10] << 8) | data[11],
+              'V3': (data[12] << 8) | data[13],
+              'V4': (data[14] << 8) | data[15],
+            },
+            'elevatorMax': {
+              'endpoint1': data[16],
+              'endpoint2': data[17],
+              'endpoint3': data[18],
+              'endpoint4': data[19],
+            },
+          };
+
+          completer.complete(batteryParameters);
+          debugPrint(
+              "📥 FUN_GET_PARAMBAT_R recibido desde $macAddress: $batteryParameters");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final batteryParameters =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return batteryParameters;
+    } catch (e) {
+      debugPrint(
+          "❌ Error al obtener los parámetros de la batería de $macAddress: $e");
+      rethrow;
+    }
+  }
+
+  String parseBatteryParameters(Map<String, dynamic> batteryParameters) {
+    final powerType = batteryParameters['powerType'];
+    final batteryModel = batteryParameters['batteryModel'];
+    final batteryStatus = batteryParameters['batteryStatus'];
+    final compensation = batteryParameters['compensation'];
+    final voltages = batteryParameters['voltages'] as Map<String, int>;
+    final elevatorMax = batteryParameters['elevatorMax'] as Map<String, int>;
+
+    return '''
+🔋 Parámetros de la batería:
+- Tipo de alimentación: $powerType
+- Modelo de batería: $batteryModel
+- Estado de la batería: $batteryStatus
+- Compensación: $compensation
+- Voltajes:
+  - V1: ${voltages['V1']} mV
+  - V2: ${voltages['V2']} mV
+  - V3: ${voltages['V3']} mV
+  - V4: ${voltages['V4']} mV
+- Elevador máximo:
+  - Endpoint 1: ${elevatorMax['endpoint1']}
+  - Endpoint 2: ${elevatorMax['endpoint2']}
+  - Endpoint 3: ${elevatorMax['endpoint3']}
+  - Endpoint 4: ${elevatorMax['endpoint4']}
+''';
+  }
+
+  Future<Map<String, dynamic>> getTariffCounters(String macAddress) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Crear el paquete de solicitud FUN_GET_CONTADOR
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x0C; // FUN_GET_CONTADOR
+
+    try {
+      // Enviar la solicitud FUN_GET_CONTADOR
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint("📤 FUN_GET_CONTADOR enviado a $macAddress.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<Map<String, dynamic>>();
+
+      // Suscribirse a las notificaciones para recibir FUN_GET_CONTADOR_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x0D) {
+          // FUN_GET_CONTADOR_R recibido
+          final tariffStatus = data[1] == 0
+              ? "Sin tarifa"
+              : data[1] == 1
+                  ? "Con tarifa"
+                  : "Con tarifa agotada";
+
+          final totalSeconds = (data[2] << 24) |
+              (data[3] << 16) |
+              (data[4] << 8) |
+              data[5]; // Contador total (32 bits)
+
+          final remainingSeconds = (data[6] << 24) |
+              (data[7] << 16) |
+              (data[8] << 8) |
+              data[9]; // Contador parcial (32 bits)
+
+          final counters = {
+            'tariffStatus': tariffStatus,
+            'totalSeconds': totalSeconds,
+            'remainingSeconds': remainingSeconds,
+          };
+
+          completer.complete(counters);
+          debugPrint(
+              "📥 FUN_GET_CONTADOR_R recibido desde $macAddress: $counters");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final counters =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return counters;
+    } catch (e) {
+      debugPrint(
+          "❌ Error al obtener los contadores de tarifa de $macAddress: $e");
+      rethrow;
+    }
+  }
+
+  String parseTariffCounters(Map<String, dynamic> counters) {
+    final tariffStatus = counters['tariffStatus'];
+    final totalSeconds = counters['totalSeconds'];
+    final remainingSeconds = counters['remainingSeconds'];
+
+    final totalTime = Duration(seconds: totalSeconds);
+    final remainingTime = Duration(seconds: remainingSeconds);
+
+    String formatDuration(Duration duration) {
+      final hours = duration.inHours;
+      final minutes = duration.inMinutes.remainder(60);
+      final seconds = duration.inSeconds.remainder(60);
+      return "${hours}h ${minutes}m ${seconds}s";
+    }
+
+    return '''
+⏳ Contadores de tarifa:
+- Estado de tarifa: $tariffStatus
+- Tiempo total utilizado: ${formatDuration(totalTime)} (${totalSeconds}s)
+- Tiempo restante de tarifa: ${formatDuration(remainingTime)} (${remainingSeconds}s)
+''';
+  }
+
+  Future<Map<String, dynamic>> getElectrostimulatorState(
+      String macAddress, int endpoint, int mode) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar que el endpoint y el modo sean válidos
+    if (endpoint < 1 || endpoint > 4) {
+      throw ArgumentError("El endpoint debe estar entre 1 y 4.");
+    }
+    if (mode < 0 || mode > 2) {
+      throw ArgumentError("El modo debe estar entre 0 y 2.");
+    }
+
+    // Crear el paquete de solicitud FUN_GET_ESTADO_EMS
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x10; // FUN_GET_ESTADO_EMS
+    requestPacket[1] = endpoint;
+    requestPacket[2] = mode;
+
+    try {
+      // Enviar la solicitud FUN_GET_ESTADO_EMS
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint(
+          "📤 FUN_GET_ESTADO_EMS enviado a $macAddress. Endpoint: $endpoint, Modo: $mode.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<Map<String, dynamic>>();
+
+      // Suscribirse a las notificaciones para recibir FUN_GET_ESTADO_EMS_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x11) {
+          // FUN_GET_ESTADO_EMS_R recibido
+          final parsedState = _parseElectrostimulatorState(data, mode);
+          completer.complete(parsedState);
+          debugPrint(
+              "📥 FUN_GET_ESTADO_EMS_R recibido desde $macAddress: $parsedState");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final state = await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return state;
+    } catch (e) {
+      debugPrint(
+          "❌ Error al obtener el estado del electroestimulador de $macAddress: $e");
+      rethrow;
+    }
+  }
+
+// Función para parsear los datos de la respuesta
+  Map<String, dynamic> _parseElectrostimulatorState(List<int> data, int mode) {
+    final endpoint = data[1];
+    final state = data[2];
+    final batteryStatus = data[3];
+    final frequency = data[4];
+    final ramp = data[5];
+    final limitador = data[9] == 0 ? "No" : "Sí";
+
+    if (mode == 0) {
+      // Modo 0: temperatura y niveles de canal
+      return {
+        'endpoint': endpoint,
+        'state': state,
+        'batteryStatus': _mapBatteryStatus(batteryStatus),
+        'frequency': frequency,
+        'ramp': ramp * 100,
+        'temperature': (data[7] << 8) | data[8],
+        'limitador': limitador,
+        'channelLevels': data.sublist(10, 20),
+      };
+    } else if (mode == 1 || mode == 2) {
+      // Modo 1: tensión batería / Modo 2: tensión elevador
+      final voltageType = mode == 1 ? "Tensión batería" : "Tensión elevador";
+      return {
+        'endpoint': endpoint,
+        'state': state,
+        'batteryStatus': _mapBatteryStatus(batteryStatus),
+        'frequency': frequency,
+        'ramp': ramp * 100,
+        voltageType: (data[7] << 8) | data[8],
+        'limitador': limitador,
+        'pulseWidths': data.sublist(10, 20),
+      };
+    } else {
+      throw ArgumentError("Modo inválido.");
+    }
+  }
+
+// Mapear el estado de la batería
+  String _mapBatteryStatus(int status) {
+    switch (status) {
+      case 0:
+        return "Muy baja";
+      case 1:
+        return "Baja";
+      case 2:
+        return "Media";
+      case 3:
+        return "Alta";
+      case 4:
+        return "Llena";
+      default:
+        return "Desconocido";
+    }
+  }
+
+  String parseElectrostimulatorState(Map<String, dynamic> state, int mode) {
+    final endpoint = state['endpoint'];
+    final batteryStatus = state['batteryStatus'];
+    final frequency = state['frequency'];
+    final ramp = state['ramp'];
+    final limitador = state['limitador'];
+
+    if (mode == 0) {
+      final temperature = state['temperature'];
+      final channelLevels = state['channelLevels'] as List<int>;
+      return '''
+⚡ Estado del electroestimulador (Modo 0):
+- Endpoint: $endpoint
+- Estado batería: $batteryStatus
+- Frecuencia: $frequency Hz
+- Rampa: ${ramp}ms
+- Temperatura: ${temperature / 10} °C
+- Limitador: $limitador
+- Niveles de canal: ${channelLevels.join(', ')}
+''';
+    } else {
+      final voltageType = mode == 1 ? "Tensión batería" : "Tensión elevador";
+      final voltage = state[voltageType];
+      final pulseWidths = state['pulseWidths'] as List<int>;
+      return '''
+⚡ Estado del electroestimulador (Modo $mode):
+- Endpoint: $endpoint
+- Estado batería: $batteryStatus
+- Frecuencia: $frequency Hz
+- Rampa: ${ramp}ms
+- $voltageType: ${voltage / 10} V
+- Limitador: $limitador
+- Ancho de pulso (μs): ${pulseWidths.map((v) => v * 5).join(', ')}
+''';
+    }
+  }
+
+  Future<bool> runElectrostimulationSession({
+    required String macAddress,
+    required int endpoint,
+    required int limitador,
+    required int rampa,
+    required int frecuencia,
+    required int deshabilitaElevador,
+    required int nivelCanales,
+    required int anchuraPulsoComun,
+    required List<int> anchuraPulsosPorCanal,
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar parámetros
+    if (endpoint < 1 || endpoint > 4) {
+      throw ArgumentError("El endpoint debe estar entre 1 y 4.");
+    }
+    if (anchuraPulsosPorCanal.length != 10) {
+      throw ArgumentError(
+          "La lista de anchuras de pulso debe contener exactamente 10 valores.");
+    }
+
+    // Crear el paquete de solicitud FUN_RUN_EMS
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x12; // FUN_RUN_EMS
+    requestPacket[1] = endpoint;
+    requestPacket[2] = limitador;
+    requestPacket[3] = rampa;
+    requestPacket[4] = frecuencia;
+    requestPacket[5] = deshabilitaElevador;
+    requestPacket[6] = nivelCanales;
+    requestPacket[7] = anchuraPulsoComun;
+    for (int i = 0; i < 10; i++) {
+      requestPacket[8 + i] = anchuraPulsosPorCanal[i];
+    }
+
+    try {
+      // Enviar la solicitud FUN_RUN_EMS
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint(
+          "📤 FUN_RUN_EMS enviado a $macAddress para endpoint $endpoint.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<bool>();
+
+      // Suscribirse a las notificaciones para recibir FUN_RUN_EMS_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x13) {
+          // FUN_RUN_EMS_R recibido
+          final retorno = data[2];
+          final result = retorno == 1;
+          completer.complete(result);
+          debugPrint(
+              "📥 FUN_RUN_EMS_R recibido desde $macAddress: ${result ? "OK" : "FAIL"}");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final result = await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return result;
+    } catch (e) {
+      debugPrint("❌ Error al iniciar sesión de electroestimulación: $e");
+      rethrow;
+    }
+  }
+
+  Future<bool> stopElectrostimulationSession({
+    required String macAddress,
+    required int endpoint,
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar el endpoint
+    if (endpoint < 1 || endpoint > 4) {
+      throw ArgumentError("El endpoint debe estar entre 1 y 4.");
+    }
+
+    // Crear el paquete de solicitud FUN_STOP_EMS
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x14; // FUN_STOP_EMS
+    requestPacket[1] = endpoint;
+
+    try {
+      // Enviar la solicitud FUN_STOP_EMS
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint(
+          "📤 FUN_STOP_EMS enviado a $macAddress para endpoint $endpoint.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<bool>();
+
+      // Suscribirse a las notificaciones para recibir FUN_STOP_EMS_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x15) {
+          // FUN_STOP_EMS_R recibido
+          final retorno = data[2];
+          final result = retorno == 1;
+          completer.complete(result);
+          debugPrint(
+              "📥 FUN_STOP_EMS_R recibido desde $macAddress: ${result ? "OK" : "FAIL"}");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final result = await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return result;
+    } catch (e) {
+      debugPrint("❌ Error al detener sesión de electroestimulación: $e");
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> controlElectrostimulatorChannel({
+    required String macAddress,
+    required int endpoint,
+    required int canal,
+    required int modo,
+    required int valor,
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar parámetros
+    if (endpoint < 1 || endpoint > 4) {
+      throw ArgumentError("El endpoint debe estar entre 1 y 4.");
+    }
+    if (canal < 0 || canal > 9) {
+      throw ArgumentError("El canal debe estar entre 0 y 9.");
+    }
+    if (modo < 0 || modo > 3) {
+      throw ArgumentError(
+          "El modo debe ser 0 (absoluto), 1 (incrementa), 2 (decrementa), o 3 (solo retorna valor).");
+    }
+    if (valor < 0 || valor > 100) {
+      throw ArgumentError("El valor debe estar entre 0 y 100.");
+    }
+
+    // Crear el paquete de solicitud FUN_CANAL_EMS
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x16; // FUN_CANAL_EMS
+    requestPacket[1] = endpoint;
+    requestPacket[2] = canal;
+    requestPacket[3] = modo;
+    requestPacket[4] = valor;
+
+    try {
+      // Enviar la solicitud FUN_CANAL_EMS
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint(
+          "📤 FUN_CANAL_EMS enviado a $macAddress. Endpoint: $endpoint, Canal: $canal, Modo: $modo, Valor: $valor.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<Map<String, dynamic>>();
+
+      // Suscribirse a las notificaciones para recibir FUN_CANAL_EMS_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x17) {
+          // FUN_CANAL_EMS_R recibido
+          final endpointResp = data[1];
+          final canalResp = data[2];
+          final resultado = data[3] == 1 ? "OK" : "FAIL";
+          final valorResp = data[4];
+
+          final response = {
+            'endpoint': endpointResp,
+            'canal': canalResp,
+            'resultado': resultado,
+            'valor': valorResp == 200 ? "Limitador activado" : "$valorResp%",
+          };
+
+          completer.complete(response);
+          debugPrint(
+              "📥 FUN_CANAL_EMS_R recibido desde $macAddress: $response");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final response =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return response;
+    } catch (e) {
+      debugPrint("❌ Error al controlar el canal del electroestimulador: $e");
+      rethrow;
+    }
+  }
+
+  String parseChannelControlResponse(Map<String, dynamic> response) {
+    final endpoint = response['endpoint'];
+    final canal = response['canal'];
+    final resultado = response['resultado'];
+    final valor = response['valor'];
+
+    return '''
+🎛️ Control del canal del electroestimulador:
+- Endpoint: $endpoint
+- Canal: $canal
+- Resultado: $resultado
+- Valor: $valor
+''';
+  }
+
+  Future<Map<String, dynamic>> controlAllElectrostimulatorChannels({
+    required String macAddress,
+    required int endpoint,
+    required int modo,
+    required List<int> valoresCanales,
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar parámetros
+    if (endpoint < 1 || endpoint > 4) {
+      throw ArgumentError("El endpoint debe estar entre 1 y 4.");
+    }
+    if (modo < 0 || modo > 3) {
+      throw ArgumentError(
+          "El modo debe ser 0 (absoluto), 1 (incrementa), 2 (decrementa), o 3 (solo retorna valores).");
+    }
+    if (valoresCanales.length != 10) {
+      throw ArgumentError(
+          "Debe haber exactamente 10 valores para los canales.");
+    }
+    if (valoresCanales.any((valor) => valor < 0 || valor > 100)) {
+      throw ArgumentError(
+          "Todos los valores de los canales deben estar entre 0 y 100.");
+    }
+
+    // Crear el paquete de solicitud FUN_ALL_CANAL_EMS
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x18; // FUN_ALL_CANAL_EMS
+    requestPacket[1] = endpoint;
+    requestPacket[2] = modo;
+    for (int i = 0; i < 10; i++) {
+      requestPacket[3 + i] = valoresCanales[i];
+    }
+
+    try {
+      // Enviar la solicitud FUN_ALL_CANAL_EMS
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint(
+          "📤 FUN_ALL_CANAL_EMS enviado a $macAddress. Endpoint: $endpoint, Modo: $modo, Valores: $valoresCanales.");
+
+      // Completer para esperar la respuesta
+      final completer = Completer<Map<String, dynamic>>();
+
+      // Suscribirse a las notificaciones para recibir FUN_ALL_CANAL_EMS_R
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x19) {
+          // FUN_ALL_CANAL_EMS_R recibido
+          final endpointResp = data[1];
+          final resultado = data[2] == 1 ? "OK" : "FAIL";
+          final valoresResp = data.sublist(3, 13).map((v) {
+            return v == 200 ? "Limitador activado" : "$v%";
+          }).toList();
+
+          final response = {
+            'endpoint': endpointResp,
+            'resultado': resultado,
+            'valoresCanales': valoresResp,
+          };
+
+          completer.complete(response);
+          debugPrint(
+              "📥 FUN_ALL_CANAL_EMS_R recibido desde $macAddress: $response");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final response =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return response;
+    } catch (e) {
+      debugPrint(
+          "❌ Error al controlar todos los canales del electroestimulador: $e");
+      rethrow;
+    }
+  }
+
+  String parseAllChannelsResponse(Map<String, dynamic> response) {
+    final endpoint = response['endpoint'];
+    final resultado = response['resultado'];
+    final valoresCanales = response['valoresCanales'] as List<String>;
+
+    final canales = valoresCanales
+        .asMap()
+        .entries
+        .map((entry) => "  Canal ${entry.key + 1}: ${entry.value}")
+        .join('\n');
+
+    return '''
+🎚️ Control de todos los canales del electroestimulador:
+- Endpoint: $endpoint
+- Resultado: $resultado
+$canales
+''';
+  }
+
+  Future<bool> performShutdown({
+    required String macAddress,
+    int temporizado = 0, // Shutdown inmediato por defecto
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    try {
+      debugPrint(
+          "🔄 Enviando comando de shutdown al dispositivo $macAddress...");
+
+      // Construir el paquete de shutdown
+      final List<int> shutdownPacket = List.filled(20, 0);
+      shutdownPacket[0] = 0x1A; // FUN_RESET
+      shutdownPacket[1] = 0x66; // Shutdown
+      shutdownPacket[2] = temporizado; // Temporizado (0 para inmediato)
+
+      // Enviar el paquete
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: shutdownPacket,
+      );
+
+      debugPrint("✅ Comando de shutdown enviado correctamente.");
+      return true;
+    } catch (e) {
+      debugPrint("❌ Error al enviar el comando de shutdown: $e");
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> getFreeMemory({
+    required String macAddress,
+    required int pagina,
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar la página
+    if (pagina < 0 || pagina > 31) {
+      throw ArgumentError("La página debe estar entre 0 y 31.");
+    }
+
+    // Crear el paquete de solicitud FUN_GET_MEM
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x1C; // FUN_GET_MEM
+    requestPacket[1] = pagina;
+
+    try {
+      // Enviar la solicitud FUN_GET_MEM
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint("📤 FUN_GET_MEM enviado a $macAddress. Página: $pagina.");
+
+      // Esperar la respuesta
+      final completer = Completer<Map<String, dynamic>>();
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x1D) {
+          // FUN_GET_MEM_R recibido
+          final response = {
+            'status': data[1] == 1 ? "OK" : "FAIL",
+            'pagina': data[2],
+            'datos': data.sublist(3, 19),
+          };
+          completer.complete(response);
+          debugPrint("📥 FUN_GET_MEM_R recibido desde $macAddress: $response");
+        }
+      });
+
+      final response =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return response;
+    } catch (e) {
+      debugPrint("❌ Error al obtener memoria libre: $e");
+      rethrow;
+    }
+  }
+
+  Future<bool> setFreeMemory({
+    required String macAddress,
+    required int pagina,
+    required List<int> datos,
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar la página y los datos
+    if (pagina < 0 || pagina > 31) {
+      throw ArgumentError("La página debe estar entre 0 y 31.");
+    }
+    if (datos.length != 16) {
+      throw ArgumentError("Los datos deben tener exactamente 16 bytes.");
+    }
+
+    // Crear el paquete de solicitud FUN_SET_MEM
+    final List<int> requestPacket = [0x1E, pagina, ...datos];
+
+    try {
+      // Enviar la solicitud FUN_SET_MEM
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint(
+          "📤 FUN_SET_MEM enviado a $macAddress. Página: $pagina, Datos: $datos.");
+
+      final characteristicTx = QualifiedCharacteristic(
+        serviceId: serviceUuid,
+        characteristicId: txCharacteristicUuid,
+        deviceId: macAddress,
+      );
+
+      final completer = Completer<bool>();
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x1F) {
+          // FUN_SET_MEM_R recibido
+          completer.complete(data[1] == 1); // OK: 1
+          debugPrint(
+              "📥 FUN_SET_MEM_R recibido desde $macAddress: ${data[1] == 1 ? "OK" : "FAIL"}");
+        }
+      });
+
+      final result = await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return result;
+    } catch (e) {
+      debugPrint("❌ Error al escribir en memoria libre: $e");
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getPulseMeter({
+    required String macAddress,
+    required int endpoint,
+  }) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Validar el endpoint
+    if (endpoint < 1 || endpoint > 4) {
+      throw ArgumentError("El endpoint debe estar entre 1 y 4.");
+    }
+
+    // Crear el paquete de solicitud FUN_GET_PULSOS
+    final List<int> requestPacket = [0x20, endpoint];
+
+    try {
+      // Enviar la solicitud FUN_GET_PULSOS
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint(
+          "📤 FUN_GET_PULSOS enviado a $macAddress. Endpoint: $endpoint.");
+
+      // Esperar la respuesta
+      final completer = Completer<Map<String, dynamic>>();
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x21) {
+          // FUN_GET_PULSOS_R recibido
+          final response = {
+            'endpoint': data[1],
+            'status': _mapPulseMeterStatus(data[2]),
+            'bps': (data[3] << 8) | data[4],
+            'SpO2': (data[5] << 8) | data[6],
+          };
+          completer.complete(response);
+          debugPrint(
+              "📥 FUN_GET_PULSOS_R recibido desde $macAddress: $response");
+        }
+      });
+
+      final response =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return response;
+    } catch (e) {
+      debugPrint("❌ Error al obtener datos del pulsómetro: $e");
+      rethrow;
+    }
+  }
+
+  String _mapPulseMeterStatus(int status) {
+    switch (status) {
+      case 0:
+        return "No existe";
+      case 1:
+        return "Sensor desconectado o con error";
+      case 2:
+        return "Sensor no capta";
+      case 3:
+        return "OK";
+      default:
+        return "Desconocido";
+    }
   }
 }
