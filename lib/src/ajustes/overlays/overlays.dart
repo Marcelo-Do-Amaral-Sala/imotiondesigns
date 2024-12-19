@@ -393,7 +393,6 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
   final SyncService _syncService = SyncService();
   final DatabaseHelperTraducciones _dbHelperTraducciones =
       DatabaseHelperTraducciones();
-  bool isLoading = false;
   String statusMessage = 'Listo para hacer la copia de seguridad';
 
   @override
@@ -451,7 +450,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
       {'name': 'Español', 'flag': 'assets/images/espana.png', 'lang': 'es'},
       {'name': 'Inglés', 'flag': 'assets/images/reino-unido.png', 'lang': 'en'},
       {'name': 'Francés', 'flag': 'assets/images/francia.png', 'lang': 'fr'},
-      {'name': 'Italiano', 'flag': 'assets/images/italia.png', 'lang': 'it'},
+      {'name': 'Alemán', 'flag': 'assets/images/italia.png', 'lang': 'dt'},
       {'name': 'Portugués', 'flag': 'assets/images/portugal.png', 'lang': 'pt'},
       // Puedes agregar más países aquí
     ];
@@ -467,227 +466,104 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedLanguage = countries[0]['lang'];
-                    });
-                    _changeAppLanguage(countries[0]['lang']!);
-                  },
-                  child: AnimatedScale(
-                    scale: _selectedLanguage == countries[0]['lang'] ? 0.9 : 1,
-                    duration: const Duration(milliseconds: 100),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Contenedor con borde alrededor de la imagen
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle, // Forma circular
-                            border: _selectedLanguage == countries[0]['lang']
-                                ? Border.all(
-                                    color: Color(0xFF2be4f3),
-                                    width: 3) // Borde azul si seleccionado
-                                : null,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              countries[0]['flag']!,
-                              fit: BoxFit.cover,
-                              width: 80,
-                              height: 80,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          countries[0]['name']!,
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+            // Columna para los ListTiles
+            Expanded(
+              flex: 2, // Le da más espacio a esta columna si se necesita
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    buildCustomCheckboxTile("ESPAÑOL"),
+                    buildCustomCheckboxTile("ENGLISH"),
+                    buildCustomCheckboxTile("FRANÇAIS"),
+                    buildCustomCheckboxTile("PORTUGÛES"),
+                    buildCustomCheckboxTile("DEUTSCH"),
+                  ],
+                ),
+              ),
+            ),
+            // Columna para el botón
+            Expanded(
+              flex: 1, // Menos espacio que la columna de ListTiles
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
                     ),
+                    backgroundColor: Color(0xFF2be4f3),
+                  ),
+                  child: Text(
+                    'SELECCIONAR',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedLanguage = countries[1]['lang'];
-                    });
-                    _changeAppLanguage(countries[1]['lang']!);
-                  },
-                  child: AnimatedScale(
-                    scale: _selectedLanguage == countries[1]['lang'] ? 0.9 : 1,
-                    duration: const Duration(milliseconds: 100),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: _selectedLanguage == countries[1]['lang']
-                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
-                                : null,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              countries[1]['flag']!,
-                              fit: BoxFit.cover,
-                              width: 80,
-                              height: 80,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          countries[1]['name']!,
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedLanguage = countries[2]['lang'];
-                    });
-                    _changeAppLanguage(countries[2]['lang']!);
-                  },
-                  child: AnimatedScale(
-                    scale: _selectedLanguage == countries[2]['lang'] ? 0.9 : 1,
-                    duration: const Duration(milliseconds: 100),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: _selectedLanguage == countries[2]['lang']
-                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
-                                : null,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              countries[2]['flag']!,
-                              fit: BoxFit.cover,
-                              width: 80,
-                              height: 80,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          countries[2]['name']!,
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedLanguage = countries[3]['lang'];
-                    });
-                    _changeAppLanguage(countries[3]['lang']!);
-                  },
-                  child: AnimatedScale(
-                    scale: _selectedLanguage == countries[3]['lang'] ? 0.9 : 1,
-                    duration: const Duration(milliseconds: 100),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: _selectedLanguage == countries[3]['lang']
-                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
-                                : null,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              countries[3]['flag']!,
-                              fit: BoxFit.cover,
-                              width: 80,
-                              height: 80,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          countries[3]['name']!,
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedLanguage = countries[4]['lang'];
-                    });
-                    _changeAppLanguage(countries[4]['lang']!);
-                  },
-                  child: AnimatedScale(
-                    scale: _selectedLanguage == countries[4]['lang'] ? 0.9 : 1,
-                    duration: const Duration(milliseconds: 100),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: _selectedLanguage == countries[4]['lang']
-                                ? Border.all(color: Color(0xFF2be4f3), width: 3)
-                                : null,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              countries[4]['flag']!,
-                              fit: BoxFit.cover,
-                              width: 80,
-                              height: 80,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          countries[4]['name']!,
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),
       ),
       onClose: widget.onClose,
+    );
+  }
+
+  Widget buildCustomCheckboxTile(String option) {
+    return ListTile(
+      leading: customCheckbox(option),
+      title: Text(
+        option,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 22.sp,
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+      onTap: () {
+        setState(() {
+          _selectedLanguage = option; // Actualiza la selección
+        });
+      },
+    );
+  }
+
+  Widget customCheckbox(String option) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedLanguage = option; // Actualiza la selección
+        });
+      },
+      child: Container(
+        width: 22.0,
+        height: 22.0,
+        margin: const EdgeInsets.all(5.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: _selectedLanguage == option
+              ? const Color(0xFF2be4f3)
+              : Colors.transparent,
+          border: Border.all(
+            color: _selectedLanguage == option
+                ? const Color(0xFF2be4f3)
+                : Colors.white,
+            width: 1.0,
+          ),
+        ),
+      ),
     );
   }
 }

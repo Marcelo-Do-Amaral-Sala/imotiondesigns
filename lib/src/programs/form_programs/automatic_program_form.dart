@@ -119,7 +119,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
     // Datos del programa automático
     Map<String, dynamic> programaAuto = {
       'nombre': _nameController.text,
-      'imagen': 'assets/images/cliente.png',
+      'imagen': 'assets/images/programacreado.png',
       'descripcion': _descController.text,
       'duracionTotal': double.tryParse(_durationController.text) ?? 0.0,
       'tipo_equipamiento': selectedEquipOption ?? 'BIO-JACKET',

@@ -187,7 +187,7 @@ final _nameController = TextEditingController();
     // Crear el mapa con los datos del programa
     Map<String, dynamic> programa = {
       'nombre': nombrePrograma,
-      'imagen': 'assets/images/cliente.png',
+      'imagen': 'assets/images/programacreado.png',
       // Puedes agregar la ruta de la imagen aquí si es necesario
       'frecuencia': frecuencia,
       'pulso': pulso,

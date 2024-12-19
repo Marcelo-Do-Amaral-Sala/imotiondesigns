@@ -101,7 +101,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.1,
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: MediaQuery.of(context).size.width * 0.3,
                   child: Image.asset(
                     'assets/images/cliente.png',
                     fit: BoxFit.contain,
@@ -160,7 +160,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.1,
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: MediaQuery.of(context).size.width * 0.3,
                   child: Image.asset(
                     'assets/images/leerbio.png',
                     fit: BoxFit.contain,

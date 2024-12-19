@@ -354,7 +354,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
           if (isOverlayVisible)
             Positioned(
               // Aplica medidas personalizadas solo para el overlay 3
-              top: overlayIndex == 3 ? screenHeight *0.1: screenHeight * 0.3, // Puedes ajustar estos valores como quieras
+              top: overlayIndex == 3 ? screenHeight *0.1: screenHeight * 0.25, // Puedes ajustar estos valores como quieras
               bottom: overlayIndex == 3 ?screenHeight *0.1 : screenHeight * 0.2,
               left: overlayIndex == 3 ? screenWidth * 0.4 : screenWidth * 0.4,
               right: overlayIndex == 3 ? screenWidth * 0.1 : screenWidth * 0.1,
