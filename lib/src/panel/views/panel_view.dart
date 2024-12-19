@@ -218,7 +218,7 @@ class _PanelViewState extends State<PanelView>
 
     // Obtener las direcciones MAC desde el AppState
     List<String> macAddresses =
-        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
     debugPrint("🔍--->>>Direcciones MAC obtenidas: $macAddresses");
 
@@ -233,20 +233,22 @@ class _PanelViewState extends State<PanelView>
     await Future.delayed(const Duration(seconds: 2));
 
     // Intentar conectar a cada dispositivo de la lista actualizada
+    List<String> successfullyConnectedDevices = [];
     for (final macAddress in macAddresses) {
       bool success =
-          await bleConnectionService._connectToDeviceByMac(macAddress);
+      await bleConnectionService._connectToDeviceByMac(macAddress);
 
       if (mounted) {
         setState(() {
           // Actualizar el estado de conexión en la UI
           deviceConnectionStatus[macAddress] =
-              success ? 'conectado' : 'desconectado';
+          success ? 'conectado' : 'desconectado';
         });
       }
 
       if (success) {
         debugPrint("✅--->>>Dispositivo $macAddress conectado correctamente.");
+        successfullyConnectedDevices.add(macAddress);
       } else {
         debugPrint("❌--->>>No se pudo conectar al dispositivo $macAddress.");
       }
@@ -254,9 +256,35 @@ class _PanelViewState extends State<PanelView>
       // Esperar brevemente entre intentos para evitar conflictos
       await Future.delayed(const Duration(seconds: 1));
     }
+
     debugPrint("🔚--->>>Proceso de conexión BLE finalizado.");
 
-    // Iniciar el chequeo periódico de conexiones
+    await Future.delayed(const Duration(seconds: 1));
+    if (successfullyConnectedDevices.length == macAddresses.length) {
+      debugPrint(
+          "✅--->>>Todos los dispositivos se conectaron correctamente. Iniciando inicialización de seguridad.");
+
+      for (final macAddress in successfullyConnectedDevices) {
+        await bleConnectionService._initializeSecurity(macAddress);
+      }
+
+      debugPrint(
+          "🔒--->>>Fase de inicialización de seguridad completada para todos los dispositivos.");
+
+      // Verificar comunicación solicitando FUN_INFO a cada dispositivo
+      for (final macAddress in successfullyConnectedDevices) {
+        final deviceInfo = await bleConnectionService.getDeviceInfo(macAddress);
+
+        // Formatear la información del dispositivo
+        final parsedInfo = bleConnectionService.parseDeviceInfo(deviceInfo);
+        debugPrint(parsedInfo); // Mostrar información en formato legible
+      }
+    } else {
+      debugPrint(
+          "⚠️--->>>No todos los dispositivos pudieron conectarse. Saltando inicialización de seguridad.");
+    }
+
+    // Iniciar la verificación periódica de conexión
     await Future.delayed(const Duration(seconds: 5));
     debugPrint("⌚--->>>Iniciando verificación de conexión periódica");
     bleConnectionService
@@ -265,7 +293,7 @@ class _PanelViewState extends State<PanelView>
         setState(() {
           // Actualizar el estado de conexión en la UI
           deviceConnectionStatus[macAddress] =
-              isConnected ? 'conectado' : 'desconectado';
+          isConnected ? 'conectado' : 'desconectado';
         });
       }
     });
@@ -5373,4 +5401,197 @@ class BleConnectionService {
   }
 
   bool get isConnected => _connected;
+
+  // Inicialización de la seguridad
+  Future<void> _initializeSecurity(String macAddress) async {
+    final characteristic = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    try {
+      // Enviar solicitud de inicialización
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristic,
+        value: [0x00, 0x00, 0x00, 0x00, 0x00],
+      );
+
+      // Suscripción a notificaciones para recibir el reto
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(
+        QualifiedCharacteristic(
+          serviceId: serviceUuid,
+          characteristicId: txCharacteristicUuid,
+          deviceId: macAddress,
+        ),
+      )
+          .listen((data) async {
+        if (data.isNotEmpty) {
+          await _handleSecurityChallenge(macAddress, data);
+        }
+      });
+    } catch (e) {
+      print("Error al inicializar seguridad: $e");
+    }
+  }
+
+  // Manejo del reto de seguridad
+  Future<void> _handleSecurityChallenge(
+      String macAddress, List<int> data) async {
+    // Proceso XOR para resolver el reto
+    final h1 = data[1] ^ 0x2A;
+    final h2 = data[2] ^ 0x55;
+    final h3 = data[3] ^ 0xAA;
+    final h4 = data[4] ^ 0xA2;
+
+    // Responder al dispositivo con el contra-reto
+    final characteristic = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+    await flutterReactiveBle.writeCharacteristicWithResponse(
+      characteristic,
+      value: [0x01, h1, h2, h3, h4],
+    );
+  }
+
+  // Envío de comandos al dispositivo
+  Future<void> sendCommand(String macAddress, List<int> command) async {
+    if (!connectedDevices.contains(macAddress)) return;
+
+    if (command.length != 20) {
+      print("El comando debe tener exactamente 20 bytes");
+      return;
+    }
+
+    final characteristic = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    try {
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristic,
+        value: command,
+      );
+    } catch (e) {
+      print("Error al enviar comando: $e");
+    }
+  }
+
+  Future<Map<String, dynamic>> getDeviceInfo(String macAddress) async {
+    final characteristicRx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: rxCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    final characteristicTx = QualifiedCharacteristic(
+      serviceId: serviceUuid,
+      characteristicId: txCharacteristicUuid,
+      deviceId: macAddress,
+    );
+
+    // Crear el paquete de solicitud FUN_INFO
+    final List<int> requestPacket = List.filled(20, 0);
+    requestPacket[0] = 0x02; // FUN_INFO
+
+    try {
+      // Enviar la solicitud FUN_INFO
+      await flutterReactiveBle.writeCharacteristicWithResponse(
+        characteristicRx,
+        value: requestPacket,
+      );
+      debugPrint("📤 FUN_INFO enviado a $macAddress.");
+
+      // Esperar la respuesta FUN_INFO_R
+      final completer = Completer<Map<String, dynamic>>();
+      notificationSubscription = flutterReactiveBle
+          .subscribeToCharacteristic(characteristicTx)
+          .listen((data) {
+        if (data.isNotEmpty && data[0] == 0x03) {
+          // Procesar la respuesta FUN_INFO_R
+          final Map<String, dynamic> deviceInfo = {
+            'mac': data.sublist(1, 7),
+            'tariff': data[7],
+            'powerType': data[8],
+            'hwVersion': data[9],
+            'swCommsVersion': data[10],
+            'endpoints': [
+              {'type': data[11], 'swVersion': data[12]},
+              {'type': data[13], 'swVersion': data[14]},
+              {'type': data[15], 'swVersion': data[16]},
+              {'type': data[17], 'swVersion': data[18]},
+            ],
+          };
+
+          completer.complete(
+              deviceInfo); // Completar con la información del dispositivo
+          debugPrint("📥 FUN_INFO_R recibido desde $macAddress: $deviceInfo");
+        }
+      });
+
+      // Tiempo máximo de espera para la respuesta
+      final deviceInfo =
+          await completer.future.timeout(const Duration(seconds: 5));
+      notificationSubscription?.cancel();
+      return deviceInfo;
+    } catch (e) {
+      debugPrint("❌ Error al obtener FUN_INFO de $macAddress: $e");
+      rethrow;
+    }
+  }
+
+  // Función para parsear información en formato texto
+  String parseDeviceInfo(Map<String, dynamic> deviceInfo) {
+    final mac = (deviceInfo['mac'] as List<int>)
+        .map((byte) => byte.toRadixString(16).padLeft(2, '0').toUpperCase())
+        .join(':');
+
+    final tariff = deviceInfo['tariff'] == 0
+        ? "Sin tarifa"
+        : deviceInfo['tariff'] == 1
+        ? "Con tarifa"
+        : "Con tarifa agotada";
+
+    final powerType = deviceInfo['powerType'] == 0
+        ? "Fuente de alimentación"
+        : "Batería de litio (8.4V)";
+
+    final hwVersion = deviceInfo['hwVersion'];
+    final swCommsVersion = deviceInfo['swCommsVersion'];
+
+    final endpoints = (deviceInfo['endpoints'] as List<Map<String, dynamic>>)
+        .asMap()
+        .entries
+        .map((entry) {
+      final index = entry.key;
+      final endpoint = entry.value;
+
+      final type = endpoint['type'] == 0
+          ? "Ninguno"
+          : endpoint['type'] == 1
+          ? "Electroestimulador (10 canales normal)"
+          : endpoint['type'] == 2
+          ? "Electroestimulador (10 canales + Ctrl Input)"
+          : "Desconocido";
+
+      final swVersion = endpoint['swVersion'];
+
+      return "  Endpoint ${index + 1}: Tipo: $type, Versión SW: $swVersion";
+    }).join('\n');
+
+    return '''
+📊 Información del dispositivo:
+- Dirección MAC: $mac
+- Tarifa: $tariff
+- Tipo de alimentación: $powerType
+- Versión HW: $hwVersion
+- Versión SW de comunicaciones: $swCommsVersion
+$endpoints
+''';
+  }
 }
