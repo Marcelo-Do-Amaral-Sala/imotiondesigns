@@ -218,9 +218,9 @@ class _PanelViewState extends State<PanelView>
 
     // Obtener las direcciones MAC desde el AppState
     List<String> macAddresses =
-    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
-    debugPrint("🔍 Direcciones MAC obtenidas: $macAddresses");
+    debugPrint("🔍--->>>Direcciones MAC obtenidas: $macAddresses");
 
     // Actualizar la lista de direcciones MAC en el servicio BLE
     if (mounted) {
@@ -234,32 +234,42 @@ class _PanelViewState extends State<PanelView>
 
     // Intentar conectar a cada dispositivo de la lista actualizada
     for (final macAddress in macAddresses) {
-      debugPrint("🔗 Intentando conectar a $macAddress...");
-
-      bool success = await bleConnectionService._connectToDeviceByMac(macAddress);
+      bool success =
+          await bleConnectionService._connectToDeviceByMac(macAddress);
 
       if (mounted) {
         setState(() {
           // Actualizar el estado de conexión en la UI
           deviceConnectionStatus[macAddress] =
-          success ? 'conectado' : 'desconectado';
+              success ? 'conectado' : 'desconectado';
         });
       }
 
       if (success) {
-        debugPrint("✅ Dispositivo $macAddress conectado correctamente.");
+        debugPrint("✅--->>>Dispositivo $macAddress conectado correctamente.");
       } else {
-        debugPrint("❌ No se pudo conectar al dispositivo $macAddress.");
+        debugPrint("❌--->>>No se pudo conectar al dispositivo $macAddress.");
       }
 
       // Esperar brevemente entre intentos para evitar conflictos
       await Future.delayed(const Duration(seconds: 1));
     }
+    debugPrint("🔚--->>>Proceso de conexión BLE finalizado.");
 
-    debugPrint("✅ Proceso de conexión BLE finalizado.");
+    // Iniciar el chequeo periódico de conexiones
+    await Future.delayed(const Duration(seconds: 5));
+    debugPrint("⌚--->>>Iniciando verificación de conexión periódica");
+    bleConnectionService
+        .startPeriodicConnectionCheck((macAddress, isConnected) {
+      if (mounted) {
+        setState(() {
+          // Actualizar el estado de conexión en la UI
+          deviceConnectionStatus[macAddress] =
+              isConnected ? 'conectado' : 'desconectado';
+        });
+      }
+    });
   }
-
-
 
   Future<void> _preloadImages() async {
     for (String path in imagePaths) {
@@ -5052,14 +5062,16 @@ class BleConnectionService {
 
   void _updateDeviceConnectionState(String macAddress, bool isConnected) {
     if (!_deviceConnectionStateControllers.containsKey(macAddress)) {
-      _deviceConnectionStateControllers[macAddress] = StreamController<bool>.broadcast();
+      _deviceConnectionStateControllers[macAddress] =
+          StreamController<bool>.broadcast();
     }
 
     final controller = _deviceConnectionStateControllers[macAddress]!;
     if (!controller.isClosed) {
       controller.add(isConnected); // Emitir el nuevo estado
       if (kDebugMode) {
-        print("🔄 Estado de conexión actualizado para $macAddress: ${isConnected ? 'conectado' : 'desconectado'}");
+        print(
+            "🔄 Estado de conexión actualizado para $macAddress: ${isConnected ? 'conectado' : 'desconectado'}");
       }
     } else {
       if (kDebugMode) {
@@ -5101,25 +5113,27 @@ class BleConnectionService {
 
     print("🔍 Iniciando escaneo BLE...");
     try {
-      _scanStream = flutterReactiveBle
-          .scanForDevices(withServices: [], scanMode: ScanMode.lowLatency)
-          .listen((device) {
+      _scanStream = flutterReactiveBle.scanForDevices(
+          withServices: [], scanMode: ScanMode.lowLatency).listen((device) {
         if (!isWidgetActive) {
           if (kDebugMode) print("El widget no está activo. Escaneo detenido.");
           _scanStream?.cancel();
           return;
         }
 
-        if (kDebugMode) print("Dispositivo encontrado: ${device.name}, ID: ${device.id}");
+        if (kDebugMode)
+          print("Dispositivo encontrado: ${device.name}, ID: ${device.id}");
 
         // Evitar duplicados y verificar si es un dispositivo objetivo
-        if (targetDeviceIds.contains(device.id) && !discoveredDevices.contains(device.id)) {
+        if (targetDeviceIds.contains(device.id) &&
+            !discoveredDevices.contains(device.id)) {
           discoveredDevices.add(device.id);
-          print("▶️ Dispositivo objetivo encontrado: ${device.id}");
+          print("▶️--->>>Dispositivo objetivo encontrado: ${device.id}");
 
           // Si todos los dispositivos objetivo han sido encontrados, detener el escaneo
           if (discoveredDevices.containsAll(targetDeviceIds)) {
-            print("✅ Todos los dispositivos objetivo encontrados. Deteniendo escaneo...");
+            print(
+                "✅--->>>Todos los dispositivos objetivo encontrados. Deteniendo escaneo...");
             _scanStream?.cancel();
           }
         }
@@ -5131,7 +5145,6 @@ class BleConnectionService {
     }
   }
 
-
   Future<bool> _connectToDeviceByMac(String macAddress) async {
     if (macAddress.isEmpty) {
       if (kDebugMode) print("Dirección MAC vacía.");
@@ -5139,79 +5152,82 @@ class BleConnectionService {
     }
 
     if (kDebugMode)
-      print("🔗 Conectando al dispositivo con la MAC: $macAddress...");
+      print("🚩--->>>Conectando al dispositivo con la MAC: $macAddress...");
 
     bool success = false;
     int attemptCount = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 5;
     Duration retryDelay = const Duration(seconds: 3);
 
     Future<void> tryConnect() async {
       _connectionStreams[macAddress] =
           flutterReactiveBle.connectToAdvertisingDevice(
-            id: macAddress,
-            prescanDuration: const Duration(seconds: 1),
-            withServices: [serviceUuid], // Agregar UUIDs si es necesario
-          ).listen((event) async {
-            switch (event.connectionState) {
-              case DeviceConnectionState.connected:
-                if (kDebugMode) print("✅ Dispositivo $macAddress conectado.");
-                final discoveredServices =
+        id: macAddress,
+        prescanDuration: const Duration(seconds: 1),
+        withServices: [serviceUuid], // Agregar UUIDs si es necesario
+      ).listen((event) async {
+        switch (event.connectionState) {
+          case DeviceConnectionState.connected:
+            if (kDebugMode)
+              print("🔗--->>> Dispositivo $macAddress conectado.");
+            success = true;
+            final discoveredServices =
                 await flutterReactiveBle.discoverServices(macAddress);
-                bool hasRequiredService = false;
+            bool hasRequiredService = false;
 
-                for (final service in discoveredServices) {
-                  if (service.serviceId == serviceUuid) {
-                    hasRequiredService = true;
+            for (final service in discoveredServices) {
+              if (service.serviceId == serviceUuid) {
+                hasRequiredService = true;
 
-                    if (kDebugMode)
-                      print("🔍 Servicio principal encontrado: $serviceUuid");
+                if (kDebugMode)
+                  print("🔍--->>>Servicio principal encontrado: $serviceUuid");
 
-                    final characteristicIds = service.characteristics
-                        .map((c) => c.characteristicId)
-                        .toList();
-                    if (characteristicIds.contains(rxCharacteristicUuid) &&
-                        characteristicIds.contains(txCharacteristicUuid)) {
-                      if (kDebugMode) {
-                        print("🛠️ Características RX y TX disponibles.");
-                      }
-                      success = true;
-                    } else {
-                      if (kDebugMode) {
-                        print("❌ Características RX o TX no encontradas.");
-                      }
-                    }
-                    break;
+                final characteristicIds = service.characteristics
+                    .map((c) => c.characteristicId)
+                    .toList();
+                if (characteristicIds.contains(rxCharacteristicUuid) &&
+                    characteristicIds.contains(txCharacteristicUuid)) {
+                  if (kDebugMode) {
+                    print("🛠️--->>>Características RX y TX disponibles.");
+                  }
+                } else {
+                  if (kDebugMode) {
+                    print("❌ Características RX o TX no encontradas.");
                   }
                 }
-
-                if (!hasRequiredService) {
-                  if (kDebugMode) print("❌ Servicio principal no encontrado.");
-                }
-
-                if (success) connectedDevices.add(macAddress);
-                _updateDeviceConnectionState(macAddress, true);
-
                 break;
-
-              case DeviceConnectionState.disconnected:
-                if (kDebugMode) print("🔌 Dispositivo $macAddress desconectado.");
-                _onDeviceDisconnected(macAddress);
-                _updateDeviceConnectionState(macAddress, false);
-                break;
-
-              default:
-                if (kDebugMode) print("⏳ Estado desconocido para $macAddress.");
-                break;
+              }
             }
-          });
+
+            if (!hasRequiredService) {
+              if (kDebugMode) print("❌ Servicio principal no encontrado.");
+            }
+
+            if (success) connectedDevices.add(macAddress);
+            _updateDeviceConnectionState(macAddress, true);
+
+            break;
+
+          case DeviceConnectionState.disconnected:
+            if (kDebugMode)
+              print("⛓️‍💥--->>>Dispositivo $macAddress desconectado.");
+            _onDeviceDisconnected(macAddress);
+            _updateDeviceConnectionState(macAddress, false);
+            break;
+
+          default:
+            if (kDebugMode)
+              print("⏳--->>>Estado desconocido para $macAddress.");
+            break;
+        }
+      });
 
       await Future.delayed(const Duration(seconds: 1));
 
       if (!success && attemptCount < maxAttempts) {
         attemptCount++;
         if (kDebugMode) {
-          print("🔄 Reintento $attemptCount para $macAddress...");
+          print("🔄--->>>Reintento $attemptCount para $macAddress...");
         }
         await Future.delayed(retryDelay);
         await tryConnect();
@@ -5222,9 +5238,72 @@ class BleConnectionService {
     return success;
   }
 
+  void startPeriodicConnectionCheck(
+      void Function(String macAddress, bool isConnected)
+          onConnectionStatusChange) {
+    const Duration checkInterval =
+        Duration(seconds: 4); // Intervalo de verificación
+
+    _connectionCheckTimer = Timer.periodic(checkInterval, (_) async {
+      if (!isWidgetActive) {
+        _connectionCheckTimer?.cancel();
+        return;
+      }
+
+      for (final macAddress in targetDeviceIds) {
+        final isConnected = connectedDevices.contains(macAddress);
+
+        if (!isConnected) {
+          // Verificar si el dispositivo está publicándose antes de intentar reconectar
+          final isAdvertising = await _isDeviceAdvertising(macAddress);
+
+          if (isAdvertising) {
+            print(
+                "⚠️ Dispositivo $macAddress está encendido pero desconectado. Intentando reconectar...");
+            final success = await _connectToDeviceByMac(macAddress);
+
+            onConnectionStatusChange(macAddress, success);
+          } else {
+            print("🚫 Dispositivo $macAddress parece estar apagado.");
+            onConnectionStatusChange(macAddress, false);
+          }
+        } else {
+          print("✅ Dispositivo sigue conectado: $macAddress");
+          onConnectionStatusChange(macAddress, true);
+        }
+      }
+    });
+  }
+
+  /// Verificar si un dispositivo está publicándose (advertising)
+  Future<bool> _isDeviceAdvertising(String macAddress) async {
+    bool found = false;
+
+    try {
+      print("🔍 Escaneando para verificar si $macAddress está publicándose...");
+      final Set<String> discoveredDevices = {};
+
+      final scanSubscription = flutterReactiveBle.scanForDevices(
+          withServices: [], scanMode: ScanMode.lowLatency).listen((device) {
+        if (device.id == macAddress && !discoveredDevices.contains(device.id)) {
+          discoveredDevices.add(device.id);
+          found = true;
+        }
+      });
+
+      // Esperar unos segundos para completar el escaneo
+      await Future.delayed(const Duration(seconds: 2));
+      await scanSubscription.cancel();
+    } catch (e) {
+      print("❌ Error durante el escaneo: $e");
+    }
+
+    return found;
+  }
 
   void _onDeviceDisconnected(String macAddress) {
-    if (kDebugMode) print("🔌 Dispositivo $macAddress desconectado.");
+    if (kDebugMode)
+      print("️‍️‍⛓️‍💥--->>>Dispositivo $macAddress desconectado.");
     connectedDevices.remove(macAddress);
 
     // Cancelar el stream asociado a la MAC
