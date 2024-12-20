@@ -41,6 +41,11 @@ class _PanelViewState extends State<PanelView>
   List<Map<String, dynamic>> selectedClients = [];
   Map<String, String> bluetoothNames = {};
   Map<String, int> batteryStatuses = {};
+  final Map<String, bool> isMciSelected = {};
+  final Map<String, Key> mciKeys = {}; // Mapa para almacenar Keys únicas por MCI
+  String? selectedKey; // Key seleccionada
+  Map<String, int> mciEquipMapping = {};
+  Map<String, Map<String, dynamic>> mciStates = {}; // Estado por MCI
 
   double scaleFactorBack = 1.0;
   double scaleFactorFull = 1.0;
@@ -195,6 +200,9 @@ class _PanelViewState extends State<PanelView>
         if (update.containsKey('batteryStatus')) {
           batteryStatuses[macAddress] = update['batteryStatus'];
         }
+        if (!isMciSelected.containsKey(macAddress)) {
+          isMciSelected[macAddress] = false; // Inicializa en falso
+        }
       });
     });
     _currentImageIndex = imagePaths.length - time;
@@ -232,9 +240,14 @@ class _PanelViewState extends State<PanelView>
 
     // Obtener las direcciones MAC desde el AppState
     List<String> macAddresses =
-    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
     debugPrint("🔍--->>>Direcciones MAC obtenidas: $macAddresses");
+
+    for (var mci in AppState.instance.mcis) {
+      String macAddress = mci['mac'];
+      mciKeys[macAddress] = ValueKey(macAddress); // Generar y asignar ValueKey
+    }
 
     // Actualizar la lista de direcciones MAC en el servicio BLE
     if (mounted) {
@@ -250,13 +263,14 @@ class _PanelViewState extends State<PanelView>
 
     // Intentar conectar a los dispositivos
     for (final macAddress in macAddresses) {
-      bool success = await bleConnectionService._connectToDeviceByMac(macAddress);
+      bool success =
+          await bleConnectionService._connectToDeviceByMac(macAddress);
 
       if (mounted) {
         setState(() {
           // Actualizar el estado de conexión en la UI
           deviceConnectionStatus[macAddress] =
-          success ? 'conectado' : 'desconectado';
+              success ? 'conectado' : 'desconectado';
         });
       }
 
@@ -292,7 +306,7 @@ class _PanelViewState extends State<PanelView>
           setState(() {
             // Actualizar el estado de conexión en la UI
             deviceConnectionStatus[macAddress] =
-            isConnected ? 'conectado' : 'desconectado';
+                isConnected ? 'conectado' : 'desconectado';
           });
         }
       });
@@ -301,7 +315,6 @@ class _PanelViewState extends State<PanelView>
           "⚠️--->>>Ningún dispositivo fue conectado exitosamente. Saltando inicialización de seguridad y operaciones.");
     }
   }
-
 
   Future<void> _preloadImages() async {
     for (String path in imagePaths) {
@@ -436,8 +449,6 @@ class _PanelViewState extends State<PanelView>
     });
   }
 
-
-
   void _startTimer() {
     setState(() {
       isRunning = true;
@@ -478,21 +489,10 @@ class _PanelViewState extends State<PanelView>
 
   @override
   void dispose() {
-    debugPrint("dispose() ejecutado");
-
-    // Detener el timer
     _timer.cancel();
-    debugPrint("Timer cancelado.");
-
-    // Liberar el controlador de animación
     _opacityController.dispose();
-    debugPrint("Controlador de animación liberado.");
-
-    // Liberar recursos BLE si aún no se han liberado
-
+    _subscription.cancel();
     bleConnectionService.disposeBleResources();
-    debugPrint("Servicios BLE liberados desde dispose().");
-
     super.dispose();
   }
 
@@ -501,10 +501,9 @@ class _PanelViewState extends State<PanelView>
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     bool isConnected = bleConnectionService.isConnected;
-
     return Scaffold(
       body: Stack(
-        key: ValueKey(selectedIndexEquip), // Clave única para el índice
+
         children: [
           // Fondo de la imagen
           SizedBox.expand(
@@ -540,113 +539,196 @@ class _PanelViewState extends State<PanelView>
                                       ...AppState.instance.mcis.map((mci) {
                                         String macAddress = mci[
                                             'mac']; // Obtener la MAC de cada dispositivo
-
+                                        // Inicializa el equipo seleccionado para la MCI si no existe
+                                        if (!mciEquipMapping.containsKey(macAddress)) {
+                                          mciEquipMapping[macAddress] = 0; // Por defecto, equipo 0
+                                        }
                                         return GestureDetector(
-                                          onTap: () async {
+                                          key: mciKeys[macAddress],
+                                          onTap: () {
                                             if (deviceConnectionStatus[macAddress] == 'conectado') {
-                                              print("✅ Dispositivo $macAddress está conectado.");
-                                              // Aquí puedes añadir la lógica para dispositivos conectados
+                                              setState(() {
+                                                // Actualizar la Key seleccionada
+                                                selectedKey = macAddress;
+                                                selectedIndexEquip = mciEquipMapping[macAddress] ?? 0;
+                                              });
+
+                                              print(
+                                                  "✅ Dispositivo $macAddress seleccionado. Equipo asociado: $selectedIndexEquip");
+                                              print("✅ Dispositivo $macAddress seleccionado.");
+                                              print("🔑 Key seleccionada: ${mciKeys[macAddress]}");
                                             } else {
-                                              print("❌ Dispositivo $macAddress no está conectado.");
+                                              print(
+                                                  "❌ Dispositivo $macAddress no está conectado.");
                                               // Aquí puedes añadir la lógica para dispositivos desconectados
                                             }
                                           },
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(right: 10),
-                                            child: SizedBox(
-                                              width: screenWidth * 0.15, // Ancho dividido en dos secciones
-                                              height: screenHeight * 0.1,
-                                              child: CustomPaint(
-                                                painter: NeonBorderPainter(
-                                                  neonColor: _getBorderColor(deviceConnectionStatus[macAddress]),
-                                                ),
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(vertical: 5.0),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.transparent,
-                                                    borderRadius: BorderRadius.circular(7), // Bordes redondeados
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: [
-                                                      // Sección izquierda (Vacía por ahora)
-                                                      Expanded(
-                                                        flex:1,
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.transparent,
-                                                            borderRadius: BorderRadius.circular(7),
-                                                          ),
-                                                          child: Center(
-                                                            child: selectedIndexEquip == 0
-                                                                ? Image.asset(
-                                                              'assets/images/chalecoblanco.png',
-                                                              fit: BoxFit.contain,
-                                                            )
-                                                                : Image.asset(
-                                                              'assets/images/pantalonblanco.png',
-                                                              fit: BoxFit.contain,
-                                                            ),
-                                                          ),
-                                                        ),
+                                          child: Stack(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 10),
+                                                child: SizedBox(
+                                                  width: screenWidth * 0.15,
+                                                  // Ancho dividido en dos secciones
+                                                  height: screenHeight * 0.1,
+                                                  child: CustomPaint(
+                                                    painter: NeonBorderPainter(
+                                                      neonColor: _getBorderColor(
+                                                          deviceConnectionStatus[
+                                                              macAddress]),
+                                                    ),
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 5.0),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            Colors.transparent,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                7), // Bordes redondeados
                                                       ),
-                                                      // Sección derecha: Nombres y barras de batería
-                                                      Expanded(
-                                                        flex:2,
-                                                        child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            // Nombre del cliente
-                                                            Text(
-                                                              selectedClientsGlobal.isEmpty
-                                                                  ? '' // Si la lista está vacía, mostrar texto vacío
-                                                                  : selectedClientsGlobal[0]['name'] ?? 'No Name',
-                                                              style: TextStyle(
-                                                                fontSize: 12.sp,
-                                                                color: const Color(0xFF28E2F5), // Color del texto
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          // Sección izquierda
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .transparent,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            7),
                                                               ),
-                                                              textAlign: TextAlign.left,
-                                                            ),
-                                                            // Nombre del Bluetooth
-                                                            Text(
-                                                              bluetoothNames[macAddress] ?? "",
-                                                              style: TextStyle(
-                                                                fontSize: 12.sp,
-                                                                color: const Color(0xFF28E2F5), // Color del texto
+                                                              child: Center(
+                                                                child: Image.asset(
+                                                                  // Mostrar la imagen según el equipo seleccionado para esta MCI
+                                                                  (mciEquipMapping[macAddress] ?? 0) == 0
+                                                                      ? 'assets/images/chalecoblanco.png' // Equipo 0
+                                                                      : 'assets/images/pantalonblanco.png', // Equipo 1
+                                                                  fit: BoxFit.contain,
+                                                                ),
                                                               ),
-                                                              textAlign: TextAlign.left,
                                                             ),
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                              children: List.generate(
-                                                                5, // Siempre 5 niveles posibles de batería
+                                                          ),
+                                                          // Sección derecha: Nombres y barras de batería
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                // Nombre del cliente
+                                                                Text(
+                                                                  selectedClientsGlobal
+                                                                          .isEmpty
+                                                                      ? '' // Si la lista está vacía, mostrar texto vacío
+                                                                      : selectedClientsGlobal[0]
+                                                                              [
+                                                                              'name'] ??
+                                                                          'No Name',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        12.sp,
+                                                                    color: const Color(
+                                                                        0xFF28E2F5), // Color del texto
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .left,
+                                                                ),
+                                                                // Nombre del Bluetooth
+                                                                Text(
+                                                                  bluetoothNames[
+                                                                          macAddress] ??
+                                                                      "",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        12.sp,
+                                                                    color: const Color(
+                                                                        0xFF28E2F5), // Color del texto
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .left,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .start,
+                                                                  children: List
+                                                                      .generate(
+                                                                    5,
+                                                                    // Siempre 5 niveles posibles de batería
                                                                     (index) {
-                                                                  return Padding(
-                                                                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                                                    child: Container(
-                                                                      width: 20, // Ancho de cada raya
-                                                                      height: 5, // Altura de cada raya
-                                                                      color: index <= (batteryStatuses[macAddress] ?? -1)
-                                                                          ? _lineColor(macAddress) // Color si el nivel es válido
-                                                                          : Colors.grey.withOpacity(0.1), // Color gris si no alcanza ese nivel
-                                                                    ),
-                                                                  );
-                                                                },
-                                                              ),
+                                                                      return Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                2.0),
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              20,
+                                                                          // Ancho de cada raya
+                                                                          height:
+                                                                              5,
+                                                                          // Altura de cada raya
+                                                                          color: index <= (batteryStatuses[macAddress] ?? -1)
+                                                                              ? _lineColor(macAddress) // Color si el nivel es válido
+                                                                              : Colors.grey.withOpacity(0.1), // Color gris si no alcanza ese nivel
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                              // Imagen en la esquina superior derecha
+                                              if (selectedKey == macAddress)
+                                                Positioned(
+                                                  top: 0,
+                                                  right: 0,
+                                                  child: Container(
+                                                    width: 30,
+                                                    // Tamaño de la imagen
+                                                    height: 30,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      // Fondo circular
+                                                      color: Colors
+                                                          .white, // Color de fondo
+                                                    ),
+                                                    child: Image.asset(
+                                                      'assets/images/cliente.png',
+                                                      // Ruta de la imagen
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
                                           ),
                                         );
-
-
                                       }),
 
                                       const Spacer(),
@@ -684,7 +766,9 @@ class _PanelViewState extends State<PanelView>
                               ),
                               Expanded(
                                 flex: 2,
-                                child: Container(
+                                child:
+                                Container(
+                                    key: ValueKey(selectedKey),
                                   padding: const EdgeInsets.all(10.0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -718,64 +802,57 @@ class _PanelViewState extends State<PanelView>
                                       ),
                                       SizedBox(width: screenWidth * 0.01),
                                       AnimatedSize(
-                                        duration:
-                                            const Duration(milliseconds: 300),
+                                        duration: const Duration(milliseconds: 300),
                                         curve: Curves.easeInOut,
                                         child: Container(
                                           padding: const EdgeInsets.all(10.0),
-                                          width: _isExpanded1
-                                              ? screenWidth * 0.25
-                                              : 0,
+                                          width: _isExpanded1 ? screenWidth * 0.25 : 0,
                                           height: screenHeight * 0.2,
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
+                                            color: Colors.black.withOpacity(0.5),
+                                            borderRadius: BorderRadius.circular(20.0),
                                           ),
                                           child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.start,
                                             children: [
+                                              // Botón "Cliente"
                                               Expanded(
                                                 child: GestureDetector(
-                                                  onTapDown: (_) => setState(
-                                                      () => scaleFactorCliente =
-                                                          0.90),
-                                                  onTapUp: (_) => setState(() =>
-                                                      scaleFactorCliente = 1.0),
-                                                  onTap: () {
+                                                  onTapDown: selectedKey == null
+                                                      ? null
+                                                      : (_) => setState(() => scaleFactorCliente = 0.90),
+                                                  onTapUp: selectedKey == null
+                                                      ? null
+                                                      : (_) => setState(() => scaleFactorCliente = 1.0),
+                                                  onTap: selectedKey == null
+                                                      ? null
+                                                      : () {
                                                     setState(() {
-                                                      toggleOverlay(
-                                                          0); // Suponiendo que toggleOverlay abre el overlay
+                                                      toggleOverlay(0); // Abre el overlay
                                                     });
                                                   },
-                                                  child: AnimatedScale(
-                                                    scale: scaleFactorCliente,
-                                                    duration: const Duration(
-                                                        milliseconds: 100),
-                                                    child: Container(
-                                                      width: screenHeight * 0.1,
-                                                      height: screenWidth * 0.1,
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                        color:
-                                                            Color(0xFF494949),
-                                                        shape: BoxShape
-                                                            .circle, // Forma circular
-                                                      ),
-                                                      child: Center(
-                                                        child: SizedBox(
-                                                          width: screenWidth *
-                                                              0.05,
-                                                          height: screenHeight *
-                                                              0.05,
-                                                          child: ClipOval(
-                                                            child: Image.asset(
-                                                              'assets/images/cliente.png',
-                                                              fit: BoxFit
-                                                                  .scaleDown,
+                                                  child: Opacity(
+                                                    opacity: selectedKey == null ? 1.0 : 1.0, // Indicación visual
+                                                    child: AnimatedScale(
+                                                      scale: scaleFactorCliente,
+                                                      duration: const Duration(milliseconds: 100),
+                                                      child: Container(
+                                                        width: screenHeight * 0.1,
+                                                        height: screenWidth * 0.1,
+                                                        decoration: const BoxDecoration(
+                                                          color: Color(0xFF494949),
+                                                          shape: BoxShape.circle, // Forma circular
+                                                        ),
+                                                        child: Center(
+                                                          child: SizedBox(
+                                                            width: screenWidth * 0.05,
+                                                            height: screenHeight * 0.05,
+                                                            child: ClipOval(
+                                                              child: Image.asset(
+                                                                'assets/images/cliente.png',
+                                                                fit: BoxFit.scaleDown,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -784,129 +861,122 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                 ),
                                               ),
-                                              SizedBox(
-                                                  width: screenWidth * 0.005),
+                                              SizedBox(width: screenWidth * 0.005),
+
+                                              // Botón "Equipo 0"
                                               Expanded(
                                                 child: AbsorbPointer(
-                                                  absorbing: isSessionStarted,
-                                                  // Bloquea las interacciones si la sesión está activa
+                                                  absorbing: selectedKey == null, // Bloquear interacción si no hay selección
                                                   child: GestureDetector(
                                                     onTap: () {
                                                       setState(() {
-                                                        selectedIndexEquip =
-                                                            0; // Sección 1 seleccionada
+                                                        if (selectedKey != null) {
+                                                          mciEquipMapping[selectedKey!] = 0; // Asocia el equipo 0
+                                                        }
+                                                        selectedIndexEquip = 0;
                                                       });
+
+                                                      print("🔄 Cambiado al equipo 0 para MCI: $selectedKey");
                                                     },
-                                                    child: Container(
-                                                      width: screenWidth * 0.1,
-                                                      height:
-                                                          screenHeight * 0.1,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            selectedIndexEquip ==
-                                                                    0
-                                                                ? selectedColor
-                                                                : unselectedColor,
-                                                        borderRadius:
-                                                            const BorderRadius
-                                                                .only(
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  10.0),
-                                                          bottomLeft:
-                                                              Radius.circular(
-                                                                  10.0),
+                                                    child: Opacity(
+                                                      opacity: selectedKey == null ? 1.0 : 1.0, // Indicación visual
+                                                      child: Container(
+                                                        width: screenWidth * 0.1,
+                                                        height: screenHeight * 0.1,
+                                                        decoration: BoxDecoration(
+                                                          color: selectedIndexEquip == 0 ? selectedColor : unselectedColor,
+                                                          borderRadius: const BorderRadius.only(
+                                                            topLeft: Radius.circular(10.0),
+                                                            bottomLeft: Radius.circular(10.0),
+                                                          ),
                                                         ),
-                                                      ),
-                                                      child: Center(
-                                                        child: Image.asset(
-                                                          'assets/images/chalecoblanco.png',
-                                                          fit: BoxFit.contain,
+                                                        child: Center(
+                                                          child: Image.asset(
+                                                            'assets/images/chalecoblanco.png',
+                                                            fit: BoxFit.contain,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
                                               ),
+
+                                              // Botón "Equipo 1"
                                               Expanded(
                                                 child: AbsorbPointer(
-                                                  absorbing: isSessionStarted,
-                                                  // Bloquea las interacciones si la sesión está activa
+                                                  absorbing: selectedKey == null, // Bloquear interacción si no hay selección
                                                   child: GestureDetector(
                                                     onTap: () {
                                                       setState(() {
-                                                        selectedIndexEquip =
-                                                            1; // Sección 2 seleccionada
+                                                        if (selectedKey != null) {
+                                                          mciEquipMapping[selectedKey!] = 1; // Asocia el equipo 1
+                                                        }
+                                                        selectedIndexEquip = 1;
                                                       });
+
+                                                      print("🔄 Cambiado al equipo 1 para MCI: $selectedKey");
                                                     },
-                                                    child: Container(
-                                                      width: screenWidth * 0.1,
-                                                      height:
-                                                          screenHeight * 0.1,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            selectedIndexEquip ==
-                                                                    1
-                                                                ? selectedColor
-                                                                : unselectedColor,
-                                                        borderRadius:
-                                                            const BorderRadius
-                                                                .only(
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  10.0),
-                                                          bottomRight:
-                                                              Radius.circular(
-                                                                  10.0),
+                                                    child: Opacity(
+                                                      opacity: selectedKey == null ? 1.0: 1.0, // Indicación visual
+                                                      child: Container(
+                                                        width: screenWidth * 0.1,
+                                                        height: screenHeight * 0.1,
+                                                        decoration: BoxDecoration(
+                                                          color: selectedIndexEquip == 1 ? selectedColor : unselectedColor,
+                                                          borderRadius: const BorderRadius.only(
+                                                            topRight: Radius.circular(10.0),
+                                                            bottomRight: Radius.circular(10.0),
+                                                          ),
                                                         ),
-                                                      ),
-                                                      child: Center(
-                                                        child: Image.asset(
-                                                          'assets/images/pantalonblanco.png',
-                                                          fit: BoxFit.contain,
+                                                        child: Center(
+                                                          child: Image.asset(
+                                                            'assets/images/pantalonblanco.png',
+                                                            fit: BoxFit.contain,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
                                               ),
-                                              SizedBox(
-                                                  width: screenWidth * 0.005),
+                                              SizedBox(width: screenWidth * 0.005),
+
+                                              // Botón "Repetir"
                                               Expanded(
                                                 child: GestureDetector(
-                                                  onTapDown: (_) => setState(
-                                                      () => scaleFactorRepeat =
-                                                          0.90),
-                                                  onTapUp: (_) => setState(() =>
-                                                      scaleFactorRepeat = 1.0),
-                                                  onTap: () {},
-                                                  child: AnimatedScale(
-                                                    scale: scaleFactorRepeat,
-                                                    duration: const Duration(
-                                                        milliseconds: 100),
-                                                    child: Container(
-                                                      width: screenHeight * 0.1,
-                                                      height: screenWidth * 0.1,
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                        color:
-                                                            Colors.transparent,
-                                                        shape: BoxShape
-                                                            .circle, // Forma circular
-                                                      ),
-                                                      child: Center(
-                                                        child: SizedBox(
-                                                          child: ClipOval(
-                                                            child: Image.asset(
-                                                              width:
-                                                                  screenHeight *
-                                                                      0.1,
-                                                              height:
-                                                                  screenWidth *
-                                                                      0.1,
-                                                              'assets/images/repeat.png',
-                                                              fit: BoxFit
-                                                                  .contain,
+                                                  onTapDown: selectedKey == null
+                                                      ? null
+                                                      : (_) => setState(() => scaleFactorRepeat = 0.90),
+                                                  onTapUp: selectedKey == null
+                                                      ? null
+                                                      : (_) => setState(() => scaleFactorRepeat = 1.0),
+                                                  onTap: selectedKey == null
+                                                      ? null
+                                                      : () {
+                                                    // Acción para botón repetir
+                                                  },
+                                                  child: Opacity(
+                                                    opacity: selectedKey == null ? 1.0 : 1.0, // Indicación visual
+                                                    child: AnimatedScale(
+                                                      scale: scaleFactorRepeat,
+                                                      duration: const Duration(milliseconds: 100),
+                                                      child: Container(
+                                                        width: screenHeight * 0.1,
+                                                        height: screenWidth * 0.1,
+                                                        decoration: const BoxDecoration(
+                                                          color: Colors.transparent,
+                                                          shape: BoxShape.circle,
+                                                        ),
+                                                        child: Center(
+                                                          child: SizedBox(
+                                                            child: ClipOval(
+                                                              child: Image.asset(
+                                                                'assets/images/repeat.png',
+                                                                width: screenHeight * 0.1,
+                                                                height: screenWidth * 0.1,
+                                                                fit: BoxFit.contain,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -919,6 +989,7 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                         ),
                                       ),
+
                                       SizedBox(width: screenWidth * 0.01),
                                       Container(
                                         padding: const EdgeInsets.all(20.0),
@@ -934,37 +1005,35 @@ class _PanelViewState extends State<PanelView>
                                               MainAxisAlignment.center,
                                           children: [
                                             OutlinedButton(
-                                              onPressed: () {
+                                              onPressed: selectedKey == null
+                                                  ? null // Inhabilitar el botón si selectedKey es null
+                                                  : () {
                                                 setState(() {
-                                                  toggleOverlay(
-                                                      1); // Suponiendo que toggleOverlay abre el overlay
+                                                  toggleOverlay(1); // Suponiendo que toggleOverlay abre el overlay
                                                 });
                                               },
                                               style: OutlinedButton.styleFrom(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: const EdgeInsets.all(10.0),
                                                 side: const BorderSide(
                                                   width: 1.0,
                                                   color: Color(0xFF2be4f3),
                                                 ),
                                                 shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  borderRadius: BorderRadius.circular(7),
                                                 ),
-                                                backgroundColor:
-                                                    const Color(0xFF2be4f3),
+                                                backgroundColor: const Color(0xFF2be4f3), // Mantener color de fondo
                                               ),
                                               child: Text(
-                                                globalSelectedProgram ??
-                                                    'PROGRAMAS',
+                                                globalSelectedProgram ?? 'PROGRAMAS',
                                                 style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: Colors.white, // Mantener color del texto
                                                   fontSize: 15.sp,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                                 textAlign: TextAlign.center,
                                               ),
                                             ),
+
                                             SizedBox(
                                                 width: screenWidth * 0.005),
                                             Column(
@@ -1026,34 +1095,27 @@ class _PanelViewState extends State<PanelView>
 
                                                       // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                                       GestureDetector(
-                                                        onTap: () {
+                                                        onTap: selectedKey == null
+                                                            ? null // Deshabilitar el pulsado si selectedKey es null
+                                                            : () {
                                                           setState(() {
                                                             toggleOverlay(2);
                                                           });
                                                         },
                                                         child: Image.asset(
-                                                          selectedIndivProgram !=
-                                                                  null
-                                                              ? selectedIndivProgram![
-                                                                      'imagen'] ??
-                                                                  'assets/images/cliente.png'
-                                                              : allIndividualPrograms
-                                                                      .isNotEmpty
-                                                                  ? allIndividualPrograms[
-                                                                              0]
-                                                                          [
-                                                                          'imagen'] ??
-                                                                      'assets/images/cliente.png'
-                                                                  : 'assets/images/cliente.png',
+                                                          selectedIndivProgram != null
+                                                              ? selectedIndivProgram!['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : allIndividualPrograms.isNotEmpty
+                                                              ? allIndividualPrograms[0]['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : 'assets/images/cliente.png',
                                                           // Imagen por defecto
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height *
-                                                              0.1,
+                                                          height: MediaQuery.of(context).size.height * 0.1,
                                                           fit: BoxFit.contain,
                                                         ),
                                                       ),
+
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
@@ -1085,34 +1147,27 @@ class _PanelViewState extends State<PanelView>
 
                                                       // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                                       GestureDetector(
-                                                        onTap: () {
+                                                        onTap: selectedKey == null
+                                                            ? null // Deshabilitar el pulsado si selectedKey es null
+                                                            : () {
                                                           setState(() {
                                                             toggleOverlay(3);
                                                           });
                                                         },
                                                         child: Image.asset(
-                                                          selectedRecoProgram !=
-                                                                  null
-                                                              ? selectedRecoProgram![
-                                                                      'imagen'] ??
-                                                                  'assets/images/cliente.png'
-                                                              : allRecoveryPrograms
-                                                                      .isNotEmpty
-                                                                  ? allRecoveryPrograms[
-                                                                              0]
-                                                                          [
-                                                                          'imagen'] ??
-                                                                      'assets/images/cliente.png'
-                                                                  : 'assets/images/cliente.png',
+                                                          selectedRecoProgram != null
+                                                              ? selectedRecoProgram!['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : allRecoveryPrograms.isNotEmpty
+                                                              ? allRecoveryPrograms[0]['imagen'] ??
+                                                              'assets/images/cliente.png'
+                                                              : 'assets/images/cliente.png',
                                                           // Imagen por defecto
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height *
-                                                              0.1,
+                                                          height: MediaQuery.of(context).size.height * 0.1,
                                                           fit: BoxFit.contain,
                                                         ),
                                                       ),
+
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
@@ -1144,7 +1199,9 @@ class _PanelViewState extends State<PanelView>
 
                                                       // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                                       GestureDetector(
-                                                        onTap: () {
+                                                        onTap: selectedKey == null
+                                                            ? null // Deshabilitar el pulsado si selectedKey es null
+                                                            : () {
                                                           setState(() {
                                                             toggleOverlay(4);
                                                           });
@@ -1388,6 +1445,7 @@ class _PanelViewState extends State<PanelView>
                         ),
                         Expanded(
                           child: Stack(
+                              key: ValueKey(selectedKey),
                             children: [
                               Positioned(
                                 top: screenHeight * 0.02,
@@ -3480,19 +3538,19 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                           Column(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                             children: [
                                               Stack(
                                                 alignment: Alignment.center,
                                                 children: [
                                                   Image.asset(
                                                     imagePaths[
-                                                        _currentImageIndex],
+                                                    _currentImageIndex],
                                                     height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.25,
+                                                    MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                        0.25,
                                                     fit: BoxFit.cover,
                                                   ),
                                                   Column(
@@ -3502,19 +3560,19 @@ class _PanelViewState extends State<PanelView>
                                                         onTap: isRunning
                                                             ? null
                                                             : () {
-                                                                setState(() {
-                                                                  if (time <
-                                                                      31) {
-                                                                    time++; // Disminuye el tiempo si es mayor que 1
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex =
-                                                                        imagePaths.length -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                          setState(() {
+                                                            if (time <
+                                                                30) {
+                                                              time++; // Disminuye el tiempo si es mayor que 1
+                                                              totalTime =
+                                                                  time *
+                                                                      60; // Actualiza el tiempo total en segundos
+                                                              _currentImageIndex =
+                                                                  imagePaths.length -
+                                                                      time;
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-arriba.png',
                                                           height: screenHeight *
@@ -3524,11 +3582,11 @@ class _PanelViewState extends State<PanelView>
                                                       ),
                                                       Text(
                                                         "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
-                                                        style: const TextStyle(
-                                                          fontSize: 25,
+                                                        style: TextStyle(
+                                                          fontSize: 25.sp,
                                                           fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Color(
+                                                          FontWeight.bold,
+                                                          color: const Color(
                                                               0xFF2be4f3), // Color para la sección seleccionada
                                                         ),
                                                       ),
@@ -3536,19 +3594,19 @@ class _PanelViewState extends State<PanelView>
                                                         onTap: isRunning
                                                             ? null
                                                             : () {
-                                                                setState(() {
-                                                                  if (time >
-                                                                      1) {
-                                                                    time--; // Disminuye el tiempo si es mayor que 1
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex =
-                                                                        imagePaths.length -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                          setState(() {
+                                                            if (time >
+                                                                1) {
+                                                              time--; // Disminuye el tiempo si es mayor que 1
+                                                              totalTime =
+                                                                  time *
+                                                                      60; // Actualiza el tiempo total en segundos
+                                                              _currentImageIndex =
+                                                                  imagePaths.length -
+                                                                      time;
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-abajo.png',
                                                           height: screenHeight *
@@ -3565,8 +3623,8 @@ class _PanelViewState extends State<PanelView>
                                                   height: screenHeight * 0.01),
                                               Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                MainAxisAlignment
+                                                    .spaceBetween,
                                                 children: [
                                                   CustomPaint(
                                                     size: const Size(110, 40),
@@ -3576,7 +3634,7 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                   SizedBox(
                                                       width:
-                                                          screenWidth * 0.01),
+                                                      screenWidth * 0.01),
                                                   Text(
                                                     timeRampa
                                                         .toString()
@@ -3585,11 +3643,11 @@ class _PanelViewState extends State<PanelView>
                                                     style: TextStyle(
                                                         fontSize: 20.sp,
                                                         fontWeight:
-                                                            FontWeight.bold,
+                                                        FontWeight.bold,
                                                         color: Colors
                                                             .lightGreenAccent
                                                             .shade400 // Color para la sección seleccionada
-                                                        ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -3599,8 +3657,8 @@ class _PanelViewState extends State<PanelView>
                                               // Barra de progreso secundaria
                                               Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                MainAxisAlignment
+                                                    .spaceBetween,
                                                 children: [
                                                   CustomPaint(
                                                     size: const Size(110, 40),
@@ -3610,7 +3668,7 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                   SizedBox(
                                                       width:
-                                                          screenWidth * 0.01),
+                                                      screenWidth * 0.01),
                                                   Text(
                                                     timePause
                                                         .toString()
@@ -3619,10 +3677,10 @@ class _PanelViewState extends State<PanelView>
                                                     style: TextStyle(
                                                         fontSize: 20.sp,
                                                         fontWeight:
-                                                            FontWeight.bold,
+                                                        FontWeight.bold,
                                                         color: Colors
                                                             .red // Color para la sección seleccionada
-                                                        ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -4725,7 +4783,6 @@ class _PanelViewState extends State<PanelView>
     }
   }
 
-
   Color _getBorderColor(String? status) {
     switch (status) {
       case 'conectado':
@@ -5210,7 +5267,7 @@ class BleConnectionService {
   }
 
   final StreamController<Map<String, dynamic>> _deviceUpdatesController =
-  StreamController.broadcast();
+      StreamController.broadcast();
 
 // Exponer el Stream para que otros lo escuchen
   Stream<Map<String, dynamic>> get deviceUpdates =>
@@ -5232,8 +5289,6 @@ class BleConnectionService {
   void updateBatteryStatus(String macAddress, int status) {
     _emitDeviceUpdate(macAddress, 'batteryStatus', status);
   }
-
-
 
   Future<void> _startScan() async {
     if (_scanStream != null) {
@@ -5281,7 +5336,8 @@ class BleConnectionService {
 
         print("Dispositivo encontrado: ${device.name}, ID: ${device.id}");
 
-        if (targetDeviceIds.contains(device.id) && !foundDevices.contains(device.id)) {
+        if (targetDeviceIds.contains(device.id) &&
+            !foundDevices.contains(device.id)) {
           foundDevices.add(device.id);
           print("▶️--->>>Dispositivo objetivo encontrado: ${device.id}");
 
@@ -5302,7 +5358,8 @@ class BleConnectionService {
         Future.delayed(const Duration(seconds: 10), () async {
           if (_scanStream != null) {
             await _scanStream?.cancel();
-            print("⏳ Escaneo BLE cancelado automáticamente después de 10 segundos.");
+            print(
+                "⏳ Escaneo BLE cancelado automáticamente después de 10 segundos.");
           }
           if (!scanCompleter.isCompleted) scanCompleter.complete();
         }),
@@ -5319,13 +5376,12 @@ class BleConnectionService {
     }
   }
 
-
-
   Future<bool> _connectToDeviceByMac(String macAddress) async {
     // Validar si no hay dispositivos encontrados
     if (foundDevices.isEmpty) {
       if (kDebugMode) {
-        print("⚠️ No se encontraron dispositivos durante el escaneo. Conexión cancelada.");
+        print(
+            "⚠️ No se encontraron dispositivos durante el escaneo. Conexión cancelada.");
       }
       return false;
     }
@@ -5333,7 +5389,8 @@ class BleConnectionService {
     // Validar si la MAC no está en la lista de dispositivos encontrados
     if (!foundDevices.contains(macAddress)) {
       if (kDebugMode) {
-        print("⚠️ No se puede conectar a $macAddress porque no se encontró durante el escaneo.");
+        print(
+            "⚠️ No se puede conectar a $macAddress porque no se encontró durante el escaneo.");
       }
       return false;
     }
@@ -5357,70 +5414,71 @@ class BleConnectionService {
     Future<void> tryConnect() async {
       _connectionStreams[macAddress] =
           flutterReactiveBle.connectToAdvertisingDevice(
-            id: macAddress,
-            prescanDuration: const Duration(seconds: 1),
-            withServices: [serviceUuid],
-          ).listen((event) async {
-            switch (event.connectionState) {
-              case DeviceConnectionState.connected:
-                if (kDebugMode) print("🔗--->>> Dispositivo $macAddress conectado.");
-                success = true;
+        id: macAddress,
+        prescanDuration: const Duration(seconds: 1),
+        withServices: [serviceUuid],
+      ).listen((event) async {
+        switch (event.connectionState) {
+          case DeviceConnectionState.connected:
+            if (kDebugMode)
+              print("🔗--->>> Dispositivo $macAddress conectado.");
+            success = true;
 
-                // Descubrir servicios
-                final discoveredServices =
+            // Descubrir servicios
+            final discoveredServices =
                 await flutterReactiveBle.discoverServices(macAddress);
-                bool hasRequiredService = false;
+            bool hasRequiredService = false;
 
-                for (final service in discoveredServices) {
-                  if (service.serviceId == serviceUuid) {
-                    hasRequiredService = true;
+            for (final service in discoveredServices) {
+              if (service.serviceId == serviceUuid) {
+                hasRequiredService = true;
 
-                    if (kDebugMode) {
-                      print("🔍--->>>Servicio principal encontrado: $serviceUuid");
-                    }
+                if (kDebugMode) {
+                  print("🔍--->>>Servicio principal encontrado: $serviceUuid");
+                }
 
-                    final characteristicIds = service.characteristics
-                        .map((c) => c.characteristicId)
-                        .toList();
+                final characteristicIds = service.characteristics
+                    .map((c) => c.characteristicId)
+                    .toList();
 
-                    if (characteristicIds.contains(rxCharacteristicUuid) &&
-                        characteristicIds.contains(txCharacteristicUuid)) {
-                      if (kDebugMode) {
-                        print("🛠️--->>>Características RX y TX disponibles.");
-                      }
-                    } else {
-                      if (kDebugMode) {
-                        print("❌ Características RX o TX no encontradas.");
-                      }
-                    }
-                    break;
+                if (characteristicIds.contains(rxCharacteristicUuid) &&
+                    characteristicIds.contains(txCharacteristicUuid)) {
+                  if (kDebugMode) {
+                    print("🛠️--->>>Características RX y TX disponibles.");
+                  }
+                } else {
+                  if (kDebugMode) {
+                    print("❌ Características RX o TX no encontradas.");
                   }
                 }
-
-                if (!hasRequiredService) {
-                  if (kDebugMode) print("❌ Servicio principal no encontrado.");
-                }
-
-                if (success) connectedDevices.add(macAddress);
-                _updateDeviceConnectionState(macAddress, true);
-
                 break;
-
-              case DeviceConnectionState.disconnected:
-                if (kDebugMode) {
-                  print("⛓️‍💥--->>>Dispositivo $macAddress desconectado.");
-                }
-                _onDeviceDisconnected(macAddress);
-                _updateDeviceConnectionState(macAddress, false);
-                break;
-
-              default:
-                if (kDebugMode) {
-                  print("⏳--->>>Estado desconocido para $macAddress.");
-                }
-                break;
+              }
             }
-          });
+
+            if (!hasRequiredService) {
+              if (kDebugMode) print("❌ Servicio principal no encontrado.");
+            }
+
+            if (success) connectedDevices.add(macAddress);
+            _updateDeviceConnectionState(macAddress, true);
+
+            break;
+
+          case DeviceConnectionState.disconnected:
+            if (kDebugMode) {
+              print("⛓️‍💥--->>>Dispositivo $macAddress desconectado.");
+            }
+            _onDeviceDisconnected(macAddress);
+            _updateDeviceConnectionState(macAddress, false);
+            break;
+
+          default:
+            if (kDebugMode) {
+              print("⏳--->>>Estado desconocido para $macAddress.");
+            }
+            break;
+        }
+      });
 
       await Future.delayed(const Duration(seconds: 1));
 
@@ -5455,53 +5513,53 @@ class BleConnectionService {
             "🔒--->>>Fase de inicialización de seguridad completada para $macAddress.");
 
         // Obtener la información del dispositivo (FUN_INFO)
-        final deviceInfo = await
-            getDeviceInfo(macAddress)
+        final deviceInfo = await getDeviceInfo(macAddress)
             .timeout(const Duration(seconds: 15));
         final parsedInfo = parseDeviceInfo(deviceInfo);
         debugPrint(parsedInfo);
 
         // Obtener el nombre del Bluetooth (FUN_GET_NAMEBT)
-        final nameBt =
-        await getBluetoothName(macAddress).timeout(const Duration(seconds: 15));;
+        final nameBt = await getBluetoothName(macAddress)
+            .timeout(const Duration(seconds: 15));
+        ;
         debugPrint("🅱️ Nombre del Bluetooth ($macAddress): $nameBt");
-        updateBluetoothName(macAddress, nameBt.isNotEmpty ? nameBt : "No disponible");
-      /*  setState(() {
+        updateBluetoothName(
+            macAddress, nameBt.isNotEmpty ? nameBt : "No disponible");
+        /*  setState(() {
           bluetoothNames[macAddress] =
           nameBt.isNotEmpty ? nameBt : "No disponible";
         });*/
 
         // Obtener los parámetros de la batería (FUN_GET_PARAMBAT)
-        final batteryParameters =
-        await getBatteryParameters(macAddress).timeout(const Duration(seconds: 15));;
-        final parsedBattery =
-       parseBatteryParameters(batteryParameters);
+        final batteryParameters = await getBatteryParameters(macAddress)
+            .timeout(const Duration(seconds: 15));
+        ;
+        final parsedBattery = parseBatteryParameters(batteryParameters);
         debugPrint(parsedBattery);
-        updateBatteryStatus(macAddress, batteryParameters['batteryStatusRaw'] ?? -1);
-       /* setState(() {
+        updateBatteryStatus(
+            macAddress, batteryParameters['batteryStatusRaw'] ?? -1);
+        /* setState(() {
           batteryStatuses[macAddress] =
               batteryParameters['batteryStatusRaw'] ?? -1;
         });*/
 
         // Obtener contadores de tarifa
-        final counters =
-        await getTariffCounters(macAddress).timeout(const Duration(seconds: 15));;
-        final parsedCounters =
-       parseTariffCounters(counters);
+        final counters = await getTariffCounters(macAddress)
+            .timeout(const Duration(seconds: 15));
+        ;
+        final parsedCounters = parseTariffCounters(counters);
         debugPrint(parsedCounters);
 
         // Operaciones con electroestimulador
         for (int mode = 0; mode < 3; mode++) {
           final state = await getElectrostimulatorState(
               macAddress, 1, mode); // Endpoint 1 como ejemplo
-          final parsedState =
-          parseElectrostimulatorState(state, mode);
+          final parsedState = parseElectrostimulatorState(state, mode);
           debugPrint(parsedState);
         }
 
         // Ejecutar sesión de electroestimulación
-        final runSuccess =
-        await runElectrostimulationSession(
+        final runSuccess = await runElectrostimulationSession(
           macAddress: macAddress,
           endpoint: 1,
           limitador: 0,
@@ -5523,8 +5581,7 @@ class BleConnectionService {
         }
 
         // Controlar canales individuales
-        final response =
-        await controlElectrostimulatorChannel(
+        final response = await controlElectrostimulatorChannel(
           macAddress: macAddress,
           endpoint: 1,
           canal: 1,
@@ -5532,13 +5589,11 @@ class BleConnectionService {
           valor: 50, // Fijar el nivel en 50%
         );
 
-        final parsedResponse =
-        parseChannelControlResponse(response);
+        final parsedResponse = parseChannelControlResponse(response);
         debugPrint(parsedResponse);
 
         // Controlar todos los canales
-        final response2 =
-        await controlAllElectrostimulatorChannels(
+        final response2 = await controlAllElectrostimulatorChannels(
           macAddress: macAddress,
           endpoint: 1,
           modo: 0,
@@ -5556,15 +5611,13 @@ class BleConnectionService {
           ], // Valores para todos los canales
         );
 
-        final parsedResponse2 =
-        parseAllChannelsResponse(response2);
+        final parsedResponse2 = parseAllChannelsResponse(response2);
         debugPrint(parsedResponse2);
 
         // Detener la sesión después de 5 segundos
         await Future.delayed(const Duration(seconds: 5));
 
-        final stopSuccess =
-        await stopElectrostimulationSession(
+        final stopSuccess = await stopElectrostimulationSession(
           macAddress: macAddress,
           endpoint: 1,
         );
@@ -5581,7 +5634,6 @@ class BleConnectionService {
       }
     }
   }
-
 
   void startPeriodicConnectionCheck(
       void Function(String macAddress, bool isConnected)
@@ -5798,13 +5850,15 @@ class BleConnectionService {
   Future<void> sendCommand(String macAddress, List<int> command) async {
     // Validar si el dispositivo está conectado
     if (connectedDevices.isNotEmpty) {
-      print("⚠️ El dispositivo $macAddress no está conectado. Comando no enviado.");
+      print(
+          "⚠️ El dispositivo $macAddress no está conectado. Comando no enviado.");
       return;
     }
 
     // Validar que el comando tenga exactamente 20 bytes
     if (command.length != 20) {
-      print("⚠️ El comando debe tener exactamente 20 bytes. Comando no enviado.");
+      print(
+          "⚠️ El comando debe tener exactamente 20 bytes. Comando no enviado.");
       return;
     }
 
@@ -5826,7 +5880,6 @@ class BleConnectionService {
       print("❌ Error al enviar comando a $macAddress: $e");
     }
   }
-
 
   Future<Map<String, dynamic>> getDeviceInfo(String macAddress) async {
     final characteristicRx = QualifiedCharacteristic(
@@ -5883,7 +5936,8 @@ class BleConnectionService {
       debugPrint("📤 FUN_INFO enviado a $macAddress.");
 
       // Esperar la respuesta con timeout
-      final deviceInfo = await completer.future.timeout(const Duration(seconds: 15));
+      final deviceInfo =
+          await completer.future.timeout(const Duration(seconds: 15));
       notificationSubscription?.cancel();
       return deviceInfo;
     } catch (e) {
@@ -5892,7 +5946,6 @@ class BleConnectionService {
       rethrow;
     }
   }
-
 
   // Función para parsear información en formato texto
   String parseDeviceInfo(Map<String, dynamic> deviceInfo) {
@@ -5975,8 +6028,10 @@ $endpoints
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x05) {
           // FUN_GET_NAMEBT_R recibido
-          final nameBytes = data.sublist(1).takeWhile((byte) => byte != 0).toList();
-          final name = String.fromCharCodes(nameBytes); // Convertir bytes a string
+          final nameBytes =
+              data.sublist(1).takeWhile((byte) => byte != 0).toList();
+          final name =
+              String.fromCharCodes(nameBytes); // Convertir bytes a string
           completer.complete(name);
           debugPrint("📥 FUN_GET_NAMEBT_R recibido desde $macAddress: $name");
         }
@@ -5991,7 +6046,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final bluetoothName =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6004,7 +6059,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   Future<Map<String, dynamic>> getBatteryParameters(String macAddress) async {
     final characteristicRx = QualifiedCharacteristic(
@@ -6040,17 +6094,17 @@ $endpoints
           final batteryParameters = {
             'batteryStatusRaw': data[3],
             'powerType':
-            data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
+                data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
             'batteryModel': data[2] == 0 ? "Por defecto" : "Desconocido",
             'batteryStatus': data[3] == 0
                 ? "Muy baja"
                 : data[3] == 1
-                ? "Baja"
-                : data[3] == 2
-                ? "Media"
-                : data[3] == 3
-                ? "Alta"
-                : "Llena",
+                    ? "Baja"
+                    : data[3] == 2
+                        ? "Media"
+                        : data[3] == 3
+                            ? "Alta"
+                            : "Llena",
             'temperature': "Sin implementar",
             'compensation': (data[6] << 8) | data[7],
             'voltages': {
@@ -6082,7 +6136,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final batteryParameters =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6095,7 +6149,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   String parseBatteryParameters(Map<String, dynamic> batteryParameters) {
     final powerType = batteryParameters['powerType'];
@@ -6157,18 +6210,18 @@ $endpoints
           final tariffStatus = data[1] == 0
               ? "Sin tarifa"
               : data[1] == 1
-              ? "Con tarifa"
-              : "Con tarifa agotada";
+                  ? "Con tarifa"
+                  : "Con tarifa agotada";
 
           final totalSeconds = (data[2] << 24) |
-          (data[3] << 16) |
-          (data[4] << 8) |
-          data[5]; // Contador total (32 bits)
+              (data[3] << 16) |
+              (data[4] << 8) |
+              data[5]; // Contador total (32 bits)
 
           final remainingSeconds = (data[6] << 24) |
-          (data[7] << 16) |
-          (data[8] << 8) |
-          data[9]; // Contador parcial (32 bits)
+              (data[7] << 16) |
+              (data[8] << 8) |
+              data[9]; // Contador parcial (32 bits)
 
           final counters = {
             'tariffStatus': tariffStatus,
@@ -6191,7 +6244,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final counters =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6204,7 +6257,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   String parseTariffCounters(Map<String, dynamic> counters) {
     final tariffStatus = counters['tariffStatus'];
@@ -6472,7 +6524,8 @@ $endpoints
           "📤 FUN_RUN_EMS enviado a $macAddress para endpoint $endpoint.");
 
       // Esperar la respuesta con timeout
-      final result = await completer.future.timeout(const Duration(seconds: 10));
+      final result =
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6484,7 +6537,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   Future<bool> stopElectrostimulationSession({
     required String macAddress,
@@ -6520,7 +6572,6 @@ $endpoints
       // Completer para manejar la respuesta
       final completer = Completer<bool>();
 
-
       // Suscribirse a las notificaciones para recibir FUN_STOP_EMS_R
       notificationSubscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
@@ -6544,7 +6595,8 @@ $endpoints
           "📤 FUN_STOP_EMS enviado a $macAddress para endpoint $endpoint.");
 
       // Esperar la respuesta con timeout
-      final result = await completer.future.timeout(const Duration(seconds: 10));
+      final result =
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6641,7 +6693,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final response =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6653,7 +6705,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   String parseChannelControlResponse(Map<String, dynamic> response) {
     final endpoint = response['endpoint'];
@@ -6722,7 +6773,6 @@ $endpoints
       // Completer para manejar la respuesta
       final completer = Completer<Map<String, dynamic>>();
 
-
       // Suscribirse a las notificaciones para recibir FUN_ALL_CANAL_EMS_R
       notificationSubscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
@@ -6757,7 +6807,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final response =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6883,7 +6933,7 @@ $canales
 
       // Esperar la respuesta con timeout
       final response =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6953,7 +7003,8 @@ $canales
           "📤 FUN_SET_MEM enviado a $macAddress. Página: $pagina, Datos: $datos.");
 
       // Esperar la respuesta con timeout
-      final result = await completer.future.timeout(const Duration(seconds: 10));
+      final result =
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -6965,7 +7016,6 @@ $canales
       rethrow;
     }
   }
-
 
   Future<Map<String, dynamic>> getPulseMeter({
     required String macAddress,
@@ -7027,7 +7077,7 @@ $canales
 
       // Esperar la respuesta con timeout
       final response =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -7039,7 +7089,6 @@ $canales
       rethrow;
     }
   }
-
 
   String _mapPulseMeterStatus(int status) {
     switch (status) {
