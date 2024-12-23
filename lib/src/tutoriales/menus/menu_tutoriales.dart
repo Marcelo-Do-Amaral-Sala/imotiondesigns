@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../overlays/overlays_tuto.dart';
 
 class TutorialesMenuView extends StatefulWidget {
@@ -95,10 +96,11 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                                               fit: BoxFit.contain,
                                             ),
                                           ),
-                                           Expanded(
+                                          Expanded(
                                             child: Text(
-                                              "TUTORIALES",
-                                              style:  TextStyle(
+                                              tr(context, 'Tutoriales')
+                                                  .toUpperCase(),
+                                              style: TextStyle(
                                                 color: const Color(0xFF28E2F5),
                                                 fontSize: 34.sp,
                                                 fontWeight: FontWeight.w600,
@@ -115,7 +117,7 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                               SizedBox(height: screenHeight * 0.05),
                               buildButton(
                                 context,
-                                'Primeros pasos',
+                                tr(context, 'Primeros pasos').toUpperCase(),
                                 scaleFactorPP,
                                 () {
                                   setState(() {
@@ -130,7 +132,7 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Software',
+                                tr(context, 'Software').toUpperCase(),
                                 scaleFactorSoft,
                                 () {
                                   setState(() {
@@ -145,7 +147,8 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Incidencias comunes',
+                                tr(context, 'Incidencias comunes')
+                                    .toUpperCase(),
                                 scaleFactorIncid,
                                 () {
                                   setState(() {
@@ -265,7 +268,7 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: const Color(0xFF28E2F5),
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w600,

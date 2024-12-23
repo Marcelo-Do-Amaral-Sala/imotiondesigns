@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../utils/translation_utils.dart';
 import '../clients/overlays/main_overlay.dart';
 import '../db/db_helper.dart';
 
@@ -74,7 +75,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
         : MainOverlay(
             // Muestra el contenido principal si el overlay no es visible
             title: Text(
-              "BIOIMPEDANCIA",
+              tr(context, 'Bioimpedancia').toUpperCase(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 34.sp,
@@ -124,7 +125,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    'SELECCIONAR CLIENTE',
+                    tr(context, 'Seleccionar cliente').toUpperCase(),
                     style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 17.sp,
@@ -138,10 +139,14 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildInputField('NOMBRE', _nameController),
-                      _buildInputField('GÉNERO', _genderController),
-                      _buildInputField('PESO (kg)', _weightController),
-                      _buildInputField('ALTURA (cm)', _heightController),
+                      _buildInputField(
+                          tr(context, 'Nombre').toUpperCase(), _nameController),
+                      _buildInputField(tr(context, 'Género').toUpperCase(),
+                          _genderController),
+                      _buildInputField(tr(context, 'Peso (kg)').toUpperCase(),
+                          _weightController),
+                      _buildInputField(tr(context, 'Altura (cm)').toUpperCase(),
+                          _heightController),
                       _buildInputField('E-MAIL', _emailController),
                     ],
                   ),
@@ -179,7 +184,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    'LEER MEDIDA',
+                    tr(context, 'Leer medida').toUpperCase(),
                     style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 17.sp,
@@ -190,7 +195,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                 Text(
-                  "CÓMO OBTENER UNA BIOMEDIDA",
+                  tr(context, 'Cómo obtener una biomedida').toUpperCase(),
                   style: TextStyle(
                       color: const Color(0xFF28E2F5),
                       fontSize: 25.sp,
@@ -394,7 +399,7 @@ class _OverlaySeleccionarClienteBioState
 
     return MainOverlay(
       title: Text(
-        "SELECCIONAR CLIENTE",
+        tr(context, 'Seleccionar cliente').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -410,7 +415,10 @@ class _OverlaySeleccionarClienteBioState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildTextField(
-                    'NOMBRE', _clientNameController, 'Ingrese nombre'),
+                  tr(context, 'Nombre').toUpperCase(),
+                  _clientNameController,
+                  tr(context, 'Introducir nombre'),
+                ),
                 SizedBox(width: screenWidth * 0.05),
                 _buildDropdown(),
               ],
@@ -466,7 +474,7 @@ class _OverlaySeleccionarClienteBioState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('ESTADO',
+          Text(tr(context, 'Estado').toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.sp,
@@ -482,17 +490,17 @@ class _OverlaySeleccionarClienteBioState
               items: [
                 DropdownMenuItem(
                     value: 'Todos',
-                    child: Text('Todos',
+                    child: Text(tr(context, 'Todos'),
                         style:
                             TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Activo',
-                    child: Text('Activo',
+                    child: Text(tr(context, 'Activo'),
                         style:
                             TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Inactivo',
-                    child: Text('Inactivo',
+                    child: Text(tr(context, 'Inactivo'),
                         style:
                             TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
@@ -529,9 +537,15 @@ class _OverlaySeleccionarClienteBioState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildHeaderCell('ID'),
-                  _buildHeaderCell('NOMBRE'),
-                  _buildHeaderCell('TELÉFONO'),
-                  _buildHeaderCell('ESTADO'),
+                  _buildHeaderCell(
+                    tr(context, 'Nombre').toUpperCase(),
+                  ),
+                  _buildHeaderCell(
+                    tr(context, 'Teléfono').toUpperCase(),
+                  ),
+                  _buildHeaderCell(
+                    tr(context, 'Estado').toUpperCase(),
+                  ),
                 ],
               ),
               const SizedBox(height: 10), // Espaciado entre encabezado y filas

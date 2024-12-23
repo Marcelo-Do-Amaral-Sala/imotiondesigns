@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class AjustesMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
   final Function() onNavigatetoLicencia; // Callback para navegar de vuelta
@@ -142,7 +144,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                           ),
                                            Expanded(
                                             child: Text(
-                                              "AJUSTES",
+                                              tr(context, 'Ajustes').toUpperCase(),
                                               style: TextStyle(
                                                 color: const Color(0xFF28E2F5),
                                                 fontSize: 34.sp,
@@ -160,7 +162,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                               SizedBox(height: screenHeight * 0.05),
                               buildButton(
                                 context,
-                                'Licencia',
+                                tr(context, 'Licencia').toUpperCase(),
                                 scaleFactorLicencia,
                                 () {
                                   setState(() {
@@ -175,7 +177,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Gestión de centros',
+                                tr(context, 'Gestión de centros').toUpperCase(),
                                 scaleFactorCentros,
                                 () {
                                   setState(() {
@@ -190,7 +192,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Copia de seguridad',
+                                tr(context, 'Copia de seguridad').toUpperCase(),
                                 scaleFactorBackup,
                                 () {
                                   setState(() {
@@ -205,7 +207,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Selección de idioma',
+                                tr(context, 'Idioma').toUpperCase(),
                                 scaleFactorIdioma,
                                 () {
                                   setState(() {
@@ -220,7 +222,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Servicio técnico',
+                                tr(context, 'Servicio técnico').toUpperCase(),
                                 scaleFactorServicio,
                                 () {
                                   setState(() {

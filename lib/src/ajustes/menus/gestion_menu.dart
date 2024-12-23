@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class GestionMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
   const GestionMenuView({super.key, required this.onBack});
@@ -12,7 +14,7 @@ class GestionMenuView extends StatefulWidget {
 
 class _GestionMenuViewState extends State<GestionMenuView> {
   double scaleFactorBack = 1.0;
-  double scaleFactorAdmins= 1.0;
+  double scaleFactorAdmins = 1.0;
   double scaleFactorCrear = 1.0;
   bool isOverlayVisible = false;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
@@ -77,17 +79,18 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                                       'assets/images/recuadro.png',
                                       fit: BoxFit.fill,
                                     ),
-                                     Padding(
-                                      padding:  const EdgeInsets.all(8.0),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: [
-                                           Expanded(
+                                          Expanded(
                                             child: Text(
-                                              "GESTIÓN DE CENTROS",
+                                              tr(context, 'Gestión de centros')
+                                                  .toUpperCase(),
                                               style: TextStyle(
-                                                color:  const Color(0xFF28E2F5),
+                                                color: const Color(0xFF28E2F5),
                                                 fontSize: 30.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
@@ -103,30 +106,30 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                               SizedBox(height: screenHeight * 0.05),
                               buildButton(
                                 context,
-                                'Administradores',
+                                tr(context, 'Administradores').toUpperCase(),
                                 scaleFactorAdmins,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorAdmins = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorAdmins = 0.90);
                                 },
                               ),
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Crear nuevo',
+                                tr(context, 'Crear nuevo').toUpperCase(),
                                 scaleFactorCrear,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorCrear = 1;
                                     toggleOverlay(1);
                                   });
                                 },
-                                    () {
+                                () {
                                   setState(() => scaleFactorCrear = 0.90);
                                 },
                               ),
@@ -238,7 +241,7 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: const Color(0xFF28E2F5),
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w600,

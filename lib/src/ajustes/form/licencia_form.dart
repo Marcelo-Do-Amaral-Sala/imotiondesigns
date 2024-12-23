@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:platform/platform.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../servicios/licencia_state.dart';
 
 class LicenciaFormView extends StatefulWidget {
@@ -415,7 +416,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              "LICENCIA",
+                                              tr(context, 'Licencia')
+                                                  .toUpperCase(),
                                               style: TextStyle(
                                                 color: const Color(0xFF28E2F5),
                                                 fontSize: 34.sp,
@@ -498,7 +500,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'DATOS LICENCIA', // Texto fijo
+                          tr(context, 'Datos licencia').toUpperCase(),
                           style: TextStyle(
                             fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
@@ -514,7 +516,10 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Nº DE LICENCIA', style: _labelStyle),
+                                  Text(
+                                      tr(context, 'Nº de licencia')
+                                          .toUpperCase(),
+                                      style: _labelStyle),
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: _inputDecoration(),
@@ -523,11 +528,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       keyboardType: TextInputType.text,
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir nº licencia'),
+                                        hintText: tr(
+                                            context, 'Introducir nº licencia'),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
-                                  Text('NOMBRE', style: _labelStyle),
+                                  Text(tr(context, 'Nombre').toUpperCase(),
+                                      style: _labelStyle),
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: _inputDecoration(),
@@ -539,7 +547,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                     ),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
-                                  Text('DIRECCIÓN', style: _labelStyle),
+                                  Text(tr(context, 'Dirección').toUpperCase(),
+                                      style: _labelStyle),
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: _inputDecoration(),
@@ -547,11 +556,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       controller: _adressController,
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir dirección'),
+                                        hintText:
+                                            tr(context, 'Introducir dirección'),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
-                                  Text('CIUDAD', style: _labelStyle),
+                                  Text(tr(context, 'Ciudad').toUpperCase(),
+                                      style: _labelStyle),
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: _inputDecoration(),
@@ -559,7 +571,9 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       controller: _cityController,
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir ciudad'),
+                                        hintText:
+                                            tr(context, 'Introducir ciudad'),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -571,7 +585,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('PROVINCIA', style: _labelStyle),
+                                  Text(tr(context, 'Provincia').toUpperCase(),
+                                      style: _labelStyle),
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: _inputDecoration(),
@@ -579,11 +594,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       controller: _provinciaController,
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir provincia'),
+                                        hintText:
+                                            tr(context, 'Introducir provincia'),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
-                                  Text('PAÍS', style: _labelStyle),
+                                  Text(tr(context, 'País').toUpperCase(),
+                                      style: _labelStyle),
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: _inputDecoration(),
@@ -591,11 +609,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       controller: _countryController,
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir país'),
+                                        hintText:
+                                            tr(context, 'Introducir país'),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
-                                  Text('TELÉFONO', style: _labelStyle),
+                                  Text(tr(context, 'Teléfono').toUpperCase(),
+                                      style: _labelStyle),
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: _inputDecoration(),
@@ -608,7 +629,9 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       ],
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir teléfono'),
+                                        hintText:
+                                            tr(context, 'Introducir teléfono'),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
@@ -625,7 +648,9 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       ],
                                       style: _inputTextStyle,
                                       decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir e-mail'),
+                                        hintText:
+                                            tr(context, 'Introducir e-mail'),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -651,7 +676,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                   backgroundColor: Colors.transparent,
                                 ),
                                 child: Text(
-                                  'VALIDAR LICENCIA',
+                                  tr(context, 'Validar licencia').toUpperCase(),
                                   style: TextStyle(
                                     color: const Color(0xFF2be4f3),
                                     fontSize: 17.sp,
@@ -664,7 +689,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                 Padding(
                                   padding: const EdgeInsets.only(left: 20.0),
                                   child: Text(
-                                    'LICENCIA VALIDADA',
+                                    tr(context, 'Licencia validada')
+                                        .toUpperCase(),
                                     style: TextStyle(
                                       color: Colors.green,
                                       fontSize: 22.sp,
@@ -688,7 +714,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                       // Alinea el texto y el contenedor al inicio
                       children: [
                         Text(
-                          'Nº DE LICENCIA', // Texto fijo
+                          tr(context, 'Nº de licencia').toUpperCase(),
+                          // Texto fijo
                           style: TextStyle(
                             fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
@@ -709,8 +736,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       buildCell('MAC'),
-                                      buildCell('TIPO'),
-                                      buildCell('ESTADO'),
+                                      buildCell(
+                                        tr(context, 'Tipo').toUpperCase(),
+                                      ),
+                                      buildCell(
+                                        tr(context, 'Estado').toUpperCase(),
+                                      ),
                                     ],
                                   ),
                                   SizedBox(
