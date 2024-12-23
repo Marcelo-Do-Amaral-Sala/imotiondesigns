@@ -19,6 +19,7 @@ class AppState {
   List<Map<String, dynamic>> allLicencias = [];
   List<Map<String, dynamic>> mcis = []; // Lista de MCIs
 
+
   // Constructor privado para el patrón Singleton
   AppState._privateConstructor();
 
@@ -92,3 +93,38 @@ class AppState {
     await prefs.setString('mcis', jsonEncode(mcis));
   }
 }
+
+
+class AppStateIdioma {
+  String currentLanguage = 'es'; // Idioma por defecto
+
+  AppStateIdioma._privateConstructor();
+  static final AppStateIdioma _instance = AppStateIdioma._privateConstructor();
+  static AppStateIdioma get instance => _instance;
+
+  Future<void> loadLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Cargar el idioma seleccionado desde SharedPreferences
+    currentLanguage = prefs.getString('currentLanguage') ?? 'es'; // Idioma por defecto: español
+
+    // Verificar que el idioma cargado es correcto
+    print('Idioma cargado desde SharedPreferences: $currentLanguage');
+  }
+
+  Future<void> saveLanguage(String language) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('currentLanguage', language);
+
+    // Verificar que el idioma se guardó correctamente
+    String? savedLanguage = prefs.getString('currentLanguage');
+    if (savedLanguage == language) {
+      print('Idioma guardado correctamente: $language');
+    } else {
+      print('Error al guardar el idioma. Intentó guardar: $language, pero se guardó: $savedLanguage');
+    }
+  }
+}
+
+
+

@@ -8,9 +8,11 @@ import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 import '../../db/db_helper_traducciones.dart';
+import '../../servicios/licencia_state.dart';
 import '../../servicios/sync.dart';
 import '../../servicios/translation_provider.dart';
 import '../form/user_form.dart';
@@ -386,20 +388,28 @@ class OverlayIdioma extends StatefulWidget {
   _OverlayIdiomaState createState() => _OverlayIdiomaState();
 }
 
-class _OverlayIdiomaState extends State<OverlayIdioma>
-    with SingleTickerProviderStateMixin {
+class _OverlayIdiomaState extends State<OverlayIdioma> with SingleTickerProviderStateMixin {
   String? _selectedLanguage;
   Map<String, String> _translations = {};
   final SyncService _syncService = SyncService();
-  final DatabaseHelperTraducciones _dbHelperTraducciones =
-      DatabaseHelperTraducciones();
+  final DatabaseHelperTraducciones _dbHelperTraducciones = DatabaseHelperTraducciones();
   String statusMessage = 'Listo para hacer la copia de seguridad';
+
+  // Mapa de nombres visibles y sus valores internos
+  final Map<String, String> _languageMap = {
+    'ESPAÑOL': 'es',
+    'ENGLISH': 'en',
+    'ITALIANO': 'it',
+    'FRANÇAIS': 'fr',
+    'PORTUGÛES': 'pt',
+    'DEUTSCH': 'dt',
+  };
 
   @override
   void initState() {
     super.initState();
     _showStoredTranslations();
-    _selectedLanguage = 'es';
+    _selectedLanguage = AppStateIdioma.instance.currentLanguage;
     _loadTranslations();
     _fetchLocalTranslations('es'); // Cargar las traducciones en español
   }
@@ -412,16 +422,18 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
   }
 
   void _fetchLocalTranslations(String language) async {
-    final translations =
-        await _dbHelperTraducciones.getTranslationsByLanguage(language);
-    setState(() {
-      _translations = Map<String, String>.from(translations);
-      if (_translations.isEmpty) {
-        statusMessage =
-            "No hay datos disponibles, la base de datos está vacía.";
-        print("La base de datos está vacía.");
-      }
-    });
+    final translations = await _dbHelperTraducciones.getTranslationsByLanguage(language);
+
+    // Verificar si el widget todavía está montado antes de llamar a setState
+    if (mounted) {
+      setState(() {
+        _translations = Map<String, String>.from(translations);
+        if (_translations.isEmpty) {
+          statusMessage = "No hay datos disponibles, la base de datos está vacía.";
+          print("La base de datos está vacía.");
+        }
+      });
+    }
   }
 
   void _showStoredTranslations() async {
@@ -436,28 +448,31 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
   }
 
   void _changeAppLanguage(String language) {
+    // Cambiar el idioma seleccionado en AppStateIdioma
+    AppStateIdioma.instance.currentLanguage = language;
+
+    // Guardar el idioma en SharedPreferences
+    AppStateIdioma.instance.saveLanguage(language);
+
+    // Verificar que el idioma se ha guardado correctamente
+    print('Idioma guardado en SharedPreferences: $language');
+
+    // Cambiar el idioma en el TranslationProvider
     final provider = Provider.of<TranslationProvider>(context, listen: false);
     provider.changeLanguage(language);
 
-    // Recargar traducciones para el idioma seleccionado
+    // Recargar las traducciones para el idioma seleccionado
     _fetchLocalTranslations(language);
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
-    // Lista de países con nombres y banderas
-    final List<Map<String, String>> countries = [
-      {'name': 'Español', 'flag': 'assets/images/espana.png', 'lang': 'es'},
-      {'name': 'Inglés', 'flag': 'assets/images/reino-unido.png', 'lang': 'en'},
-      {'name': 'Francés', 'flag': 'assets/images/francia.png', 'lang': 'fr'},
-      {'name': 'Alemán', 'flag': 'assets/images/italia.png', 'lang': 'dt'},
-      {'name': 'Portugués', 'flag': 'assets/images/portugal.png', 'lang': 'pt'},
-      // Puedes agregar más países aquí
-    ];
-
     return MainOverlay(
       title: Text(
-        "SELECCIONAR IDIOMA",
+        tr(context, 'Selección de idioma').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -467,36 +482,49 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
       ),
       content: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Row(
+        child: Column(
           children: [
-            // Columna para los ListTiles
-            Expanded(
-              flex: 2, // Le da más espacio a esta columna si se necesita
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    buildCustomCheckboxTile("ESPAÑOL"),
-                    buildCustomCheckboxTile("ENGLISH"),
-                    buildCustomCheckboxTile("FRANÇAIS"),
-                    buildCustomCheckboxTile("PORTUGÛES"),
-                    buildCustomCheckboxTile("DEUTSCH"),
-                  ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Primera columna con parte de los ListTiles
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: _languageMap.keys.take(3).map((language) {
+                      return buildCustomCheckboxTile(language);
+                    }).toList(),
+                  ),
                 ),
-              ),
+                // Segunda columna con el resto de los ListTiles
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: _languageMap.keys.skip(3).map((language) {
+                      return buildCustomCheckboxTile(language);
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
-            // Columna para el botón
             Expanded(
-              flex: 1, // Menos espacio que la columna de ListTiles
               child: Align(
-                alignment: Alignment.bottomCenter,
+                alignment: Alignment.bottomRight,
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (_selectedLanguage != null) {
+                      print("Idioma seleccionado: $_selectedLanguage");
+                      _changeAppLanguage(_selectedLanguage!); // Cambia el idioma seleccionado
+                    }
+                    widget.onClose();
+                  },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -521,11 +549,11 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
     );
   }
 
-  Widget buildCustomCheckboxTile(String option) {
+  Widget buildCustomCheckboxTile(String language) {
     return ListTile(
-      leading: customCheckbox(option),
+      leading: customCheckbox(language),
       title: Text(
-        option,
+        language,
         style: TextStyle(
           color: Colors.white,
           fontSize: 22.sp,
@@ -534,17 +562,17 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
       ),
       onTap: () {
         setState(() {
-          _selectedLanguage = option; // Actualiza la selección
+          _selectedLanguage = _languageMap[language]; // Actualiza la selección con el valor interno
         });
       },
     );
   }
 
-  Widget customCheckbox(String option) {
+  Widget customCheckbox(String language) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedLanguage = option; // Actualiza la selección
+          _selectedLanguage = _languageMap[language]; // Actualiza la selección con el valor interno
         });
       },
       child: Container(
@@ -553,11 +581,11 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: _selectedLanguage == option
+          color: _selectedLanguage == _languageMap[language]
               ? const Color(0xFF2be4f3)
               : Colors.transparent,
           border: Border.all(
-            color: _selectedLanguage == option
+            color: _selectedLanguage == _languageMap[language]
                 ? const Color(0xFF2be4f3)
                 : Colors.white,
             width: 1.0,

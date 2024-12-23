@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class BonosTableWidget extends StatefulWidget {
   final List<Map<String, String>> bonosData;
   final bool showHour; // Parámetro para mostrar u ocultar la columna "HORA"
@@ -46,9 +48,18 @@ class _BonosTableWidgetState extends State<BonosTableWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        buildCell('FECHA'),
-        if (widget.showHour) buildCell('HORA'), // Condicional para la hora
-        buildCell('CANTIDAD'), // Reemplazar BONOS por CANTIDAD
+        buildCell(
+          tr(context, 'Fecha').toUpperCase(),
+        ),
+        if (widget.showHour)
+          buildCell(
+            tr(context, 'Hora').toUpperCase(),
+          ),
+        // Condicional para la hora
+        buildCell(
+          tr(context, 'Cantidad').toUpperCase(),
+        ),
+        // Reemplazar BONOS por CANTIDAD
       ],
     );
   }

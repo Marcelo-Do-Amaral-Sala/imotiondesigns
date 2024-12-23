@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDk9JgT0Kt_-oGS3G6mTaKm35O-6SYJ86c',
-    appId: '1:1093761830210:web:8952e244ffbe5cfcb5ccdb',
-    messagingSenderId: '1093761830210',
-    projectId: 'traducciones-v25',
-    authDomain: 'traducciones-v25.firebaseapp.com',
-    storageBucket: 'traducciones-v25.firebasestorage.app',
-    measurementId: 'G-8EEWF5KLWG',
+    apiKey: 'AIzaSyCNH9kTZj1bjOvMkSCPXxWyjbb9dcT6CFQ',
+    appId: '1:313073231514:web:b2b0274676aa4d871ea123',
+    messagingSenderId: '313073231514',
+    projectId: 'traducciones-v25-imotion',
+    authDomain: 'traducciones-v25-imotion.firebaseapp.com',
+    storageBucket: 'traducciones-v25-imotion.firebasestorage.app',
+    measurementId: 'G-SQMGZ7002J',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBMlx0YOt0_8Wvb4tT2Yhn4E4KRMS0metY',
-    appId: '1:1093761830210:android:f8dc7e0abcb39a71b5ccdb',
-    messagingSenderId: '1093761830210',
-    projectId: 'traducciones-v25',
-    storageBucket: 'traducciones-v25.firebasestorage.app',
+    apiKey: 'AIzaSyC3Zh3MoE4eKHVOAtgd10nACwfcVYgKlnU',
+    appId: '1:313073231514:android:732e8c39ce30a72b1ea123',
+    messagingSenderId: '313073231514',
+    projectId: 'traducciones-v25-imotion',
+    storageBucket: 'traducciones-v25-imotion.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCf1IbbTBaZklY6ZF3kJaYtbVgi9d6g_WI',
-    appId: '1:1093761830210:ios:6ba37a4ee2746795b5ccdb',
-    messagingSenderId: '1093761830210',
-    projectId: 'traducciones-v25',
-    storageBucket: 'traducciones-v25.firebasestorage.app',
+    apiKey: 'AIzaSyCuv5SZqeI2JLx42W5y48BIq_EUmiZQc_Y',
+    appId: '1:313073231514:ios:02b152d03cc96b5a1ea123',
+    messagingSenderId: '313073231514',
+    projectId: 'traducciones-v25-imotion',
+    storageBucket: 'traducciones-v25-imotion.firebasestorage.app',
     iosBundleId: 'com.example.imotionDesigns',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCf1IbbTBaZklY6ZF3kJaYtbVgi9d6g_WI',
-    appId: '1:1093761830210:ios:6ba37a4ee2746795b5ccdb',
-    messagingSenderId: '1093761830210',
-    projectId: 'traducciones-v25',
-    storageBucket: 'traducciones-v25.firebasestorage.app',
+    apiKey: 'AIzaSyCuv5SZqeI2JLx42W5y48BIq_EUmiZQc_Y',
+    appId: '1:313073231514:ios:02b152d03cc96b5a1ea123',
+    messagingSenderId: '313073231514',
+    projectId: 'traducciones-v25-imotion',
+    storageBucket: 'traducciones-v25-imotion.firebasestorage.app',
     iosBundleId: 'com.example.imotionDesigns',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDk9JgT0Kt_-oGS3G6mTaKm35O-6SYJ86c',
-    appId: '1:1093761830210:web:74a96468712b52c8b5ccdb',
-    messagingSenderId: '1093761830210',
-    projectId: 'traducciones-v25',
-    authDomain: 'traducciones-v25.firebaseapp.com',
-    storageBucket: 'traducciones-v25.firebasestorage.app',
-    measurementId: 'G-NN3EPJX12E',
+    apiKey: 'AIzaSyCNH9kTZj1bjOvMkSCPXxWyjbb9dcT6CFQ',
+    appId: '1:313073231514:web:8d0a5a0c66377d231ea123',
+    messagingSenderId: '313073231514',
+    projectId: 'traducciones-v25-imotion',
+    authDomain: 'traducciones-v25-imotion.firebaseapp.com',
+    storageBucket: 'traducciones-v25-imotion.firebasestorage.app',
+    measurementId: 'G-B1H7FZYT73',
   );
+
 }

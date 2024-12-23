@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import '../../utils/translation_utils.dart';
 import '../db/db_helper.dart';
 import '../db/db_helper_pc.dart';
 import '../db/db_helper_web.dart';
@@ -136,9 +137,10 @@ class _ClientsViewState extends State<ClientsView> {
                                               fit: BoxFit.contain,
                                             ),
                                           ),
-                                           Expanded(
+                                          Expanded(
                                             child: Text(
-                                              "CLIENTES",
+                                              tr(context, 'Clientes')
+                                                  .toUpperCase(),
                                               style: TextStyle(
                                                 color: const Color(0xFF28E2F5),
                                                 fontSize: 33.sp,
@@ -156,7 +158,8 @@ class _ClientsViewState extends State<ClientsView> {
                               SizedBox(height: screenHeight * 0.05),
                               buildButton(
                                 context,
-                                'Listado de clientes',
+                                tr(context, 'Listado de clientes')
+                                    .toUpperCase(),
                                 scaleFactorListado,
                                 () {
                                   setState(() {
@@ -172,7 +175,8 @@ class _ClientsViewState extends State<ClientsView> {
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Crear clientes',
+                                tr(context, 'Crear clientes')
+                                    .toUpperCase(),
                                 scaleFactorCrear,
                                 () {
                                   setState(() {
@@ -278,7 +282,7 @@ class _ClientsViewState extends State<ClientsView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: const Color(0xFF28E2F5),
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w600,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class BioSessionTableWidget extends StatefulWidget {
   final List<Map<String, String>> bioimpedanceData;
 
@@ -54,9 +56,15 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         buildCell(''), // Encabezado de la fila
-        buildCell('VALOR CALCULADO'),
-        buildCell('REFERENCIA'),
-        buildCell('RESULTADO'),
+        buildCell(
+          tr(context, 'Valor calculado').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Referencia').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Resultado').toUpperCase(),
+        ),
       ],
     );
   }

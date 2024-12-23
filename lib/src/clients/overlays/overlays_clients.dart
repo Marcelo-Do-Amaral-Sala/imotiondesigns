@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../utils/translation_utils.dart';
 import '../forms/clients_form.dart';
 import '../forms/clients_form_groups.dart';
 import '../forms/clients_forms_bonos.dart';
@@ -54,7 +55,7 @@ class _OverlayInfoState extends State<OverlayInfo>
   Widget build(BuildContext context) {
     return MainOverlay(
       title: Text(
-        "LISTADO DE CLIENTES",
+        tr(context, 'Listado de clientes').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -93,11 +94,11 @@ class _OverlayInfoState extends State<OverlayInfo>
           });
         },
         tabs: [
-          _buildTab('DATOS PERSONALES', 0),
-          _buildTab('ACTIVIDAD', 1),
-          _buildTab('BONOS', 2),
-          _buildTab('BIOIMPEDANCIA', 3),
-          _buildTab('GRUPOS ACTIVOS', 4),
+          _buildTab(tr(context, 'Datos personales').toUpperCase(), 0),
+          _buildTab(tr(context, 'Actividad').toUpperCase(), 1),
+          _buildTab(tr(context, 'Bonos').toUpperCase(), 2),
+          _buildTab(tr(context, 'Bioimpedancia').toUpperCase(), 3),
+          _buildTab(tr(context, 'Grupos activos').toUpperCase(), 4),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
@@ -105,7 +106,7 @@ class _OverlayInfoState extends State<OverlayInfo>
         ),
         dividerColor: Colors.black,
         labelColor: const Color(0xFF2be4f3),
-        labelStyle:  TextStyle(
+        labelStyle: TextStyle(
           fontSize: 16.sp,
           fontWeight: FontWeight.bold,
         ),
@@ -277,7 +278,7 @@ class _OverlayCrearState extends State<OverlayCrear>
 
     return MainOverlay(
       title: Text(
-        "CREAR CLIENTE",
+        tr(context, 'Crear clientes').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -307,7 +308,7 @@ class _OverlayCrearState extends State<OverlayCrear>
         return AlertDialog(
           backgroundColor: const Color(0xFF494949),
           title: Text(
-            '¡ALERTA!',
+            tr(context, '¡Alerta!').toUpperCase(),
             style: TextStyle(
                 color: Colors.red,
                 fontSize: 30.sp,
@@ -315,7 +316,8 @@ class _OverlayCrearState extends State<OverlayCrear>
             textAlign: TextAlign.center,
           ),
           content: Text(
-            'Debes completar el formulario para continuar',
+            tr(context, 'Debes completar el formulario para continuar')
+                .toUpperCase(),
             style: TextStyle(color: Colors.white, fontSize: 25.sp),
             textAlign: TextAlign.center,
           ),
@@ -339,7 +341,7 @@ class _OverlayCrearState extends State<OverlayCrear>
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    '¡ENTENDIDO!',
+                    tr(context, '¡Entendido!').toUpperCase(),
                     style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 17.sp,
@@ -381,9 +383,9 @@ class _OverlayCrearState extends State<OverlayCrear>
               }
             },
             tabs: [
-              _buildTab('DATOS PERSONALES', 0),
-              _buildTab('BONOS', 1),
-              _buildTab('GRUPOS ACTIVOS', 2),
+              _buildTab(tr(context, 'Datos personales').toUpperCase(), 0),
+              _buildTab(tr(context, 'Bonos').toUpperCase(), 1),
+              _buildTab(tr(context, 'Grupos activos').toUpperCase(), 2),
             ],
             indicator: const BoxDecoration(
               color: Color(0xFF494949),

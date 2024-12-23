@@ -341,7 +341,7 @@ flutter:
     - assets/images/29.png
     - assets/images/30.png
     - .env
-    - assets/traducciones1.json
+    - assets/traduccionesv25.json
     - assets/videos/tutorial.mp4
 
   #   - images/a_dot_ham.jpeg

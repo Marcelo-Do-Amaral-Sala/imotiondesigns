@@ -12,7 +12,7 @@ class _UploadJsonViewState extends State<UploadJsonView> {
 
   // Leer archivo JSON desde los assets
   Future<Map<String, dynamic>> loadJson() async {
-    final String response = await rootBundle.loadString('assets/traducciones1.json');
+    final String response = await rootBundle.loadString('assets/traduccionesv25.json');
     final Map<String, dynamic> data = json.decode(response);
     return data;
   }

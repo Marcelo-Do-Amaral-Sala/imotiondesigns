@@ -2,11 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class DataTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> data; // Mantener el tipo como dynamic
-  final Function(Map<String, dynamic>) onRowTap; // Callback con el tipo correcto
+  final Function(Map<String, dynamic>)
+      onRowTap; // Callback con el tipo correcto
 
-  const DataTableWidget({super.key, required this.data, required this.onRowTap});
+  const DataTableWidget(
+      {super.key, required this.data, required this.onRowTap});
 
   @override
   _DataTableWidgetState createState() => _DataTableWidgetState();
@@ -18,7 +22,9 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
-        SizedBox(height: MediaQuery.of(context).size.height*0.01), // Espaciado entre encabezado y filas
+        SizedBox(
+            height: MediaQuery.of(context).size.height *
+                0.01), // Espaciado entre encabezado y filas
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -26,15 +32,21 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 return Column(
                   children: [
                     DataRowWidget(
-                      id: (row['id'] is int) ? row['id'] : int.tryParse(row['id'].toString()) ?? 0,
+                      id: (row['id'] is int)
+                          ? row['id']
+                          : int.tryParse(row['id'].toString()) ?? 0,
                       name: row['name'] ?? '',
-                      phone: (row['phone'] is int) ? row['phone'] : int.tryParse(row['phone'].toString()) ?? 0,
+                      phone: (row['phone'] is int)
+                          ? row['phone']
+                          : int.tryParse(row['phone'].toString()) ?? 0,
                       status: row['status'] ?? '',
                       onTap: () {
                         widget.onRowTap(row); // Pasar el mapa completo
                       },
                     ),
-                     SizedBox(height: MediaQuery.of(context).size.height*0.02), // Espaciado entre filas
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height *
+                            0.02), // Espaciado entre filas
                   ],
                 );
               }).toList(),
@@ -50,9 +62,15 @@ class _DataTableWidgetState extends State<DataTableWidget> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         buildCell('ID'),
-        buildCell('NOMBRE'),
-        buildCell('TELÉFONO'),
-        buildCell('ESTADO'),
+        buildCell(
+          tr(context, 'Nombre').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Teléfono').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Estado').toUpperCase(),
+        ),
       ],
     );
   }
@@ -64,7 +82,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style:  TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 17.sp,
@@ -133,9 +151,11 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            buildCell(widget.id.toString()), // Convertir a String solo para mostrar
+            buildCell(widget.id.toString()),
+            // Convertir a String solo para mostrar
             buildCell(widget.name),
-            buildCell(widget.phone.toString()), // Convertir a String para mostrar
+            buildCell(widget.phone.toString()),
+            // Convertir a String para mostrar
             buildCell(widget.status),
           ],
         ),
@@ -150,7 +170,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style:  TextStyle(color: Colors.white, fontSize: 15.sp),
+          style: TextStyle(color: Colors.white, fontSize: 15.sp),
         ),
       ),
     );

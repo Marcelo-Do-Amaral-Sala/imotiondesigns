@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class PersonalDataForm extends StatefulWidget {
@@ -81,13 +82,14 @@ class PersonalDataFormState extends State<PersonalDataForm> {
         !_emailController.text.contains('@')) {
       // Verificación de '@' en el correo
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "Por favor, complete todos los campos correctamente.",
-            style: TextStyle(color: Colors.white, fontSize: 17),
+            tr(context, 'Por favor, complete todos los campos correctamente')
+                .toUpperCase(),
+            style: const TextStyle(color: Colors.white, fontSize: 17),
           ),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       return;
@@ -116,13 +118,13 @@ class PersonalDataFormState extends State<PersonalDataForm> {
     print('Datos del cliente insertados: $clientData');
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          "Cliente añadido correctamente",
-          style: TextStyle(color: Colors.white, fontSize: 17),
+          tr(context, 'Cliente añadido correctamente').toUpperCase(),
+          style: const TextStyle(color: Colors.white, fontSize: 17),
         ),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
 
@@ -158,7 +160,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('NOMBRE', style: _labelStyle),
+                            Text(tr(context, 'Nombre').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -166,7 +169,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 controller: _nameController,
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                  hintText: 'Introducir nombre',
+                                  hintText: tr(context, 'Introducir nombre'),
                                 ),
                               ),
                             ),
@@ -178,22 +181,23 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('ESTADO', style: _labelStyle),
+                            Text(tr(context, 'Estado').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedOption,
                                 items: [
                                   DropdownMenuItem(
                                       value: 'Activo',
-                                      child: Text('Activo',
+                                      child: Text(tr(context, 'Activo'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'Inactivo',
-                                      child: Text('Inactivo',
+                                      child: Text(tr(context, 'Inactivo'),
                                           style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
@@ -220,22 +224,23 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('GÉNERO', style: _labelStyle),
+                            Text(tr(context, 'Género').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedGender,
                                 items: [
                                   DropdownMenuItem(
                                       value: 'Hombre',
-                                      child: Text('Hombre',
+                                      child: Text(tr(context, 'Hombre'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'Mujer',
-                                      child: Text('Mujer',
+                                      child: Text(tr(context, 'Mujer'),
                                           style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
@@ -249,7 +254,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
-                            Text('FECHA DE NACIMIENTO', style: _labelStyle),
+                            Text(
+                                tr(context, 'Fecha de nacimiento')
+                                    .toUpperCase(),
+                                style: _labelStyle),
                             GestureDetector(
                               onTap: () => _selectDate(context),
                               child: Container(
@@ -262,7 +270,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
-                            Text('TELÉFONO', style: _labelStyle),
+                            Text(tr(context, 'Teléfono').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -274,7 +283,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir teléfono'),
+                                    hintText:
+                                        tr(context, 'Introducir teléfono')),
                               ),
                             ),
                           ],
@@ -285,7 +295,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('ALTURA (cm)', style: _labelStyle),
+                            Text(tr(context, 'Altura (cm)').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -298,11 +309,13 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir altura'),
+                                  hintText: tr(context, 'Introducir altura'),
+                                ),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
-                            Text('PESO (kg)', style: _labelStyle),
+                            Text(tr(context, 'Peso (kg)').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -312,13 +325,15 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                     const TextInputType.numberWithOptions(
                                         decimal: true),
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(
-                                      r'^\d*\.?\d*$')), // Permite números enteros y decimales
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d*\.?\d*$')),
+                                  // Permite números enteros y decimales
                                   LengthLimitingTextInputFormatter(3),
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir peso'),
+                                  hintText: tr(context, 'Introducir peso'),
+                                ),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
@@ -335,7 +350,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir e-mail'),
+                                  hintText: tr(context, 'Introducir e-mail'),
+                                ),
                               ),
                             ),
                           ],
@@ -382,10 +398,13 @@ class PersonalDataFormState extends State<PersonalDataForm> {
 // Ajustes de estilos para simplificar
   TextStyle get _labelStyle => TextStyle(
       color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
+
   TextStyle get _inputTextStyle =>
       TextStyle(color: Colors.white, fontSize: 14.sp);
+
   TextStyle get _dropdownHintStyle =>
       TextStyle(color: Colors.white, fontSize: 14.sp);
+
   TextStyle get _dropdownItemStyle =>
       TextStyle(color: Colors.white, fontSize: 15.sp);
 

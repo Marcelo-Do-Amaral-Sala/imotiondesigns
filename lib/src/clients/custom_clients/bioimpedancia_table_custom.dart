@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class BioimpedanciaTableWidget extends StatefulWidget {
   final List<Map<String, String>> dataRegister;
   final Function(Map<String, String>) onRowTap;
@@ -57,8 +59,12 @@ class _BioimpedanciaTableWidgetState extends State<BioimpedanciaTableWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        buildCell('FECHA'),
-        buildCell('HORA'),
+        buildCell(
+          tr(context, 'Fecha').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Hora').toUpperCase(),
+        ),
       ],
     );
   }

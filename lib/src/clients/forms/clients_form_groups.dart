@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class ClientsFormGroups extends StatefulWidget {
@@ -52,7 +53,9 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
     setState(() {
       selectedGroups = {for (var row in result) row['nombre']: true};
-      hintColors = {for (var row in result) row['nombre']: const Color(0xFF2be4f3)};
+      hintColors = {
+        for (var row in result) row['nombre']: const Color(0xFF2be4f3)
+      };
       groupIds = {for (var row in result) row['nombre']: row['id']};
       imagePaths = {for (var row in result) row['nombre']: row['imagen']};
     });
@@ -97,13 +100,13 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     // Mostrar el SnackBar solo una vez, dependiendo del resultado final
     if (allSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "Grupos añadidos correctamente",
-            style: TextStyle(color: Colors.white, fontSize: 17),
+            tr(context, 'Grupos añadidos correctamente').toUpperCase(),
+            style: TextStyle(color: Colors.white, fontSize: 17.sp),
           ),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     } else {
@@ -193,7 +196,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                               Text('NOMBRE',
+                              Text(tr(context, 'Nombre').toUpperCase(),
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 15.sp,
@@ -205,7 +208,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                     borderRadius: BorderRadius.circular(7)),
                                 child: TextField(
                                   controller: _nameController,
-                                  style:  TextStyle(
+                                  style: TextStyle(
                                       color: Colors.white, fontSize: 14.sp),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
@@ -225,8 +228,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                               Text(
-                                'ESTADO',
+                              Text(
+                                tr(context, 'Estado').toUpperCase(),
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15.sp,
@@ -241,17 +244,17 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                   absorbing: true,
                                   // Esto deshabilita la interacción con el DropdownButton
                                   child: DropdownButton<String>(
-                                    hint:  Text(
-                                      'Seleccione',
+                                    hint: Text(
+                                      tr(context, 'Seleccione'),
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 14.sp),
                                     ),
                                     value: selectedOption,
-                                    items:  [
+                                    items: [
                                       DropdownMenuItem(
                                         value: 'Activo',
                                         child: Text(
-                                          'Activo',
+                                          tr(context, 'Activo'),
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 14.sp),
@@ -260,7 +263,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                       DropdownMenuItem(
                                         value: 'Inactivo',
                                         child: Text(
-                                          'Inactivo',
+                                          tr(context, 'Inactivo'),
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 14.sp),
@@ -302,7 +305,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               'Isquiotibiales',
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                                padding: EdgeInsets.only(
+                                    bottom: screenHeight * 0.01),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -310,16 +314,18 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                       child: GestureDetector(
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius: BorderRadius.circular(7),
+                                                borderRadius:
+                                                    BorderRadius.circular(7),
                                               ),
                                               child: TextField(
-                                                style:  TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 14.sp,
                                                 ),
@@ -331,10 +337,13 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                                     fontSize: 14.sp,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.circular(7),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            7),
                                                   ),
                                                   filled: true,
-                                                  fillColor: const Color(0xFF313030),
+                                                  fillColor:
+                                                      const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -359,7 +368,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage('assets/images/avatar_back.png'),
+                                      image: AssetImage(
+                                          'assets/images/avatar_back.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -368,15 +378,16 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                              [
-                                'Trapecios',
-                                'Dorsales',
-                                'Lumbares',
-                                'Glúteos',
-                                'Isquiotibiales',
-                                'Gemelos'
-                              ].contains(entry.key) &&
-                                  entry.value) // Filtra solo los grupos seleccionados
+                                      [
+                                        'Trapecios',
+                                        'Dorsales',
+                                        'Lumbares',
+                                        'Glúteos',
+                                        'Isquiotibiales',
+                                        'Gemelos'
+                                      ].contains(entry.key) &&
+                                      entry
+                                          .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
 
@@ -384,16 +395,15 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 String? imagePath = imagePaths[groupName];
 
                                 // Si la ruta no está definida, asignamos una imagen predeterminada
-                                if (imagePath == null) {
-                                  imagePath = 'assets/images/default_image.png';
-                                }
+                                imagePath ??= 'assets/images/default_image.png';
 
                                 // Cargar la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
+                                        image: AssetImage(imagePath),
+                                        // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -412,7 +422,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage('assets/images/avatar_front.png'),
+                                      image: AssetImage(
+                                          'assets/images/avatar_front.png'),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -421,13 +432,14 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               // Iterar sobre los grupos seleccionados y mostrar las imágenes correspondientes
                               ...selectedGroups.entries
                                   .where((entry) =>
-                              [
-                                'Pectorales',
-                                'Abdomen',
-                                'Cuádriceps',
-                                'Bíceps'
-                              ].contains(entry.key) &&
-                                  entry.value) // Filtra solo los grupos seleccionados
+                                      [
+                                        'Pectorales',
+                                        'Abdomen',
+                                        'Cuádriceps',
+                                        'Bíceps'
+                                      ].contains(entry.key) &&
+                                      entry
+                                          .value) // Filtra solo los grupos seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
 
@@ -435,16 +447,15 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                 String? imagePath = imagePaths[groupName];
 
                                 // Si la ruta no está definida, asignamos una imagen predeterminada
-                                if (imagePath == null) {
-                                  imagePath = 'assets/images/default_image.png';
-                                }
+                                imagePath ??= 'assets/images/default_image.png';
 
                                 // Cargar la imagen con la ruta completa, incluyendo la extensión
                                 return Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(imagePath), // Usar la ruta completa con extensión
+                                        image: AssetImage(imagePath),
+                                        // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -466,7 +477,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                               'Gemelos',
                             ].map((group) {
                               return Padding(
-                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                                padding: EdgeInsets.only(
+                                    bottom: screenHeight * 0.01),
                                 child: Row(
                                   children: [
                                     customCheckbox(group),
@@ -474,16 +486,18 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                       child: GestureDetector(
                                         onTap: () => handleTextFieldTap(group),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
                                                 color: const Color(0xFF313030),
-                                                borderRadius: BorderRadius.circular(7),
+                                                borderRadius:
+                                                    BorderRadius.circular(7),
                                               ),
                                               child: TextField(
-                                                style:  TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 14.sp,
                                                 ),
@@ -495,10 +509,13 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                                     fontSize: 14.sp,
                                                   ),
                                                   border: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.circular(7),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            7),
                                                   ),
                                                   filled: true,
-                                                  fillColor: const Color(0xFF313030),
+                                                  fillColor:
+                                                      const Color(0xFF313030),
                                                   isDense: true,
                                                   enabled: false,
                                                 ),
@@ -517,7 +534,6 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -562,7 +578,6 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                         );
                       }
                     },
-
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),

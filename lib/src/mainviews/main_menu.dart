@@ -131,7 +131,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/panel.png',
-                                'PANEL DE CONTROL',
+                                tr(context, 'Panel de control').toUpperCase(),
                                 scaleFactorPanel,
                                     () {
                                   scaleFactorPanel = 1;
@@ -143,7 +143,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/cliente.png',
-                                'CLIENTES',
+                                tr(context, 'Clientes').toUpperCase(),
                                 scaleFactorClient,
                                     () {
                                   scaleFactorClient = 1;
@@ -155,7 +155,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/programas.png',
-                                'PROGRAMAS',
+                                tr(context, 'Programas').toUpperCase(),
                                 scaleFactorProgram,
                                     () {
                                   setState(() {
@@ -169,7 +169,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/bio.png',
-                                'BIOIMPEDANCIA',
+                                tr(context, 'Bioimpedancia').toUpperCase(),
                                 scaleFactorBio,
                                     () {
                                   setState(() {
@@ -183,7 +183,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/tutoriales.png',
-                                'TUTORIALES',
+                                tr(context, 'Tutoriales').toUpperCase(),
                                 scaleFactorTuto,
                                     () {
                                   setState(() {
@@ -197,7 +197,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                               buildButton(
                                 context,
                                 'assets/images/ajustes.png',
-                                'AJUSTES',
+                                tr(context, 'Ajustes').toUpperCase(),
                                 scaleFactorAjustes,
                                     () {
                                   setState(() {

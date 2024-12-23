@@ -1,13 +1,32 @@
 {
   "project_info": {
-    "project_number": "1093761830210",
-    "project_id": "traducciones-v25",
-    "storage_bucket": "traducciones-v25.firebasestorage.app"
+    "project_number": "313073231514",
+    "project_id": "traducciones-v25-imotion",
+    "storage_bucket": "traducciones-v25-imotion.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1093761830210:android:f8dc7e0abcb39a71b5ccdb",
+        "mobilesdk_app_id": "1:313073231514:android:732e8c39ce30a72b1ea123",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3Zh3MoE4eKHVOAtgd10nACwfcVYgKlnU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:313073231514:android:61bf0b16c171730b1ea123",
         "android_client_info": {
           "package_name": "com.example.imotion_designs"
         }
@@ -15,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBMlx0YOt0_8Wvb4tT2Yhn4E4KRMS0metY"
+          "current_key": "AIzaSyC3Zh3MoE4eKHVOAtgd10nACwfcVYgKlnU"
         }
       ],
       "services": {

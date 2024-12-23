@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class ActivityTableWidget extends StatefulWidget {
   final List<Map<String, String>> activityData;
 
@@ -16,7 +18,7 @@ class _ActivityTableWidgetState extends State<ActivityTableWidget> {
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
-        SizedBox(height: MediaQuery.of(context).size.height*0.01),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -30,7 +32,7 @@ class _ActivityTableWidgetState extends State<ActivityTableWidget> {
                       points: row['points'] ?? '',
                       ekal: row['ekal'] ?? '',
                     ),
-                     SizedBox(height: MediaQuery.of(context).size.height*0.01),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   ],
                 );
               }).toList(),
@@ -45,10 +47,18 @@ class _ActivityTableWidgetState extends State<ActivityTableWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        buildCell('FECHA'),
-        buildCell('HORA'),
-        buildCell('BONOS'),
-        buildCell('PUNTOS'),
+        buildCell(
+          tr(context, 'Fecha').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Hora').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Bonos').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Puntos').toUpperCase(),
+        ),
         buildCell('E-KAL'),
       ],
     );
@@ -61,7 +71,7 @@ class _ActivityTableWidgetState extends State<ActivityTableWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style:  TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 17.sp,
             fontWeight: FontWeight.bold,
@@ -119,7 +129,10 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
-          style:  TextStyle(color: Colors.white, fontSize: 14.sp,),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14.sp,
+          ),
         ),
       ),
     );

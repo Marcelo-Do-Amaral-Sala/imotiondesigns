@@ -6,6 +6,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 import '../../servicios/licencia_state.dart';
 import '../custom/border_neon.dart';
@@ -488,7 +489,8 @@ class _PanelViewState extends State<PanelView>
     setState(() {
       isRunning = false;
       pausedTime = elapsedTime; // Guardar el tiempo actual cuando se pausa
-      pausedTime = elapsedTimeContraction; // Guardar el tiempo actual cuando se pausa
+      pausedTime =
+          elapsedTimeContraction; // Guardar el tiempo actual cuando se pausa
       pausedTime = elapsedTimePause; // Guardar el tiempo actual cuando se pausa
       _timer.cancel(); // Detener el temporizador
     });
@@ -602,7 +604,8 @@ class _PanelViewState extends State<PanelView>
                                                     mciEquipMapping[
                                                             macAddress] ??
                                                         0;
-                                                clientsNames[macAddress] = mci['clientName'];
+                                                clientsNames[macAddress] =
+                                                    mci['clientName'];
                                               });
 
                                               print(
@@ -772,7 +775,8 @@ class _PanelViewState extends State<PanelView>
                                                     width: 30,
                                                     // Tamaño de la imagen
                                                     height: 30,
-                                                    decoration: const BoxDecoration(
+                                                    decoration:
+                                                        const BoxDecoration(
                                                       shape: BoxShape.circle,
                                                       // Fondo circular
                                                       color: Colors
@@ -810,7 +814,8 @@ class _PanelViewState extends State<PanelView>
                                           backgroundColor: Colors.transparent,
                                         ),
                                         child: Text(
-                                          'DEFINIR GRUPOS',
+                                          tr(context, 'Definir grupos')
+                                              .toUpperCase(),
                                           style: TextStyle(
                                             color: const Color(0xFF2be4f3),
                                             fontSize: 17.sp,
@@ -1175,8 +1180,11 @@ class _PanelViewState extends State<PanelView>
                                                     0xFF2be4f3), // Mantener color de fondo
                                               ),
                                               child: Text(
-                                                globalSelectedProgram ??
-                                                    'PROGRAMAS',
+                                                (tr(
+                                                        context,
+                                                        globalSelectedProgram ??
+                                                            'Programas'))
+                                                    .toUpperCase(),
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   // Mantener color del texto
@@ -1197,7 +1205,9 @@ class _PanelViewState extends State<PanelView>
                                                     children: [
                                                       // Texto predeterminado si no se ha seleccionado ningún programa
                                                       Text(
-                                                        "NOMBRE PROGRAMA",
+                                                        tr(context,
+                                                                'Nombre programa')
+                                                            .toUpperCase(),
                                                         style: TextStyle(
                                                           color: const Color(
                                                               0xFF2be4f3),
@@ -1226,18 +1236,21 @@ class _PanelViewState extends State<PanelView>
                                                     children: [
                                                       // Mostrar el nombre del programa seleccionado o el primer programa por defecto
                                                       Text(
-                                                        selectedIndivProgram !=
-                                                                null
-                                                            ? selectedIndivProgram![
-                                                                    'nombre'] ??
-                                                                "NOMBRE PROGRAMA"
-                                                            : allIndividualPrograms
+                                                        selectedIndivProgram?[
+                                                                    'nombre']
+                                                                ?.toUpperCase() ??
+                                                            (allIndividualPrograms
                                                                     .isNotEmpty
-                                                                ? allIndividualPrograms[
-                                                                            0][
-                                                                        'nombre'] ??
-                                                                    "NOMBRE PROGRAMA"
-                                                                : "No hay programas disponibles",
+                                                                ? (allIndividualPrograms[0]
+                                                                            [
+                                                                            'nombre']
+                                                                        ?.toUpperCase() ??
+                                                                    tr(context,
+                                                                            'NOMBRE PROGRAMA')
+                                                                        .toUpperCase())
+                                                                : tr(context,
+                                                                        'No hay programas disponibles')
+                                                                    .toUpperCase()),
                                                         style: TextStyle(
                                                           color: const Color(
                                                               0xFF2be4f3),
@@ -1289,18 +1302,21 @@ class _PanelViewState extends State<PanelView>
                                                     children: [
                                                       // Mostrar el nombre del programa seleccionado o el primer programa por defecto
                                                       Text(
-                                                        selectedRecoProgram !=
-                                                                null
-                                                            ? selectedRecoProgram![
-                                                                    'nombre'] ??
-                                                                "NOMBRE PROGRAMA"
-                                                            : allRecoveryPrograms
+                                                        selectedRecoProgram?[
+                                                                    'nombre']
+                                                                ?.toUpperCase() ??
+                                                            (allRecoveryPrograms
                                                                     .isNotEmpty
-                                                                ? allRecoveryPrograms[
-                                                                            0][
-                                                                        'nombre'] ??
-                                                                    "NOMBRE PROGRAMA"
-                                                                : "No hay programas disponibles",
+                                                                ? (allRecoveryPrograms[0]
+                                                                            [
+                                                                            'nombre']
+                                                                        ?.toUpperCase() ??
+                                                                    tr(context,
+                                                                            'NOMBRE PROGRAMA')
+                                                                        .toUpperCase())
+                                                                : tr(context,
+                                                                        'No hay programas disponibles')
+                                                                    .toUpperCase()),
                                                         style: TextStyle(
                                                           color: const Color(
                                                               0xFF2be4f3),
@@ -1352,18 +1368,21 @@ class _PanelViewState extends State<PanelView>
                                                     children: [
                                                       // Mostrar el nombre del programa seleccionado o el primer programa por defecto
                                                       Text(
-                                                        selectedAutoProgram !=
-                                                                null
-                                                            ? selectedAutoProgram![
-                                                                    'nombre_programa_automatico'] ??
-                                                                "NOMBRE PROGRAMA"
-                                                            : allAutomaticPrograms
+                                                        selectedAutoProgram?[
+                                                                    'nombre_programa_automatico']
+                                                                ?.toUpperCase() ??
+                                                            (allAutomaticPrograms
                                                                     .isNotEmpty
-                                                                ? allAutomaticPrograms[
-                                                                            0][
-                                                                        'nombre_programa_automatico'] ??
-                                                                    "NOMBRE PROGRAMA"
-                                                                : "No hay programas disponibles",
+                                                                ? (allAutomaticPrograms[0]
+                                                                            [
+                                                                            'nombre_programa_automatico']
+                                                                        ?.toUpperCase() ??
+                                                                    tr(context,
+                                                                            'NOMBRE PROGRAMA')
+                                                                        .toUpperCase())
+                                                                : tr(context,
+                                                                        'No hay programas disponibles')
+                                                                    .toUpperCase()),
                                                         style: TextStyle(
                                                           color: const Color(
                                                               0xFF2be4f3),
@@ -1548,7 +1567,7 @@ class _PanelViewState extends State<PanelView>
                                                     Colors.transparent,
                                               ),
                                               child: Text(
-                                                'CICLOS',
+                                                tr(context, 'Ciclos').toUpperCase(),
                                                 style: TextStyle(
                                                   color:
                                                       const Color(0xFF2be4f3),
@@ -2459,7 +2478,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter(
-                                                          progress: progressContraction,
+                                                          progress:
+                                                              progressContraction,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -2494,7 +2514,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter2(
-                                                          progress: progressPause,
+                                                          progress:
+                                                              progressPause,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -4006,7 +4027,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter(
-                                                          progress: progressContraction,
+                                                          progress:
+                                                              progressContraction,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -4041,7 +4063,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter2(
-                                                          progress: progressPause,
+                                                          progress:
+                                                              progressPause,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -5775,7 +5798,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter(
-                                                          progress: progressContraction,
+                                                          progress:
+                                                              progressContraction,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -5810,7 +5834,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter2(
-                                                          progress: progressPause,
+                                                          progress:
+                                                              progressPause,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -7322,7 +7347,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter(
-                                                          progress: progressContraction,
+                                                          progress:
+                                                              progressContraction,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -7357,7 +7383,8 @@ class _PanelViewState extends State<PanelView>
                                                     CustomPaint(
                                                       size: const Size(110, 40),
                                                       painter: LinePainter2(
-                                                          progress: progressPause,
+                                                          progress:
+                                                              progressPause,
                                                           strokeHeight: 20),
                                                     ),
                                                     SizedBox(
@@ -8363,7 +8390,7 @@ class _PanelViewState extends State<PanelView>
             child: Column(
               children: [
                 Text(
-                  'AVISO',
+                  tr(context, 'Aviso').toUpperCase(),
                   style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 30.sp,
@@ -8372,7 +8399,7 @@ class _PanelViewState extends State<PanelView>
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '¿QUIERES RESETEAR TODO?',
+                  tr(context, '¿Quieres resetear todo?').toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
@@ -8392,7 +8419,7 @@ class _PanelViewState extends State<PanelView>
                         ),
                       ),
                       child: Text(
-                        'CANCELAR',
+                          tr(context, 'Cancelar').toUpperCase(),
                         style: TextStyle(
                             color: const Color(0xFF2be4f3), fontSize: 17.sp),
                       ),
@@ -8410,7 +8437,7 @@ class _PanelViewState extends State<PanelView>
                           ),
                           backgroundColor: Colors.red),
                       child: Text(
-                        '¡SÍ, QUIERO RESETEAR!',
+                        tr(context, 'Sí, quiero resetear!').toUpperCase(),
                         style: TextStyle(color: Colors.white, fontSize: 17.sp),
                       ),
                     ),
@@ -8445,7 +8472,7 @@ class _PanelViewState extends State<PanelView>
             child: Column(
               children: [
                 Text(
-                  'AVISO',
+                  tr(context, 'Aviso').toUpperCase(),
                   style: TextStyle(
                     color: const Color(0xFF2be4f3),
                     fontSize: 30.sp,
@@ -8455,7 +8482,7 @@ class _PanelViewState extends State<PanelView>
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  '¿QUIERES SALIR DEL PANEL?',
+                  tr(context, '¿Quieres salir del panel?').toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
@@ -8475,7 +8502,7 @@ class _PanelViewState extends State<PanelView>
                         ),
                       ),
                       child: Text(
-                        'CANCELAR',
+                        tr(context, 'Cancelar').toUpperCase(),
                         style: TextStyle(
                           color: const Color(0xFF2be4f3),
                           fontSize: 17.sp,
@@ -8497,7 +8524,7 @@ class _PanelViewState extends State<PanelView>
                         backgroundColor: Colors.red,
                       ),
                       child: Text(
-                        'SALIR DEL PANEL',
+                        tr(context, 'Salir del panel').toUpperCase(),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 17.sp,
