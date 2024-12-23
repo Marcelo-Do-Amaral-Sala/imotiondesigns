@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class AdminsData extends StatefulWidget {
@@ -141,10 +142,11 @@ class AdminsDataState extends State<AdminsData> {
         !_emailController.text.contains('@')) {
       // Verificación de '@' en el correo
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "Por favor, complete todos los campos correctamente.",
-            style: TextStyle(color: Colors.white, fontSize: 17),
+            tr(context, 'Por favor, complete todos los campos correctamente')
+                .toUpperCase(),
+            style: TextStyle(color: Colors.white, fontSize: 17.sp),
           ),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
@@ -196,16 +198,16 @@ class AdminsDataState extends State<AdminsData> {
 
     // Mostrar un SnackBar de éxito
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          "Usuario actualizado correctamente",
+          tr(context, 'Usuario actualizado correctamente').toUpperCase(),
           style: TextStyle(
             color: Colors.white,
-            fontSize: 17,
+            fontSize: 17.sp,
           ),
         ),
-        backgroundColor: Color(0xFF2be4f3),
-        duration: Duration(seconds: 2),
+        backgroundColor: const Color(0xFF2be4f3),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -219,15 +221,16 @@ class AdminsDataState extends State<AdminsData> {
           backgroundColor: const Color(0xFF494949),
           // Color de fondo del diálogo
           title: Text(
-            'Confirmar Borrado',
+            tr(context, 'Confirmar borrado').toUpperCase(),
             style: TextStyle(
-                color: Color(0xFF2be4f3),
+                color: const Color(0xFF2be4f3),
                 fontSize: 30.sp,
                 fontWeight: FontWeight.bold),
             textAlign: TextAlign.center, // Color del texto
           ),
           content: Text(
-            '¿Estás seguro de que quieres borrar este cliente?',
+            tr(context, '¿Estás seguro que quieres borrar este cliente?')
+                .toUpperCase(),
             style: TextStyle(color: Colors.white, fontSize: 25.sp),
             textAlign: TextAlign.center, // Color del texto
           ),
@@ -251,7 +254,7 @@ class AdminsDataState extends State<AdminsData> {
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    'CANCELAR',
+                    tr(context, 'Cancelar').toUpperCase(),
                     style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 17.sp,
@@ -267,13 +270,15 @@ class AdminsDataState extends State<AdminsData> {
 
                     // Mostrar Snackbar de éxito
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
-                          "Usuario borrado correctamente",
-                          style: TextStyle(color: Colors.white, fontSize: 17),
+                          tr(context, 'Usuario borrado correctamente')
+                              .toUpperCase(),
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 17.sp),
                         ),
                         backgroundColor: Colors.orange,
-                        duration: Duration(seconds: 2),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                     // Cierra el diálogo después de confirmar el borrado
@@ -284,17 +289,17 @@ class AdminsDataState extends State<AdminsData> {
                     padding: const EdgeInsets.all(10.0),
                     side: const BorderSide(
                       width: 1.0,
-                      color: Color(0xFF2be4f3),
+                      color: Colors.red,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
-                    backgroundColor: Colors.transparent,
+                    backgroundColor: Colors.red,
                   ),
                   child: Text(
-                    '¡SÍ, ESTOY SEGURO!',
+                    tr(context, '¡Sí, estoy seguro!').toUpperCase(),
                     style: TextStyle(
-                      color: const Color(0xFF2be4f3),
+                      color: Colors.white,
                       fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -336,7 +341,8 @@ class AdminsDataState extends State<AdminsData> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('NOMBRE', style: _labelStyle),
+                            Text(tr(context, 'Nombre').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -344,7 +350,7 @@ class AdminsDataState extends State<AdminsData> {
                                 controller: _nameController,
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                  hintText: 'Introducir nombre',
+                                  hintText: tr(context, 'Introducir nombre'),
                                 ),
                               ),
                             ),
@@ -356,22 +362,23 @@ class AdminsDataState extends State<AdminsData> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('ESTADO', style: _labelStyle),
+                            Text(tr(context, 'Estado').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedOption,
                                 items: [
                                   DropdownMenuItem(
                                       value: 'Activo',
-                                      child: Text('Activo',
+                                      child: Text(tr(context, 'Activo'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'Inactivo',
-                                      child: Text('Inactivo',
+                                      child: Text(tr(context, 'Inactivo'),
                                           style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
@@ -402,7 +409,7 @@ class AdminsDataState extends State<AdminsData> {
                           backgroundColor: Colors.transparent,
                         ),
                         child: Text(
-                          'RESET PASSWORD',
+                          tr(context, 'Reset password').toUpperCase(),
                           style: TextStyle(
                             color: const Color(0xFF2be4f3),
                             fontSize: 17.sp,
@@ -422,22 +429,23 @@ class AdminsDataState extends State<AdminsData> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('GÉNERO', style: _labelStyle),
+                            Text(tr(context, 'Género').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedGender,
                                 items: [
                                   DropdownMenuItem(
                                       value: 'Hombre',
-                                      child: Text('Hombre',
+                                      child: Text(tr(context, 'Hombre'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'Mujer',
-                                      child: Text('Mujer',
+                                      child: Text(tr(context, 'Mujer'),
                                           style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
@@ -451,7 +459,10 @@ class AdminsDataState extends State<AdminsData> {
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
-                            Text('FECHA DE NACIMIENTO', style: _labelStyle),
+                            Text(
+                                tr(context, 'Fecha de nacimiento')
+                                    .toUpperCase(),
+                                style: _labelStyle),
                             GestureDetector(
                               onTap: () => _selectDate(context),
                               child: Container(
@@ -464,7 +475,8 @@ class AdminsDataState extends State<AdminsData> {
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
-                            Text('TELÉFONO', style: _labelStyle),
+                            Text(tr(context, 'Teléfono').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -476,7 +488,8 @@ class AdminsDataState extends State<AdminsData> {
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir teléfono'),
+                                  hintText: tr(context, 'Introducir teléfono'),
+                                ),
                               ),
                             ),
                           ],
@@ -500,11 +513,13 @@ class AdminsDataState extends State<AdminsData> {
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir e-mail'),
+                                  hintText: tr(context, 'Introducir e-mail'),
+                                ),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
-                            Text('FECHA DE ALTA', style: _labelStyle),
+                            Text(tr(context, 'Fecha de alta').toUpperCase(),
+                                style: _labelStyle),
                             GestureDetector(
                               onTap: () => _selectAltaDate(context),
                               child: Container(
@@ -517,26 +532,27 @@ class AdminsDataState extends State<AdminsData> {
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
-                            Text('TIPO DE PERFIL', style: _labelStyle),
+                            Text(tr(context, 'Tipo de perfil').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedTipoPerfil,
                                 items: [
                                   DropdownMenuItem(
                                       value: 'Administrador',
-                                      child: Text('Administrador',
+                                      child: Text(tr(context, 'Administrador'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'Entrenador',
-                                      child: Text('Entrenador',
+                                      child: Text(tr(context, 'Entrenador'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'Ambos',
-                                      child: Text('Ambos',
+                                      child: Text(tr(context, 'Ambos'),
                                           style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
@@ -559,22 +575,25 @@ class AdminsDataState extends State<AdminsData> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('CONTROL DE SESIONES', style: _labelStyle),
+                            Text(
+                                tr(context, 'Control de sesiones')
+                                    .toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedControlSesiones,
                                 items: [
                                   DropdownMenuItem(
                                       value: 'Sí',
-                                      child: Text('Sí',
+                                      child: Text(tr(context, 'Sí'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'No',
-                                      child: Text('No',
+                                      child: Text(tr(context, 'No'),
                                           style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {
@@ -588,22 +607,23 @@ class AdminsDataState extends State<AdminsData> {
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
-                            Text('CONTROL DE TIEMPO', style: _labelStyle),
+                            Text(tr(context, 'Control de tiempo').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedControlTiempo,
                                 items: [
                                   DropdownMenuItem(
                                       value: 'Sí',
-                                      child: Text('Sí',
+                                      child: Text(tr(context, 'Sí'),
                                           style: _dropdownItemStyle)),
                                   DropdownMenuItem(
                                       value: 'No',
-                                      child: Text('No',
+                                      child: Text(tr(context, 'No'),
                                           style: _dropdownItemStyle)),
                                 ],
                                 onChanged: (value) {

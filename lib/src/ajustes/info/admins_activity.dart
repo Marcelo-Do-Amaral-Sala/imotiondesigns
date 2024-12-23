@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/activity_table_custom.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class AdminsActivity extends StatefulWidget {
   final Map<String, dynamic> adminDataActivity;
 
@@ -93,19 +95,16 @@ class _AdminsActivityState extends State<AdminsActivity> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Campo ID
-                  Flexible(
-                    child: _buildTextField('ID', _indexController, false),
-                  ),
-                  SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
                   // Campo NOMBRE
                   Flexible(
-                    child: _buildTextField('NOMBRE', _nameController, false),
+                    child: _buildTextField(tr(context, 'Nombre').toUpperCase(),
+                        _nameController, false),
                   ),
                   SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
                   // Campo ESTADO
-                  Flexible(             
+                  Flexible(
                     child: _buildDropdownField(
-                      'ESTADO',
+                      tr(context, 'Estado').toUpperCase(),
                       selectedOption,
                       (value) {
                         setState(() {
@@ -203,7 +202,7 @@ class _AdminsActivityState extends State<AdminsActivity> {
             absorbing: !enabled, // Deshabilitar interacción
             child: DropdownButton<String>(
               hint: Text(
-                'Seleccione',
+                tr(context, 'Seleccione'),
                 style: TextStyle(color: Colors.white, fontSize: 14.sp),
               ),
               value: value,
@@ -211,14 +210,14 @@ class _AdminsActivityState extends State<AdminsActivity> {
                 DropdownMenuItem(
                   value: 'Activo',
                   child: Text(
-                    'Activo',
+                    tr(context, 'Activo'),
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),
                 DropdownMenuItem(
                   value: 'Inactivo',
                   child: Text(
-                    'Inactivo',
+                    tr(context, 'Inactivo'),
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),

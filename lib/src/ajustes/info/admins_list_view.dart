@@ -3,11 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/custom/admins_table_widget.dart';
 import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class AdminsListView extends StatefulWidget {
   final Function(Map<String, dynamic>)
-  onAdminTap; // Cambia el tipo a dynamic para incluir int
+      onAdminTap; // Cambia el tipo a dynamic para incluir int
 
   const AdminsListView({Key? key, required this.onAdminTap}) : super(key: key);
 
@@ -34,13 +35,19 @@ class _AdminsListViewState extends State<AdminsListView> {
     final dbHelper = DatabaseHelper();
     try {
       // Obtener los usuarios cuyo perfil es "Administrador" o "Ambos"
-      final adminData = await dbHelper.getUsuariosPorTipoPerfil('Administrador');
-      final adminDataEntrenador = await dbHelper.getUsuariosPorTipoPerfil('Entrenador');
+      final adminData =
+          await dbHelper.getUsuariosPorTipoPerfil('Administrador');
+      final adminDataEntrenador =
+          await dbHelper.getUsuariosPorTipoPerfil('Entrenador');
       // También podemos obtener usuarios con el tipo de perfil 'Ambos' si es necesario
       final adminDataAmbos = await dbHelper.getUsuariosPorTipoPerfil('Ambos');
 
       // Combina ambas listas
-      final allAdminData = [...adminData, ...adminDataAmbos, ...adminDataEntrenador];
+      final allAdminData = [
+        ...adminData,
+        ...adminDataAmbos,
+        ...adminDataEntrenador
+      ];
 
       setState(() {
         allAdmins = allAdminData; // Asigna los usuarios filtrados
@@ -52,7 +59,6 @@ class _AdminsListViewState extends State<AdminsListView> {
       print('Error fetching clients: $e');
     }
   }
-
 
   Future<void> _filterAdmins() async {
     String searchText = _adminNameController.text.toLowerCase();
@@ -72,8 +78,8 @@ class _AdminsListViewState extends State<AdminsListView> {
       // Filtra por nombre
       admins = admins.where((admin) {
         final matchesName = admin['name']!.toLowerCase().contains(searchText);
-        final matchesStatus =
-            selectedAdminOption == 'Todos' || admin['status'] == selectedAdminOption;
+        final matchesStatus = selectedAdminOption == 'Todos' ||
+            admin['status'] == selectedAdminOption;
         return matchesName && matchesStatus;
       }).toList();
 
@@ -85,7 +91,6 @@ class _AdminsListViewState extends State<AdminsListView> {
       print("Error al filtrar administradores: $e");
     }
   }
-
 
   void _showPrint(Map<String, dynamic> adminData) {
     _updateAdminFields(adminData);
@@ -116,8 +121,8 @@ class _AdminsListViewState extends State<AdminsListView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildTextField(
-                  'NOMBRE', _adminNameController, 'Ingrese nombre'),
+              _buildTextField(tr(context, 'Nombre').toUpperCase(),
+                  _adminNameController, tr(context, 'Introducir nombre')),
               SizedBox(width: screenWidth * 0.02),
               _buildDropdown1(),
               SizedBox(width: screenWidth * 0.02),
@@ -138,7 +143,7 @@ class _AdminsListViewState extends State<AdminsListView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style:  TextStyle(
+              style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.bold)),
@@ -159,7 +164,7 @@ class _AdminsListViewState extends State<AdminsListView> {
                 fillColor: const Color(0xFF313030),
                 isDense: true,
                 hintText: hint,
-                hintStyle:  TextStyle(color: Colors.grey, fontSize: 14.sp),
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),
           ),
@@ -173,7 +178,7 @@ class _AdminsListViewState extends State<AdminsListView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text('ESTADO',
+          Text(tr(context, 'Estado').toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.sp,
@@ -186,19 +191,22 @@ class _AdminsListViewState extends State<AdminsListView> {
             ),
             child: DropdownButton<String>(
               value: selectedAdminOption,
-              items:  [
+              items: [
                 DropdownMenuItem(
                     value: 'Todos',
-                    child: Text('Todos',
-                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
+                    child: Text(tr(context, 'Todos'),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Activo',
-                    child: Text('Activo',
-                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
+                    child: Text(tr(context, 'Activo'),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Inactivo',
-                    child: Text('Inactivo',
-                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
+                    child: Text(tr(context, 'Inactivo'),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
               onChanged: (value) {
                 setState(() {
@@ -215,12 +223,13 @@ class _AdminsListViewState extends State<AdminsListView> {
       ),
     );
   }
+
   Widget _buildDropdown2() {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text('TIPO',
+          Text(tr(context, 'Tipo').toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.sp,
@@ -233,19 +242,22 @@ class _AdminsListViewState extends State<AdminsListView> {
             ),
             child: DropdownButton<String>(
               value: selectedTipo,
-              items:  [
+              items: [
                 DropdownMenuItem(
                     value: 'Ambos',
-                    child: Text('Ambos',
-                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
+                    child: Text(tr(context, 'Ambos'),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Administrador',
-                    child: Text('Administrador',
-                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
+                    child: Text(tr(context, 'Administrador'),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Entrenador',
-                    child: Text('Entrenador',
-                        style: TextStyle(color: Colors.white, fontSize: 14.sp))),
+                    child: Text(tr(context, 'Entrenador'),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
               onChanged: (value) {
                 setState(() {

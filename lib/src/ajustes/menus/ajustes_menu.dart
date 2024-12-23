@@ -147,7 +147,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                               tr(context, 'Ajustes').toUpperCase(),
                                               style: TextStyle(
                                                 color: const Color(0xFF28E2F5),
-                                                fontSize: 34.sp,
+                                                fontSize: 32.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,

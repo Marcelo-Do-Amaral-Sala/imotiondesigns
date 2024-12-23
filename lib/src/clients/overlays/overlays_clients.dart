@@ -305,26 +305,36 @@ class _OverlayCrearState extends State<OverlayCrear>
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF494949),
-          title: Text(
-            tr(context, '¡Alerta!').toUpperCase(),
-            style: TextStyle(
-                color: Colors.red,
-                fontSize: 30.sp,
-                fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          content: Text(
-            tr(context, 'Debes completar el formulario para continuar')
-                .toUpperCase(),
-            style: TextStyle(color: Colors.white, fontSize: 25.sp),
-            textAlign: TextAlign.center,
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            // Aquí defines el ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.3,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: 1,
+              ),
+            ),
+            child: Column(
               children: [
+                Text(
+                  tr(context, '¡Alerta!').toUpperCase(),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  tr(context, 'Debes completar el formulario para continuar')
+                      .toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                  textAlign: TextAlign.center,
+                ),
                 OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog
@@ -352,7 +362,7 @@ class _OverlayCrearState extends State<OverlayCrear>
                 ),
               ],
             ),
-          ],
+          ),
         );
       },
     );

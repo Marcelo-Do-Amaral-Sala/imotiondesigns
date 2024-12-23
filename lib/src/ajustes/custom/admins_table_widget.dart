@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class AdminsTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> data; // Mantener el tipo como dynamic
   final Function(Map<String, dynamic>)
@@ -67,9 +69,15 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         buildCell('ID'),
-        buildCell('NOMBRE'),
-        buildCell('TELÉFONO'),
-        buildCell('ESTADO'),
+        buildCell(
+          tr(context, 'Nombre').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Teléfono').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Estado').toUpperCase(),
+        ),
       ],
     );
   }

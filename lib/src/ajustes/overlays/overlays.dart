@@ -178,7 +178,7 @@ class _OverlayBackupState extends State<OverlayBackup>
   Widget build(BuildContext context) {
     return MainOverlay(
       title: Text(
-        "COPIA DE SEGURIDAD",
+        tr(context, 'Copia de seguridad').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -198,9 +198,10 @@ class _OverlayBackupState extends State<OverlayBackup>
                   onPressed: () {
                     setState(() {
                       showConfirmation = true;
-                      actionMessage =
-                          '¿Seguro que quieres hacer la copia de seguridad?';
-                      subActionMessage = 'Sobreescribirás tu copia anterior';
+                      actionMessage = tr(context,
+                          '¿Seguro que quieres hacer la copia de seguridad?');
+                      subActionMessage =
+                          tr(context, 'Sobreescribirás tu copia anterior');
                     });
                   },
                   style: OutlinedButton.styleFrom(
@@ -213,7 +214,7 @@ class _OverlayBackupState extends State<OverlayBackup>
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    'HACER COPIA',
+                    tr(context, 'Hacer copia').toUpperCase(),
                     style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 17.sp,
@@ -226,9 +227,10 @@ class _OverlayBackupState extends State<OverlayBackup>
                   onPressed: () {
                     setState(() {
                       showConfirmation = true;
-                      actionMessage = '¿Seguro que quieres recuperar la copia?';
-                      subActionMessage =
-                          'La aplicación se reiniciará después de la descarga';
+                      actionMessage = tr(context,
+                          '¿Seguro que quieres restaurar la copia de seguridad?');
+                      subActionMessage = tr(context,
+                          'La aplicación se reiniciará después de la descarga');
                     });
                   },
                   style: OutlinedButton.styleFrom(
@@ -239,7 +241,7 @@ class _OverlayBackupState extends State<OverlayBackup>
                     backgroundColor: const Color(0xFF2be4f3),
                   ),
                   child: Text(
-                    'RECUPERAR COPIA',
+                    tr(context, 'Recuperar copia').toUpperCase(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 17.sp,
@@ -334,7 +336,7 @@ class _OverlayBackupState extends State<OverlayBackup>
                         backgroundColor: Colors.green,
                       ),
                       child: Text(
-                        'SÍ',
+                        tr(context, 'Sí').toUpperCase(),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 17.sp,
@@ -358,7 +360,7 @@ class _OverlayBackupState extends State<OverlayBackup>
                         backgroundColor: Colors.red,
                       ),
                       child: Text(
-                        'NO',
+                        tr(context, 'No').toUpperCase(),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 17.sp,
@@ -388,11 +390,13 @@ class OverlayIdioma extends StatefulWidget {
   _OverlayIdiomaState createState() => _OverlayIdiomaState();
 }
 
-class _OverlayIdiomaState extends State<OverlayIdioma> with SingleTickerProviderStateMixin {
+class _OverlayIdiomaState extends State<OverlayIdioma>
+    with SingleTickerProviderStateMixin {
   String? _selectedLanguage;
   Map<String, String> _translations = {};
   final SyncService _syncService = SyncService();
-  final DatabaseHelperTraducciones _dbHelperTraducciones = DatabaseHelperTraducciones();
+  final DatabaseHelperTraducciones _dbHelperTraducciones =
+      DatabaseHelperTraducciones();
   String statusMessage = 'Listo para hacer la copia de seguridad';
 
   // Mapa de nombres visibles y sus valores internos
@@ -422,14 +426,16 @@ class _OverlayIdiomaState extends State<OverlayIdioma> with SingleTickerProvider
   }
 
   void _fetchLocalTranslations(String language) async {
-    final translations = await _dbHelperTraducciones.getTranslationsByLanguage(language);
+    final translations =
+        await _dbHelperTraducciones.getTranslationsByLanguage(language);
 
     // Verificar si el widget todavía está montado antes de llamar a setState
     if (mounted) {
       setState(() {
         _translations = Map<String, String>.from(translations);
         if (_translations.isEmpty) {
-          statusMessage = "No hay datos disponibles, la base de datos está vacía.";
+          statusMessage =
+              "No hay datos disponibles, la base de datos está vacía.";
           print("La base de datos está vacía.");
         }
       });
@@ -465,14 +471,11 @@ class _OverlayIdiomaState extends State<OverlayIdioma> with SingleTickerProvider
     _fetchLocalTranslations(language);
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
       title: Text(
-        tr(context, 'Selección de idioma').toUpperCase(),
+        tr(context, 'Idioma').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -518,20 +521,22 @@ class _OverlayIdiomaState extends State<OverlayIdioma> with SingleTickerProvider
                   onPressed: () {
                     if (_selectedLanguage != null) {
                       print("Idioma seleccionado: $_selectedLanguage");
-                      _changeAppLanguage(_selectedLanguage!); // Cambia el idioma seleccionado
+                      _changeAppLanguage(
+                          _selectedLanguage!); // Cambia el idioma seleccionado
                     }
                     widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
                     backgroundColor: Color(0xFF2be4f3),
                   ),
                   child: Text(
-                    'SELECCIONAR',
+                    tr(context, 'Seleccionar').toUpperCase(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25.sp,
@@ -562,7 +567,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma> with SingleTickerProvider
       ),
       onTap: () {
         setState(() {
-          _selectedLanguage = _languageMap[language]; // Actualiza la selección con el valor interno
+          _selectedLanguage = _languageMap[
+              language]; // Actualiza la selección con el valor interno
         });
       },
     );
@@ -572,7 +578,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma> with SingleTickerProvider
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedLanguage = _languageMap[language]; // Actualiza la selección con el valor interno
+          _selectedLanguage = _languageMap[
+              language]; // Actualiza la selección con el valor interno
         });
       },
       child: Container(
@@ -619,7 +626,7 @@ class _OverlayServicioState extends State<OverlayServicio>
   Widget build(BuildContext context) {
     return MainOverlay(
       title: Text(
-        "SERVICIO TÉCNICO",
+        tr(context, 'Servicio técnico').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -632,7 +639,7 @@ class _OverlayServicioState extends State<OverlayServicio>
         child: Column(
           children: [
             Text(
-              "CONTACTO",
+              tr(context, 'Contacto').toUpperCase(),
               style: TextStyle(
                   color: const Color(0xFF28E2F5),
                   fontSize: 25.sp,
@@ -640,7 +647,8 @@ class _OverlayServicioState extends State<OverlayServicio>
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             Text(
-              "Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional",
+              tr(context,
+                  'Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional'),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 20.sp,
@@ -726,7 +734,7 @@ class _OverlayAdminsState extends State<OverlayAdmins>
   Widget build(BuildContext context) {
     return MainOverlay(
       title: Text(
-        "ADMINISTRADORES",
+        tr(context, 'Administradores').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -762,9 +770,9 @@ class _OverlayAdminsState extends State<OverlayAdmins>
           setState(() {});
         },
         tabs: [
-          _buildTab('DATOS PERSONALES', 0),
-          _buildTab('BONOS', 1),
-          _buildTab('ACTIVIDAD', 2),
+          _buildTab(tr(context, 'Datos personales').toUpperCase(), 0),
+          _buildTab(tr(context, 'Bonos').toUpperCase(), 1),
+          _buildTab(tr(context, 'Actividad').toUpperCase(), 2),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
@@ -850,7 +858,7 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
 
     return MainOverlay(
       title: Text(
-        "CREAR NUEVO",
+        tr(context, 'Crear nuevo').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -877,25 +885,36 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF494949),
-          title: Text(
-            '¡ALERTA!',
-            style: TextStyle(
-                color: Colors.red,
-                fontSize: 30.sp,
-                fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          content: Text(
-            'Debes completar el formulario para continuar',
-            style: TextStyle(color: Colors.white, fontSize: 25.sp),
-            textAlign: TextAlign.center,
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            // Aquí defines el ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.3,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: 1,
+              ),
+            ),
+            child: Column(
               children: [
+                Text(
+                  tr(context, '¡Alerta!').toUpperCase(),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  tr(context, 'Debes completar el formulario para continuar')
+                      .toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                  textAlign: TextAlign.center,
+                ),
                 OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog
@@ -912,7 +931,7 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    '¡ENTENDIDO!',
+                    tr(context, '¡Entendido!').toUpperCase(),
                     style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 17.sp,
@@ -923,7 +942,7 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
                 ),
               ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -954,8 +973,8 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
               }
             },
             tabs: [
-              _buildTab('DATOS PERSONALES', 0),
-              _buildTab('BONOS', 1),
+              _buildTab(tr(context, 'Datos personales').toUpperCase(), 0),
+              _buildTab(tr(context, 'Bonos').toUpperCase(), 1),
             ],
             indicator: const BoxDecoration(
               color: Color(0xFF494949),

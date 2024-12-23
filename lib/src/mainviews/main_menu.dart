@@ -139,7 +139,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 },
                                     () => setState(() => scaleFactorPanel = 0.90),
                               ),
-                              SizedBox(height: screenHeight * 0.02),
+                              SizedBox(height: screenHeight * 0.01),
                               buildButton(
                                 context,
                                 'assets/images/cliente.png',
@@ -151,7 +151,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 },
                                     () => setState(() => scaleFactorClient = 0.90),
                               ),
-                              SizedBox(height: screenHeight * 0.02),
+                              SizedBox(height: screenHeight * 0.01),
                               buildButton(
                                 context,
                                 'assets/images/programas.png',
@@ -165,7 +165,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 },
                                     () => setState(() => scaleFactorProgram = 0.90),
                               ),
-                              SizedBox(height: screenHeight * 0.02),
+                              SizedBox(height: screenHeight * 0.01),
                               buildButton(
                                 context,
                                 'assets/images/bio.png',
@@ -179,7 +179,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 },
                                     () => setState(() => scaleFactorBio = 0.90),
                               ),
-                              SizedBox(height: screenHeight * 0.02),
+                              SizedBox(height: screenHeight * 0.01),
                               buildButton(
                                 context,
                                 'assets/images/tutoriales.png',
@@ -193,7 +193,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 },
                                     () => setState(() => scaleFactorTuto = 0.90),
                               ),
-                              SizedBox(height: screenHeight * 0.02),
+                              SizedBox(height: screenHeight * 0.01),
                               buildButton(
                                 context,
                                 'assets/images/ajustes.png',
@@ -274,7 +274,7 @@ class _MainMenuViewState extends State<MainMenuView> {
           duration: const Duration(milliseconds: 100),
           child: SizedBox(
             width: screenWidth * 0.25,
-            height: screenHeight * 0.1,
+            height: screenHeight * 0.12,
             child: Stack(
               alignment: Alignment.center,
               children: [

@@ -8397,13 +8397,11 @@ class _PanelViewState extends State<PanelView>
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 20),
                 Text(
                   tr(context, '¿Quieres resetear todo?').toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -8480,13 +8478,11 @@ class _PanelViewState extends State<PanelView>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 20),
                 Text(
                   tr(context, '¿Quieres salir del panel?').toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
