@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/bioimpedancia_table_custom.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class ClientsBio extends StatefulWidget {
   final Function(Map<String, String>) onClientTap;
   final Map<String, dynamic> clientDataBio;
@@ -86,14 +88,14 @@ class _ClientsBioState extends State<ClientsBio> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Expanded(
-            child: _buildTextField(
-                'NOMBRE', _nameController, false), // Deshabilitado
+            child: _buildTextField(tr(context, 'Nombre').toUpperCase(),
+                _nameController, false), // Deshabilitado
           ),
           SizedBox(width: screenWidth * 0.05), // Espaciado entre campos
           // Campo ESTADO (Dropdown)
           Expanded(
             child: _buildDropdownField(
-              'ESTADO',
+              tr(context, 'Estado').toUpperCase(),
               selectedOption,
               (value) {
                 setState(() {
@@ -113,7 +115,7 @@ class _ClientsBioState extends State<ClientsBio> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         // Contenedor de la bio
-        _buildBioContainer(screenHeight,screenWidth),
+        _buildBioContainer(screenHeight, screenWidth),
         SizedBox(width: screenWidth * 0.02), // Espaciado entre bio y botón
         // Botón de evolución
         _buildEvolutionButton(),
@@ -127,7 +129,7 @@ class _ClientsBioState extends State<ClientsBio> {
       flex: 2,
       // Este valor define cuánta parte del espacio disponible debe ocupar el widget
       child: Container(
-        height: screenHeight*0.5,
+        height: screenHeight * 0.5,
         width: screenWidth, // Mantiene el ancho completo de la pantalla
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 46, 46, 46),
@@ -148,7 +150,7 @@ class _ClientsBioState extends State<ClientsBio> {
     return Expanded(
       flex: 1,
       child: _buildOutlinedButton(
-        'EVOLUCIÓN',
+        tr(context, 'Evolución').toUpperCase(),
         widget.onEvolutionPressed, // Llama al callback
       ),
     );
@@ -167,7 +169,7 @@ class _ClientsBioState extends State<ClientsBio> {
       ),
       child: Text(
         text,
-        style:  TextStyle(
+        style: TextStyle(
           color: const Color(0xFF2be4f3),
           fontSize: 17.sp,
           fontWeight: FontWeight.bold,
@@ -185,7 +187,7 @@ class _ClientsBioState extends State<ClientsBio> {
         // Etiqueta del campo de texto
         Text(
           label,
-          style:  TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
@@ -223,7 +225,7 @@ class _ClientsBioState extends State<ClientsBio> {
         // Etiqueta del dropdown
         Text(
           label,
-          style:  TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
@@ -240,23 +242,23 @@ class _ClientsBioState extends State<ClientsBio> {
             absorbing: !enabled,
             // Si no está habilitado, se bloquea la interacción
             child: DropdownButton<String>(
-              hint:  Text(
-                'Seleccione',
+              hint: Text(
+                tr(context, 'Seleccione'),
                 style: TextStyle(color: Colors.white, fontSize: 14.sp),
               ),
               value: value,
-              items:  [
+              items: [
                 DropdownMenuItem(
                   value: 'Activo',
                   child: Text(
-                    'Activo',
+                    tr(context, 'Activo'),
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),
                 DropdownMenuItem(
                   value: 'Inactivo',
                   child: Text(
-                    'Inactivo',
+                    tr(context, 'Inactivo'),
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),

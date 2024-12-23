@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class IndividualProgramForm extends StatefulWidget {
@@ -464,9 +465,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           setState(() {});
         },
         tabs: [
-          _buildTab('CONFIGURACIÓN', 0),
-          _buildTab('CRONAXIA', 1),
-          _buildTab('GRUPOS ACTIVOS', 2),
+          _buildTab(tr(context, 'Configuración').toUpperCase(), 0),
+          _buildTab(tr(context, 'Cronaxia').toUpperCase(), 1),
+          _buildTab(tr(context, 'Grupos activos').toUpperCase(), 2),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
@@ -520,7 +521,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
+                          Text(tr(context, 'Nombre del programa').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
@@ -528,7 +530,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               controller: _nameController,
                               style: _inputTextStyle,
                               decoration: _inputDecorationStyle(
-                                hintText: 'Introducir nombre de programa',
+                                hintText: tr(
+                                    context, 'Introducir nombre del programa'),
                               ),
                             ),
                           ),
@@ -540,13 +543,14 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('EQUIPAMIENTO', style: _labelStyle),
+                          Text(tr(context, 'Equipamiento').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
-                              hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              hint: Text(tr(context, 'Seleccione'),
+                                  style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -586,7 +590,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('FRECUENCIA (Hz)', style: _labelStyle),
+                            Text(tr(context, 'Frecuencia (Hz)').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -601,11 +606,14 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir frecuencia'),
+                                  hintText:
+                                      tr(context, 'Introducir frecuencia'),
+                                ),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.01),
-                            Text('PULSO (ms)', style: _labelStyle),
+                            Text(tr(context, 'Pulso (ms)').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -620,7 +628,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir pulso'),
+                                  hintText: tr(context, 'Introducir pulso'),
+                                ),
                               ),
                             ),
                           ],
@@ -645,7 +654,10 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('RAMPA (sx10)', style: _labelStyle),
+                                      Text(
+                                        "${tr(context, 'Rampa').toUpperCase()} (sx10)",
+                                        style: _labelStyle,
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -659,7 +671,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
-                                              hintText: 'Introducir rampa'),
+                                              hintText: tr(
+                                                  context, 'Introducir rampa')),
                                         ),
                                       ),
                                     ],
@@ -681,8 +694,10 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('CONTRACCIÓN (s.)',
-                                          style: _labelStyle),
+                                      Text(
+                                        "${tr(context, 'Contracción').toUpperCase()} (s.)",
+                                        style: _labelStyle,
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -696,8 +711,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
-                                              hintText:
-                                                  'Introducir contracción'),
+                                            hintText: tr(context,
+                                                'Introducir contracción'),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -719,7 +735,10 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('PAUSA (s.)', style: _labelStyle),
+                                      Text(
+                                        "${tr(context, 'Pausa').toUpperCase()} (s.)",
+                                        style: _labelStyle,
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -733,7 +752,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
-                                              hintText: 'Introducir pausa'),
+                                            hintText:
+                                                tr(context, 'Introducir pausa'),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -805,7 +826,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
+                          Text(tr(context, 'Nombre del programa').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
@@ -813,7 +835,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               controller: _nameController,
                               style: _inputTextStyle,
                               decoration: _inputDecorationStyle(
-                                hintText: 'Introducir nombre de programa',
+                                hintText: tr(
+                                    context, 'Introducir nombre del programa'),
                                 enabled: false,
                               ),
                             ),
@@ -826,14 +849,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('EQUIPAMIENTO', style: _labelStyle),
+                          Text(tr(context, 'Equipamiento').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
                             child: AbsorbPointer(
                               // Deshabilita interacciones con el Dropdown
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedEquipOption,
                                 items: [
@@ -1208,7 +1232,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
+                          Text(tr(context, 'Nombre del programa').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
@@ -1216,7 +1241,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               controller: _nameController,
                               style: _inputTextStyle,
                               decoration: _inputDecorationStyle(
-                                hintText: 'Introducir nombre de programa',
+                                hintText: tr(
+                                    context, 'Introducir nombre del programa'),
                                 enabled: false,
                               ),
                             ),
@@ -1229,7 +1255,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('EQUIPAMIENTO', style: _labelStyle),
+                          Text(tr(context, 'Equipamiento'), style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),

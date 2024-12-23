@@ -1,6 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:path/path.dart';
+
+import '../../../utils/translation_utils.dart';
 
 class SubprogramTableWidget extends StatelessWidget {
   final List<Map<String, dynamic>> subprogramData; // Datos de los subprogramas
@@ -11,8 +13,8 @@ class SubprogramTableWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildHeaderRow(), // Encabezado de la tabla
-          SizedBox(height: MediaQuery.of(context).size.height*0.01),
+        buildHeaderRow(context), // Encabezado de la tabla
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -24,37 +26,48 @@ class SubprogramTableWidget extends StatelessWidget {
                   children: [
                     DataRowWidget(
                       orden: (subprograma['orden'] is int)
-                      ? subprograma['orden']
-                      : int.tryParse(subprograma['orden'].toString()) ?? 0,// Índice (empezando desde 1)
+                          ? subprograma['orden']
+                          : int.tryParse(subprograma['orden'].toString()) ?? 0,
+                      // Índice (empezando desde 1)
                       nombre: subprograma['nombre'] ?? 'N/A',
                       // Manejo de duracionTotal y ajuste como valores double
                       duracion: (subprograma['duracion'] is double)
                           ? subprograma['duracion']
-                          : double.tryParse(subprograma['duracion'].toString()) ?? 0.0,
+                          : double.tryParse(
+                                  subprograma['duracion'].toString()) ??
+                              0.0,
                       ajuste: (subprograma['ajuste'] is double)
                           ? subprograma['ajuste']
-                          : double.tryParse(subprograma['ajuste'].toString()) ?? 0.0,
+                          : double.tryParse(subprograma['ajuste'].toString()) ??
+                              0.0,
                     ),
-                     SizedBox(height: MediaQuery.of(context).size.height*0.01),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   ],
                 );
               }).toList(),
             ),
           ),
         )
-
       ],
     );
   }
 
-  Widget buildHeaderRow() {
+  Widget buildHeaderRow(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        buildCell('ORDEN'),
-        buildCell('PROGRAMA'),
-        buildCell('DURACIÓN'),
-        buildCell('AJUSTE'),
+        buildCell(
+          tr(context, 'Orden').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Programa').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Duración').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Ajuste').toUpperCase(),
+        ),
       ],
     );
   }
@@ -71,7 +84,8 @@ class SubprogramTableWidget extends StatelessWidget {
             textAlign: TextAlign.center, // Alineación horizontal centrada
             style: TextStyle(
               color: isNameColumn
-                  ? const Color.fromARGB(255, 3, 236, 244) // Color específico para la columna de nombre
+                  ? const Color.fromARGB(255, 3, 236,
+                      244) // Color específico para la columna de nombre
                   : Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 17.sp, // Ajuste del tamaño de la fuente
@@ -100,7 +114,7 @@ class DataRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
       child: Row(
@@ -124,7 +138,8 @@ class DataRowWidget extends StatelessWidget {
           textAlign: TextAlign.center, // Alineación centrada
           style: TextStyle(
             color: isNameColumn
-                ? const Color.fromARGB(255, 3, 236, 244) // Color para la columna de nombre
+                ? const Color.fromARGB(
+                    255, 3, 236, 244) // Color para la columna de nombre
                 : Colors.white,
             fontSize: 15.sp,
             fontWeight: FontWeight.bold, // Ajuste del tamaño del texto

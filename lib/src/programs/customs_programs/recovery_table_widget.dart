@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class RecoveryTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> programData; // Mantener el tipo como dynamic
 
@@ -17,7 +19,7 @@ class _RecoveryTableWidgetState extends State<RecoveryTableWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildHeaderRow(), // Encabezado fijo
+        buildHeaderRow(context), // Encabezado fijo
         SizedBox(height: MediaQuery.of(context).size.height*0.01),
         Expanded(
           child: SingleChildScrollView(
@@ -55,17 +57,29 @@ class _RecoveryTableWidgetState extends State<RecoveryTableWidget> {
     );
   }
 
-  Widget buildHeaderRow() {
+  Widget buildHeaderRow(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         buildCell(''),
-        buildCell('NOMBRE'),
-        buildCell('FRECUENCIA (Hz)'),
-        buildCell('PULSO (ms)'),
-        buildCell('RAMPA'),
-        buildCell('CONTRACCIÓN'),
-        buildCell('PAUSA'),
+        buildCell(
+          tr(context, 'Nombre').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Frecuencia (Hz)').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Pulso (ms)').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Rampa').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Contracción').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Pausa').toUpperCase(),
+        ),
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class ClientsGroups extends StatefulWidget {
@@ -82,16 +83,16 @@ class _ClientsGroupsState extends State<ClientsGroups> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          "Grupos actualizados correctamente",
+          tr(context, 'Grupos actualizados correctamente').toUpperCase(),
           style: TextStyle(
             color: Colors.white,
-            fontSize: 17,
+            fontSize: 17.sp,
           ),
         ),
-        backgroundColor: Color(0xFF2be4f3),
-        duration: Duration(seconds: 2),
+        backgroundColor: const Color(0xFF2be4f3),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -244,7 +245,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('NOMBRE',
+                              Text(tr(context, 'Nombre').toUpperCase(),
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 15.sp,
@@ -277,7 +278,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'ESTADO',
+                                tr(context, 'Estado').toUpperCase(),
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15.sp,
@@ -293,7 +294,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   // Esto deshabilita la interacción con el DropdownButton
                                   child: DropdownButton<String>(
                                     hint: Text(
-                                      'Seleccione',
+                                      tr(context, 'Seleccione'),
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 14.sp),
                                     ),
@@ -302,7 +303,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       DropdownMenuItem(
                                         value: 'Activo',
                                         child: Text(
-                                          'Activo',
+                                          tr(context, 'Activo'),
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 14.sp),
@@ -311,7 +312,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                       DropdownMenuItem(
                                         value: 'Inactivo',
                                         child: Text(
-                                          'Inactivo',
+                                          tr(context, 'Inactivo'),
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 14.sp),
@@ -452,8 +453,8 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(
-                                            imagePath), // Usar la ruta completa con extensión
+                                        image: AssetImage(imagePath),
+                                        // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -506,8 +507,8 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(
-                                            imagePath), // Usar la ruta completa con extensión
+                                        image: AssetImage(imagePath),
+                                        // Usar la ruta completa con extensión
                                         fit: BoxFit.contain,
                                       ),
                                     ),

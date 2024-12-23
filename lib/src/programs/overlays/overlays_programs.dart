@@ -6,6 +6,7 @@ import 'package:imotion_designs/src/programs/form_programs/recovery_program_form
 import 'package:imotion_designs/src/programs/info_programs/programs_indiv_list_view.dart';
 import 'package:imotion_designs/src/programs/info_programs/programs_reco_list_view.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../form_programs/automatic_program_form.dart';
 import '../info_programs/programs_auto_list_view.dart';
@@ -36,12 +37,11 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title:  Text(
-        "INDIVIDUALES",
+      title: Text(
+        tr(context, 'Individuales').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -83,8 +83,8 @@ class _OverlayAutoState extends State<OverlayAuto> {
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title:  Text(
-        "AUTOMÁTICOS",
+      title: Text(
+        tr(context, 'Automáticos').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -146,7 +146,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
                                   TextSpan(
                                     text:
                                         'Nº${program['id_programa_automatico']}  ${program['nombre_programa_automatico']} - ',
-                                    style:  TextStyle(
+                                    style: TextStyle(
                                       fontSize: 25.sp,
                                       fontWeight: FontWeight.bold,
                                       color: const Color(
@@ -156,7 +156,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
                                   TextSpan(
                                     text:
                                         '${(program['duracionTotal'] as double).toInt()} min', // Convertir a entero
-                                    style:  TextStyle(
+                                    style: TextStyle(
                                       fontSize: 25.sp,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white, // Duración en blanco
@@ -174,7 +174,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
                               '${program['descripcion_programa_automatico'] ?? 'No disponible'}',
                               softWrap: true,
                               overflow: TextOverflow.visible,
-                              style:  TextStyle(
+                              style: TextStyle(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.normal,
                                 color: Colors.white, // Color del nuevo texto
@@ -262,12 +262,11 @@ class _OverlayRecoveryState extends State<OverlayRecovery>
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MainOverlay(
-      title:  Text(
-        "RECOVERY",
+      title: Text(
+        tr(context, 'Recovery').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -315,8 +314,8 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
     double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
-      title:  Text(
-        "CREAR PROGRAMA",
+      title: Text(
+        tr(context, 'Crear programa').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -349,9 +348,9 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
           setState(() {});
         },
         tabs: [
-          _buildTab('INDIVIDUAL', 0),
-          _buildTab('AUTOMÁTICO', 1),
-          _buildTab('RECOVERY', 2),
+          _buildTab(tr(context, 'Individuales').toUpperCase(), 0),
+          _buildTab(tr(context, 'Automáticos').toUpperCase(), 1),
+          _buildTab(tr(context, 'Recovery').toUpperCase(), 2),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
@@ -359,7 +358,7 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
         ),
         dividerColor: Colors.black,
         labelColor: const Color(0xFF2be4f3),
-        labelStyle:  TextStyle(
+        labelStyle: TextStyle(
           fontSize: 16.sp,
           fontWeight: FontWeight.bold,
         ),
@@ -391,7 +390,8 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
       children: [
         IndividualProgramForm(
           onDataChanged: (data) {
-            debugPrint(data as String?); // Verify that the data is arriving correctly
+            debugPrint(
+                data as String?); // Verify that the data is arriving correctly
             setState(() {});
           },
           onClose: widget.onClose,

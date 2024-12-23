@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/activity_table_custom.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class ClientsActivity extends StatefulWidget {
   final Map<String, dynamic> clientDataActivity;
 
@@ -94,13 +96,14 @@ class _ClientsActivityState extends State<ClientsActivity> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Flexible(
-                    child: _buildTextField('NOMBRE', _nameController, false),
+                    child: _buildTextField(tr(context, 'Nombre').toUpperCase(),
+                        _nameController, false),
                   ),
                   SizedBox(width: screenWidth * 0.05), // Espaciado entre campos
                   // Campo ESTADO
                   Flexible(
                     child: _buildDropdownField(
-                      'ESTADO',
+                      tr(context, 'Estado').toUpperCase(),
                       selectedOption,
                       (value) {
                         setState(() {
@@ -143,7 +146,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
         // Etiqueta del campo
         Text(
           label,
-          style:  TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
@@ -158,7 +161,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
           ),
           child: TextField(
             controller: controller,
-            style:  TextStyle(color: Colors.white, fontSize: 14.sp),
+            style: TextStyle(color: Colors.white, fontSize: 14.sp),
             decoration: InputDecoration(
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
@@ -181,7 +184,7 @@ class _ClientsActivityState extends State<ClientsActivity> {
         // Etiqueta del dropdown
         Text(
           label,
-          style:  TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
@@ -197,23 +200,23 @@ class _ClientsActivityState extends State<ClientsActivity> {
           child: AbsorbPointer(
             absorbing: !enabled, // Deshabilitar interacción
             child: DropdownButton<String>(
-              hint:  Text(
-                'Seleccione',
+              hint: Text(
+                tr(context, 'Seleccione').toUpperCase(),
                 style: TextStyle(color: Colors.white, fontSize: 14.sp),
               ),
               value: value,
-              items:  [
+              items: [
                 DropdownMenuItem(
                   value: 'Activo',
                   child: Text(
-                    'Activo',
+                    tr(context, 'Activo'),
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),
                 DropdownMenuItem(
                   value: 'Inactivo',
                   child: Text(
-                    'Inactivo',
+                    tr(context, 'Inactivo'),
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
                   ),
                 ),

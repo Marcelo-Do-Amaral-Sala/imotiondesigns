@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/programs/overlays/overlays_programs.dart';
 
+import '../../utils/translation_utils.dart';
+
 class ProgramsMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
   const ProgramsMenuView({super.key, required this.onBack});
@@ -95,9 +97,10 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                                               fit: BoxFit.contain,
                                             ),
                                           ),
-                                           Expanded(
+                                          Expanded(
                                             child: Text(
-                                              "PROGRAMAS",
+                                              tr(context, 'Programas')
+                                                  .toUpperCase(),
                                               style: TextStyle(
                                                 color: const Color(0xFF28E2F5),
                                                 fontSize: 33.sp,
@@ -115,7 +118,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                               SizedBox(height: screenHeight * 0.05),
                               buildButton(
                                 context,
-                                'Individuales',
+                                tr(context, 'Individuales').toUpperCase(),
                                 scaleFactorIndiv,
                                 () {
                                   setState(() {
@@ -130,7 +133,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Automáticos',
+                                tr(context, 'Automáticos').toUpperCase(),
                                 scaleFactorAuto,
                                 () {
                                   setState(() {
@@ -145,7 +148,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Recovery',
+                                tr(context, 'Recovery').toUpperCase(),
                                 scaleFactorRecovery,
                                 () {
                                   setState(() {
@@ -160,7 +163,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                               SizedBox(height: screenHeight * 0.02),
                               buildButton(
                                 context,
-                                'Crear programa',
+                                tr(context, 'Crear programa').toUpperCase(),
                                 scaleFactorCrearP,
                                 () {
                                   setState(() {
@@ -289,7 +292,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: const Color(0xFF28E2F5),
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w600,

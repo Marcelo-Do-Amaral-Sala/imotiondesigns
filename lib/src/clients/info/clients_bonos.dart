@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 import '../custom_clients/bonos_table_custom.dart';
 
@@ -131,9 +132,11 @@ class _ClientsBonosState extends State<ClientsBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildTextField('NOMBRE', _nameController, enabled: false),
+        _buildTextField(tr(context, 'Nombre').toUpperCase(), _nameController,
+            enabled: false),
         SizedBox(width: screenWidth * 0.05),
-        _buildDropdownField('ESTADO', selectedOption, (value) {
+        _buildDropdownField(tr(context, 'Estado').toUpperCase(), selectedOption,
+            (value) {
           setState(() {
             selectedOption = value;
           });
@@ -152,7 +155,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
             backgroundColor: Colors.transparent,
           ),
           child: Text(
-            'AÑADIR BONOS',
+            tr(context, 'Añadir bonos').toUpperCase(),
             style: TextStyle(
               color: const Color(0xFF2be4f3),
               fontSize: 17.sp,
@@ -169,9 +172,13 @@ class _ClientsBonosState extends State<ClientsBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildHeaderText("BONOS DISPONIBLES"),
+        _buildHeaderText(
+          tr(context, 'Bonos disponibles').toUpperCase(),
+        ),
         SizedBox(width: screenWidth * 0.02),
-        _buildHeaderText("BONOS CONSUMIDOS"),
+        _buildHeaderText(
+          tr(context, 'Bonos consumidos').toUpperCase(),
+        ),
       ],
     );
   }
@@ -225,10 +232,11 @@ class _ClientsBonosState extends State<ClientsBonos> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildTotalContainer(screenHeight, "TOTAL",
+        _buildTotalContainer(screenHeight, tr(context, 'Total').toUpperCase(),
             totalBonosAvailables.toString(), Colors.green),
         SizedBox(width: screenWidth * 0.02),
-        _buildTotalContainer(screenHeight, "TOTAL", "456", Colors.red),
+        _buildTotalContainer(screenHeight, tr(context, 'Total').toUpperCase(),
+            "456", Colors.red),
       ],
     );
   }
@@ -316,18 +324,18 @@ class _ClientsBonosState extends State<ClientsBonos> {
             child: AbsorbPointer(
               absorbing: !enabled,
               child: DropdownButton<String>(
-                hint: Text('Seleccione',
+                hint: Text(tr(context, 'Seleccione'),
                     style: TextStyle(color: Colors.white, fontSize: 14.sp)),
                 value: value,
                 items: [
                   DropdownMenuItem(
                       value: 'Activo',
-                      child: Text('Activo',
+                      child: Text(tr(context, 'Activo'),
                           style:
                               TextStyle(color: Colors.white, fontSize: 14.sp))),
                   DropdownMenuItem(
                       value: 'Inactivo',
-                      child: Text('Inactivo',
+                      child: Text(tr(context, 'Inactivo'),
                           style:
                               TextStyle(color: Colors.white, fontSize: 14.sp))),
                 ],
@@ -393,7 +401,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                     children: [
                       Center(
                         child: Text(
-                          "COMPRAR BONOS",
+                          tr(context, 'Comprar bonos').toUpperCase(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 30.sp,
@@ -448,7 +456,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                               border: InputBorder.none,
                               filled: true,
                               fillColor: const Color(0xFF313030),
-                              hintText: 'Introduzca los bonos',
+                              hintText: tr(context, 'Introduzca los bonos'),
                               hintStyle: TextStyle(
                                   color: Colors.grey, fontSize: 17.sp),
                               isDense: true,
@@ -463,16 +471,17 @@ class _ClientsBonosState extends State<ClientsBonos> {
                                 int.tryParse(_bonosController.text);
                             if (cantidadBonos == null || cantidadBonos <= 0) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text(
-                                    "Introduzca un valor válido",
+                                    tr(context, 'Introduzca un valor válido')
+                                        .toUpperCase(),
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 20,
+                                      fontSize: 20.sp,
                                     ),
                                   ),
                                   backgroundColor: Colors.red,
-                                  duration: Duration(seconds: 2),
+                                  duration: const Duration(seconds: 2),
                                 ),
                               );
                               return;
@@ -482,16 +491,17 @@ class _ClientsBonosState extends State<ClientsBonos> {
                             Navigator.of(context).pop();
                             _bonosController.clear();
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
-                                  "Bonos añadidos correctamente",
+                                  tr(context, 'Bonos añadidos correctamente')
+                                      .toUpperCase(),
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 20,
+                                    fontSize: 20.sp,
                                   ),
                                 ),
                                 backgroundColor: Colors.green,
-                                duration: Duration(seconds: 2),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           },
@@ -507,7 +517,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                             backgroundColor: Colors.transparent,
                           ),
                           child: Text(
-                            'AÑADIR',
+                            tr(context, 'Añadir').toUpperCase(),
                             style: TextStyle(
                               color: const Color(0xFF2be4f3),
                               fontSize: 17.sp,

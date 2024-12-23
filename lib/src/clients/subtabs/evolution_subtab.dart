@@ -1,5 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../utils/translation_utils.dart';
 
 class EvolutionSubTab extends StatefulWidget {
   final Function(Map<String, String>) onClientTap;
@@ -103,12 +106,12 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             // Distribuir uniformemente las pestañas
             children: [
-              _buildTab('HIDRATACIÓN SIN GRASA', 0),
-              _buildTab('EQUILIBRIO HÍDRICO', 1),
+              _buildTab(tr(context, 'Hidratación sin grasa').toUpperCase(), 0),
+              _buildTab(tr(context, 'Equilibrio hídrico').toUpperCase(), 1),
               _buildTab('IMC', 2),
-              _buildTab('MASA GRASA', 3),
-              _buildTab('MÚSCULO', 4),
-              _buildTab('SALUD ÓSEA', 5),
+              _buildTab(tr(context, 'Masa grasa').toUpperCase(), 3),
+              _buildTab(tr(context, 'Músculo').toUpperCase(), 4),
+              _buildTab(tr(context, 'Esqueleto').toUpperCase(), 5),
             ],
           ),
         ));
@@ -211,46 +214,46 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
                   getTitlesWidget: (value, meta) {
                     switch (value.toInt()) {
                       case 0:
-                        return const Text('Excelente',
+                        return Text(tr(context, 'Excelente'),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ));
                       case 20:
-                        return const Text('Muy bien',
+                        return Text(tr(context, 'Muy bien'),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ));
                       case 40:
-                        return const Text('Normal',
+                        return Text(tr(context, 'Normal'),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ));
                       case 60:
-                        return const Text('Cerca de la norma',
+                        return Text(tr(context, 'Cerca de la norma'),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ));
                       case 80:
-                        return const Text('A vigilar',
+                        return Text(tr(context, 'A vigilar'),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ));
                       case 100:
-                        return const Text('A tratar',
+                        return Text(tr(context, 'A tratar'),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ));
                     }
                     return const Text('');

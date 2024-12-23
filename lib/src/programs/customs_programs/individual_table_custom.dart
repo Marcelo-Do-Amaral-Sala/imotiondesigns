@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
+
 class IndividualTableWidget extends StatefulWidget {
   final List<Map<String, dynamic>> programData; // Mantener el tipo como dynamic
 
@@ -16,8 +18,8 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildHeaderRow(), // Encabezado fijo
-          SizedBox(height: MediaQuery.of(context).size.height*0.01),
+        buildHeaderRow(context), // Encabezado fijo
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -29,7 +31,8 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
                       nombre: row['nombre'] ?? '',
                       frecuencia: (row['frecuencia'] is double)
                           ? row['frecuencia']
-                          : double.tryParse(row['frecuencia'].toString()) ?? 0.0,
+                          : double.tryParse(row['frecuencia'].toString()) ??
+                              0.0,
                       pulso: (row['pulso'] is double)
                           ? row['pulso']
                           : double.tryParse(row['pulso'].toString()) ?? 0.0,
@@ -38,12 +41,13 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
                           : double.tryParse(row['rampa'].toString()) ?? 0.0,
                       contraccion: (row['contraccion'] is double)
                           ? row['contraccion']
-                          : double.tryParse(row['contraccion'].toString()) ?? 0.0,
+                          : double.tryParse(row['contraccion'].toString()) ??
+                              0.0,
                       pausa: (row['pausa'] is double)
                           ? row['pausa']
                           : double.tryParse(row['pausa'].toString()) ?? 0.0,
                     ),
-                      SizedBox(height: MediaQuery.of(context).size.height*0.01),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   ],
                 );
               }).toList(),
@@ -54,17 +58,29 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
     );
   }
 
-  Widget buildHeaderRow() {
+  Widget buildHeaderRow(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         buildCell(''),
-        buildCell('NOMBRE'),
-        buildCell('FRECUENCIA (Hz)'),
-        buildCell('PULSO (ms)'),
-        buildCell('RAMPA'),
-        buildCell('CONTRACCIÓN'),
-        buildCell('PAUSA'),
+        buildCell(
+          tr(context, 'Nombre').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Frecuencia (Hz)').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Pulso (ms)').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Rampa').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Contracción').toUpperCase(),
+        ),
+        buildCell(
+          tr(context, 'Pausa').toUpperCase(),
+        ),
       ],
     );
   }
@@ -82,7 +98,7 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
             style: TextStyle(
               color: isNameColumn
                   ? const Color.fromARGB(255, 3, 236,
-                  244) // Color específico para la columna de nombre
+                      244) // Color específico para la columna de nombre
                   : Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 17.sp, // Ajuste del tamaño de la fuente
@@ -189,6 +205,8 @@ class _DataRowWidgetState extends State<DataRowWidget> {
 
   // Función para formatear los números, eliminando decimales si es un número entero
   String formatNumber(double value) {
-    return value == value.toInt() ? value.toInt().toString() : value.toStringAsFixed(2);
+    return value == value.toInt()
+        ? value.toInt().toString()
+        : value.toStringAsFixed(2);
   }
 }

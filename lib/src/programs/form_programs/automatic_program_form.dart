@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class AutomaticProgramForm extends StatefulWidget {
@@ -199,7 +200,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
+                            Text(
+                                tr(context, 'Nombre del programa')
+                                    .toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -207,7 +211,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                 controller: _nameController,
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                  hintText: 'Introducir nombre de programa',
+                                  hintText: tr(context,
+                                      'Introducir nombre del programa'),
                                 ),
                               ),
                             ),
@@ -219,7 +224,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('DURACIÓN', style: _labelStyle),
+                            Text(tr(context, 'Duración').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -235,7 +241,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                  hintText: 'Introducir duración del programa',
+                                  hintText: tr(context,
+                                      'Introducir duración del programa'),
                                   enabled: true,
                                 ),
                               ),
@@ -248,12 +255,13 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('EQUIPAMIENTO', style: _labelStyle),
+                            Text(tr(context, 'Equipamiento').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedEquipOption,
                                 items: [
@@ -320,7 +328,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
-                                                'ORDEN',
+                                                tr(context, 'Orden')
+                                                    .toUpperCase(),
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -333,7 +342,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
-                                                'PROGRAMA',
+                                                tr(context, 'Programa')
+                                                    .toUpperCase(),
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -346,7 +356,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
-                                                'DURACIÓN',
+                                                tr(context, 'Duración')
+                                                    .toUpperCase(),
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -359,7 +370,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
-                                                'AJUSTE',
+                                                tr(context, 'Ajuste')
+                                                    .toUpperCase(),
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -372,7 +384,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             padding: const EdgeInsets.all(8.0),
                                             child: Center(
                                               child: Text(
-                                                'ACCIÓN',
+                                                tr(context, 'Acción')
+                                                    .toUpperCase(),
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -508,7 +521,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                             backgroundColor: Colors.transparent,
                           ),
                           child: Text(
-                            'CREAR SECUENCIA',
+                            tr(context, 'Crear secuencia').toUpperCase(),
                             style: TextStyle(
                               color: const Color(0xFF2be4f3),
                               fontSize: 17.sp,
@@ -639,7 +652,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                         children: [
                           Center(
                             child: Text(
-                              "AGREGAR PROGRAMA AUTOMÁTICO",
+                              tr(context, 'Agregar programa automático')
+                                  .toUpperCase(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 30.sp,
@@ -677,7 +691,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                           children: [
                             Title(
                               color: Colors.white,
-                              child:  Text(
+                              child: Text(
                                 "¡Estás a un paso de terminar!\nSolo falta añadir una descripción para guardar tu programa.",
                                 style: TextStyle(
                                   fontSize: 25.sp,
@@ -821,9 +835,9 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                       ),
                       child: Stack(
                         children: [
-                           Center(
+                          Center(
                             child: Text(
-                              "CREAR SECUENCIA",
+                              tr(context, 'Crear secuencia').toUpperCase(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 30.sp,
@@ -861,7 +875,9 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('SELECCIÓN PROGRAMA', style: _labelStyle),
+                            Text(
+                                tr(context, 'Selección programa').toUpperCase(),
+                                style: _labelStyle),
                             SizedBox(height: screenHeight * 0.01),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -897,7 +913,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     icon: const Icon(Icons.arrow_drop_down,
                                         color: Color(0xFF2be4f3), size: 30),
                                     hint: Text(
-                                      'Seleccione un programa',
+                                      tr(context, 'Seleccione un programa'),
                                       style: _dropdownHintStyle,
                                     ),
                                   ),
@@ -914,7 +930,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('ORDEN', style: _labelStyle),
+                                      Text(tr(context, 'Orden').toUpperCase(),
+                                          style: _labelStyle),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -939,7 +956,9 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('DURACIÓN (s)', style: _labelStyle),
+                                      Text(
+                                          '${tr(context, 'Duración').toUpperCase()} (s)',
+                                          style: _labelStyle),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -966,7 +985,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('AJUSTE', style: _labelStyle),
+                                      Text(tr(context, 'Ajuste').toUpperCase(),
+                                          style: _labelStyle),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),

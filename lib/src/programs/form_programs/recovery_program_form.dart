@@ -1,23 +1,25 @@
-     import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class RecoveryProgramForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onDataChanged;
   final VoidCallback onClose;
 
-  const RecoveryProgramForm({super.key, required this.onDataChanged, required this.onClose});
+  const RecoveryProgramForm(
+      {super.key, required this.onDataChanged, required this.onClose});
 
   @override
   RecoveryProgramFormState createState() => RecoveryProgramFormState();
 }
 
 class RecoveryProgramFormState extends State<RecoveryProgramForm>
-    with SingleTickerProviderStateMixin   {
-final _nameController = TextEditingController();
+    with SingleTickerProviderStateMixin {
+  final _nameController = TextEditingController();
   final _frequencyController = TextEditingController();
   final _pulseController = TextEditingController();
   final _contractionController = TextEditingController();
@@ -463,9 +465,9 @@ final _nameController = TextEditingController();
           setState(() {});
         },
         tabs: [
-          _buildTab('CONFIGURACIÓN', 0),
-          _buildTab('CRONAXIA', 1),
-          _buildTab('GRUPOS ACTIVOS', 2),
+          _buildTab(tr(context, 'Configuración').toUpperCase(), 0),
+          _buildTab(tr(context, 'Cronaxia').toUpperCase(), 1),
+          _buildTab(tr(context, 'Grupos activos').toUpperCase(), 2),
         ],
         indicator: const BoxDecoration(
           color: Color(0xFF494949),
@@ -519,7 +521,8 @@ final _nameController = TextEditingController();
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
+                          Text(tr(context, 'Nombre del programa').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
@@ -527,7 +530,8 @@ final _nameController = TextEditingController();
                               controller: _nameController,
                               style: _inputTextStyle,
                               decoration: _inputDecorationStyle(
-                                hintText: 'Introducir nombre de programa',
+                                hintText: tr(
+                                    context, 'Introducir nombre del programa'),
                               ),
                             ),
                           ),
@@ -539,13 +543,14 @@ final _nameController = TextEditingController();
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('EQUIPAMIENTO', style: _labelStyle),
+                          Text(tr(context, 'Equipamiento').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
                             child: DropdownButton<String>(
-                              hint:
-                                  Text('Seleccione', style: _dropdownHintStyle),
+                              hint: Text(tr(context, 'Seleccione'),
+                                  style: _dropdownHintStyle),
                               value: selectedEquipOption,
                               items: [
                                 DropdownMenuItem(
@@ -585,7 +590,8 @@ final _nameController = TextEditingController();
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('FRECUENCIA (Hz)', style: _labelStyle),
+                            Text(tr(context, 'Frecuencia (Hz)').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -600,11 +606,14 @@ final _nameController = TextEditingController();
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir frecuencia'),
+                                  hintText:
+                                      tr(context, 'Introducir frecuencia'),
+                                ),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.01),
-                            Text('PULSO (ms)', style: _labelStyle),
+                            Text(tr(context, 'Pulso (ms)').toUpperCase(),
+                                style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
@@ -619,7 +628,8 @@ final _nameController = TextEditingController();
                                 ],
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                    hintText: 'Introducir pulso'),
+                                  hintText: tr(context, 'Introducir pulso'),
+                                ),
                               ),
                             ),
                           ],
@@ -644,7 +654,10 @@ final _nameController = TextEditingController();
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('RAMPA (sx10)', style: _labelStyle),
+                                      Text(
+                                        "${tr(context, 'Rampa').toUpperCase()} (sx10)",
+                                        style: _labelStyle,
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -658,7 +671,8 @@ final _nameController = TextEditingController();
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
-                                              hintText: 'Introducir rampa'),
+                                              hintText: tr(
+                                                  context, 'Introducir rampa')),
                                         ),
                                       ),
                                     ],
@@ -680,8 +694,10 @@ final _nameController = TextEditingController();
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('CONTRACCIÓN (s.)',
-                                          style: _labelStyle),
+                                      Text(
+                                        "${tr(context, 'Contracción').toUpperCase()} (s.)",
+                                        style: _labelStyle,
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -695,8 +711,9 @@ final _nameController = TextEditingController();
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
-                                              hintText:
-                                                  'Introducir contracción'),
+                                            hintText: tr(context,
+                                                'Introducir contracción'),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -718,7 +735,10 @@ final _nameController = TextEditingController();
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('PAUSA (s.)', style: _labelStyle),
+                                      Text(
+                                        "${tr(context, 'Pausa').toUpperCase()} (s.)",
+                                        style: _labelStyle,
+                                      ),
                                       Container(
                                         alignment: Alignment.center,
                                         decoration: _inputDecoration(),
@@ -732,7 +752,9 @@ final _nameController = TextEditingController();
                                           ],
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
-                                              hintText: 'Introducir pausa'),
+                                            hintText:
+                                                tr(context, 'Introducir pausa'),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -804,7 +826,8 @@ final _nameController = TextEditingController();
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
+                          Text(tr(context, 'Nombre del programa').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
@@ -812,7 +835,8 @@ final _nameController = TextEditingController();
                               controller: _nameController,
                               style: _inputTextStyle,
                               decoration: _inputDecorationStyle(
-                                hintText: 'Introducir nombre de programa',
+                                hintText: tr(
+                                    context, 'Introducir nombre del programa'),
                                 enabled: false,
                               ),
                             ),
@@ -825,14 +849,15 @@ final _nameController = TextEditingController();
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('EQUIPAMIENTO', style: _labelStyle),
+                          Text(tr(context, 'Equipamiento').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
                             child: AbsorbPointer(
                               // Deshabilita interacciones con el Dropdown
                               child: DropdownButton<String>(
-                                hint: Text('Seleccione',
+                                hint: Text(tr(context, 'Seleccione'),
                                     style: _dropdownHintStyle),
                                 value: selectedEquipOption,
                                 items: [
@@ -1207,7 +1232,8 @@ final _nameController = TextEditingController();
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('NOMBRE DEL PROGRAMA', style: _labelStyle),
+                          Text(tr(context, 'Nombre del programa').toUpperCase(),
+                              style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
@@ -1215,7 +1241,8 @@ final _nameController = TextEditingController();
                               controller: _nameController,
                               style: _inputTextStyle,
                               decoration: _inputDecorationStyle(
-                                hintText: 'Introducir nombre de programa',
+                                hintText: tr(
+                                    context, 'Introducir nombre del programa'),
                                 enabled: false,
                               ),
                             ),
@@ -1228,7 +1255,7 @@ final _nameController = TextEditingController();
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('EQUIPAMIENTO', style: _labelStyle),
+                          Text(tr(context, 'Equipamiento'), style: _labelStyle),
                           Container(
                             alignment: Alignment.center,
                             decoration: _inputDecoration(),
@@ -1826,6 +1853,3 @@ final _nameController = TextEditingController();
         color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
   }
 }
-
-
-

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/bio_session_table.dart';
 
 class BioSessionSubTab extends StatefulWidget {
@@ -31,7 +32,6 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-
     return Column(
       children: [
         // Fila con el botón de retroceso
@@ -53,7 +53,6 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 5.0),
-
                 height: screenHeight * 0.08,
                 width: screenWidth * 0.08,
                 decoration: const BoxDecoration(
@@ -90,10 +89,13 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
                     children: [
                       // Usamos un Stack para superponer los widgets
                       Stack(
-                        alignment: Alignment.center,  // Aseguramos que estén centrados
+                        alignment: Alignment.center,
+                        // Aseguramos que estén centrados
                         children: [
-                          CircunferenciasWidget(), // El widget de las circunferencias (debe ir abajo)
-                          SpiderChart(data: [90, 75, 90, 60, 85]), // El gráfico de araña (debe ir arriba)
+                          CircunferenciasWidget(),
+                          // El widget de las circunferencias (debe ir abajo)
+                          SpiderChart(data: [90, 75, 90, 60, 85]),
+                          // El gráfico de araña (debe ir arriba)
                         ],
                       ),
                     ],
@@ -188,7 +190,8 @@ class SpiderChartPainter extends CustomPainter {
       // Usar un color diferente para cada círculo de referencia
       Paint circlePaint = Paint()
         ..color = circleColors[i - 1]
-        ..style = PaintingStyle.stroke; // Aseguramos que sea solo un borde, no relleno
+        ..style = PaintingStyle
+            .stroke; // Aseguramos que sea solo un borde, no relleno
 
       canvas.drawCircle(center, levelRadius, circlePaint);
     }
@@ -216,7 +219,7 @@ class SpiderChartPainter extends CustomPainter {
 
       // Configurar el estilo del texto
       TextSpan span = TextSpan(
-        style: const TextStyle(color: Colors.black, fontSize: 15),
+        style: TextStyle(color: Colors.white, fontSize: 15.sp),
         text: label,
       );
       TextPainter tp = TextPainter(
@@ -230,7 +233,8 @@ class SpiderChartPainter extends CustomPainter {
       canvas.save();
       canvas.translate(x, y); // Mover al centro de la etiqueta
       canvas.rotate(tangentAngle); // Rotar el texto para que sea perpendicular
-      tp.paint(canvas, Offset(-tp.width / 2, -tp.height / 2)); // Dibujar el texto
+      tp.paint(
+          canvas, Offset(-tp.width / 2, -tp.height / 2)); // Dibujar el texto
       canvas.restore();
     }
   }
