@@ -528,7 +528,7 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
                             backgroundColor: Colors.transparent,
                           ),
                           child: Text(
-                            '¡AÑADIR!',
+                            'AÑADIR',
                             style: TextStyle(
                               color: const Color(0xFF2be4f3),
                               fontSize: 17.sp,

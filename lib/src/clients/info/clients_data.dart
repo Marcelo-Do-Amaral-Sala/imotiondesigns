@@ -191,7 +191,7 @@ class _ClientsDataState extends State<ClientsData> {
             textAlign: TextAlign.center, // Color del texto
           ),
           content: Text(
-            '¿Estás seguro de que quieres borrar este cliente?',
+            '¿Estás seguro que quieres borrar este cliente?',
             style: TextStyle(color: Colors.white, fontSize: 25.sp),
             textAlign: TextAlign.center, // Color del texto
           ),
@@ -248,17 +248,17 @@ class _ClientsDataState extends State<ClientsData> {
                     padding: const EdgeInsets.all(10.0),
                     side: const BorderSide(
                       width: 1.0,
-                      color: Color(0xFF2be4f3),
+                      color: Colors.red,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
-                    backgroundColor: Colors.transparent,
+                    backgroundColor: Colors.red,
                   ),
                   child: Text(
                     '¡SÍ, ESTOY SEGURO!',
                     style: TextStyle(
-                      color: const Color(0xFF2be4f3),
+                      color:  Colors.white,
                       fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                     ),

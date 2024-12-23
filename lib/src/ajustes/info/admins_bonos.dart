@@ -510,7 +510,7 @@ class _AdminsBonosState extends State<AdminsBonos> {
                             backgroundColor: Colors.transparent,
                           ),
                           child: Text(
-                            '¡AÑADIR!',
+                            'AÑADIR',
                             style: TextStyle(
                               color: const Color(0xFF2be4f3),
                               fontSize: 17.sp,

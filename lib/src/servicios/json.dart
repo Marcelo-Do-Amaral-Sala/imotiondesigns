@@ -46,7 +46,7 @@ class _UploadJsonViewState extends State<UploadJsonView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Subir Traducciones a Firestore'),
+        title: const Text('Subir Traducciones a Firestore'),
         backgroundColor: Colors.blue,
       ),
       body: Center(
@@ -55,7 +55,7 @@ class _UploadJsonViewState extends State<UploadJsonView> {
             // Llamar a la función para subir el JSON a Firestore
             uploadTranslationsToFirestore();
           },
-          child: Text(
+          child: const Text(
             'Subir Traducciones',
             style: TextStyle(fontSize: 18),
           ),

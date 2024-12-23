@@ -497,7 +497,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                         Text(
+                        Text(
                           'DATOS LICENCIA', // Texto fijo
                           style: TextStyle(
                             fontSize: 22.sp,
@@ -650,7 +650,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                   ),
                                   backgroundColor: Colors.transparent,
                                 ),
-                                child:  Text(
+                                child: Text(
                                   'VALIDAR LICENCIA',
                                   style: TextStyle(
                                     color: const Color(0xFF2be4f3),
@@ -661,8 +661,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                 ),
                               ),
                               if (AppState.instance.isLicenciaValida)
-                                 Padding(
-                                  padding:  const EdgeInsets.only(left: 20.0),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20.0),
                                   child: Text(
                                     'LICENCIA VALIDADA',
                                     style: TextStyle(
@@ -687,7 +687,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       // Alinea el texto y el contenedor al inicio
                       children: [
-                         Text(
+                        Text(
                           'Nº DE LICENCIA', // Texto fijo
                           style: TextStyle(
                             fontSize: 22.sp,
@@ -780,7 +780,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style:  TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 15.sp,
@@ -835,6 +835,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
             });
           }
         });
+        _showConfirmationDialog(context);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -866,7 +867,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style:  TextStyle(color: Colors.white, fontSize: 17.sp),
+          style: TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
       ),
     );
@@ -896,4 +897,82 @@ InputDecoration _inputDecorationStyle(
 BoxDecoration _inputDecoration() {
   return BoxDecoration(
       color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
+}
+
+void _showConfirmationDialog(
+  BuildContext context,
+) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            color: Color(0xFF2be4f3),
+          ),
+          borderRadius: BorderRadius.circular(7),
+        ),
+        backgroundColor: const Color(0xFF2E2E2E),
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.5,
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height *
+                0.55, // Fijar altura máxima
+          ),
+          padding: const EdgeInsets.all(25.0),
+          child: Column(
+            // Centra todo en el eje vertical
+            children: [
+              SingleChildScrollView(
+                child: Center(
+                  // Usa el widget Center para centrar el contenido
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'INFO MCI',
+                        style: TextStyle(
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 30.sp,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                            decorationColor: const Color(0xFF2be4f3)),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    'CERRAR',
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
