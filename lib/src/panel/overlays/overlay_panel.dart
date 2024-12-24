@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 
@@ -24,7 +25,7 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
   Widget build(BuildContext context) {
     return MainOverlay(
       title: Text(
-        "SELECCIONAR TIPO DE PROGRAMA",
+        tr(context, "Seleccionar tipo de programa").toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -44,9 +45,15 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    buildCustomCheckboxTile("INDIVIDUAL"),
-                    buildCustomCheckboxTile("RECOVERY"),
-                    buildCustomCheckboxTile("AUTOMÁTICOS"),
+                    buildCustomCheckboxTile(
+                      tr(context, "Individual").toUpperCase(),
+                    ),
+                    buildCustomCheckboxTile(
+                      tr(context, "Recovery").toUpperCase(),
+                    ),
+                    buildCustomCheckboxTile(
+                      tr(context, "Automáticos").toUpperCase(),
+                    ),
                   ],
                 ),
               ),
@@ -72,7 +79,7 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
                     backgroundColor: Color(0xFF2be4f3),
                   ),
                   child: Text(
-                    'SELECCIONAR',
+                    tr(context, "Seleccionar").toUpperCase(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25.sp,
@@ -202,7 +209,7 @@ class _OverlaySeleccionarProgramaIndividualState
 
     return MainOverlay(
       title: Text(
-        "SELECCIONAR PROGRAMA",
+        tr(context, "Seleccionar programa").toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -338,7 +345,7 @@ class _OverlaySeleccionarProgramaIndividualState
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'DATOS',
+                          tr(context, "Datos").toUpperCase(),
                           style: TextStyle(
                               color: const Color(0xFF2be4f3),
                               fontSize: 30.sp,
@@ -348,15 +355,30 @@ class _OverlaySeleccionarProgramaIndividualState
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.03),
-                        _buildDetailRow('FRECUENCIA: ', frecuencia, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('RAMPA: ', rampa, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Rampa").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('PAUSA: ', pausa, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Pausa").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('CONTRACCIÓN: ', contraccion, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Contracción").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('PULSO: ', pulso, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Pulso (ms)").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                       ],
                     ),
                   ),
@@ -377,7 +399,7 @@ class _OverlaySeleccionarProgramaIndividualState
                       backgroundColor: Colors.transparent,
                     ),
                     child: Text(
-                      'CERRAR',
+                      tr(context, 'Cerrar').toUpperCase(),
                       style: TextStyle(
                         color: const Color(0xFF2be4f3),
                         fontSize: 17.sp,
@@ -510,7 +532,7 @@ class _OverlaySeleccionarProgramaRecoveryState
 
     return MainOverlay(
       title: Text(
-        "SELECCIONAR PROGRAMA",
+        tr(context, "Seleccionar programa").toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -646,7 +668,7 @@ class _OverlaySeleccionarProgramaRecoveryState
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'DATOS',
+                          tr(context, "Datos").toUpperCase(),
                           style: TextStyle(
                               color: const Color(0xFF2be4f3),
                               fontSize: 30.sp,
@@ -656,15 +678,30 @@ class _OverlaySeleccionarProgramaRecoveryState
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.03),
-                        _buildDetailRow('FRECUENCIA: ', frecuencia, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('RAMPA: ', rampa, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Rampa").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('PAUSA: ', pausa, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Pausa").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('CONTRACCIÓN: ', contraccion, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Contracción").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildDetailRow('PULSO: ', pulso, ' μs'),
+                        _buildDetailRow(
+                            '${tr(context, "Pulso (ms)").toUpperCase()}: ',
+                            pulso,
+                            ' μs'),
                       ],
                     ),
                   ),
@@ -685,7 +722,7 @@ class _OverlaySeleccionarProgramaRecoveryState
                       backgroundColor: Colors.transparent,
                     ),
                     child: Text(
-                      'CERRAR',
+                      tr(context, 'Cerrar').toUpperCase(),
                       style: TextStyle(
                         color: const Color(0xFF2be4f3),
                         fontSize: 17.sp,
@@ -824,7 +861,7 @@ class _OverlaySeleccionarProgramaAutomaticState
 
     return MainOverlay(
       title: Text(
-        "SELECCIONAR PROGRAMA",
+        tr(context, "Seleccionar programa").toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -959,7 +996,7 @@ class _OverlaySeleccionarProgramaAutomaticState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'DATOS',
+                  tr(context, 'Datos').toUpperCase(),
                   style: TextStyle(
                     color: const Color(0xFF2be4f3),
                     fontSize: 30.sp,
@@ -976,7 +1013,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'DURACIÓN:',
+                      tr(context, 'Duración').toUpperCase(),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -998,7 +1035,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'DESCRIPCIÓN:',
+                      tr(context, 'Descripción').toUpperCase(),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -1022,7 +1059,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'EQUIPAMIENTO:',
+                      tr(context, 'Equipamiento').toUpperCase(),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -1042,7 +1079,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                 SizedBox(height: screenHeight * 0.01),
 
                 Text(
-                  'SUBPROGRAMAS:',
+                  tr(context, 'Subprogramas').toUpperCase(),
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -1069,10 +1106,11 @@ class _OverlaySeleccionarProgramaAutomaticState
                                 color: Color(0xFF2be4f3),
                               ),
                               children: [
-                                _tableCell('Orden'),
-                                _tableCell('Nombre'),
-                                _tableCell('Duración'),
-                                _tableCell('Ajuste'),
+                                _tableCell(tr(context, 'Orden').toUpperCase()),
+                                _tableCell(tr(context, 'Nombre').toUpperCase()),
+                                _tableCell(
+                                    tr(context, 'Duración').toUpperCase()),
+                                _tableCell(tr(context, 'Ajuste').toUpperCase()),
                               ],
                             ),
                             // Filas de los subprogramas
@@ -1115,7 +1153,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                       backgroundColor: Colors.transparent,
                     ),
                     child: Text(
-                      'CERRAR',
+                      tr(context, 'Cerrar').toUpperCase(),
                       style: TextStyle(
                         color: const Color(0xFF2be4f3),
                         fontSize: 17.sp,
@@ -1221,7 +1259,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
 
     return MainOverlay(
       title: Text(
-        "SELECCIONAR CLIENTE",
+        tr(context, 'Seleccionar cliente').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -1237,7 +1275,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildTextField(
-                    'NOMBRE', _clientNameController, 'Ingrese nombre'),
+                    tr(context, 'Nombre').toUpperCase(), _clientNameController, tr(context, 'Introducir nombre')),
                 SizedBox(width: screenWidth * 0.05),
                 _buildDropdown(),
               ],
@@ -1293,7 +1331,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('ESTADO',
+          Text(tr(context, 'Estado').toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.sp,
@@ -1309,17 +1347,17 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
               items: [
                 DropdownMenuItem(
                     value: 'Todos',
-                    child: Text('Todos',
+                    child: Text(tr(context, 'Todos'),
                         style:
                             TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Activo',
-                    child: Text('Activo',
+                    child: Text(tr(context, 'Activo'),
                         style:
                             TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Inactivo',
-                    child: Text('Inactivo',
+                    child: Text(tr(context, 'Inactivo'),
                         style:
                             TextStyle(color: Colors.white, fontSize: 14.sp))),
               ],
@@ -1356,9 +1394,9 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildHeaderCell('ID'),
-                  _buildHeaderCell('NOMBRE'),
-                  _buildHeaderCell('TELÉFONO'),
-                  _buildHeaderCell('ESTADO'),
+                  _buildHeaderCell(tr(context, 'Nombre').toUpperCase()),
+                  _buildHeaderCell(tr(context, 'Teléfono').toUpperCase()),
+                  _buildHeaderCell(tr(context, 'Estado').toUpperCase()),
                 ],
               ),
               const SizedBox(height: 10), // Espaciado entre encabezado y filas

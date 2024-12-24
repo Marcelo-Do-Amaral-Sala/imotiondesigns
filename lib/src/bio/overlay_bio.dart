@@ -16,7 +16,7 @@ class OverlayBioimpedancia extends StatefulWidget {
 
 class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
     with SingleTickerProviderStateMixin {
-  bool isBodyPro = true;
+  bool isBodyPro = false;
   String? selectedGender;
   bool isOverlayVisible = false; // Controla la visibilidad del overlay
   int overlayIndex = -1; // -1 indica que no hay overlay visible
@@ -225,7 +225,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "SÓLO PARA CLIENTES CON",
+            tr(context, 'Sólo para clientes con').toUpperCase(),
             style: TextStyle(
                 color: const Color(0xFF28E2F5),
                 fontSize: 30.sp,
@@ -242,7 +242,7 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.1),
           Text(
-            "CONTACTE CON NOSOTROS PARA OBTENER NUESTRO DISPOSITIVO DE ANÁLISIS DE LA COMPOSICIÓN CORPORAL",
+            tr(context,'Contacte con nosotros para obtener nuestro dispositivo de análisis de la composición corporal').toUpperCase(),
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 25.sp,

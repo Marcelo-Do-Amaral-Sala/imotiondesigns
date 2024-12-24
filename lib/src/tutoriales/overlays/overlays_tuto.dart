@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../info/videos_tutoriales.dart';
 
@@ -24,7 +25,7 @@ class _OverlayPPState extends State<OverlayPP>
   Widget build(BuildContext context) {
     return MainOverlay(
       title:  Text(
-        "PRIMEROS PASOS",
+        tr(context,'Primeros pasos').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,

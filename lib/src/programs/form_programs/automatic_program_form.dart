@@ -104,13 +104,14 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       // Verificación de '@' en el correo
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              "Por favor, introduzca todos los campos y secuencias",
-              style: TextStyle(color: Colors.white, fontSize: 17),
+              tr(context,
+                  "Por favor, introduzca todos los campos y secuencias"),
+              style: TextStyle(color: Colors.white, fontSize: 17.sp),
             ),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -553,14 +554,15 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                             secuencias.isEmpty) {
                           // Verificación de '@' en el correo
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                "Por favor, introduzca todos los campos y secuencias",
+                                tr(context,
+                                    "Por favor, introduzca todos los campos y secuencias").toUpperCase(),
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 17),
+                                    color: Colors.white, fontSize: 17.sp),
                               ),
                               backgroundColor: Colors.red,
-                              duration: Duration(seconds: 2),
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                           return;
@@ -692,7 +694,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                             Title(
                               color: Colors.white,
                               child: Text(
-                                "¡Estás a un paso de terminar!\nSolo falta añadir una descripción para guardar tu programa.",
+                                tr(context,
+                                    "¡Estás a un paso de terminar!\nSolo falta añadir una descripción para guardar tu programa."),
                                 style: TextStyle(
                                   fontSize: 25.sp,
                                   // Tamaño de la fuente
@@ -750,15 +753,16 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                     Navigator.pop(context);
                                     await widget.onClose();
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
+                                      SnackBar(
                                         content: Text(
-                                          "Programa automático creado correctamente",
+                                          tr(context,
+                                              "Programa automático creado correctamente").toUpperCase(),
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 17),
+                                              fontSize: 17.sp),
                                         ),
                                         backgroundColor: Colors.green,
-                                        duration: Duration(seconds: 2),
+                                        duration: const Duration(seconds: 2),
                                       ),
                                     );
                                   },

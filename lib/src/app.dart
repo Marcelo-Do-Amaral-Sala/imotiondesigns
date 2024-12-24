@@ -51,6 +51,9 @@ class _AppState extends State<App> {
               navigateTo('panel'), // Manejo de reinicio solo para Panel
         );
         break;
+      case 'json':
+        viewToDisplay = UploadJsonView();
+        break;
       case 'clients':
         viewToDisplay = ClientsView(
           onBack: () => navigateTo('mainMenu'),
@@ -103,6 +106,7 @@ class _AppState extends State<App> {
         textTheme: GoogleFonts.oswaldTextTheme(),
       ),
       home: Scaffold(
+        resizeToAvoidBottomInset: true,
         body: viewToDisplay,
       ),
     );

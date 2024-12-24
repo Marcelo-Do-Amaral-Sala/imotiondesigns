@@ -92,7 +92,7 @@ class _PanelViewState extends State<PanelView>
   double progressPause = 0.0;
   int time = 25;
   double seconds = 0.0;
-
+  bool isContractionPhase = true;
   int timePause = 0;
   int timeContraction = 0;
 
@@ -244,6 +244,19 @@ class _PanelViewState extends State<PanelView>
     // Cargar los datos de AppState y actualizar el servicio BLE
     await AppState.instance.loadState();
 
+    // Verificar que BLE esté inicializado correctamente
+    try {
+      bleConnectionService.flutterReactiveBle.initialize();
+      if (kDebugMode) {
+        print("✅ Recursos BLE inicializados correctamente.");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("❌ Error al inicializar los recursos BLE: $e");
+      }
+      return; // Si no se pudo inicializar BLE, salir de la función.
+    }
+
     // Obtener las direcciones MAC desde el AppState
     List<String> macAddresses =
         AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
@@ -263,7 +276,7 @@ class _PanelViewState extends State<PanelView>
     }
 
     // Esperar un breve espacio de tiempo para procesar las conexiones actuales
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
 
     successfullyConnectedDevices.clear();
 
@@ -500,6 +513,7 @@ class _PanelViewState extends State<PanelView>
     setState(() {
       isRunning = true;
       elapsedTimeContraction = 0.0;
+      isContractionPhase=true;
     });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -507,18 +521,20 @@ class _PanelViewState extends State<PanelView>
         elapsedTimeContraction += 1.0;
         progressContraction = elapsedTimeContraction / valueContraction;
 
+        // Cuando se alcance el tiempo de contracción, inicia el temporizador de pausa
         if (elapsedTimeContraction >= valueContraction) {
-          // Pausar o detener el temporizador cuando se alcanza el tiempo de contracción
-          _pauseTimer();
+          _pauseTimer();  // Detener el temporizador actual
+          _startTimerPause();  // Iniciar el temporizador de pausa
         }
       });
     });
   }
 
-  // Iniciar el temporizador para pausa
+// Iniciar el temporizador de pausa
   void _startTimerPause() {
     setState(() {
       elapsedTimePause = 0.0;
+      isContractionPhase=false;
     });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -526,21 +542,50 @@ class _PanelViewState extends State<PanelView>
         elapsedTimePause += 1.0;
         progressPause = elapsedTimePause / valuePause;
 
+        // Cuando se alcance el tiempo de pausa, inicia el temporizador de contracción nuevamente
         if (elapsedTimePause >= valuePause) {
-          // Pausar o detener el temporizador cuando se alcanza el tiempo de pausa
-          _pauseTimer();
+          _pauseTimer();  // Detener el temporizador actual
+          _startTimerContraction();  // Iniciar el temporizador de contracción
         }
       });
     });
   }
 
+
   @override
   void dispose() {
+    if (kDebugMode) {
+      print("🧹 Limpiando recursos del widget...");
+    }
+
+    // Cancelar el timer
     _timer.cancel();
+    if (kDebugMode) {
+      print("⏲️ Timer cancelado.");
+    }
+
+    // Liberar el controlador de opacidad
     _opacityController.dispose();
+    if (kDebugMode) {
+      print("🔧 Controlador de opacidad liberado.");
+    }
+
+    // Cancelar la suscripción
     _subscription.cancel();
+    if (kDebugMode) {
+      print("📡 Suscripción cancelada.");
+    }
+
+    // Liberar recursos BLE
     bleConnectionService.disposeBleResources();
+    if (kDebugMode) {
+      print("💡 Recursos BLE liberados.");
+    }
+
     super.dispose();
+    if (kDebugMode) {
+      print("🚀 dispose() ejecutado correctamente.");
+    }
   }
 
   @override
@@ -593,7 +638,7 @@ class _PanelViewState extends State<PanelView>
                                         }
                                         return GestureDetector(
                                           key: mciKeys[macAddress],
-                                          onTap: () {
+                                          onTap: () async {
                                             if (deviceConnectionStatus[
                                                     macAddress] ==
                                                 'conectado') {
@@ -604,8 +649,6 @@ class _PanelViewState extends State<PanelView>
                                                     mciEquipMapping[
                                                             macAddress] ??
                                                         0;
-                                                clientsNames[macAddress] =
-                                                    mci['clientName'];
                                               });
 
                                               print(
@@ -617,7 +660,34 @@ class _PanelViewState extends State<PanelView>
                                             } else {
                                               print(
                                                   "❌ Dispositivo $macAddress no está conectado.");
-                                              // Aquí puedes añadir la lógica para dispositivos desconectados
+                                              // Intentar conectar al dispositivo
+                                              bool success =
+                                                  await bleConnectionService
+                                                      ._connectToDeviceByMacOnce(
+                                                          macAddress);
+
+                                              if (success) {
+                                                // Si la conexión es exitosa, se actualizan los estados y variables necesarias
+                                                setState(() {
+                                                  deviceConnectionStatus[
+                                                      macAddress] = 'conectado';
+                                                  selectedKey = macAddress;
+                                                  selectedIndexEquip =
+                                                      mciEquipMapping[
+                                                              macAddress] ??
+                                                          0;
+                                                });
+
+                                                print(
+                                                    "✅ Dispositivo $macAddress conectado y seleccionado.");
+                                                print(
+                                                    "✅ Dispositivo $macAddress seleccionado.");
+                                                print(
+                                                    "🔑 Key seleccionada: ${mciKeys[macAddress]}");
+                                              } else {
+                                                print(
+                                                    "❌ No se pudo conectar al dispositivo $macAddress.");
+                                              }
                                             }
                                           },
                                           child: Stack(
@@ -1229,7 +1299,7 @@ class _PanelViewState extends State<PanelView>
                                                   ),
 
                                                 if (globalSelectedProgram ==
-                                                        'INDIVIDUAL' &&
+                                                    tr(context, 'Individual').toUpperCase() &&
                                                     allIndividualPrograms
                                                         .isNotEmpty)
                                                   Column(
@@ -1295,7 +1365,7 @@ class _PanelViewState extends State<PanelView>
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
-                                                        'RECOVERY' &&
+                                                    tr(context, 'Recovery').toUpperCase() &&
                                                     allRecoveryPrograms
                                                         .isNotEmpty)
                                                   Column(
@@ -1361,7 +1431,7 @@ class _PanelViewState extends State<PanelView>
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
-                                                        'AUTOMÁTICOS' &&
+                                                      tr(context, 'Automáticos').toUpperCase() &&
                                                     allAutomaticPrograms
                                                         .isNotEmpty)
                                                   Column(
@@ -1459,7 +1529,7 @@ class _PanelViewState extends State<PanelView>
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
-                                                        'INDIVIDUAL' &&
+                                                    tr(context, 'Individual').toUpperCase() &&
                                                     allIndividualPrograms
                                                         .isNotEmpty)
                                                   Column(
@@ -1493,7 +1563,7 @@ class _PanelViewState extends State<PanelView>
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
-                                                        'RECOVERY' &&
+                                                      tr(context, 'Recovery').toUpperCase() &&
                                                     allRecoveryPrograms
                                                         .isNotEmpty)
                                                   Column(
@@ -1527,7 +1597,7 @@ class _PanelViewState extends State<PanelView>
                                                     ],
                                                   )
                                                 else if (globalSelectedProgram ==
-                                                        'AUTOMÁTICOS' &&
+                                                        tr(context, 'Automáticos').toUpperCase() &&
                                                     allAutomaticPrograms
                                                         .isNotEmpty)
                                                   Column(
@@ -1567,7 +1637,8 @@ class _PanelViewState extends State<PanelView>
                                                     Colors.transparent,
                                               ),
                                               child: Text(
-                                                tr(context, 'Ciclos').toUpperCase(),
+                                                tr(context, 'Ciclos')
+                                                    .toUpperCase(),
                                                 style: TextStyle(
                                                   color:
                                                       const Color(0xFF2be4f3),
@@ -3138,8 +3209,6 @@ class _PanelViewState extends State<PanelView>
                                                         } else {
                                                           // Inicia o reanuda el temporizador si está pausado
                                                           _startTimer();
-                                                          _startTimerContraction();
-                                                          _startTimerPause();
                                                         }
                                                         isSessionStarted =
                                                             !isSessionStarted;
@@ -4564,8 +4633,6 @@ class _PanelViewState extends State<PanelView>
                                                         } else {
                                                           // Inicia o reanuda el temporizador si está pausado
                                                           _startTimer();
-                                                          _startTimerContraction();
-                                                          _startTimerPause();
                                                         }
                                                         isSessionStarted =
                                                             !isSessionStarted;
@@ -6458,8 +6525,6 @@ class _PanelViewState extends State<PanelView>
                                                         } else {
                                                           // Inicia o reanuda el temporizador si está pausado
                                                           _startTimer();
-                                                          _startTimerContraction();
-                                                          _startTimerPause();
                                                         }
                                                         isSessionStarted =
                                                             !isSessionStarted;
@@ -7884,8 +7949,6 @@ class _PanelViewState extends State<PanelView>
                                                         } else {
                                                           // Inicia o reanuda el temporizador si está pausado
                                                           _startTimer();
-                                                          _startTimerContraction();
-                                                          _startTimerPause();
                                                         }
                                                         isSessionStarted =
                                                             !isSessionStarted;
@@ -8402,6 +8465,7 @@ class _PanelViewState extends State<PanelView>
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -8417,7 +8481,7 @@ class _PanelViewState extends State<PanelView>
                         ),
                       ),
                       child: Text(
-                          tr(context, 'Cancelar').toUpperCase(),
+                        tr(context, 'Cancelar').toUpperCase(),
                         style: TextStyle(
                             color: const Color(0xFF2be4f3), fontSize: 17.sp),
                       ),
@@ -8435,7 +8499,7 @@ class _PanelViewState extends State<PanelView>
                           ),
                           backgroundColor: Colors.red),
                       child: Text(
-                        tr(context, 'Sí, quiero resetear!').toUpperCase(),
+                        tr(context, '¡Sí, quiero resetear!').toUpperCase(),
                         style: TextStyle(color: Colors.white, fontSize: 17.sp),
                       ),
                     ),
@@ -8483,6 +8547,7 @@ class _PanelViewState extends State<PanelView>
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -9019,6 +9084,7 @@ class BleConnectionService {
   BleConnectionService(List<String> macAddresses) {
     targetDeviceIds =
         macAddresses; // Inicializamos con la lista vacía o los valores proporcionados
+    flutterReactiveBle.initialize();
     _startScan();
   }
 
@@ -9094,16 +9160,23 @@ class BleConnectionService {
       return;
     }
 
-    // Solicitar permisos de ubicación
+    // Verificar permisos de ubicación
     bool permGranted = false;
+
     if (Platform.isAndroid || Platform.isIOS) {
-      final permission = await Permission.location.request();
-      if (permission == PermissionStatus.granted) {
+      // Verificar los permisos en lugar de solicitar nuevamente
+      PermissionStatus permissionWhenInUse =
+          await Permission.locationWhenInUse.status;
+      PermissionStatus permissionAlways =
+          await Permission.locationAlways.status;
+
+      if (permissionWhenInUse == PermissionStatus.granted &&
+          permissionAlways == PermissionStatus.granted) {
         permGranted = true;
-        if (kDebugMode) print("Permiso de ubicación concedido.");
+        if (kDebugMode) print("Permisos de ubicación concedidos.");
       } else {
-        if (kDebugMode) print("Permiso de ubicación denegado.");
-        return;
+        if (kDebugMode) print("Permisos de ubicación no concedidos.");
+        return; // No iniciar escaneo si los permisos no están concedidos
       }
     }
 
@@ -9132,7 +9205,7 @@ class BleConnectionService {
         if (targetDeviceIds.contains(device.id) &&
             !foundDevices.contains(device.id)) {
           foundDevices.add(device.id);
-          print("▶️--->>>Dispositivo objetivo encontrado: ${device.id}");
+          print("▶️--->>> Dispositivo objetivo encontrado: ${device.id}");
 
           if (foundDevices.toSet().containsAll(targetDeviceIds)) {
             debugPrint("✅ Todos los dispositivos objetivo encontrados.");
@@ -9290,6 +9363,111 @@ class BleConnectionService {
     return success;
   }
 
+  Future<bool> _connectToDeviceByMacOnce(String macAddress) async {
+    // Validar si no hay dispositivos encontrados
+    if (foundDevices.isEmpty) {
+      if (kDebugMode) {
+        print(
+            "⚠️ No se encontraron dispositivos durante el escaneo. Conexión cancelada.");
+      }
+      return false;
+    }
+
+    // Validar si la MAC no está en la lista de dispositivos encontrados
+    if (!foundDevices.contains(macAddress)) {
+      if (kDebugMode) {
+        print(
+            "⚠️ No se puede conectar a $macAddress porque no se encontró durante el escaneo.");
+      }
+      return false;
+    }
+
+    // Validar si la MAC está vacía
+    if (macAddress.isEmpty) {
+      if (kDebugMode) print("⚠️ Dirección MAC vacía.");
+      return false;
+    }
+
+    if (kDebugMode) {
+      print("🚩--->>> Conectando al dispositivo con la MAC: $macAddress...");
+    }
+
+    bool success = false;
+
+    // Intentar conectar una sola vez
+    _connectionStreams[macAddress] =
+        flutterReactiveBle.connectToAdvertisingDevice(
+      id: macAddress,
+      prescanDuration: const Duration(seconds: 1),
+      withServices: [serviceUuid],
+    ).listen((event) async {
+      switch (event.connectionState) {
+        case DeviceConnectionState.connected:
+          if (kDebugMode) print("🔗--->>> Dispositivo $macAddress conectado.");
+
+          success = true;
+
+          // Descubrir servicios
+          final discoveredServices =
+              await flutterReactiveBle.discoverServices(macAddress);
+          bool hasRequiredService = false;
+
+          for (final service in discoveredServices) {
+            if (service.serviceId == serviceUuid) {
+              hasRequiredService = true;
+
+              if (kDebugMode) {
+                print("🔍--->>> Servicio principal encontrado: $serviceUuid");
+              }
+
+              final characteristicIds = service.characteristics
+                  .map((c) => c.characteristicId)
+                  .toList();
+
+              if (characteristicIds.contains(rxCharacteristicUuid) &&
+                  characteristicIds.contains(txCharacteristicUuid)) {
+                if (kDebugMode) {
+                  print("🛠️--->>> Características RX y TX disponibles.");
+                }
+              } else {
+                if (kDebugMode) {
+                  print("❌ Características RX o TX no encontradas.");
+                }
+              }
+              break;
+            }
+          }
+
+          if (!hasRequiredService) {
+            if (kDebugMode) print("❌ Servicio principal no encontrado.");
+          }
+
+          if (success) connectedDevices.add(macAddress);
+          _updateDeviceConnectionState(macAddress, true);
+          break;
+
+        case DeviceConnectionState.disconnected:
+          if (kDebugMode) {
+            print("⛓️‍💥--->>> Dispositivo $macAddress desconectado.");
+          }
+          _onDeviceDisconnected(macAddress);
+          _updateDeviceConnectionState(macAddress, false);
+          break;
+
+        default:
+          if (kDebugMode) {
+            print("⏳--->>> Estado desconocido para $macAddress.");
+          }
+          break;
+      }
+    });
+
+    // Esperar un momento para que se complete la conexión antes de retornar
+    await Future.delayed(const Duration(seconds: 1));
+
+    return success;
+  }
+
   Future<void> processConnectedDevices() async {
     if (connectedDevices.isEmpty) {
       debugPrint("⚠️ Ningún dispositivo conectado. Abortando operaciones.");
@@ -9318,10 +9496,6 @@ class BleConnectionService {
         debugPrint("🅱️ Nombre del Bluetooth ($macAddress): $nameBt");
         updateBluetoothName(
             macAddress, nameBt.isNotEmpty ? nameBt : "No disponible");
-        /*  setState(() {
-          bluetoothNames[macAddress] =
-          nameBt.isNotEmpty ? nameBt : "No disponible";
-        });*/
 
         // Obtener los parámetros de la batería (FUN_GET_PARAMBAT)
         final batteryParameters = await getBatteryParameters(macAddress)
@@ -9331,10 +9505,6 @@ class BleConnectionService {
         debugPrint(parsedBattery);
         updateBatteryStatus(
             macAddress, batteryParameters['batteryStatusRaw'] ?? -1);
-        /* setState(() {
-          batteryStatuses[macAddress] =
-              batteryParameters['batteryStatusRaw'] ?? -1;
-        });*/
 
         // Obtener contadores de tarifa
         final counters = await getTariffCounters(macAddress)
@@ -9514,22 +9684,42 @@ class BleConnectionService {
       }
 
       // Cancelar la suscripción del stream de conexión
-      await _connectionStreams[macAddress]?.cancel();
-      _connectionStreams.remove(macAddress);
+      if (_connectionStreams.containsKey(macAddress)) {
+        await _connectionStreams[macAddress]?.cancel();
+        if (kDebugMode) {
+          print("⚠️ Suscripción cancelada para el dispositivo $macAddress.");
+        }
+        _connectionStreams.remove(macAddress);
+      }
 
       // Verificar si el StreamController no está cerrado antes de agregar un evento
       final controller = _deviceConnectionStateControllers[macAddress];
       if (controller != null && !controller.isClosed) {
         controller.add(false); // Estado desconectado
+        if (kDebugMode) {
+          print(
+              "🔴 Evento 'desconectado' agregado al controller del dispositivo $macAddress.");
+        }
       } else {
         if (kDebugMode) {
-          print("El StreamController ya está cerrado para la MAC $macAddress.");
+          print(
+              "⚠️ El StreamController ya está cerrado para la MAC $macAddress.");
         }
       }
 
       // Detener el chequeo periódico de la conexión (si existe)
-      _connectionCheckTimer?.cancel();
-      _connectionCheckTimer = null;
+      if (_connectionCheckTimer?.isActive ?? false) {
+        _connectionCheckTimer?.cancel();
+        _connectionCheckTimer = null;
+        if (kDebugMode) {
+          print("⏲️ Timer de verificación de conexión cancelado.");
+        }
+      } else {
+        if (kDebugMode) {
+          print(
+              "⏲️ No había un timer activo para la verificación de conexión.");
+        }
+      }
     } else {
       if (kDebugMode) {
         print("No hay dispositivo conectado con la MAC $macAddress.");
@@ -9551,10 +9741,25 @@ class BleConnectionService {
       if (kDebugMode) {
         debugPrint("⏲️ Timer de verificación de conexión cancelado.");
       }
+    } else {
+      if (kDebugMode) {
+        debugPrint(
+            "⏲️ No había un timer activo para la verificación de conexión.");
+      }
+    }
+
+    if (_scanStream != null) {
+      _scanStream?.cancel();
+      if (kDebugMode) {
+        debugPrint("🔴 Escaneo BLE cancelado.");
+      }
     }
     // Desconectar todos los dispositivos si están conectados
     for (var macAddress in _deviceConnectionStateControllers.keys) {
       disconnect(macAddress);
+      if (kDebugMode) {
+        debugPrint("🛑 Desconectando dispositivo con MAC: $macAddress");
+      }
     }
 
     // Cerrar todos los StreamControllers de forma segura
@@ -9563,7 +9768,12 @@ class BleConnectionService {
         controller.close();
         if (kDebugMode) {
           debugPrint(
-              "Stream controller para el dispositivo $macAddress cerrado.");
+              "🗑️ Stream controller para el dispositivo $macAddress cerrado.");
+        }
+      } else {
+        if (kDebugMode) {
+          debugPrint(
+              "⚠️ El Stream controller ya estaba cerrado para el dispositivo $macAddress.");
         }
       }
     });
@@ -9571,7 +9781,13 @@ class BleConnectionService {
     if (!_deviceUpdatesController.isClosed) {
       _deviceUpdatesController.close();
       if (kDebugMode) {
-        debugPrint("Stream controller de actualizaciones generales cerrado.");
+        debugPrint(
+            "🗑️ Stream controller de actualizaciones generales cerrado.");
+      }
+    } else {
+      if (kDebugMode) {
+        debugPrint(
+            "⚠️ El Stream controller de actualizaciones generales ya estaba cerrado.");
       }
     }
 

@@ -389,17 +389,13 @@ class OverlayIdioma extends StatefulWidget {
   @override
   _OverlayIdiomaState createState() => _OverlayIdiomaState();
 }
-
-class _OverlayIdiomaState extends State<OverlayIdioma>
-    with SingleTickerProviderStateMixin {
+class _OverlayIdiomaState extends State<OverlayIdioma> {
   String? _selectedLanguage;
   Map<String, String> _translations = {};
+  Map<String, Map<String, String>> _translationsCache = {}; // Caché de traducciones
   final SyncService _syncService = SyncService();
-  final DatabaseHelperTraducciones _dbHelperTraducciones =
-      DatabaseHelperTraducciones();
-  String statusMessage = 'Listo para hacer la copia de seguridad';
+  final DatabaseHelperTraducciones _dbHelperTraducciones = DatabaseHelperTraducciones();
 
-  // Mapa de nombres visibles y sus valores internos
   final Map<String, String> _languageMap = {
     'ESPAÑOL': 'es',
     'ENGLISH': 'en',
@@ -412,62 +408,37 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
   @override
   void initState() {
     super.initState();
-    _showStoredTranslations();
     _selectedLanguage = AppStateIdioma.instance.currentLanguage;
     _loadTranslations();
-    _fetchLocalTranslations('es'); // Cargar las traducciones en español
   }
 
   void _loadTranslations() async {
+    // Sincronizar datos de Firebase a SQLite
     await _syncService.syncFirebaseToSQLite();
     if (_selectedLanguage != null) {
+      // Cargar traducciones desde la caché o la base de datos
       _fetchLocalTranslations(_selectedLanguage!);
     }
   }
 
+  // Consultar el caché y luego la base de datos si es necesario
   void _fetchLocalTranslations(String language) async {
-    final translations =
-        await _dbHelperTraducciones.getTranslationsByLanguage(language);
+    final provider = Provider.of<TranslationProvider>(context, listen: false);
+    await provider.changeLanguage(language); // Cambiar el idioma usando el provider
 
-    // Verificar si el widget todavía está montado antes de llamar a setState
-    if (mounted) {
-      setState(() {
-        _translations = Map<String, String>.from(translations);
-        if (_translations.isEmpty) {
-          statusMessage =
-              "No hay datos disponibles, la base de datos está vacía.";
-          print("La base de datos está vacía.");
-        }
-      });
-    }
-  }
-
-  void _showStoredTranslations() async {
-    final allTranslations = await _dbHelperTraducciones.getAllTranslations();
-    if (allTranslations.isEmpty) {
-      print("No hay traducciones almacenadas.");
-    } else {
-      for (var translation in allTranslations) {
-        print(translation);
-      }
-    }
+    setState(() {
+      _translations = provider.translations; // Obtener las traducciones actualizadas
+    });
   }
 
   void _changeAppLanguage(String language) {
-    // Cambiar el idioma seleccionado en AppStateIdioma
     AppStateIdioma.instance.currentLanguage = language;
-
-    // Guardar el idioma en SharedPreferences
     AppStateIdioma.instance.saveLanguage(language);
 
-    // Verificar que el idioma se ha guardado correctamente
-    print('Idioma guardado en SharedPreferences: $language');
-
-    // Cambiar el idioma en el TranslationProvider
     final provider = Provider.of<TranslationProvider>(context, listen: false);
-    provider.changeLanguage(language);
+    provider.changeLanguage(language); // Cambiar el idioma usando el provider
 
-    // Recargar las traducciones para el idioma seleccionado
+    // Recargar las traducciones inmediatamente
     _fetchLocalTranslations(language);
   }
 
@@ -520,16 +491,14 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
                 child: OutlinedButton(
                   onPressed: () {
                     if (_selectedLanguage != null) {
-                      print("Idioma seleccionado: $_selectedLanguage");
-                      _changeAppLanguage(
-                          _selectedLanguage!); // Cambia el idioma seleccionado
+                      _changeAppLanguage(_selectedLanguage!); // Cambia el idioma seleccionado
+                      setState(() {});
                     }
                     widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -567,8 +536,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
       ),
       onTap: () {
         setState(() {
-          _selectedLanguage = _languageMap[
-              language]; // Actualiza la selección con el valor interno
+          _selectedLanguage = _languageMap[language];
         });
       },
     );
@@ -578,8 +546,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedLanguage = _languageMap[
-              language]; // Actualiza la selección con el valor interno
+          _selectedLanguage = _languageMap[language];
         });
       },
       child: Container(
@@ -602,6 +569,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma>
     );
   }
 }
+
+
 
 class OverlayServicio extends StatefulWidget {
   final VoidCallback onClose;

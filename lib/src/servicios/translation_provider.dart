@@ -1,25 +1,40 @@
 import 'package:flutter/material.dart';
 import '../db/db_helper_traducciones.dart';
-import 'licencia_state.dart';  // Asegúrate de importar AppStateIdioma
+import 'licencia_state.dart'; // Asegúrate de importar AppStateIdioma
 
-class TranslationProvider extends ChangeNotifier {
-  final DatabaseHelperTraducciones _dbHelper = DatabaseHelperTraducciones();
-  String _currentLanguage = 'es'; // Idioma predeterminado
-  Map<String, String> _translations = {}; // Traducciones actuales
+class TranslationProvider with ChangeNotifier {
+  Map<String, String> _translations = {};
+  Map<String, Map<String, String>> _translationsCache =
+      {}; // Caché de traducciones
 
-  String get currentLanguage => _currentLanguage;
   Map<String, String> get translations => _translations;
 
-  // Cambia el idioma y recarga las traducciones
-  Future<void> changeLanguage(String languageCode) async {
-    _currentLanguage = languageCode;
-    _translations = await _dbHelper.getTranslationsByLanguage(languageCode);
-    notifyListeners(); // Notificar a los widgets para que se actualicen
+  Future<void> changeLanguage(String language) async {
+    if (_translationsCache.containsKey(language)) {
+      // Si las traducciones ya están en caché, las usamos directamente
+      _translations = Map<String, String>.from(_translationsCache[language]!);
+      notifyListeners();
+    } else {
+      // Si no están en caché, las cargamos desde la base de datos
+      await _fetchTranslationsFromDatabase(language);
+    }
   }
 
-  // Traduce una clave
+  // Cargar traducciones desde la base de datos
+  Future<void> _fetchTranslationsFromDatabase(String language) async {
+    final translations =
+        await DatabaseHelperTraducciones().getTranslationsByLanguage(language);
+
+    // Actualizamos el caché
+    _translationsCache[language] = Map<String, String>.from(translations);
+
+    // Actualizamos las traducciones y notificamos a los listeners
+    _translations = Map<String, String>.from(translations);
+    notifyListeners();
+  }
+
   String translate(String key) {
-    return _translations[key] ?? key; // Retorna la clave si no hay traducción
+    return _translations[key] ??
+        key; // Devuelve la clave si no encuentra la traducción
   }
 }
-

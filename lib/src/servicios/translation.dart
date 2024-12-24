@@ -22,5 +22,6 @@ class TranslationService {
       throw Exception("Error al descargar las traducciones: $e");
     }
   }
-
 }
+
+

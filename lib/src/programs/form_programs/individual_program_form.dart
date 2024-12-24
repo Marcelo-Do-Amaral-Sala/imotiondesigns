@@ -212,13 +212,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         .insertarGruposMuscularesPorDefecto(programaId, equipamiento);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          "Programa individual creado correctamente",
-          style: TextStyle(color: Colors.white, fontSize: 17),
+          tr(context, "Programa individual creado correctamente").toUpperCase(),
+          style: TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -253,13 +253,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         await DatabaseHelper().updateCronaxia(programaId, grupo['id'], valor);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              "Cronaxias añadidas correctamente",
-              style: TextStyle(color: Colors.white, fontSize: 17),
+              tr(context, "Cronaxias añadidas correctamente").toUpperCase(),
+              style: TextStyle(color: Colors.white, fontSize: 17.sp),
             ),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -351,13 +351,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       print('No se encontraron programas en la base de datos');
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          "Grupos activos añadidos correctamente",
-          style: TextStyle(color: Colors.white, fontSize: 17),
+          tr(context, "Grupos activos añadidos correctamente").toUpperCase(),
+          style: TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

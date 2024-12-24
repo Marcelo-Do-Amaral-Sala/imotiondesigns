@@ -4,12 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/bio/overlay_bio.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../db/db_helper.dart';
 import '../db/db_helper_pc.dart';
+import '../db/db_helper_traducciones.dart';
 import '../db/db_helper_web.dart';
+import '../servicios/licencia_state.dart';
+import '../servicios/sync.dart';
 import '../servicios/translation_provider.dart'; // Importa el TranslationProvider
 
 class MainMenuView extends StatefulWidget {
@@ -45,10 +49,16 @@ class _MainMenuViewState extends State<MainMenuView> {
   Map<String, String>? clientData;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
 
+  Map<String, String> _translations = {};
+  final SyncService _syncService = SyncService();
+  final DatabaseHelperTraducciones _dbHelperTraducciones =
+  DatabaseHelperTraducciones();
+
   @override
   void initState() {
     super.initState();
     _initializeDatabase();
+    _requestLocationPermissions();
   }
 
   void toggleOverlay(int index) {
@@ -81,6 +91,33 @@ class _MainMenuViewState extends State<MainMenuView> {
     }
   }
 
+
+  Future<void> _requestLocationPermissions() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      PermissionStatus permission = PermissionStatus.denied;
+
+      if (Platform.isAndroid) {
+        permission = await Permission.locationWhenInUse.request();
+        if (permission == PermissionStatus.granted) {
+          permission = await Permission.locationAlways.request();
+        }
+      } else if (Platform.isIOS) {
+        permission = await Permission.locationWhenInUse.request();
+        if (permission == PermissionStatus.granted) {
+          permission = await Permission.locationAlways.request();
+        }
+      }
+
+      if (permission == PermissionStatus.denied ||
+          permission == PermissionStatus.permanentlyDenied) {
+        debugPrint("Permiso de ubicación denegado o denegado permanentemente.");
+        openAppSettings();
+      } else {
+        debugPrint("Permisos de ubicación concedidos.");
+      }
+    }
+  }
+
   // Función de traducción utilitaria
   String tr(BuildContext context, String key) {
     return Provider.of<TranslationProvider>(context, listen: false)
@@ -89,14 +126,8 @@ class _MainMenuViewState extends State<MainMenuView> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: Stack(
@@ -133,11 +164,11 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/panel.png',
                                 tr(context, 'Panel de control').toUpperCase(),
                                 scaleFactorPanel,
-                                    () {
+                                () {
                                   scaleFactorPanel = 1;
                                   widget.onNavigateToPanel();
                                 },
-                                    () => setState(() => scaleFactorPanel = 0.90),
+                                () => setState(() => scaleFactorPanel = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -145,11 +176,11 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/cliente.png',
                                 tr(context, 'Clientes').toUpperCase(),
                                 scaleFactorClient,
-                                    () {
+                                () {
                                   scaleFactorClient = 1;
                                   widget.onNavigateToClients();
                                 },
-                                    () => setState(() => scaleFactorClient = 0.90),
+                                () => setState(() => scaleFactorClient = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -157,13 +188,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/programas.png',
                                 tr(context, 'Programas').toUpperCase(),
                                 scaleFactorProgram,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorProgram = 1;
                                     widget.onNavigateToPrograms();
                                   });
                                 },
-                                    () => setState(() => scaleFactorProgram = 0.90),
+                                () => setState(() => scaleFactorProgram = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -171,13 +202,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/bio.png',
                                 tr(context, 'Bioimpedancia').toUpperCase(),
                                 scaleFactorBio,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorBio = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                    () => setState(() => scaleFactorBio = 0.90),
+                                () => setState(() => scaleFactorBio = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -185,13 +216,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/tutoriales.png',
                                 tr(context, 'Tutoriales').toUpperCase(),
                                 scaleFactorTuto,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorTuto = 1;
                                     widget.onNavigateToTutoriales();
                                   });
                                 },
-                                    () => setState(() => scaleFactorTuto = 0.90),
+                                () => setState(() => scaleFactorTuto = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -199,13 +230,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/ajustes.png',
                                 tr(context, 'Ajustes').toUpperCase(),
                                 scaleFactorAjustes,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorAjustes = 1;
                                     widget.onNavigateToAjustes();
                                   });
                                 },
-                                    () => setState(() => scaleFactorAjustes = 0.90),
+                                () => setState(() => scaleFactorAjustes = 0.90),
                               ),
                             ],
                           ),
@@ -255,14 +286,8 @@ class _MainMenuViewState extends State<MainMenuView> {
 
   Widget buildButton(BuildContext context, String imagePath, String text,
       double scale, VoidCallback onTapUp, VoidCallback onTapDown) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Align(
       alignment: Alignment.centerRight,
@@ -288,7 +313,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.only(left:20.0),
+                        padding: const EdgeInsets.only(left: 20.0),
                         width: screenWidth * 0.05,
                         height: screenHeight * 0.1,
                         child: Image.asset(
@@ -299,7 +324,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                       Expanded(
                         child: Text(
                           text,
-                          style:  TextStyle(
+                          style: TextStyle(
                             color: const Color(0xFF28E2F5),
                             fontSize: 22.sp,
                             fontWeight: FontWeight.w600,
