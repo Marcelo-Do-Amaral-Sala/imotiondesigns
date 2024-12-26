@@ -6,13 +6,14 @@ import 'package:imotion_designs/src/panel/views/panel_view.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
 import 'package:imotion_designs/src/servicios/json.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
-
 import 'ajustes/menus/ajustes_menu.dart';
 import 'ajustes/menus/gestion_menu.dart';
 import 'clients/clients_main_view.dart';
 
 class App extends StatefulWidget {
-  App({Key? key}) : super(key: key);
+  final double screenWidth;
+  final double screenHeight;
+  App({Key? key, required this.screenWidth, required this.screenHeight}) : super(key: key);
 
   @override
   _AppState createState() => _AppState();
@@ -42,73 +43,98 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     Widget viewToDisplay;
 
-    switch (currentView) {
-      case 'panel':
-        viewToDisplay = PanelView(
-          key: panelViewKey, // Usar la clave única para PanelView
-          onBack: () => navigateTo('mainMenu'),
-          onReset: () =>
-              navigateTo('panel'), // Manejo de reinicio solo para Panel
-        );
-        break;
-      case 'json':
-        viewToDisplay = UploadJsonView();
-        break;
-      case 'clients':
-        viewToDisplay = ClientsView(
-          onBack: () => navigateTo('mainMenu'),
-        );
-        break;
-      case 'programs':
-        viewToDisplay = ProgramsMenuView(
-          onBack: () => navigateTo('mainMenu'),
-        );
-        break;
-      case 'tutoriales':
-        viewToDisplay = TutorialesMenuView(
-          onBack: () => navigateTo('mainMenu'),
-        );
-        break;
-      case 'ajustes':
-        viewToDisplay = AjustesMenuView(
-          onBack: () => navigateTo('mainMenu'),
-          onNavigatetoLicencia: () => navigateTo('licencia'),
-          onNavigatetoGestion: () => navigateTo('gestion'),
-        );
-        break;
-      case 'gestion':
-        viewToDisplay = GestionMenuView(
-          onBack: () => navigateTo('ajustes'),
-        );
-        break;
-      case 'licencia':
-        viewToDisplay = LicenciaFormView(
-          onBack: () => navigateTo('ajustes'),
-          onMciTap: (mciData) {
-            selectMCI(mciData);
-          },
-        );
-        break;
-      case 'mainMenu':
-      default:
-        viewToDisplay = MainMenuView(
-          onNavigateToPanel: () => navigateTo('panel'),
-          onNavigateToClients: () => navigateTo('clients'),
-          onNavigateToPrograms: () => navigateTo('programs'),
-          onNavigateToAjustes: () => navigateTo('ajustes'),
-          onNavigateToTutoriales: () => navigateTo('tutoriales'),
-        );
-        break;
-    }
+    // Usamos LayoutBuilder para obtener las restricciones de tamaño de la pantalla
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Obtiene el tamaño disponible de la pantalla
+        double screenWidth = constraints.maxWidth;
+        double screenHeight = constraints.maxHeight;
 
-    return MaterialApp(
-      theme: ThemeData(
-        textTheme: GoogleFonts.oswaldTextTheme(),
-      ),
-      home: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: viewToDisplay,
-      ),
+        // Aquí ajustamos la vista según el tamaño disponible
+        switch (currentView) {
+          case 'panel':
+            viewToDisplay = PanelView(
+              key: panelViewKey, // Usar la clave única para PanelView
+              onBack: () => navigateTo('mainMenu'),
+              onReset: () => navigateTo('panel'), // Manejo de reinicio solo para Panel
+              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'json':
+            viewToDisplay = UploadJsonView();
+            break;
+          case 'clients':
+            viewToDisplay = ClientsView(
+              onBack: () => navigateTo('mainMenu'),
+              screenWidth: screenWidth,
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'programs':
+            viewToDisplay = ProgramsMenuView(
+              onBack: () => navigateTo('mainMenu'),
+              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'tutoriales':
+            viewToDisplay = TutorialesMenuView(
+              onBack: () => navigateTo('mainMenu'),
+              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'ajustes':
+            viewToDisplay = AjustesMenuView(
+              onBack: () => navigateTo('mainMenu'),
+              onNavigatetoLicencia: () => navigateTo('licencia'),
+              onNavigatetoGestion: () => navigateTo('gestion'),
+              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'gestion':
+            viewToDisplay = GestionMenuView(
+              onBack: () => navigateTo('ajustes'),
+              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'licencia':
+            viewToDisplay = LicenciaFormView(
+              onBack: () => navigateTo('ajustes'),
+              onMciTap: (mciData) {
+                selectMCI(mciData);
+              },
+              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'mainMenu':
+          default:
+            viewToDisplay = MainMenuView(
+              onNavigateToPanel: () => navigateTo('panel'),
+              onNavigateToClients: () => navigateTo('clients'),
+              onNavigateToPrograms: () => navigateTo('programs'),
+              onNavigateToAjustes: () => navigateTo('ajustes'),
+              onNavigateToTutoriales: () => navigateTo('tutoriales'),
+              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+        }
+
+        return MaterialApp(
+          theme: ThemeData(
+            textTheme: GoogleFonts.oswaldTextTheme(),
+          ),
+          home: Scaffold(
+            resizeToAvoidBottomInset: true,
+            body: viewToDisplay,
+          ),
+        );
+      },
     );
   }
 }

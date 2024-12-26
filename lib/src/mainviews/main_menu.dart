@@ -22,6 +22,8 @@ class MainMenuView extends StatefulWidget {
   final Function() onNavigateToPrograms;
   final Function() onNavigateToAjustes;
   final Function() onNavigateToTutoriales;
+  final double screenWidth;
+  final double screenHeight;
 
   const MainMenuView({
     Key? key,
@@ -30,6 +32,8 @@ class MainMenuView extends StatefulWidget {
     required this.onNavigateToPrograms,
     required this.onNavigateToAjustes,
     required this.onNavigateToTutoriales,
+    required this.screenWidth,
+    required this.screenHeight,
   }) : super(key: key);
 
   @override
@@ -52,7 +56,7 @@ class _MainMenuViewState extends State<MainMenuView> {
   Map<String, String> _translations = {};
   final SyncService _syncService = SyncService();
   final DatabaseHelperTraducciones _dbHelperTraducciones =
-  DatabaseHelperTraducciones();
+      DatabaseHelperTraducciones();
 
   @override
   void initState() {
@@ -90,7 +94,6 @@ class _MainMenuViewState extends State<MainMenuView> {
       debugPrint("Error al inicializar la base de datos: $e");
     }
   }
-
 
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {

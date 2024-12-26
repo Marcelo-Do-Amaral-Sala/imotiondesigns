@@ -7,7 +7,14 @@ import '../overlays/overlays_tuto.dart';
 
 class TutorialesMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
-  const TutorialesMenuView({super.key, required this.onBack});
+  final double screenWidth;
+  final double screenHeight;
+
+  const TutorialesMenuView(
+      {super.key,
+      required this.onBack,
+      required this.screenWidth,
+      required this.screenHeight});
 
   @override
   State<TutorialesMenuView> createState() => _TutorialesMenuViewState();

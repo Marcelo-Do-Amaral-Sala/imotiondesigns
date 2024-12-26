@@ -9,7 +9,6 @@ import 'package:imotion_designs/src/servicios/sync.dart';
 import 'package:imotion_designs/src/servicios/translation_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-
 import 'firebase_options.dart';
 
 void main() async {
@@ -21,7 +20,10 @@ void main() async {
   WakelockPlus.enable();
 
   // Establece la orientación horizontal obligatoria
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
   final SyncService syncService = SyncService();
 
@@ -36,24 +38,36 @@ void main() async {
   await AppStateIdioma.instance.loadLanguage();
 
   // Verificación: imprimir el idioma cargado
-  print('Idioma cargado en main.dart: ${AppStateIdioma.instance.currentLanguage}');
+  print(
+      'Idioma cargado en main.dart: ${AppStateIdioma.instance.currentLanguage}');
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => TranslationProvider()..changeLanguage(AppStateIdioma.instance.currentLanguage), // Cargar el idioma guardado
+          create: (_) => TranslationProvider()
+            ..changeLanguage(AppStateIdioma
+                .instance.currentLanguage), // Cargar el idioma guardado
         ),
       ],
       child: ScreenUtilInit(
-        designSize: const Size(1200, 1920),  // Tamaño base de la tablet Galaxy A8
+        designSize: const Size(1200, 1920), // Tamaño base de la tablet Galaxy A8
         builder: (context, child) {
-          return App(); // Aquí colocamos el widget raíz como child de MultiProvider
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              // Aquí obtienes las restricciones máximas de ancho y alto de la pantalla
+              double screenWidth = constraints.maxWidth;
+              double screenHeight = constraints.maxHeight;
+
+              // Ajusta el diseño de acuerdo al tamaño disponible
+              return App(
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+              );
+            },
+          );
         },
       ),
     ),
   );
 }
-
-
-

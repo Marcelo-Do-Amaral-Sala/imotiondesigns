@@ -15,8 +15,15 @@ import '../custom/linear_custom.dart';
 class PanelView extends StatefulWidget {
   final VoidCallback onBack;
   final VoidCallback onReset; // Nuevo callback para reiniciar
+  final double screenWidth;
+  final double screenHeight;
 
-  const PanelView({super.key, required this.onBack, required this.onReset});
+  const PanelView(
+      {super.key,
+      required this.onBack,
+      required this.onReset,
+      required this.screenWidth,
+      required this.screenHeight});
 
   @override
   State<PanelView> createState() => _PanelViewState();
@@ -136,8 +143,6 @@ class _PanelViewState extends State<PanelView>
     30: 'assets/images/2.png',
     31: 'assets/images/1.png',
   };
-
-
 
   int _currentImageIndex = 0;
   final List<bool> _isMusculoTrajeInactivo = [
@@ -339,9 +344,73 @@ class _PanelViewState extends State<PanelView>
 
   void _clearGlobals() {
     setState(() {
+      // Restablecer variables globales
       globalSelectedProgram = null;
       selectedClientsGlobal = [];
+
+      isSessionStarted = false;
+      _isImagesLoaded = false;
+      isRunning = false;
+      isContractionPhase = true;
+      isOverlayVisible = false;
+      isPantalonSelected = false;
+
+      // Restablecer los programas
+      selectedProgram = null;
+      // Restablecer valores de escalado
+      scaleFactorBack = 1.0;
+      scaleFactorFull = 1.0;
+      scaleFactorCliente = 1.0;
+      scaleFactorRepeat = 1.0;
+      scaleFactorTrainer = 1.0;
+      scaleFactorReset = 1.0;
+      scaleFactorMas = 1.0;
+      scaleFactorMenos = 1.0;
+
+      // Restablecer los valores de rotación
+      rotationAngle1 = 0.0;
+      rotationAngle2 = 0.0;
+      rotationAngle3 = 0.0;
+
+      // Restablecer los índices y estados de expansión
+      _isExpanded1 = false;
+      _isExpanded2 = false;
+      _isExpanded3 = false;
+
+      // Restablecer el estado de la imagen y su índice
+      _currentImageIndex = 31 - 25;
+
+      // Restablecer la lista de músculos inactivos
+      _isMusculoTrajeInactivo.fillRange(0, 10, false);
+      _isMusculoPantalonInactivo.fillRange(0, 7, false);
+
+      // Restablecer los bloqueos de músculos
+      _isMusculoTrajeBloqueado.fillRange(0, 10, false);
+      _isMusculoPantalonBloqueado.fillRange(0, 7, false);
+
+      // Restablecer los porcentajes
+      porcentajesMusculoTraje.fillRange(0, 10, 0);
+      porcentajesMusculoPantalon.fillRange(0, 7, 0);
+
+      // Restablecer las variables relacionadas con el temporizador
+      valueContraction = 1.0;
+      valueRampa = 1.0;
+      valuePause = 1.0;
+
+      elapsedTime = 0.0;
+      time = 25;
+      seconds = 0.0;
+      progress = 1.0;
+      elapsedTimeContraction = 0.0;
+      elapsedTimePause = 0.0;
+      progressContraction = 0.0;
+      progressPause = 0.0;
+      startTime = DateTime.now();
+      pausedTime = 0.0;
+      _phaseTimer?.cancel();
+      _timer.cancel();
     });
+    Navigator.of(context).pop();
   }
 
   Future<void> _fetchClients() async {
@@ -1589,7 +1658,7 @@ class _PanelViewState extends State<PanelView>
                                                       Text(
                                                         selectedRecoProgram !=
                                                                 null
-                                                            ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedIndivProgram!['pulso'] as double) : 'N/A'} ms"
+                                                            ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : 'N/A'} ms"
                                                             : allRecoveryPrograms
                                                                     .isNotEmpty
                                                                 ? "${formatNumber(allRecoveryPrograms[0]['pulso'] as double)} ms"
@@ -2406,8 +2475,14 @@ class _PanelViewState extends State<PanelView>
                                                 alignment: Alignment.center,
                                                 children: [
                                                   Image.asset(
-                                                    imagePaths[_currentImageIndex]!, // Accede al valor en el mapa usando la clave _currentImageIndex
-                                                    height: MediaQuery.of(context).size.height * 0.25,
+                                                    imagePaths[
+                                                        _currentImageIndex]!,
+                                                    // Accede al valor en el mapa usando la clave _currentImageIndex
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.25,
                                                     fit: BoxFit.cover,
                                                   ),
                                                   Column(
@@ -2417,18 +2492,25 @@ class _PanelViewState extends State<PanelView>
                                                         onTap: isRunning
                                                             ? null
                                                             : () {
-                                                          setState(() {
-                                                            if (time < 30) { // Máximo valor de time es 30
-                                                              time++; // Aumentar el tiempo
-                                                              totalTime = time * 60; // Actualiza el tiempo total en segundos
-                                                              // Calcula el índice de la imagen con el nuevo tiempo
-                                                              _currentImageIndex = 31 - time;
-                                                            }
-                                                          });
-                                                        },
+                                                                setState(() {
+                                                                  if (time <
+                                                                      30) {
+                                                                    // Máximo valor de time es 30
+                                                                    time++; // Aumentar el tiempo
+                                                                    totalTime =
+                                                                        time *
+                                                                            60; // Actualiza el tiempo total en segundos
+                                                                    // Calcula el índice de la imagen con el nuevo tiempo
+                                                                    _currentImageIndex =
+                                                                        31 -
+                                                                            time;
+                                                                  }
+                                                                });
+                                                              },
                                                         child: Image.asset(
                                                           'assets/images/flecha-arriba.png',
-                                                          height: screenHeight * 0.04,
+                                                          height: screenHeight *
+                                                              0.04,
                                                           fit: BoxFit.scaleDown,
                                                         ),
                                                       ),
@@ -2436,26 +2518,35 @@ class _PanelViewState extends State<PanelView>
                                                         "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
                                                         style: TextStyle(
                                                           fontSize: 25.sp,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: const Color(0xFF2be4f3), // Color para la sección seleccionada
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: const Color(
+                                                              0xFF2be4f3), // Color para la sección seleccionada
                                                         ),
                                                       ),
                                                       GestureDetector(
                                                         onTap: isRunning
                                                             ? null
                                                             : () {
-                                                          setState(() {
-                                                            if (time > 1) { // Mínimo valor de time es 1
-                                                              time--; // Disminuir el tiempo
-                                                              totalTime = time * 60; // Actualiza el tiempo total en segundos
-                                                              // Calcula el índice de la imagen con el nuevo tiempo
-                                                              _currentImageIndex = 31 - time;
-                                                            }
-                                                          });
-                                                        },
+                                                                setState(() {
+                                                                  if (time >
+                                                                      1) {
+                                                                    // Mínimo valor de time es 1
+                                                                    time--; // Disminuir el tiempo
+                                                                    totalTime =
+                                                                        time *
+                                                                            60; // Actualiza el tiempo total en segundos
+                                                                    // Calcula el índice de la imagen con el nuevo tiempo
+                                                                    _currentImageIndex =
+                                                                        31 -
+                                                                            time;
+                                                                  }
+                                                                });
+                                                              },
                                                         child: Image.asset(
                                                           'assets/images/flecha-abajo.png',
-                                                          height: screenHeight * 0.04,
+                                                          height: screenHeight *
+                                                              0.04,
                                                           fit: BoxFit.scaleDown,
                                                         ),
                                                       ),
@@ -2463,7 +2554,6 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                 ],
                                               ),
-
 
                                               SizedBox(
                                                   height: screenHeight * 0.01),
@@ -3814,11 +3904,16 @@ class _PanelViewState extends State<PanelView>
                                                 alignment: Alignment.center,
                                                 children: [
                                                   Image.asset(
-                                                    imagePaths[_currentImageIndex]!, // Accede al valor en el mapa usando la clave _currentImageIndex
-                                                    height: MediaQuery.of(context).size.height * 0.25,
+                                                    imagePaths[
+                                                        _currentImageIndex]!,
+                                                    // Accede al valor en el mapa usando la clave _currentImageIndex
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.25,
                                                     fit: BoxFit.cover,
                                                   ),
-
                                                   Column(
                                                     children: [
                                                       // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
@@ -4919,8 +5014,6 @@ class _PanelViewState extends State<PanelView>
                     OutlinedButton(
                       onPressed: () {
                         _clearGlobals();
-                        widget.onReset();
-                        Navigator.of(context).pop();
                       },
                       style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.red),
@@ -5112,13 +5205,16 @@ class _PanelViewState extends State<PanelView>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          color: _isMusculoTrajeInactivo[index] // Si está inactivo, color gris
-              ? Colors.grey.withOpacity(0.5) // Color gris cuando inactivo
-              : _isMusculoTrajeBloqueado[
-                      index] // Si está bloqueado, color naranja
-                  ? const Color(0xFFFFA500).withOpacity(0.3)
-                  : Colors.transparent,
-          // Si no está bloqueado ni inactivo, fondo transparente
+          decoration: BoxDecoration(
+            color:
+                _isMusculoTrajeInactivo[index] // Si está inactivo, color gris
+                    ? Colors.grey.withOpacity(0.5) // Color gris cuando inactivo
+                    : _isMusculoTrajeBloqueado[
+                            index] // Si está bloqueado, color naranja
+                        ? const Color(0xFFFFA500).withOpacity(0.3)
+                        : Colors.transparent,
+            borderRadius: BorderRadius.circular(7.0), // Redondea las esquinas
+          ),
           child: Row(
             children: [
               // Botón "Más"
@@ -5141,7 +5237,7 @@ class _PanelViewState extends State<PanelView>
                 isDisabled: _isMusculoTrajeBloqueado[index] ||
                     _isMusculoTrajeInactivo[index],
               ),
-              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.005),
 
               // Columna que contiene el GestureDetector y el porcentaje
               Column(
@@ -5171,6 +5267,7 @@ class _PanelViewState extends State<PanelView>
                       height: _isFullScreen ? 80.0 : 70.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
+                        // Redondear la imagen
                         child: Image.asset(
                           // Lógica de selección de la imagen
                           _isMusculoTrajeBloqueado[index]
@@ -5195,7 +5292,7 @@ class _PanelViewState extends State<PanelView>
                   ),
                 ],
               ),
-              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.005),
 
               // Botón "Menos"
               CustomIconButton(
@@ -5233,14 +5330,16 @@ class _PanelViewState extends State<PanelView>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          color:
-              _isMusculoPantalonInactivo[index] // Si está inactivo, color gris
-                  ? Colors.grey.withOpacity(0.5) // Color gris cuando inactivo
-                  : _isMusculoPantalonBloqueado[
-                          index] // Si está bloqueado, color naranja
-                      ? const Color(0xFFFFA500).withOpacity(0.3)
-                      : Colors.transparent,
-          // Si no está bloqueado ni inactivo, fondo transparente
+          decoration: BoxDecoration(
+            color: _isMusculoPantalonInactivo[
+                    index] // Si está inactivo, color gris
+                ? Colors.grey.withOpacity(0.3) // Color gris cuando inactivo
+                : _isMusculoPantalonBloqueado[
+                        index] // Si está bloqueado, color naranja
+                    ? const Color(0xFFFFA500).withOpacity(0.3)
+                    : Colors.transparent,
+            borderRadius: BorderRadius.circular(7.0), // Redondea las esquinas
+          ),
           child: Row(
             children: [
               // Botón "Más"
@@ -5263,7 +5362,7 @@ class _PanelViewState extends State<PanelView>
                 isDisabled: _isMusculoPantalonBloqueado[index] ||
                     _isMusculoPantalonInactivo[index],
               ),
-              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.005),
 
               // Columna que contiene el GestureDetector y el porcentaje
               Column(
@@ -5317,7 +5416,7 @@ class _PanelViewState extends State<PanelView>
                   ),
                 ],
               ),
-              SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.005),
 
               // Botón "Menos"
               CustomIconButton(

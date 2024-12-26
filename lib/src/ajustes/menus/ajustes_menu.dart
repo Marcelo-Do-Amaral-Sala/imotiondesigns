@@ -8,11 +8,16 @@ class AjustesMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
   final Function() onNavigatetoLicencia; // Callback para navegar de vuelta
   final Function() onNavigatetoGestion; // Callback para navegar de vuelta
+  final double screenWidth;
+  final double screenHeight;
+
   const AjustesMenuView(
       {super.key,
       required this.onBack,
       required this.onNavigatetoLicencia,
-      required this.onNavigatetoGestion});
+      required this.onNavigatetoGestion,
+      required this.screenWidth,
+      required this.screenHeight});
 
   @override
   State<AjustesMenuView> createState() => _AjustesMenuViewState();
@@ -50,11 +55,13 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
     // Iniciar la animación de latido, pero solo hacerla una vez (sin repetir)
     _controller.repeat(
         reverse: true,
-        period: const Duration(milliseconds: 500)); // Reproducir la animación una sola vez
+        period: const Duration(
+            milliseconds: 500)); // Reproducir la animación una sola vez
 
     // Después de 10 segundos, detener la animación y dejar la escala fija
     Future.delayed(const Duration(seconds: 6), () {
-      if (mounted) { // Verifica si el widget sigue montado
+      if (mounted) {
+        // Verifica si el widget sigue montado
         setState(() {
           // Asegurarse de que la animación quede fija en el valor final
           _controller.stop();
@@ -66,13 +73,15 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
   }
 
   void toggleOverlay(int index) {
-    if (mounted) { // Verifica si el widget sigue montado
+    if (mounted) {
+      // Verifica si el widget sigue montado
       setState(() {
         isOverlayVisible = !isOverlayVisible;
         overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
       });
     }
   }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -142,9 +151,10 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                               fit: BoxFit.contain,
                                             ),
                                           ),
-                                           Expanded(
+                                          Expanded(
                                             child: Text(
-                                              tr(context, 'Ajustes').toUpperCase(),
+                                              tr(context, 'Ajustes')
+                                                  .toUpperCase(),
                                               style: TextStyle(
                                                 color: const Color(0xFF28E2F5),
                                                 fontSize: 32.sp,
@@ -319,7 +329,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                           setState(() => scaleFactorVITA = 1.0),
                                       onTap: () {
                                         setState(() {
-                                          isOverlayVisible=false;
+                                          isOverlayVisible = false;
                                           toggleOverlay(3);
                                         });
                                       },
@@ -356,8 +366,10 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
           if (isOverlayVisible)
             Positioned(
               // Aplica medidas personalizadas solo para el overlay 3
-              top: overlayIndex == 3 ? screenHeight *0.1: screenHeight * 0.25, // Puedes ajustar estos valores como quieras
-              bottom: overlayIndex == 3 ?screenHeight *0.1 : screenHeight * 0.2,
+              top: overlayIndex == 3 ? screenHeight * 0.1 : screenHeight * 0.25,
+              // Puedes ajustar estos valores como quieras
+              bottom:
+                  overlayIndex == 3 ? screenHeight * 0.1 : screenHeight * 0.2,
               left: overlayIndex == 3 ? screenWidth * 0.4 : screenWidth * 0.4,
               right: overlayIndex == 3 ? screenWidth * 0.1 : screenWidth * 0.1,
               child: Align(
@@ -365,7 +377,6 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                 child: _getOverlayWidget(overlayIndex),
               ),
             ),
-
         ],
       ),
     );
@@ -418,7 +429,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     text,
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: const Color(0xFF28E2F5),
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w600,

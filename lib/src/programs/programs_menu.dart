@@ -6,7 +6,9 @@ import '../../utils/translation_utils.dart';
 
 class ProgramsMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
-  const ProgramsMenuView({super.key, required this.onBack});
+  final double screenWidth;
+  final double screenHeight;
+  const ProgramsMenuView({super.key, required this.onBack, required this.screenWidth, required this.screenHeight});
 
   @override
   State<ProgramsMenuView> createState() => _ProgramsMenuViewState();

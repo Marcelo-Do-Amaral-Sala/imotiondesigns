@@ -6,7 +6,14 @@ import '../../../utils/translation_utils.dart';
 
 class GestionMenuView extends StatefulWidget {
   final Function() onBack; // Callback para navegar de vuelta
-  const GestionMenuView({super.key, required this.onBack});
+  final double screenWidth;
+  final double screenHeight;
+
+  const GestionMenuView(
+      {super.key,
+      required this.onBack,
+      required this.screenWidth,
+      required this.screenHeight});
 
   @override
   State<GestionMenuView> createState() => _GestionMenuViewState();

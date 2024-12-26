@@ -13,8 +13,15 @@ import '../../servicios/licencia_state.dart';
 class LicenciaFormView extends StatefulWidget {
   final Function(Map<String, dynamic>) onMciTap;
   final Function() onBack; // Callback para navegar de vuelta
+  final double screenWidth;
+  final double screenHeight;
+
   const LicenciaFormView(
-      {super.key, required this.onBack, required this.onMciTap});
+      {super.key,
+      required this.onBack,
+      required this.onMciTap,
+      required this.screenWidth,
+      required this.screenHeight});
 
   @override
   State<LicenciaFormView> createState() => _LicenciaFormViewState();
