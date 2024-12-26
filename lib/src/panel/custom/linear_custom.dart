@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class LinePainter extends CustomPainter {
-  final double progress; // El progreso de 1.0 a 0.0 (completo a vacío)
+  final double progress2; // El progreso de 1.0 a 0.0 (completo a vacío)
   final double strokeHeight; // Altura de la barra
 
-  LinePainter({required this.progress, required this.strokeHeight});
+  LinePainter({required this.progress2, required this.strokeHeight});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -16,22 +16,29 @@ class LinePainter extends CustomPainter {
       ..color = Colors.lightGreenAccent.shade400 // Color verde para el relleno
       ..style = PaintingStyle.fill;
 
-    double cornerRadius = strokeHeight / 5; // El radio de las esquinas redondeadas
+    double cornerRadius =
+        strokeHeight / 5; // El radio de las esquinas redondeadas
 
-    // Dibuja la barra de fondo (inicialmente vacía)
+// Dibuja la barra de fondo (inicialmente vacía)
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
+        Rect.fromLTWH(
+            0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
         Radius.circular(cornerRadius),
       ),
       backgroundPaint,
     );
 
-    // Dibuja el progreso (barra verde)
-    double progressWidth = size.width * progress; // Calcula el ancho basado en el progreso
+// Dibuja el progreso (barra verde)
+    double progressWidth =
+        size.width * progress2; // Calcula el ancho basado en el progreso
+    progressWidth = progressWidth.clamp(
+        0.0, size.width); // Asegura que no supere el ancho de la barra
+
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
+        Rect.fromLTWH(
+            0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
         Radius.circular(cornerRadius),
       ),
       progressPaint,
@@ -45,10 +52,10 @@ class LinePainter extends CustomPainter {
 }
 
 class LinePainter2 extends CustomPainter {
-  final double progress; // El progreso de 1.0 a 0.0 (completo a vacío)
+  final double progress3; // El progreso de 1.0 a 0.0 (completo a vacío)
   final double strokeHeight; // Altura de la barra
 
-  LinePainter2({required this.progress, required this.strokeHeight});
+  LinePainter2({required this.progress3, required this.strokeHeight});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -60,22 +67,29 @@ class LinePainter2 extends CustomPainter {
       ..color = Colors.red // Color rojo para el relleno
       ..style = PaintingStyle.fill;
 
-    double cornerRadius = strokeHeight / 5; // El radio de las esquinas redondeadas
+    double cornerRadius =
+        strokeHeight / 5; // El radio de las esquinas redondeadas
 
     // Dibuja la barra de fondo (inicialmente vacía)
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
+        Rect.fromLTWH(
+            0, size.height / 2 - strokeHeight / 2, size.width, strokeHeight),
         Radius.circular(cornerRadius),
       ),
       backgroundPaint,
     );
 
-    // Dibuja el progreso (barra roja)
-    double progressWidth = size.width * progress; // Calcula el ancho basado en el progreso
+// Dibuja el progreso (barra roja)
+    double progressWidth =
+        size.width * progress3; // Calcula el ancho basado en el progreso
+    progressWidth = progressWidth.clamp(
+        0.0, size.width); // Asegura que no supere el ancho de la barra
+
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
+        Rect.fromLTWH(
+            0, size.height / 2 - strokeHeight / 2, progressWidth, strokeHeight),
         Radius.circular(cornerRadius),
       ),
       progressPaint,
