@@ -54,8 +54,10 @@ class _PanelViewState extends State<PanelView>
       {}; // Mapa para almacenar Keys únicas por MCI
   String? selectedKey; // Key seleccionada
   Map<String, int> mciEquipMapping = {};
-  Map<String, Map<String, dynamic>> mciStates = {}; // Estado por MCI
-  Map<String, Map<String, dynamic>> deviceStates = {};
+  Map<String, int> mciGroupMapping = {};
+  List<String> groupSelectedMCIs = [];
+  String? individualSelectedMCI;
+  Map<String, String?> mciSelectionStatus = {};
 
   double scaleFactorBack = 1.0;
   double scaleFactorFull = 1.0;
@@ -65,24 +67,27 @@ class _PanelViewState extends State<PanelView>
   double scaleFactorReset = 1.0;
   double scaleFactorMas = 1.0;
   double scaleFactorMenos = 1.0;
-
+  bool _isButtonPressed = false;
   late AnimationController _opacityController;
   late Animation<double> _opacityAnimation;
-
+  String? selectedMci;
   double rotationAngle1 = 0.0; // Controla el ángulo de rotación de la flecha
   double rotationAngle2 = 0.0; // Controla el ángulo de rotación de la flecha
   double rotationAngle3 = 0.0; // Controla el ángulo de rotación de la flecha
   bool _isExpanded1 = false;
   bool _isExpanded2 = false;
   bool _isExpanded3 = false;
-
+  int? _selectedGroup;
   int selectedIndexEquip = 0;
   bool _isFullScreen = false;
   bool isPantalonSelected = false;
   Color selectedColor =
       const Color(0xFF2be4f3); // Color para la sección seleccionada
   Color unselectedColor = const Color(0xFF494949);
-
+  Color selectedColorGroupA = Colors.green; // Verde para "A"
+  Color selectedColorGroupB = Colors.red; // Rojo para "B"
+  Color selectedColorGroupC = Colors.grey; // Rojo para "B"
+  Color unselectedColorGroup = Colors.transparent;
   double progress = 1.0; // El progreso del círculo
   final double strokeWidth = 20.0; // Grosor del borde
   double strokeHeight = 20.0; // Altura de la barra
@@ -234,6 +239,7 @@ class _PanelViewState extends State<PanelView>
     _fetchIndividualPrograms();
     _fetchRecoveryPrograms();
     _fetchAutoPrograms();
+    initializeMcis(AppState.instance.mcis);
   }
 
   @override
@@ -241,6 +247,13 @@ class _PanelViewState extends State<PanelView>
     super.didChangeDependencies();
     _preloadImages();
   } // Verificar que BLE esté inicializado correctamente
+
+  void initializeMcis(List<Map<String, dynamic>> mcisList) {
+    for (var mci in mcisList) {
+      String macAddress = mci['mac'];
+      mciSelectionStatus[macAddress] = null;  // Ningún grupo seleccionado por defecto
+    }
+  }
 
   Future<void> initializeAndConnectBLE() async {
     // Inicializar el servicio BLE con una lista vacía
@@ -724,12 +737,14 @@ class _PanelViewState extends State<PanelView>
                                       ...AppState.instance.mcis.map((mci) {
                                         String macAddress = mci[
                                             'mac']; // Obtener la MAC de cada dispositivo
+
                                         // Inicializa el equipo seleccionado para la MCI si no existe
                                         if (!mciEquipMapping
                                             .containsKey(macAddress)) {
                                           mciEquipMapping[macAddress] =
                                               0; // Por defecto, equipo 0
                                         }
+
                                         return GestureDetector(
                                           key: mciKeys[macAddress],
                                           onTap: () {
@@ -737,20 +752,60 @@ class _PanelViewState extends State<PanelView>
                                                     macAddress] ==
                                                 'conectado') {
                                               setState(() {
-                                                // Actualizar la Key seleccionada
-                                                selectedKey = macAddress;
-                                                selectedIndexEquip =
-                                                    mciEquipMapping[
-                                                            macAddress] ??
-                                                        0;
-                                              });
+                                                if (!_isButtonPressed) {
+                                                  // Menú cerrado: solo una selección individual permitida
+                                                  // Si ya hay una selección individual, la eliminamos al seleccionar otra MCI
+                                                  if (individualSelectedMCI !=
+                                                          null &&
+                                                      individualSelectedMCI !=
+                                                          macAddress) {
+                                                    print(
+                                                        "❌ Selección individual anterior eliminada.");
+                                                  }
+                                                  individualSelectedMCI =
+                                                      macAddress; // Guardar la nueva selección individual
+                                                  groupSelectedMCIs
+                                                      .clear(); // Asegurarse de que no haya selecciones de grupo
+                                                  mciGroupMapping[macAddress] =
+                                                      2; // Asignar al grupo predeterminado (grupo 2)
+                                                  print(
+                                                      "✅ Dispositivo $macAddress seleccionado individualmente.");
+                                                } else if (_isButtonPressed &&
+                                                    (_selectedGroup == 0 ||
+                                                        _selectedGroup == 1)) {
+                                                  // Menú abierto: selección de múltiples MCIs para un grupo
+                                                  if (groupSelectedMCIs
+                                                      .contains(macAddress)) {
+                                                    // Deseleccionar si ya está en la lista de grupo
+                                                    groupSelectedMCIs
+                                                        .remove(macAddress);
+                                                    mciGroupMapping.remove(
+                                                        macAddress); // Eliminar del mapeo de grupos
+                                                    print(
+                                                        "❌ Dispositivo $macAddress eliminado del grupo $_selectedGroup.");
+                                                  } else {
+                                                    // Añadir a la lista de grupo
+                                                    groupSelectedMCIs
+                                                        .add(macAddress);
+                                                    mciGroupMapping[
+                                                            macAddress] =
+                                                        _selectedGroup!; // Asignar al grupo seleccionado
+                                                    print(
+                                                        "✅ Dispositivo $macAddress añadido al grupo $_selectedGroup.");
+                                                  }
+                                                } else {
+                                                  print(
+                                                      "⚠️ Selección no válida: no hay grupo asignado o no se permite.");
+                                                }
 
-                                              print(
-                                                  "✅ Dispositivo $macAddress seleccionado. Equipo asociado: $selectedIndexEquip");
-                                              print(
-                                                  "✅ Dispositivo $macAddress seleccionado.");
-                                              print(
-                                                  "🔑 Key seleccionada: ${mciKeys[macAddress]}");
+                                                // Imprimir el estado actual
+                                                print(
+                                                    "📋 Selección individual: $individualSelectedMCI");
+                                                print(
+                                                    "📋 Selecciones de grupo: $groupSelectedMCIs");
+                                                print(
+                                                    "📋 Asignaciones actuales: $mciGroupMapping");
+                                              });
                                             } else {
                                               print(
                                                   "❌ Dispositivo $macAddress no está conectado.");
@@ -762,8 +817,7 @@ class _PanelViewState extends State<PanelView>
                                                 padding: const EdgeInsets.only(
                                                     right: 10),
                                                 child: SizedBox(
-                                                  width: screenWidth * 0.15,
-                                                  // Ancho dividido en dos secciones
+                                                  width: screenWidth * 0.1,
                                                   height: screenHeight * 0.1,
                                                   child: CustomPaint(
                                                     painter: NeonBorderPainter(
@@ -811,7 +865,7 @@ class _PanelViewState extends State<PanelView>
                                                                       : 'assets/images/pantalonblanco.png',
                                                                   // Equipo 1
                                                                   fit: BoxFit
-                                                                      .contain,
+                                                                      .scaleDown,
                                                                 ),
                                                               ),
                                                             ),
@@ -839,9 +893,9 @@ class _PanelViewState extends State<PanelView>
                                                                   style:
                                                                       TextStyle(
                                                                     fontSize:
-                                                                        12.sp,
+                                                                        10.sp,
                                                                     color: const Color(
-                                                                        0xFF28E2F5), // Color del texto
+                                                                        0xFF28E2F5),
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -855,18 +909,19 @@ class _PanelViewState extends State<PanelView>
                                                                   style:
                                                                       TextStyle(
                                                                     fontSize:
-                                                                        12.sp,
+                                                                        10.sp,
                                                                     color: const Color(
-                                                                        0xFF28E2F5), // Color del texto
+                                                                        0xFF28E2F5),
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
                                                                           .left,
                                                                 ),
+                                                                // Barras de batería
                                                                 Row(
                                                                   mainAxisAlignment:
                                                                       MainAxisAlignment
-                                                                          .start,
+                                                                          .center,
                                                                   children: List
                                                                       .generate(
                                                                     5,
@@ -876,18 +931,16 @@ class _PanelViewState extends State<PanelView>
                                                                         padding: const EdgeInsets
                                                                             .symmetric(
                                                                             horizontal:
-                                                                                2.0),
+                                                                                1.0),
                                                                         child:
                                                                             Container(
                                                                           width:
-                                                                              20,
-                                                                          // Ancho de cada raya
+                                                                              screenWidth * 0.01,
                                                                           height:
-                                                                              5,
-                                                                          // Altura de cada raya
+                                                                              screenHeight * 0.01,
                                                                           color: index <= (batteryStatuses[macAddress] ?? -1)
                                                                               ? _lineColor(macAddress) // Color si el nivel es válido
-                                                                              : Colors.grey.withOpacity(0.1), // Color gris si no alcanza ese nivel
+                                                                              : Colors.white.withOpacity(0.5), // Color gris si no alcanza ese nivel
                                                                         ),
                                                                       );
                                                                     },
@@ -902,40 +955,14 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                 ),
                                               ),
-                                              // Imagen en la esquina superior derecha
-                                              if (selectedKey == macAddress)
-                                                Positioned(
-                                                  top: 0,
-                                                  right: 0,
-                                                  child: Container(
-                                                    width: 30,
-                                                    // Tamaño de la imagen
-                                                    height: 30,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      // Fondo circular
-                                                      color: Colors
-                                                          .white, // Color de fondo
-                                                    ),
-                                                    child: Image.asset(
-                                                      'assets/images/cliente.png',
-                                                      // Ruta de la imagen
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                                  ),
-                                                ),
                                             ],
                                           ),
                                         );
                                       }),
-
                                       const Spacer(),
-
-                                      // Botón para definir grupos
                                       OutlinedButton(
                                         onPressed: () {
-                                          // Define tu acción para el botón aquí
+                                          _showMCIListDialog(context);
                                         },
                                         style: OutlinedButton.styleFrom(
                                           padding: const EdgeInsets.all(10.0),
@@ -5036,6 +5063,453 @@ class _PanelViewState extends State<PanelView>
     );
   }
 
+  Future<void> _showMCIListDialog(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height * 0.7,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF494949),
+                  borderRadius: BorderRadius.circular(7),
+                  border: Border.all(
+                    color: const Color(0xFF28E2F5),
+                    width: 1,
+                  ),
+                ),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    tr(context, "Grupo A").toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 25.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.green,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.05,
+                                  ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: AppState.instance.mcis.length,
+                                      itemBuilder: (context, index) {
+                                        var mci = AppState.instance.mcis[index];
+                                        String macAddress = mci['mac'];
+
+                                        // Verificar si está seleccionado para el grupo A
+                                        bool isSelected = mciSelectionStatus[macAddress] == 'A';
+
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context).size.height * 0.02,
+                                          ),
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context).size.width * 0.15,
+                                            height: MediaQuery.of(context).size.height * 0.1,
+                                            child: CustomPaint(
+                                              painter: NeonBorderPainter(
+                                                neonColor: _getBorderColor(
+                                                    deviceConnectionStatus[macAddress]),
+                                              ),
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.transparent,
+                                                  borderRadius: BorderRadius.circular(7),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    customCheckbox(macAddress, isSelected, setState, 'A'),
+                                                    // Grupo A
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Center(
+                                                        child: Image.asset(
+                                                          (mciEquipMapping[macAddress] ?? 0) == 0
+                                                              ? 'assets/images/chalecoblanco.png'
+                                                              : 'assets/images/pantalonblanco.png',
+                                                          fit: BoxFit.scaleDown,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: Column(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        children: [
+                                                          Text(
+                                                            selectedClientsGlobal.isEmpty
+                                                                ? ''
+                                                                : selectedClientsGlobal[0]['name'] ??
+                                                                'No Name',
+                                                            style: TextStyle(
+                                                              fontSize: 14.sp,
+                                                              color: const Color(0xFF28E2F5),
+                                                            ),
+                                                            textAlign: TextAlign.left,
+                                                          ),
+                                                          Text(
+                                                            bluetoothNames[macAddress] ?? "",
+                                                            style: TextStyle(
+                                                              fontSize: 14.sp,
+                                                              color: const Color(0xFF28E2F5),
+                                                            ),
+                                                            textAlign: TextAlign.left,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: List.generate(
+                                                              5,
+                                                                  (batteryIndex) {
+                                                                return Padding(
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                      horizontal: 1.0),
+                                                                  child: Container(
+                                                                    width: MediaQuery.of(context)
+                                                                        .size
+                                                                        .width *
+                                                                        0.015,
+                                                                    height: MediaQuery.of(context)
+                                                                        .size
+                                                                        .height *
+                                                                        0.015,
+                                                                    color: batteryIndex <=
+                                                                        (batteryStatuses[macAddress] ??
+                                                                            -1)
+                                                                        ? _lineColor(macAddress)
+                                                                        : Colors.white.withOpacity(0.5),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    tr(context, "Grupo B").toUpperCase(),
+                                    style: TextStyle(
+                                        fontSize: 25.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Colors.red),
+                                  ),
+                                  SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.05),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: AppState.instance.mcis.length,
+                                      itemBuilder: (context, index) {
+                                        var mci = AppState.instance.mcis[index];
+                                        String macAddress = mci['mac'];
+
+                                        // Verificar si está seleccionado para el grupo A
+                                        bool isSelected = mciSelectionStatus[macAddress] == 'B';
+
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.02),
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.15,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.1,
+                                            child: CustomPaint(
+                                              painter: NeonBorderPainter(
+                                                neonColor: _getBorderColor(
+                                                    deviceConnectionStatus[
+                                                        macAddress]),
+                                              ),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 5.0),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.transparent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(7),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    customCheckbox(
+                                                        macAddress,
+                                                        isSelected,
+                                                        setState,
+                                                        'B'),
+                                                    // Grupo B
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Center(
+                                                        child: Image.asset(
+                                                          (mciEquipMapping[
+                                                                          macAddress] ??
+                                                                      0) ==
+                                                                  0
+                                                              ? 'assets/images/chalecoblanco.png'
+                                                              : 'assets/images/pantalonblanco.png',
+                                                          fit: BoxFit.scaleDown,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
+                                                            selectedClientsGlobal
+                                                                    .isEmpty
+                                                                ? ''
+                                                                : selectedClientsGlobal[
+                                                                            0][
+                                                                        'name'] ??
+                                                                    'No Name',
+                                                            style: TextStyle(
+                                                              fontSize: 14.sp,
+                                                              color: const Color(
+                                                                  0xFF28E2F5),
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
+                                                          Text(
+                                                            bluetoothNames[
+                                                                    macAddress] ??
+                                                                "",
+                                                            style: TextStyle(
+                                                              fontSize: 14.sp,
+                                                              color: const Color(
+                                                                  0xFF28E2F5),
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children:
+                                                                List.generate(
+                                                              5,
+                                                              (batteryIndex) {
+                                                                return Padding(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          1.0),
+                                                                  child:
+                                                                      Container(
+                                                                    width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width *
+                                                                        0.015,
+                                                                    height: MediaQuery.of(context)
+                                                                            .size
+                                                                            .height *
+                                                                        0.015,
+                                                                    color: batteryIndex <=
+                                                                            (batteryStatuses[macAddress] ??
+                                                                                -1)
+                                                                        ? _lineColor(
+                                                                            macAddress)
+                                                                        : Colors
+                                                                            .white
+                                                                            .withOpacity(0.5),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.red),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                            child: Text(
+                              'Cancelar'.toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17.sp,
+                              ),
+                            ),
+                          ),
+                          OutlinedButton(
+                            onPressed: () {
+                              // Filtrar las MCIs seleccionadas para el Grupo A y B
+                              List<String> selectedForGroupA = mciSelectionStatus.entries
+                                  .where((entry) => entry.value == 'A')
+                                  .map((entry) => entry.key)
+                                  .toList();
+
+                              List<String> selectedForGroupB = mciSelectionStatus.entries
+                                  .where((entry) => entry.value == 'B')
+                                  .map((entry) => entry.key)
+                                  .toList();
+
+                              print('Grupo A seleccionados: $selectedForGroupA');
+                              print('Grupo B seleccionados: $selectedForGroupB');
+                              Navigator.of(context).pop();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF2be4f3)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              backgroundColor: const Color(0xFF2be4f3),
+                            ),
+                            child: Text(
+                              'Definir grupos'.toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget customCheckbox(String option, bool isSelected, StateSetter setState, String group) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          // Verifica si el grupo es A o B y actualiza el mapa mciSelectionStatus
+          if (group == 'A') {
+            if (isSelected) {
+              // Si está seleccionado, desmarcarlo (asignar null)
+              mciSelectionStatus[option] = null; // Remover de Grupo A
+            } else {
+              // Si no está seleccionado, añadirlo a Grupo A
+              mciSelectionStatus[option] = 'A';
+              // Desmarcarlo de Grupo B si estaba allí
+              mciSelectionStatus[option] = mciSelectionStatus[option] == 'B' ? null : mciSelectionStatus[option];
+            }
+          } else if (group == 'B') {
+            if (isSelected) {
+              // Si está seleccionado en Grupo B, desmarcarlo (asignar null)
+              mciSelectionStatus[option] = null; // Remover de Grupo B
+            } else {
+              // Si no está seleccionado, añadirlo a Grupo B
+              mciSelectionStatus[option] = 'B';
+              // Desmarcarlo de Grupo A si estaba allí
+              mciSelectionStatus[option] = mciSelectionStatus[option] == 'A' ? null : mciSelectionStatus[option];
+            }
+          }
+        });
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.03,
+        height: MediaQuery.of(context).size.height * 0.03,
+        margin: const EdgeInsets.all(5.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isSelected ? const Color(0xFF2be4f3) : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? const Color(0xFF2be4f3) : Colors.white,
+            width: 1.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
   Future<void> _exitScreen(BuildContext context) async {
     showDialog(
       context: context,
@@ -5095,7 +5569,6 @@ class _PanelViewState extends State<PanelView>
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        _clearGlobals();
                         widget.onBack();
                         Navigator.of(context)
                             .pop(); // Cierra el diálogo de confirmación
@@ -5165,6 +5638,22 @@ class _PanelViewState extends State<PanelView>
       default:
         return Colors
             .grey; // Color predeterminado (gris si no coincide con ningún estado)
+    }
+  }
+
+  Color _getColorForGroup(int group) {
+    switch (group) {
+      case 0:
+        return Colors
+            .lightGreen; // Color para el grupo 0 (puedes personalizar este color)
+      case 1:
+        return Colors
+            .red; // Color para el grupo 1 (puedes personalizar este color)
+      case 2:
+        return const Color(
+            0xFF2be4f3); // Color para el grupo 2 (puedes personalizar este color)
+      default:
+        return Colors.grey; // Color por defecto si no hay grupo asignado
     }
   }
 
