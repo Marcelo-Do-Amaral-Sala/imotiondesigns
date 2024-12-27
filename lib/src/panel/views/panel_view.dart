@@ -2548,74 +2548,91 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                 ],
                                               ),
-
                                               SizedBox(
                                                   height: screenHeight * 0.01),
                                               Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   CustomPaint(
-                                                    size: const Size(110, 40),
+                                                    size: Size(
+                                                      _isFullScreen ? screenWidth * 0.1 : screenWidth * 0.1, // Aumentar tamaño si isFullScreen es verdadero
+                                                      _isFullScreen ? screenHeight * 0.03 : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                    ),
                                                     painter: LinePainter(
-                                                        progress2:
-                                                            progressContraction,
-                                                        strokeHeight: 20),
+                                                      progress2: progressContraction,
+                                                      strokeHeight: _isFullScreen ? 20 : 15, // Aumentar altura si isFullScreen es verdadero
+                                                    ),
                                                   ),
                                                   SizedBox(
-                                                      width:
-                                                          screenWidth * 0.01),
+                                                    width: _isFullScreen ? screenWidth * 0.01 : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                  ),
                                                   Text(
-                                                    valueContraction
-                                                        .toString()
-                                                        .padLeft(1, '0'),
-                                                    // Convierte seconds a entero y usa padLeft para formato mm:ss
+                                                    valueContraction.toString().padLeft(1, '0'),
                                                     style: TextStyle(
-                                                        fontSize: 20.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors
-                                                            .lightGreenAccent
-                                                            .shade400 // Color para la sección seleccionada
-                                                        ),
+                                                      fontSize: _isFullScreen ?25.sp : 20.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.lightGreenAccent.shade400,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  CustomPaint(
+                                                    size: Size(
+                                                      _isFullScreen ? screenWidth * 0.1 : screenWidth * 0.1, // Aumentar tamaño si isFullScreen es verdadero
+                                                      _isFullScreen ? screenHeight * 0.03 : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                    ),
+                                                    painter: LinePainter2(
+                                                      progress3: progressPause,
+                                                      strokeHeight: _isFullScreen ? 20 : 15, // Aumentar altura si isFullScreen es verdadero
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: _isFullScreen ? screenWidth * 0.01 : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                  ),
+                                                  Text(
+                                                    valuePause.toString().padLeft(1, '0'),
+                                                    style: TextStyle(
+                                                      fontSize: _isFullScreen ? 25.sp : 20.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: _isFullScreen ? screenHeight * 0.02 : screenHeight * 0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Text(
+                                                    "AVERAGE",
+                                                    style: TextStyle(
+                                                      fontSize: _isFullScreen ? 23.sp : 18.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                      fontWeight: FontWeight.bold,
+                                                      color: const Color(0xFF2be4f3),
+                                                    ),
+                                                  ),
+                                                  CustomPaint(
+                                                    size: Size(
+                                                      _isFullScreen ? screenWidth * 0.15 : screenWidth * 0.15, // Aumentar tamaño si isFullScreen es verdadero
+                                                      _isFullScreen ? screenHeight * 0.05 : screenHeight * 0.05, // Aumentar tamaño si isFullScreen es verdadero
+                                                    ),
+                                                    painter: AverageLineWithTextPainter(
+                                                      average:100.0 / 100.0,
+                                                      strokeHeight: _isFullScreen ? screenHeight * 0.03 : screenHeight * 0.02, // Aumentar altura si isFullScreen es verdadero
+                                                      textStyle: TextStyle(
+                                                        fontSize: _isFullScreen ? 23.sp : 18.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                        fontWeight: FontWeight.bold,
+                                                        fontStyle: FontStyle.italic,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
 
-                                              SizedBox(
-                                                  height: screenHeight * 0.01),
-                                              // Barra de progreso secundaria
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  CustomPaint(
-                                                    size: const Size(110, 40),
-                                                    painter: LinePainter2(
-                                                        progress3:
-                                                            progressPause,
-                                                        strokeHeight: 20),
-                                                  ),
-                                                  SizedBox(
-                                                      width:
-                                                          screenWidth * 0.01),
-                                                  Text(
-                                                    valuePause
-                                                        .toString()
-                                                        .padLeft(1, '0'),
-                                                    // Convierte seconds a entero y usa padLeft para formato mm:ss
-                                                    style: TextStyle(
-                                                        fontSize: 20.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors
-                                                            .red // Color para la sección seleccionada
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
                                             ],
                                           ),
                                           Stack(
@@ -3121,6 +3138,7 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                         ],
                                       ),
+                                      SizedBox(height:screenHeight*0.02),
                                       Row(
                                         children: [
                                           // Botón "Menos"
@@ -3218,29 +3236,6 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: screenHeight * 0.01),
-                                      Row(children: [
-                                        Text(
-                                          "AVERAGE",
-                                          style: TextStyle(
-                                            fontSize: 22.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: const Color(
-                                                0xFF2be4f3), // Color para la sección seleccionada
-                                          ),
-                                        ),
-                                        SizedBox(width: screenWidth * 0.01),
-                                        Text(
-                                          "25%",
-                                          style: TextStyle(
-                                            fontSize: 25.sp,
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle: FontStyle.italic,
-                                            color: const Color(
-                                                0xFF2be4f3), // Color para la sección seleccionada
-                                          ),
-                                        ),
-                                      ])
                                     ],
                                   ),
                                   Column(
@@ -3915,20 +3910,20 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                           Column(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                             children: [
                                               Stack(
                                                 alignment: Alignment.center,
                                                 children: [
                                                   Image.asset(
                                                     imagePaths[
-                                                        _currentImageIndex]!,
+                                                    _currentImageIndex]!,
                                                     // Accede al valor en el mapa usando la clave _currentImageIndex
                                                     height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.25,
+                                                    MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                        0.25,
                                                     fit: BoxFit.cover,
                                                   ),
                                                   Column(
@@ -3938,19 +3933,21 @@ class _PanelViewState extends State<PanelView>
                                                         onTap: isRunning
                                                             ? null
                                                             : () {
-                                                                setState(() {
-                                                                  if (time <
-                                                                      30) {
-                                                                    time++; // Disminuye el tiempo si es mayor que 1
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex =
-                                                                        imagePaths.length -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                          setState(() {
+                                                            if (time <
+                                                                30) {
+                                                              // Máximo valor de time es 30
+                                                              time++; // Aumentar el tiempo
+                                                              totalTime =
+                                                                  time *
+                                                                      60; // Actualiza el tiempo total en segundos
+                                                              // Calcula el índice de la imagen con el nuevo tiempo
+                                                              _currentImageIndex =
+                                                                  31 -
+                                                                      time;
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-arriba.png',
                                                           height: screenHeight *
@@ -3963,7 +3960,7 @@ class _PanelViewState extends State<PanelView>
                                                         style: TextStyle(
                                                           fontSize: 25.sp,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           color: const Color(
                                                               0xFF2be4f3), // Color para la sección seleccionada
                                                         ),
@@ -3972,19 +3969,21 @@ class _PanelViewState extends State<PanelView>
                                                         onTap: isRunning
                                                             ? null
                                                             : () {
-                                                                setState(() {
-                                                                  if (time >
-                                                                      1) {
-                                                                    time--; // Disminuye el tiempo si es mayor que 1
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    _currentImageIndex =
-                                                                        imagePaths.length -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                          setState(() {
+                                                            if (time >
+                                                                1) {
+                                                              // Mínimo valor de time es 1
+                                                              time--; // Disminuir el tiempo
+                                                              totalTime =
+                                                                  time *
+                                                                      60; // Actualiza el tiempo total en segundos
+                                                              // Calcula el índice de la imagen con el nuevo tiempo
+                                                              _currentImageIndex =
+                                                                  31 -
+                                                                      time;
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-abajo.png',
                                                           height: screenHeight *
@@ -3996,74 +3995,92 @@ class _PanelViewState extends State<PanelView>
                                                   ),
                                                 ],
                                               ),
-
                                               SizedBox(
                                                   height: screenHeight * 0.01),
                                               Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   CustomPaint(
-                                                    size: const Size(110, 40),
+                                                    size: Size(
+                                                      _isFullScreen ? screenWidth * 0.1 : screenWidth * 0.1, // Aumentar tamaño si isFullScreen es verdadero
+                                                      _isFullScreen ? screenHeight * 0.03 : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                    ),
                                                     painter: LinePainter(
-                                                        progress2:
-                                                            progressContraction,
-                                                        strokeHeight: 20),
+                                                      progress2: progressContraction,
+                                                      strokeHeight: _isFullScreen ? 20 : 15, // Aumentar altura si isFullScreen es verdadero
+                                                    ),
                                                   ),
                                                   SizedBox(
-                                                      width:
-                                                          screenWidth * 0.01),
+                                                    width: _isFullScreen ? screenWidth * 0.01 : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                  ),
                                                   Text(
-                                                    valueContraction
-                                                        .toString()
-                                                        .padLeft(1, '0'),
-                                                    // Convierte seconds a entero y usa padLeft para formato mm:ss
+                                                    valueContraction.toString().padLeft(1, '0'),
                                                     style: TextStyle(
-                                                        fontSize: 20.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors
-                                                            .lightGreenAccent
-                                                            .shade400 // Color para la sección seleccionada
-                                                        ),
+                                                      fontSize: _isFullScreen ?25.sp : 20.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.lightGreenAccent.shade400,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  CustomPaint(
+                                                    size: Size(
+                                                      _isFullScreen ? screenWidth * 0.1 : screenWidth * 0.1, // Aumentar tamaño si isFullScreen es verdadero
+                                                      _isFullScreen ? screenHeight * 0.03 : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                    ),
+                                                    painter: LinePainter2(
+                                                      progress3: progressPause,
+                                                      strokeHeight: _isFullScreen ? 20 : 15, // Aumentar altura si isFullScreen es verdadero
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: _isFullScreen ? screenWidth * 0.01 : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                  ),
+                                                  Text(
+                                                    valuePause.toString().padLeft(1, '0'),
+                                                    style: TextStyle(
+                                                      fontSize: _isFullScreen ? 25.sp : 20.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: _isFullScreen ? screenHeight * 0.02 : screenHeight * 0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Text(
+                                                    "AVERAGE",
+                                                    style: TextStyle(
+                                                      fontSize: _isFullScreen ? 23.sp : 18.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                      fontWeight: FontWeight.bold,
+                                                      color: const Color(0xFF2be4f3),
+                                                    ),
+                                                  ),
+                                                  CustomPaint(
+                                                    size: Size(
+                                                      _isFullScreen ? screenWidth * 0.15 : screenWidth * 0.15, // Aumentar tamaño si isFullScreen es verdadero
+                                                      _isFullScreen ? screenHeight * 0.05 : screenHeight * 0.05, // Aumentar tamaño si isFullScreen es verdadero
+                                                    ),
+                                                    painter: AverageLineWithTextPainter(
+                                                      average: 30.0 / 100.0,
+                                                      strokeHeight: _isFullScreen ? screenHeight * 0.03 : screenHeight * 0.02, // Aumentar altura si isFullScreen es verdadero
+                                                      textStyle: TextStyle(
+                                                        fontSize: _isFullScreen ? 25.sp : 20.sp, // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                        fontWeight: FontWeight.bold,
+                                                        fontStyle: FontStyle.italic,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
 
-                                              SizedBox(
-                                                  height: screenHeight * 0.01),
-                                              // Barra de progreso secundaria
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  CustomPaint(
-                                                    size: const Size(110, 40),
-                                                    painter: LinePainter2(
-                                                        progress3:
-                                                            progressPause,
-                                                        strokeHeight: 20),
-                                                  ),
-                                                  SizedBox(
-                                                      width:
-                                                          screenWidth * 0.01),
-                                                  Text(
-                                                    valuePause
-                                                        .toString()
-                                                        .padLeft(1, '0'),
-                                                    // Convierte seconds a entero y usa padLeft para formato mm:ss
-                                                    style: TextStyle(
-                                                        fontSize: 20.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors
-                                                            .red // Color para la sección seleccionada
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
+
                                             ],
                                           ),
                                           Stack(
@@ -4456,6 +4473,7 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                         ],
                                       ),
+                                      SizedBox(height:screenHeight*0.02),
                                       Row(
                                         children: [
                                           // Botón "Menos"
@@ -4891,73 +4909,73 @@ class _PanelViewState extends State<PanelView>
                                     ],
                                   ),
                                 ),
-                                // Segunda sección independiente
-                                Stack(
-                                  children: [
-                                    // Aquí puedes colocar tu widget Expanded con los botones de la fila, sin cambios
-                                    Expanded(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          GestureDetector(
-                                            onTapDown: (_) => setState(
-                                                () => scaleFactorReset = 0.90),
-                                            onTapUp: (_) => setState(
-                                                () => scaleFactorReset = 1.0),
-                                            onTap: () {
-                                              _resetScreen(context);
-                                            },
-                                            child: AnimatedScale(
-                                              scale: scaleFactorReset,
-                                              duration: const Duration(
-                                                  milliseconds: 100),
-                                              child: SizedBox(
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    'assets/images/RESET.png',
-                                                    width: screenWidth * 0.1,
-                                                    height: screenHeight * 0.1,
-                                                    fit: BoxFit.contain,
-                                                  ),
+
+                                // Usamos Expanded para que ocupe el espacio disponible
+                                Expanded(
+                                  child: Stack(
+                                    children: [
+                                      // Aquí puedes poner otros widgets dentro del Stack si lo necesitas
+                                      Positioned(
+                                        bottom: 0,
+                                        left: screenWidth * 0.02,
+                                        child: GestureDetector(
+                                          onTapDown: (_) => setState(
+                                              () => scaleFactorReset = 0.90),
+                                          onTapUp: (_) => setState(
+                                              () => scaleFactorReset = 1.0),
+                                          onTap: () {
+                                            _resetScreen(context);
+                                          },
+                                          child: AnimatedScale(
+                                            scale: scaleFactorReset,
+                                            duration: const Duration(
+                                                milliseconds: 100),
+                                            child: SizedBox(
+                                              child: ClipOval(
+                                                child: Image.asset(
+                                                  'assets/images/RESET.png',
+                                                  width: screenWidth * 0.1,
+                                                  height: screenHeight * 0.1,
+                                                  fit: BoxFit.contain,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                    // Ahora, agregamos un Positioned para poner la imagen en la esquina inferior derecha
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: GestureDetector(
-                                        onTapDown: (_) => setState(
-                                            () => scaleFactorFull = 0.90),
-                                        onTapUp: (_) => setState(
-                                            () => scaleFactorFull = 1.0),
-                                        onTap: () {
-                                          setState(() {
-                                            _isFullScreen =
-                                                !_isFullScreen; // Cambia el estado de pantalla completa
-                                          });
-                                        },
-                                        child: AnimatedScale(
-                                          scale: scaleFactorFull,
-                                          duration:
-                                              const Duration(milliseconds: 100),
-                                          child: ClipOval(
-                                            child: Image.asset(
-                                              'assets/images/fullscreen.png',
-                                              width: screenWidth * 0.08,
-                                              height: screenHeight * 0.08,
-                                              fit: BoxFit.scaleDown,
+
+                                      // Aquí está la imagen de fullscreen en la esquina
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: GestureDetector(
+                                          onTapDown: (_) => setState(
+                                              () => scaleFactorFull = 0.90),
+                                          onTapUp: (_) => setState(
+                                              () => scaleFactorFull = 1.0),
+                                          onTap: () {
+                                            setState(() {
+                                              _isFullScreen =
+                                                  !_isFullScreen; // Cambia el estado de pantalla completa
+                                            });
+                                          },
+                                          child: AnimatedScale(
+                                            scale: scaleFactorFull,
+                                            duration: const Duration(
+                                                milliseconds: 100),
+                                            child: ClipOval(
+                                              child: Image.asset(
+                                                'assets/images/fullscreen.png',
+                                                width: screenWidth * 0.08,
+                                                height: screenHeight * 0.08,
+                                                fit: BoxFit.scaleDown,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -5549,8 +5567,8 @@ class _PanelViewState extends State<PanelView>
         });
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.03,
-        height: MediaQuery.of(context).size.height * 0.03,
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: MediaQuery.of(context).size.height * 0.04,
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
