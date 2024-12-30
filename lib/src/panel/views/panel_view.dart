@@ -57,6 +57,8 @@ class _PanelViewState extends State<PanelView>
   String connectionStatus = "desconectado";
   String? selectedProgram;
   String? selectedKey;
+  String? macAddress;
+  String? grupoKey;
 
   int selectedIndexEquip = 0;
   int totalTime = 25 * 60;
@@ -139,6 +141,28 @@ class _PanelViewState extends State<PanelView>
     false, //GLUTEOS
     false //ISQUIOS
   ];
+  List<List<int>> porcentajesPorGrupoTraje = [
+    [0, 10, 20, 35], // Pecho
+    [0, 10, 20, 35], // Brazo
+    [0, 25, 45, 70], // Abdomen
+    [0, 20, 40, 60], // Cuadriceps
+    [0, 10, 20, 35], // Gemelo
+    [0, 10, 20, 35], // Trapecio
+    [0, 15, 30, 50], // Dorsal
+    [0, 15, 30, 50], // Lumbar
+    [0, 25, 45, 70], // Glúteo
+    [0, 15, 30, 50], // Isquiotibial
+  ];
+  List<List<int>> porcentajesPorGrupoPantalon = [
+    [0, 10, 20, 35], // Brazo
+    [0, 25, 45, 70], // Abdomen
+    [0, 20, 40, 60], // Cuadriceps
+    [0, 10, 20, 35], // Gemelo
+    [0, 15, 30, 50], // Lumbar
+    [0, 25, 45, 70], // Glúteo
+    [0, 15, 30, 50], // Isquiotibial
+  ];
+
   final List<int> porcentajesMusculoTraje = List.filled(10, 0);
   final List<int> porcentajesMusculoPantalon = List.filled(7, 0);
 
@@ -338,6 +362,14 @@ class _PanelViewState extends State<PanelView>
       debugPrint(
           "⚠️--->>>Ningún dispositivo fue conectado exitosamente. Saltando inicialización de seguridad y operaciones.");
     }
+  }
+
+  // Método para actualizar los valores de macAddress y grupoKey
+  void updateDeviceSelection(String mac, String group) {
+    setState(() {
+      macAddress = mac;
+      grupoKey = group;
+    });
   }
 
   Future<void> _preloadImages() async {
@@ -708,15 +740,15 @@ class _PanelViewState extends State<PanelView>
                 vertical: screenHeight * 0.02, horizontal: screenWidth * 0.02),
             child: Column(
               children: [
-                  Expanded(
-                    flex: 1,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: [
-                              if (!_isFullScreen)
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          children: [
+                            if (!_isFullScreen)
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.all(10.0),
@@ -728,7 +760,6 @@ class _PanelViewState extends State<PanelView>
                                             'mac']; // Obtener la MAC de cada dispositivo
 
                                         return GestureDetector(
-                                          key: mciKeys[macAddress],
                                           onTap: () {
                                             if (deviceConnectionStatus[
                                                     macAddress] ==
@@ -767,6 +798,9 @@ class _PanelViewState extends State<PanelView>
                                                       "🔑 Clave asignada (dispositivo individual): $selectedKey");
                                                   mciEquipmentMap[macAddress] =
                                                       {}; // Mapa vacío para equipo
+
+                                                  updateDeviceSelection(
+                                                      macAddress, '');
                                                 }
 
                                                 // Caso 2: Dispositivo con grupo
@@ -826,6 +860,8 @@ class _PanelViewState extends State<PanelView>
                                                       mciEquipmentMap[
                                                               deviceMac] =
                                                           {}; // Asignar un mapa vacío de equipos
+                                                      updateDeviceSelection(
+                                                          macAddress, grupoKey);
                                                     });
                                                   }
                                                 }
@@ -1069,24 +1105,24 @@ class _PanelViewState extends State<PanelView>
                                           textAlign: TextAlign.center,
                                         ),
                                       ),
-                                     SizedBox(width: screenWidth*0.05),
+                                      SizedBox(width: screenWidth * 0.05),
                                       GestureDetector(
-                                        onTapDown: (_) =>
-                                            setState(() => scaleFactorBack = 0.90),
-                                        onTapUp: (_) =>
-                                            setState(() => scaleFactorBack = 1.0),
+                                        onTapDown: (_) => setState(
+                                            () => scaleFactorBack = 0.90),
+                                        onTapUp: (_) => setState(
+                                            () => scaleFactorBack = 1.0),
                                         onTap: () {
                                           _exitScreen(context);
                                         },
                                         child: AnimatedScale(
                                           scale: scaleFactorBack,
-                                          duration: const Duration(milliseconds: 100),
+                                          duration:
+                                              const Duration(milliseconds: 100),
                                           child: SizedBox(
                                             child: ClipOval(
                                               child: Image.asset(
-                                               
                                                 // Ajusta el tamaño como sea necesario
-                                               
+
                                                 'assets/images/back.png',
                                                 fit: BoxFit.scaleDown,
                                               ),
@@ -1098,4608 +1134,14 @@ class _PanelViewState extends State<PanelView>
                                   ),
                                 ),
                               ),
-                              Expanded(
-                                flex:9,
-                                child: SizedBox(
-                                    height: screenHeight,
-                                    width: screenWidth,
-                                    child: Column(children: [
-                                      if (!_isFullScreen)
-                                      Expanded(
-                                        child: Container(
-                                          key: ValueKey(selectedKey),
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    _isExpanded1 =
-                                                        !_isExpanded1; // Cambia el estado de expansión
-                                                    rotationAngle1 = _isExpanded1
-                                                        ? 3.14159
-                                                        : 0.0; // Cambia la dirección de la flecha (180 grados)
-                                                  });
-                                                },
-                                                child: AnimatedRotation(
-                                                  duration: const Duration(
-                                                      milliseconds: 200),
-                                                  turns: rotationAngle1 /
-                                                      (2 * 3.14159),
-                                                  child: SizedBox(
-                                                    height: screenHeight * 0.15,
-                                                    child: ClipOval(
-                                                      child: Image.asset(
-                                                        'assets/images/flderecha.png',
-                                                        fit: BoxFit.contain,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                  width: screenWidth * 0.02),
-                                              AnimatedSize(
-                                                duration: const Duration(
-                                                    milliseconds: 300),
-                                                curve: Curves.easeInOut,
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(
-                                                      10.0),
-                                                  width: _isExpanded1
-                                                      ? screenWidth * 0.25
-                                                      : 0,
-                                                  height: screenHeight * 0.2,
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black
-                                                        .withOpacity(0.5),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20.0),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      // Botón "Cliente"
-                                                      Expanded(
-                                                        child: GestureDetector(
-                                                          onTapDown: selectedKey ==
-                                                                  null
-                                                              ? null
-                                                              : (_) => setState(
-                                                                  () =>
-                                                                      scaleFactorCliente =
-                                                                          0.90),
-                                                          onTapUp: selectedKey ==
-                                                                  null
-                                                              ? null
-                                                              : (_) => setState(
-                                                                  () =>
-                                                                      scaleFactorCliente =
-                                                                          1.0),
-                                                          onTap: selectedKey ==
-                                                                  null
-                                                              ? null
-                                                              : () {
-                                                                  setState(() {
-                                                                    toggleOverlay(
-                                                                        0); // Abre el overlay
-                                                                  });
-                                                                },
-                                                          child: Opacity(
-                                                            opacity:
-                                                                selectedKey ==
-                                                                        null
-                                                                    ? 1.0
-                                                                    : 1.0,
-                                                            // Indicación visual
-                                                            child:
-                                                                AnimatedScale(
-                                                              scale:
-                                                                  scaleFactorCliente,
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          100),
-                                                              child: Container(
-                                                                width:
-                                                                    screenHeight *
-                                                                        0.1,
-                                                                height:
-                                                                    screenWidth *
-                                                                        0.1,
-                                                                decoration:
-                                                                    const BoxDecoration(
-                                                                  color: Color(
-                                                                      0xFF494949),
-                                                                  shape: BoxShape
-                                                                      .circle, // Forma circular
-                                                                ),
-                                                                child: Center(
-                                                                  child:
-                                                                      SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.05,
-                                                                    height:
-                                                                        screenHeight *
-                                                                            0.05,
-                                                                    child:
-                                                                        ClipOval(
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/cliente.png',
-                                                                        fit: BoxFit
-                                                                            .scaleDown,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                          width: screenWidth *
-                                                              0.01),
+                              buildExpandedContent(context)
 
-                                                      // Botón "Equipo 0"
-                                                      Expanded(
-                                                        child: AbsorbPointer(
-                                                          absorbing:
-                                                              selectedKey ==
-                                                                  null,
-                                                          // Bloquear interacción si no hay selección
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                selectedIndexEquip =
-                                                                    0;
-                                                              });
-
-                                                              print(
-                                                                  "🔄 Cambiado al equipo 0 para MCI: $selectedKey");
-                                                            },
-                                                            child: Opacity(
-                                                              opacity:
-                                                                  selectedKey ==
-                                                                          null
-                                                                      ? 0.5
-                                                                      : 1.0,
-                                                              // Indicación visual
-                                                              child: Container(
-                                                                width:
-                                                                    screenWidth *
-                                                                        0.1,
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.1,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: selectedIndexEquip ==
-                                                                          0
-                                                                      ? selectedColor
-                                                                      : unselectedColor,
-                                                                  borderRadius:
-                                                                      const BorderRadius
-                                                                          .only(
-                                                                    topLeft: Radius
-                                                                        .circular(
-                                                                            10.0),
-                                                                    bottomLeft:
-                                                                        Radius.circular(
-                                                                            10.0),
-                                                                  ),
-                                                                ),
-                                                                child: Center(
-                                                                  child: Image
-                                                                      .asset(
-                                                                    'assets/images/chalecoblanco.png',
-                                                                    fit: BoxFit
-                                                                        .contain,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: AbsorbPointer(
-                                                          absorbing:
-                                                              selectedKey ==
-                                                                  null,
-                                                          // Bloquear interacción si no hay selección
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                selectedIndexEquip =
-                                                                    1;
-                                                              });
-
-                                                              print(
-                                                                  "🔄 Cambiado al equipo 1 para MCI: $selectedKey");
-                                                            },
-                                                            child: Opacity(
-                                                              opacity:
-                                                                  selectedKey ==
-                                                                          null
-                                                                      ? 0.5
-                                                                      : 1.0,
-                                                              // Indicación visual
-                                                              child: Container(
-                                                                width:
-                                                                    screenWidth *
-                                                                        0.1,
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.1,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: selectedIndexEquip ==
-                                                                          1
-                                                                      ? selectedColor
-                                                                      : unselectedColor,
-                                                                  borderRadius:
-                                                                      const BorderRadius
-                                                                          .only(
-                                                                    topRight: Radius
-                                                                        .circular(
-                                                                            10.0),
-                                                                    bottomRight:
-                                                                        Radius.circular(
-                                                                            10.0),
-                                                                  ),
-                                                                ),
-                                                                child: Center(
-                                                                  child: Image
-                                                                      .asset(
-                                                                    'assets/images/pantalonblanco.png',
-                                                                    fit: BoxFit
-                                                                        .contain,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-
-                                                      SizedBox(
-                                                          width: screenWidth *
-                                                              0.01),
-
-                                                      // Botón "Repetir"
-                                                      Expanded(
-                                                        child: GestureDetector(
-                                                          onTapDown: selectedKey ==
-                                                                  null
-                                                              ? null
-                                                              : (_) => setState(
-                                                                  () =>
-                                                                      scaleFactorRepeat =
-                                                                          0.90),
-                                                          onTapUp: selectedKey ==
-                                                                  null
-                                                              ? null
-                                                              : (_) => setState(
-                                                                  () =>
-                                                                      scaleFactorRepeat =
-                                                                          1.0),
-                                                          onTap: selectedKey ==
-                                                                  null
-                                                              ? null
-                                                              : () {
-                                                                  // Acción para botón repetir
-                                                                },
-                                                          child: Opacity(
-                                                            opacity:
-                                                                selectedKey ==
-                                                                        null
-                                                                    ? 1.0
-                                                                    : 1.0,
-                                                            // Indicación visual
-                                                            child:
-                                                                AnimatedScale(
-                                                              scale:
-                                                                  scaleFactorRepeat,
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          100),
-                                                              child: Container(
-                                                                width:
-                                                                    screenHeight *
-                                                                        0.1,
-                                                                height:
-                                                                    screenWidth *
-                                                                        0.1,
-                                                                decoration:
-                                                                    const BoxDecoration(
-                                                                  color: Colors
-                                                                      .transparent,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                child: Center(
-                                                                  child:
-                                                                      SizedBox(
-                                                                    child:
-                                                                        ClipOval(
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/repeat.png',
-                                                                        width: screenHeight *
-                                                                            0.1,
-                                                                        height: screenWidth *
-                                                                            0.1,
-                                                                        fit: BoxFit
-                                                                            .contain,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                  width: screenWidth * 0.02),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(20.0),
-                                                height: screenHeight * 0.2,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.black
-                                                      .withOpacity(0.5),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.0),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    OutlinedButton(
-                                                      onPressed: selectedKey ==
-                                                              null
-                                                          ? null // Inhabilitar el botón si selectedKey es null
-                                                          : () {
-                                                              setState(() {
-                                                                toggleOverlay(
-                                                                    1); // Suponiendo que toggleOverlay abre el overlay
-                                                              });
-                                                            },
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10.0),
-                                                        side: const BorderSide(
-                                                          width: 1.0,
-                                                          color:
-                                                              Color(0xFF2be4f3),
-                                                        ),
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(7),
-                                                        ),
-                                                        backgroundColor:
-                                                            const Color(
-                                                                0xFF2be4f3), // Mantener color de fondo
-                                                      ),
-                                                      child: Text(
-                                                        (tr(
-                                                                context,
-                                                                globalSelectedProgram ??
-                                                                    'Programas'))
-                                                            .toUpperCase(),
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          // Mantener color del texto
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        width: screenWidth *
-                                                            0.01),
-                                                    Column(
-                                                      children: [
-                                                        // Condicional: Si globalSelectedProgram es null, muestra una imagen y texto predeterminados
-                                                        if (globalSelectedProgram ==
-                                                            null)
-                                                          Column(
-                                                            children: [
-                                                              // Texto predeterminado si no se ha seleccionado ningún programa
-                                                              Text(
-                                                                tr(context,
-                                                                        'Nombre programa')
-                                                                    .toUpperCase(),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: const Color(
-                                                                      0xFF2be4f3),
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-                                                              // Imagen predeterminada si no se ha seleccionado ningún programa
-                                                              Image.asset(
-                                                                'assets/images/programacreado.png',
-                                                                // Imagen predeterminada
-                                                                height: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height *
-                                                                    0.1,
-                                                                fit: BoxFit
-                                                                    .contain,
-                                                              ),
-                                                            ],
-                                                          ),
-
-                                                        if (globalSelectedProgram ==
-                                                                tr(context,
-                                                                        'Individual')
-                                                                    .toUpperCase() &&
-                                                            allIndividualPrograms
-                                                                .isNotEmpty)
-                                                          Column(
-                                                            children: [
-                                                              // Mostrar el nombre del programa seleccionado o el primer programa por defecto
-                                                              Text(
-                                                                selectedIndivProgram?[
-                                                                            'nombre']
-                                                                        ?.toUpperCase() ??
-                                                                    (allIndividualPrograms
-                                                                            .isNotEmpty
-                                                                        ? (allIndividualPrograms[0]['nombre']?.toUpperCase() ??
-                                                                            tr(context, 'NOMBRE PROGRAMA')
-                                                                                .toUpperCase())
-                                                                        : tr(context,
-                                                                                'No hay programas disponibles')
-                                                                            .toUpperCase()),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: const Color(
-                                                                      0xFF2be4f3),
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-
-                                                              // Imagen del programa seleccionado o la imagen del primer programa por defecto
-                                                              GestureDetector(
-                                                                onTap: selectedKey ==
-                                                                        null
-                                                                    ? null // Deshabilitar el pulsado si selectedKey es null
-                                                                    : () {
-                                                                        setState(
-                                                                            () {
-                                                                          toggleOverlay(
-                                                                              2);
-                                                                        });
-                                                                      },
-                                                                child:
-                                                                    Image.asset(
-                                                                  selectedIndivProgram !=
-                                                                          null
-                                                                      ? selectedIndivProgram![
-                                                                              'imagen'] ??
-                                                                          'assets/images/cliente.png'
-                                                                      : allIndividualPrograms
-                                                                              .isNotEmpty
-                                                                          ? allIndividualPrograms[0]['imagen'] ??
-                                                                              'assets/images/cliente.png'
-                                                                          : 'assets/images/cliente.png',
-                                                                  // Imagen por defecto
-                                                                  height: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .height *
-                                                                      0.1,
-                                                                  fit: BoxFit
-                                                                      .contain,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        else if (globalSelectedProgram ==
-                                                                tr(context,
-                                                                        'Recovery')
-                                                                    .toUpperCase() &&
-                                                            allRecoveryPrograms
-                                                                .isNotEmpty)
-                                                          Column(
-                                                            children: [
-                                                              // Mostrar el nombre del programa seleccionado o el primer programa por defecto
-                                                              Text(
-                                                                selectedRecoProgram?[
-                                                                            'nombre']
-                                                                        ?.toUpperCase() ??
-                                                                    (allRecoveryPrograms
-                                                                            .isNotEmpty
-                                                                        ? (allRecoveryPrograms[0]['nombre']?.toUpperCase() ??
-                                                                            tr(context, 'NOMBRE PROGRAMA')
-                                                                                .toUpperCase())
-                                                                        : tr(context,
-                                                                                'No hay programas disponibles')
-                                                                            .toUpperCase()),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: const Color(
-                                                                      0xFF2be4f3),
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-
-                                                              // Imagen del programa seleccionado o la imagen del primer programa por defecto
-                                                              GestureDetector(
-                                                                onTap: selectedKey ==
-                                                                        null
-                                                                    ? null // Deshabilitar el pulsado si selectedKey es null
-                                                                    : () {
-                                                                        setState(
-                                                                            () {
-                                                                          toggleOverlay(
-                                                                              3);
-                                                                        });
-                                                                      },
-                                                                child:
-                                                                    Image.asset(
-                                                                  selectedRecoProgram !=
-                                                                          null
-                                                                      ? selectedRecoProgram![
-                                                                              'imagen'] ??
-                                                                          'assets/images/cliente.png'
-                                                                      : allRecoveryPrograms
-                                                                              .isNotEmpty
-                                                                          ? allRecoveryPrograms[0]['imagen'] ??
-                                                                              'assets/images/cliente.png'
-                                                                          : 'assets/images/cliente.png',
-                                                                  // Imagen por defecto
-                                                                  height: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .height *
-                                                                      0.1,
-                                                                  fit: BoxFit
-                                                                      .contain,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        else if (globalSelectedProgram ==
-                                                                tr(context,
-                                                                        'Automáticos')
-                                                                    .toUpperCase() &&
-                                                            allAutomaticPrograms
-                                                                .isNotEmpty)
-                                                          Column(
-                                                            children: [
-                                                              // Mostrar el nombre del programa seleccionado o el primer programa por defecto
-                                                              Text(
-                                                                selectedAutoProgram?[
-                                                                            'nombre_programa_automatico']
-                                                                        ?.toUpperCase() ??
-                                                                    (allAutomaticPrograms
-                                                                            .isNotEmpty
-                                                                        ? (allAutomaticPrograms[0]['nombre_programa_automatico']?.toUpperCase() ??
-                                                                            tr(context, 'NOMBRE PROGRAMA')
-                                                                                .toUpperCase())
-                                                                        : tr(context,
-                                                                                'No hay programas disponibles')
-                                                                            .toUpperCase()),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: const Color(
-                                                                      0xFF2be4f3),
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-
-                                                              // Imagen del programa seleccionado o la imagen del primer programa por defecto
-                                                              GestureDetector(
-                                                                onTap: selectedKey ==
-                                                                        null
-                                                                    ? null // Deshabilitar el pulsado si selectedKey es null
-                                                                    : () {
-                                                                        setState(
-                                                                            () {
-                                                                          toggleOverlay(
-                                                                              4);
-                                                                        });
-                                                                      },
-                                                                child:
-                                                                    Image.asset(
-                                                                  selectedAutoProgram !=
-                                                                          null
-                                                                      ? selectedAutoProgram![
-                                                                              'imagen'] ??
-                                                                          'assets/images/cliente.png'
-                                                                      : allAutomaticPrograms
-                                                                              .isNotEmpty
-                                                                          ? allAutomaticPrograms[0]['imagen'] ??
-                                                                              'assets/images/cliente.png'
-                                                                          : 'assets/images/cliente.png',
-                                                                  // Imagen por defecto
-                                                                  height: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .height *
-                                                                      0.1,
-                                                                  fit: BoxFit
-                                                                      .contain,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                        width: screenWidth *
-                                                            0.01),
-                                                    Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        if (globalSelectedProgram ==
-                                                            null)
-                                                          Column(
-                                                            children: [
-                                                              Text(
-                                                                "",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                "",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        else if (globalSelectedProgram ==
-                                                                tr(context,
-                                                                        'Individual')
-                                                                    .toUpperCase() &&
-                                                            allIndividualPrograms
-                                                                .isNotEmpty)
-                                                          Column(
-                                                            children: [
-                                                              Text(
-                                                                selectedIndivProgram !=
-                                                                        null
-                                                                    ? "${selectedIndivProgram!['frecuencia'] != null ? formatNumber(selectedIndivProgram!['frecuencia'] as double) : 'N/A'} Hz"
-                                                                    : allIndividualPrograms
-                                                                            .isNotEmpty
-                                                                        ? "${formatNumber(allIndividualPrograms[0]['frecuencia'] as double)} Hz"
-                                                                        : " N/A",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                selectedIndivProgram !=
-                                                                        null
-                                                                    ? "${selectedIndivProgram!['pulso'] != null ? formatNumber(selectedIndivProgram!['pulso'] as double) : 'N/A'} ms"
-                                                                    : allIndividualPrograms
-                                                                            .isNotEmpty
-                                                                        ? "${formatNumber(allIndividualPrograms[0]['pulso'] as double)} ms"
-                                                                        : "N/A",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        else if (globalSelectedProgram ==
-                                                                tr(context,
-                                                                        'Recovery')
-                                                                    .toUpperCase() &&
-                                                            allRecoveryPrograms
-                                                                .isNotEmpty)
-                                                          Column(
-                                                            children: [
-                                                              Text(
-                                                                selectedRecoProgram !=
-                                                                        null
-                                                                    ? "${selectedRecoProgram!['frecuencia'] != null ? formatNumber(selectedRecoProgram!['frecuencia'] as double) : 'N/A'} Hz"
-                                                                    : allRecoveryPrograms
-                                                                            .isNotEmpty
-                                                                        ? "${formatNumber(allRecoveryPrograms[0]['frecuencia'] as double)} Hz"
-                                                                        : "N/A",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                selectedRecoProgram !=
-                                                                        null
-                                                                    ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : 'N/A'} ms"
-                                                                    : allRecoveryPrograms
-                                                                            .isNotEmpty
-                                                                        ? "${formatNumber(allRecoveryPrograms[0]['pulso'] as double)} ms"
-                                                                        : "N/A",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        else if (globalSelectedProgram ==
-                                                                tr(context,
-                                                                        'Automáticos')
-                                                                    .toUpperCase() &&
-                                                            allAutomaticPrograms
-                                                                .isNotEmpty)
-                                                          Column(
-                                                            children: [
-                                                              Text(
-                                                                selectedAutoProgram !=
-                                                                        null
-                                                                    ? "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min"
-                                                                    : allAutomaticPrograms
-                                                                            .isNotEmpty
-                                                                        ? "${formatNumber(allAutomaticPrograms[0]['duracionTotal'] as double)} min"
-                                                                        : "N/A",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                        width: screenWidth *
-                                                            0.01),
-                                                    OutlinedButton(
-                                                      onPressed: () {},
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10.0),
-                                                        side: const BorderSide(
-                                                            width: 1.0,
-                                                            color: Color(
-                                                                0xFF2be4f3)),
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(7),
-                                                        ),
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                      ),
-                                                      child: Text(
-                                                        tr(context, 'Ciclos')
-                                                            .toUpperCase(),
-                                                        style: TextStyle(
-                                                          color: const Color(
-                                                              0xFF2be4f3),
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              Row(
-                                                children: [
-                                                  Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text("VIRTUAL TRAINER",
-                                                          style: TextStyle(
-                                                            color: const Color(
-                                                                0xFF2be4f3),
-                                                            fontSize: 15.sp,
-                                                          )),
-                                                      GestureDetector(
-                                                        onTapDown: (_) =>
-                                                            setState(() =>
-                                                                scaleFactorTrainer =
-                                                                    0.90),
-                                                        onTapUp: (_) =>
-                                                            setState(() =>
-                                                                scaleFactorTrainer =
-                                                                    1.0),
-                                                        onTap: () {},
-                                                        child: AnimatedScale(
-                                                          scale:
-                                                              scaleFactorTrainer,
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      100),
-                                                          child: Container(
-                                                            decoration:
-                                                                const BoxDecoration(
-                                                              color: Colors
-                                                                  .transparent,
-                                                            ),
-                                                            child: Center(
-                                                              child: SizedBox(
-                                                                child:
-                                                                    Image.asset(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.1,
-                                                                  'assets/images/virtualtrainer.png',
-                                                                  fit: BoxFit
-                                                                      .contain,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                      width:
-                                                          screenWidth * 0.05),
-                                                  Image.asset(
-                                                    height: screenHeight * 0.1,
-                                                    'assets/images/rayoaz.png',
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: _isFullScreen ? 1 : 3,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                              top: _isFullScreen ? 50.0 : 5.0),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                flex: _isFullScreen ? 1 : 6,
-                                                child: Stack(children: [
-                                                  Row(
-                                                    children: [
-                                                      if (selectedIndexEquip ==
-                                                          0) ...[
-                                                        Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            if (isSessionStarted) ...[
-                                                              _buildMuscleRow(
-                                                                index: 0,
-                                                                imagePathEnabled:
-                                                                    'assets/images/pec_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/pecazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/pec_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 1,
-                                                                imagePathEnabled:
-                                                                    'assets/images/biceps_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/bicepsazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/biceps_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 2,
-                                                                imagePathEnabled:
-                                                                    'assets/images/abs_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/absazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/abs_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 3,
-                                                                imagePathEnabled:
-                                                                    'assets/images/cua_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/cuazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/cua_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 4,
-                                                                imagePathEnabled:
-                                                                    'assets/images/gemelos_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/gemelosazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/gemelos_gris.png',
-                                                              ),
-                                                            ] else if (!isSessionStarted) ...[
-                                                              _buildMuscleRow(
-                                                                index: 0,
-                                                                imagePathEnabled:
-                                                                    'assets/images/pec_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/pec_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/pec_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 1,
-                                                                imagePathEnabled:
-                                                                    'assets/images/biceps_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/biceps_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/biceps_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 2,
-                                                                imagePathEnabled:
-                                                                    'assets/images/abs_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/abs_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/abs_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 3,
-                                                                imagePathEnabled:
-                                                                    'assets/images/cua_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/cua_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/cua_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 4,
-                                                                imagePathEnabled:
-                                                                    'assets/images/gemelos_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/gemelos_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/gemelos_gris.png',
-                                                              ),
-                                                            ]
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                Stack(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  children: [
-                                                                    // Imagen base del avatar
-                                                                    Image.asset(
-                                                                      "assets/images/avatar_frontal.png",
-                                                                      height: _isFullScreen
-                                                                          ? screenHeight *
-                                                                              0.65
-                                                                          : screenHeight *
-                                                                              0.4,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                    // Superposición de imágenes si `musculosTrajeSelected` es verdadero
-                                                                    if (isSessionStarted) ...[
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          0]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_pec_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          0]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_pec_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_pecho_azul.png",
-                                                                                  // Imagen para el estado animado
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          1]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          1]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_naranja.png",
-                                                                            // Imagen bloqueada para bíceps
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_biceps_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          2]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          2]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_abs_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          3]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          3]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_cua_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          4]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          4]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_gem_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ] else if (!isSessionStarted) ...[
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          0]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_pec_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          0]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_pec_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_pec_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          1]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          1]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          2]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          2]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          3]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          3]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          4]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          4]) ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_naranja.png",
-                                                                            // Imagen bloqueada para abdominales
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelo_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ]
-                                                                  ],
-                                                                ),
-                                                                Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Stack(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .center,
-                                                                      children: [
-                                                                        Image
-                                                                            .asset(
-                                                                          imagePaths[
-                                                                              _currentImageIndex]!,
-                                                                          // Accede al valor en el mapa usando la clave _currentImageIndex
-                                                                          height:
-                                                                              MediaQuery.of(context).size.height * 0.25,
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                        ),
-                                                                        Column(
-                                                                          children: [
-                                                                            // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
-                                                                            GestureDetector(
-                                                                              onTap: isRunning
-                                                                                  ? null
-                                                                                  : () {
-                                                                                      setState(() {
-                                                                                        if (time < 30) {
-                                                                                          // Máximo valor de time es 30
-                                                                                          time++; // Aumentar el tiempo
-                                                                                          totalTime = time * 60; // Actualiza el tiempo total en segundos
-                                                                                          // Calcula el índice de la imagen con el nuevo tiempo
-                                                                                          _currentImageIndex = 31 - time;
-                                                                                        }
-                                                                                      });
-                                                                                    },
-                                                                              child: Image.asset(
-                                                                                'assets/images/flecha-arriba.png',
-                                                                                height: screenHeight * 0.04,
-                                                                                fit: BoxFit.scaleDown,
-                                                                              ),
-                                                                            ),
-                                                                            Text(
-                                                                              "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
-                                                                              style: TextStyle(
-                                                                                fontSize: 25.sp,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: const Color(0xFF2be4f3), // Color para la sección seleccionada
-                                                                              ),
-                                                                            ),
-                                                                            GestureDetector(
-                                                                              onTap: isRunning
-                                                                                  ? null
-                                                                                  : () {
-                                                                                      setState(() {
-                                                                                        if (time > 1) {
-                                                                                          // Mínimo valor de time es 1
-                                                                                          time--; // Disminuir el tiempo
-                                                                                          totalTime = time * 60; // Actualiza el tiempo total en segundos
-                                                                                          // Calcula el índice de la imagen con el nuevo tiempo
-                                                                                          _currentImageIndex = 31 - time;
-                                                                                        }
-                                                                                      });
-                                                                                    },
-                                                                              child: Image.asset(
-                                                                                'assets/images/flecha-abajo.png',
-                                                                                height: screenHeight * 0.04,
-                                                                                fit: BoxFit.scaleDown,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    SizedBox(
-                                                                        height: screenHeight *
-                                                                            0.01),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        CustomPaint(
-                                                                          size:
-                                                                              Size(
-                                                                            _isFullScreen
-                                                                                ? screenWidth * 0.1
-                                                                                : screenWidth * 0.1,
-                                                                            // Aumentar tamaño si isFullScreen es verdadero
-                                                                            _isFullScreen
-                                                                                ? screenHeight * 0.03
-                                                                                : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
-                                                                          ),
-                                                                          painter:
-                                                                              LinePainter(
-                                                                            progress2:
-                                                                                progressContraction,
-                                                                            strokeHeight: _isFullScreen
-                                                                                ? 20
-                                                                                : 15, // Aumentar altura si isFullScreen es verdadero
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width: _isFullScreen
-                                                                              ? screenWidth * 0.01
-                                                                              : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
-                                                                        ),
-                                                                        Text(
-                                                                          valueContraction.toString().padLeft(
-                                                                              1,
-                                                                              '0'),
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize: _isFullScreen
-                                                                                ? 25.sp
-                                                                                : 20.sp,
-                                                                            // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                Colors.lightGreenAccent.shade400,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        CustomPaint(
-                                                                          size:
-                                                                              Size(
-                                                                            _isFullScreen
-                                                                                ? screenWidth * 0.1
-                                                                                : screenWidth * 0.1,
-                                                                            // Aumentar tamaño si isFullScreen es verdadero
-                                                                            _isFullScreen
-                                                                                ? screenHeight * 0.03
-                                                                                : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
-                                                                          ),
-                                                                          painter:
-                                                                              LinePainter2(
-                                                                            progress3:
-                                                                                progressPause,
-                                                                            strokeHeight: _isFullScreen
-                                                                                ? 20
-                                                                                : 15, // Aumentar altura si isFullScreen es verdadero
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width: _isFullScreen
-                                                                              ? screenWidth * 0.01
-                                                                              : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
-                                                                        ),
-                                                                        Text(
-                                                                          valuePause.toString().padLeft(
-                                                                              1,
-                                                                              '0'),
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize: _isFullScreen
-                                                                                ? 25.sp
-                                                                                : 20.sp,
-                                                                            // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                Colors.red,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height: _isFullScreen
-                                                                          ? screenHeight *
-                                                                              0.02
-                                                                          : screenHeight *
-                                                                              0.01, // Aumentar el espacio si isFullScreen es verdadero
-                                                                    ),
-                                                                    Column(
-                                                                      children: [
-                                                                        Text(
-                                                                          "AVERAGE",
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize: _isFullScreen
-                                                                                ? 23.sp
-                                                                                : 18.sp,
-                                                                            // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                const Color(0xFF2be4f3),
-                                                                          ),
-                                                                        ),
-                                                                        CustomPaint(
-                                                                          size:
-                                                                              Size(
-                                                                            _isFullScreen
-                                                                                ? screenWidth * 0.15
-                                                                                : screenWidth * 0.15,
-                                                                            // Aumentar tamaño si isFullScreen es verdadero
-                                                                            _isFullScreen
-                                                                                ? screenHeight * 0.05
-                                                                                : screenHeight * 0.05, // Aumentar tamaño si isFullScreen es verdadero
-                                                                          ),
-                                                                          painter:
-                                                                              AverageLineWithTextPainter(
-                                                                            average:
-                                                                                100.0 / 100.0,
-                                                                            strokeHeight: _isFullScreen
-                                                                                ? screenHeight * 0.03
-                                                                                : screenHeight * 0.02,
-                                                                            // Aumentar altura si isFullScreen es verdadero
-                                                                            textStyle:
-                                                                                TextStyle(
-                                                                              fontSize: _isFullScreen ? 23.sp : 18.sp,
-                                                                              // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontStyle: FontStyle.italic,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                Stack(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  children: [
-                                                                    // Imagen base del avatar
-                                                                    Image.asset(
-                                                                      "assets/images/avatar_post.png",
-                                                                      height: _isFullScreen
-                                                                          ? screenHeight *
-                                                                              0.65
-                                                                          : screenHeight *
-                                                                              0.4,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                    // Superposición de imágenes si `musculosTrajeSelected` es verdadero
-                                                                    if (isSessionStarted) ...[
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          5]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_trap_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          5]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_trap_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_trap_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          6]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_dorsal_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          6]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_dorsal_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_dorsal_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          7]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_gris.png",
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          7]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_lumbar_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          8]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gluteos_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          8]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gluteo_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_gluteo_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          9]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          9]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_isquio_azul.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ] else if (!isSessionStarted) ...[
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          5]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_trap_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          5]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_trap_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_trap_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          6]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_dorsal_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          6]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_dorsal_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_dorsal_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          7]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          7]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          8]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gluteos_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          8]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gluteo_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gluteo_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoTrajeInactivo[
-                                                                          9]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_gris.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoTrajeBloqueado[
-                                                                          9]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_naranja.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ]
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.02),
-                                                            Row(
-                                                              children: [
-                                                                // Botón "Menos"
-                                                                CustomIconButton(
-                                                                  onTap: selectedKey ==
-                                                                          null
-                                                                      ? null // Si selectedKey es null, el botón estará deshabilitado
-                                                                      : () {
-                                                                          setState(
-                                                                              () {
-                                                                            // Disminuir el porcentaje de los músculos que no están bloqueados ni inactivos
-                                                                            for (int i = 0;
-                                                                                i < _isMusculoTrajeBloqueado.length;
-                                                                                i++) {
-                                                                              if (!_isMusculoTrajeBloqueado[i] && !_isMusculoTrajeInactivo[i]) {
-                                                                                porcentajesMusculoTraje[i] = (porcentajesMusculoTraje[i] - 1).clamp(0, 100);
-                                                                              }
-                                                                            }
-                                                                          });
-                                                                        },
-                                                                  imagePath:
-                                                                      'assets/images/menos.png',
-                                                                  size:
-                                                                      screenHeight *
-                                                                          0.1,
-                                                                ),
-
-                                                                SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.01),
-                                                                // Botón de control de sesión (Reproducir/Pausar)
-                                                                GestureDetector(
-                                                                  onTap: selectedKey ==
-                                                                          null
-                                                                      ? null // Si selectedKey es null, el botón estará deshabilitado
-                                                                      : () {
-                                                                          setState(
-                                                                              () {
-                                                                            if (isRunning) {
-                                                                              // Pausa el temporizador si está corriendo
-                                                                              _pauseTimer();
-                                                                            } else {
-                                                                              // Inicia o reanuda el temporizador si está pausado
-                                                                              _startTimer();
-                                                                            }
-                                                                            isSessionStarted =
-                                                                                !isSessionStarted;
-                                                                            debugPrint('isSessionStarted: $isSessionStarted');
-                                                                          });
-                                                                        },
-                                                                  child:
-                                                                      SizedBox(
-                                                                    child:
-                                                                        ClipOval(
-                                                                      child: Image
-                                                                          .asset(
-                                                                        height: screenHeight *
-                                                                            0.15,
-                                                                        'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
-                                                                        fit: BoxFit
-                                                                            .scaleDown,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.01),
-                                                                // Botón "Más"
-                                                                CustomIconButton(
-                                                                  onTap: selectedKey ==
-                                                                          null
-                                                                      ? null // Si selectedKey es null, el botón estará deshabilitado
-                                                                      : () {
-                                                                          setState(
-                                                                              () {
-                                                                            // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
-                                                                            for (int i = 0;
-                                                                                i < _isMusculoTrajeBloqueado.length;
-                                                                                i++) {
-                                                                              if (!_isMusculoTrajeBloqueado[i] && !_isMusculoTrajeInactivo[i]) {
-                                                                                porcentajesMusculoTraje[i] = (porcentajesMusculoTraje[i] + 1).clamp(0, 100);
-                                                                              }
-                                                                            }
-                                                                          });
-                                                                        },
-                                                                  imagePath:
-                                                                      'assets/images/mas.png',
-                                                                  size:
-                                                                      screenHeight *
-                                                                          0.1,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            if (isSessionStarted) ...[
-                                                              _buildMuscleRow(
-                                                                index: 5,
-                                                                imagePathEnabled:
-                                                                    'assets/images/trap_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/trapazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/trap_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 6,
-                                                                imagePathEnabled:
-                                                                    'assets/images/dorsal_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/dorsalazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/dorsal_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 7,
-                                                                imagePathEnabled:
-                                                                    'assets/images/lumbar_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/lumbarazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/lumbar_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 8,
-                                                                imagePathEnabled:
-                                                                    'assets/images/gluteo_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/gluteoazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/gluteo_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 9,
-                                                                imagePathEnabled:
-                                                                    'assets/images/isquio_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/isquioazul.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/isquio_gris.png',
-                                                              ),
-                                                            ] else if (!isSessionStarted) ...[
-                                                              _buildMuscleRow(
-                                                                index: 5,
-                                                                imagePathEnabled:
-                                                                    'assets/images/trap_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/trap_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/trap_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 6,
-                                                                imagePathEnabled:
-                                                                    'assets/images/dorsal_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/dorsal_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/dorsal_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 7,
-                                                                imagePathEnabled:
-                                                                    'assets/images/lumbar_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/lumbar_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/lumbar_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 8,
-                                                                imagePathEnabled:
-                                                                    'assets/images/gluteo_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/gluteo_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/gluteo_gris.png',
-                                                              ),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow(
-                                                                index: 9,
-                                                                imagePathEnabled:
-                                                                    'assets/images/isquio_naranja.png',
-                                                                imagePathDisabled:
-                                                                    'assets/images/isquio_blanco.png',
-                                                                imagePathInactive:
-                                                                    'assets/images/isquio_gris.png',
-                                                              ),
-                                                            ]
-                                                          ],
-                                                        ),
-                                                      ] else if (selectedIndexEquip ==
-                                                          1) ...[
-                                                        Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            if (isSessionStarted) ...[
-                                                              _buildMuscleRow2(
-                                                                  index: 0,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/biceps_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/bicepsazul.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/biceps_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 1,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/abs_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/absazul.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/abs_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 2,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/cua_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/cuazul.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/cua_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 3,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/gemelos_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/gemelosazul.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/gemelos_gris.png'),
-                                                            ] else if (!isSessionStarted) ...[
-                                                              _buildMuscleRow2(
-                                                                  index: 0,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/biceps_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/biceps_blanco_pantalon.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/biceps_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 1,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/abs_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/abs_blanco.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/abs_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 2,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/cua_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/cua_blanco_pantalon.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/cua_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 3,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/gemelos_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/gemelo_blanco_pantalon.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/gemelos_gris.png'),
-                                                            ]
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                Stack(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  children: [
-                                                                    // Imagen base del avatar
-                                                                    Image.asset(
-                                                                      "assets/images/pantalon_frontal.png",
-                                                                      height: _isFullScreen
-                                                                          ? screenHeight *
-                                                                              0.65
-                                                                          : screenHeight *
-                                                                              0.4,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                    // Superposición de imágenes si `musculosTrajeSelected` es verdadero
-                                                                    if (isSessionStarted) ...[
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          0]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          0]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_biceps_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          1]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_inf_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_sup_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          1]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_inf_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_sup_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_abs_inf_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_abs_sup_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          2]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          2]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_cua_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          3]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          3]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_gem_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ] else if (!isSessionStarted) ...[
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          0]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          0]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_biceps_blanco_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          1]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_inf_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_sup_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          1]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_inf_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_sup_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_inf_blanco.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_abs_sup_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          2]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          2]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_cua_blanco_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          3]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          3]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gemelos_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_gem_blanco_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ]
-                                                                  ],
-                                                                ),
-                                                                Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    Stack(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .center,
-                                                                      children: [
-                                                                        Image
-                                                                            .asset(
-                                                                          imagePaths[
-                                                                              _currentImageIndex]!,
-                                                                          // Accede al valor en el mapa usando la clave _currentImageIndex
-                                                                          height:
-                                                                              MediaQuery.of(context).size.height * 0.25,
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                        ),
-                                                                        Column(
-                                                                          children: [
-                                                                            // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
-                                                                            GestureDetector(
-                                                                              onTap: isRunning
-                                                                                  ? null
-                                                                                  : () {
-                                                                                      setState(() {
-                                                                                        if (time < 30) {
-                                                                                          // Máximo valor de time es 30
-                                                                                          time++; // Aumentar el tiempo
-                                                                                          totalTime = time * 60; // Actualiza el tiempo total en segundos
-                                                                                          // Calcula el índice de la imagen con el nuevo tiempo
-                                                                                          _currentImageIndex = 31 - time;
-                                                                                        }
-                                                                                      });
-                                                                                    },
-                                                                              child: Image.asset(
-                                                                                'assets/images/flecha-arriba.png',
-                                                                                height: screenHeight * 0.04,
-                                                                                fit: BoxFit.scaleDown,
-                                                                              ),
-                                                                            ),
-                                                                            Text(
-                                                                              "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
-                                                                              style: TextStyle(
-                                                                                fontSize: 25.sp,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: const Color(0xFF2be4f3), // Color para la sección seleccionada
-                                                                              ),
-                                                                            ),
-                                                                            GestureDetector(
-                                                                              onTap: isRunning
-                                                                                  ? null
-                                                                                  : () {
-                                                                                      setState(() {
-                                                                                        if (time > 1) {
-                                                                                          // Mínimo valor de time es 1
-                                                                                          time--; // Disminuir el tiempo
-                                                                                          totalTime = time * 60; // Actualiza el tiempo total en segundos
-                                                                                          // Calcula el índice de la imagen con el nuevo tiempo
-                                                                                          _currentImageIndex = 31 - time;
-                                                                                        }
-                                                                                      });
-                                                                                    },
-                                                                              child: Image.asset(
-                                                                                'assets/images/flecha-abajo.png',
-                                                                                height: screenHeight * 0.04,
-                                                                                fit: BoxFit.scaleDown,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    SizedBox(
-                                                                        height: screenHeight *
-                                                                            0.01),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        CustomPaint(
-                                                                          size:
-                                                                              Size(
-                                                                            _isFullScreen
-                                                                                ? screenWidth * 0.1
-                                                                                : screenWidth * 0.1,
-                                                                            // Aumentar tamaño si isFullScreen es verdadero
-                                                                            _isFullScreen
-                                                                                ? screenHeight * 0.03
-                                                                                : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
-                                                                          ),
-                                                                          painter:
-                                                                              LinePainter(
-                                                                            progress2:
-                                                                                progressContraction,
-                                                                            strokeHeight: _isFullScreen
-                                                                                ? 20
-                                                                                : 15, // Aumentar altura si isFullScreen es verdadero
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width: _isFullScreen
-                                                                              ? screenWidth * 0.01
-                                                                              : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
-                                                                        ),
-                                                                        Text(
-                                                                          valueContraction.toString().padLeft(
-                                                                              1,
-                                                                              '0'),
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize: _isFullScreen
-                                                                                ? 25.sp
-                                                                                : 20.sp,
-                                                                            // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                Colors.lightGreenAccent.shade400,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        CustomPaint(
-                                                                          size:
-                                                                              Size(
-                                                                            _isFullScreen
-                                                                                ? screenWidth * 0.1
-                                                                                : screenWidth * 0.1,
-                                                                            // Aumentar tamaño si isFullScreen es verdadero
-                                                                            _isFullScreen
-                                                                                ? screenHeight * 0.03
-                                                                                : screenHeight * 0.02, // Aumentar tamaño si isFullScreen es verdadero
-                                                                          ),
-                                                                          painter:
-                                                                              LinePainter2(
-                                                                            progress3:
-                                                                                progressPause,
-                                                                            strokeHeight: _isFullScreen
-                                                                                ? 20
-                                                                                : 15, // Aumentar altura si isFullScreen es verdadero
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width: _isFullScreen
-                                                                              ? screenWidth * 0.01
-                                                                              : screenWidth * 0.01, // Aumentar el espacio si isFullScreen es verdadero
-                                                                        ),
-                                                                        Text(
-                                                                          valuePause.toString().padLeft(
-                                                                              1,
-                                                                              '0'),
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize: _isFullScreen
-                                                                                ? 25.sp
-                                                                                : 20.sp,
-                                                                            // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                Colors.red,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height: _isFullScreen
-                                                                          ? screenHeight *
-                                                                              0.02
-                                                                          : screenHeight *
-                                                                              0.01, // Aumentar el espacio si isFullScreen es verdadero
-                                                                    ),
-                                                                    Column(
-                                                                      children: [
-                                                                        Text(
-                                                                          "AVERAGE",
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize: _isFullScreen
-                                                                                ? 23.sp
-                                                                                : 18.sp,
-                                                                            // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color:
-                                                                                const Color(0xFF2be4f3),
-                                                                          ),
-                                                                        ),
-                                                                        CustomPaint(
-                                                                          size:
-                                                                              Size(
-                                                                            _isFullScreen
-                                                                                ? screenWidth * 0.15
-                                                                                : screenWidth * 0.15,
-                                                                            // Aumentar tamaño si isFullScreen es verdadero
-                                                                            _isFullScreen
-                                                                                ? screenHeight * 0.05
-                                                                                : screenHeight * 0.05, // Aumentar tamaño si isFullScreen es verdadero
-                                                                          ),
-                                                                          painter:
-                                                                              AverageLineWithTextPainter(
-                                                                            average:
-                                                                                100.0 / 100.0,
-                                                                            strokeHeight: _isFullScreen
-                                                                                ? screenHeight * 0.03
-                                                                                : screenHeight * 0.02,
-                                                                            // Aumentar altura si isFullScreen es verdadero
-                                                                            textStyle:
-                                                                                TextStyle(
-                                                                              fontSize: _isFullScreen ? 23.sp : 18.sp,
-                                                                              // Aumentar tamaño de fuente si isFullScreen es verdadero
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontStyle: FontStyle.italic,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                Stack(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  children: [
-                                                                    // Imagen base del avatar
-                                                                    Image.asset(
-                                                                      "assets/images/pantalon_posterior.png",
-                                                                      height: _isFullScreen
-                                                                          ? screenHeight *
-                                                                              0.65
-                                                                          : screenHeight *
-                                                                              0.4,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                    // Superposición de imágenes si `musculosTrajeSelected` es verdadero
-                                                                    if (isSessionStarted) ...[
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          4]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          4]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_lumbar_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          5]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_sup_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_inf_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          5]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_sup_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_inf_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_glut_inf_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_glut_sup_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          6]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          6]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        // Si el músculo no está bloqueado, muestra la capa animada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              AnimatedBuilder(
-                                                                            animation:
-                                                                                _opacityAnimation,
-                                                                            builder:
-                                                                                (context, child) {
-                                                                              return Opacity(
-                                                                                opacity: _opacityAnimation.value,
-                                                                                child: Image.asset(
-                                                                                  "assets/images/capa_isquio_azul_pantalon.png",
-                                                                                  height: _isFullScreen ? screenHeight * 0.65 : screenHeight * 0.4,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ] else if (!isSessionStarted) ...[
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          4]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          4]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_lumbar_blanco_pantalon.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          5]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_sup_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_inf_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          5]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_sup_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_inf_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_sup_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_glut_inf_blanco.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                      if (_isMusculoPantalonInactivo[
-                                                                          6]) ...[
-                                                                        // Si el músculo está inactivo, muestra otra capa
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_gris_pantalon.png",
-                                                                            // Imagen para el estado inactivo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else if (_isMusculoPantalonBloqueado[
-                                                                          6]) ...[
-                                                                        // Si el músculo está bloqueado, muestra la capa estática bloqueada
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_naranja_pantalon.png",
-                                                                            // Imagen para el estado bloqueado
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ] else ...[
-                                                                        Positioned(
-                                                                          top:
-                                                                              0,
-                                                                          // Ajusta la posición de la superposición
-                                                                          child:
-                                                                              Image.asset(
-                                                                            "assets/images/capa_isquio_blanco_pantalon.png",
-                                                                            // Reemplaza con la ruta de la imagen del músculo
-                                                                            height: _isFullScreen
-                                                                                ? screenHeight * 0.65
-                                                                                : screenHeight * 0.4,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ]
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.02),
-                                                            Row(
-                                                              children: [
-                                                                // Botón "Menos"
-                                                                CustomIconButton(
-                                                                  onTap: selectedKey ==
-                                                                          null
-                                                                      ? null // Si selectedKey es null, el botón estará deshabilitado
-                                                                      : () {
-                                                                          setState(
-                                                                              () {
-                                                                            // Disminuir el porcentaje de los músculos no bloqueados
-                                                                            for (int i = 0;
-                                                                                i < _isMusculoPantalonBloqueado.length;
-                                                                                i++) {
-                                                                              if (!_isMusculoPantalonBloqueado[i] && !_isMusculoPantalonInactivo[i]) {
-                                                                                porcentajesMusculoPantalon[i] = (porcentajesMusculoPantalon[i] - 1).clamp(0, 100);
-                                                                              }
-                                                                            }
-                                                                          });
-                                                                        },
-                                                                  imagePath:
-                                                                      'assets/images/menos.png',
-                                                                  size:
-                                                                      screenHeight *
-                                                                          0.1,
-                                                                ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.01),
-
-                                                                // Botón de control de sesión (Reproducir/Pausar)
-                                                                GestureDetector(
-                                                                  onTap: selectedKey ==
-                                                                          null
-                                                                      ? null // Si selectedKey es null, el botón estará deshabilitado
-                                                                      : () {
-                                                                          setState(
-                                                                              () {
-                                                                            if (isRunning) {
-                                                                              // Pausa el temporizador si está corriendo
-                                                                              _pauseTimer();
-                                                                            } else {
-                                                                              // Inicia o reanuda el temporizador si está pausado
-                                                                              _startTimer();
-                                                                            }
-                                                                            isSessionStarted =
-                                                                                !isSessionStarted;
-                                                                            debugPrint('isSessionStarted: $isSessionStarted');
-                                                                          });
-                                                                        },
-                                                                  child:
-                                                                      SizedBox(
-                                                                    child:
-                                                                        ClipOval(
-                                                                      child: Image
-                                                                          .asset(
-                                                                        height: screenHeight *
-                                                                            0.15,
-                                                                        'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
-                                                                        fit: BoxFit
-                                                                            .scaleDown,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.01),
-
-                                                                // Botón "Más"
-                                                                CustomIconButton(
-                                                                  onTap: selectedKey ==
-                                                                          null
-                                                                      ? null // Si selectedKey es null, el botón estará deshabilitado
-                                                                      : () {
-                                                                          setState(
-                                                                              () {
-                                                                            // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
-                                                                            for (int i = 0;
-                                                                                i < _isMusculoPantalonBloqueado.length;
-                                                                                i++) {
-                                                                              if (!_isMusculoPantalonBloqueado[i] && !_isMusculoPantalonInactivo[i]) {
-                                                                                porcentajesMusculoPantalon[i] = (porcentajesMusculoPantalon[i] + 1).clamp(0, 100);
-                                                                              }
-                                                                            }
-                                                                          });
-                                                                        },
-                                                                  imagePath:
-                                                                      'assets/images/mas.png',
-                                                                  size:
-                                                                      screenHeight *
-                                                                          0.1,
-                                                                )
-                                                              ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            if (isSessionStarted) ...[
-                                                              _buildMuscleRow2(
-                                                                  index: 4,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/lumbar_naranja_pantalon.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/lumbar_pantalon_azul.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/lumbar_gris_pantalon.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 5,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/gluteo_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/gluteoazul.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/gluteo_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 6,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/isquio_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/isquioazul.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/isquio_gris.png'),
-                                                            ] else if (!isSessionStarted) ...[
-                                                              _buildMuscleRow2(
-                                                                  index: 4,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/lumbar_naranja_pantalon.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/lumbar_blanco_pantalon.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/lumbar_gris_pantalon.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 5,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/gluteo_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/gluteo_blanco.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/gluteo_gris.png'),
-                                                              SizedBox(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.005),
-                                                              _buildMuscleRow2(
-                                                                  index: 6,
-                                                                  imagePathEnabled:
-                                                                      'assets/images/isquio_naranja.png',
-                                                                  imagePathDisabled:
-                                                                      'assets/images/isquio_blanco_pantalon.png',
-                                                                  imagePathInactive:
-                                                                      'assets/images/isquio_gris.png'),
-                                                            ]
-                                                          ],
-                                                        ),
-                                                      ]
-                                                    ],
-                                                  ),
-                                                  if (_isFullScreen)
-                                                    Positioned(
-                                                      bottom: 0,
-                                                      // Distancia desde el borde superior
-                                                      right: 0,
-                                                      // Distancia desde el borde derecho
-                                                      child: GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            _isFullScreen =
-                                                                false; // Cambia el estado para ocultar este botón
-                                                          });
-                                                        },
-                                                        child: ClipOval(
-                                                          child: Image.asset(
-                                                            'assets/images/fullscreen.png',
-                                                            width: screenWidth *
-                                                                0.08,
-                                                            // Ajusta el tamaño según sea necesario
-                                                            height:
-                                                                screenHeight *
-                                                                    0.08,
-                                                            fit: BoxFit.contain,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ]),
-                                              ),
-                                              if (!_isFullScreen)
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      // Primera sección (con las imágenes y el diseño de la primera parte)
-                                                      Expanded(
-                                                        flex: 3,
-                                                        child: Column(
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                // Contenedor para las imágenes flizquierda alineadas a la derecha
-                                                                Expanded(
-                                                                  child: Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .centerRight,
-                                                                    // Alineación hacia la derecha
-                                                                    child:
-                                                                        GestureDetector(
-                                                                      onTap:
-                                                                          () {
-                                                                        setState(
-                                                                            () {
-                                                                          _isExpanded2 =
-                                                                              !_isExpanded2; // Cambia el estado de expansión
-                                                                          rotationAngle2 = _isExpanded2
-                                                                              ? 3.14159
-                                                                              : 0.0; // Flecha rota 180 grados
-                                                                        });
-                                                                      },
-                                                                      child:
-                                                                          AnimatedRotation(
-                                                                        duration:
-                                                                            const Duration(milliseconds: 200),
-                                                                        turns: rotationAngle2 /
-                                                                            (2 *
-                                                                                3.14159),
-                                                                        child:
-                                                                            SizedBox(
-                                                                          height:
-                                                                              screenHeight * 0.15,
-                                                                          child:
-                                                                              ClipOval(
-                                                                            child:
-                                                                                Image.asset(
-                                                                              'assets/images/flizquierda.png',
-                                                                              fit: BoxFit.contain,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.01),
-                                                                AnimatedSize(
-                                                                  duration: const Duration(
-                                                                      milliseconds:
-                                                                          300),
-                                                                  curve: Curves
-                                                                      .easeInOut,
-                                                                  child:
-                                                                      Container(
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .all(
-                                                                            10.0),
-                                                                    width: _isExpanded2
-                                                                        ? screenWidth *
-                                                                            0.2
-                                                                        : 0,
-                                                                    height:
-                                                                        screenHeight *
-                                                                            0.2,
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .center,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: Colors
-                                                                          .black
-                                                                          .withOpacity(
-                                                                              0.5),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              20.0),
-                                                                    ),
-                                                                    child:
-                                                                        const Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .start,
-                                                                      children: [],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.01),
-                                                            Row(
-                                                              children: [
-                                                                // Contenedor para las imágenes flizquierda alineadas a la derecha
-                                                                Expanded(
-                                                                  child: Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .centerRight,
-                                                                    // Alineación hacia la derecha
-                                                                    child:
-                                                                        GestureDetector(
-                                                                      onTap:
-                                                                          () {
-                                                                        setState(
-                                                                            () {
-                                                                          _isExpanded3 =
-                                                                              !_isExpanded3; // Cambia el estado de expansión
-                                                                          rotationAngle3 = _isExpanded3
-                                                                              ? 3.14159
-                                                                              : 0.0; // Flecha rota 180 grados
-                                                                        });
-                                                                      },
-                                                                      child:
-                                                                          AnimatedRotation(
-                                                                        duration:
-                                                                            const Duration(milliseconds: 200),
-                                                                        turns: rotationAngle3 /
-                                                                            (2 *
-                                                                                3.14159),
-                                                                        child:
-                                                                            SizedBox(
-                                                                          height:
-                                                                              screenHeight * 0.15,
-                                                                          child:
-                                                                              ClipOval(
-                                                                            child:
-                                                                                Image.asset(
-                                                                              'assets/images/flizquierda.png',
-                                                                              fit: BoxFit.contain,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.01),
-                                                                AnimatedSize(
-                                                                  duration: const Duration(
-                                                                      milliseconds:
-                                                                          300),
-                                                                  curve: Curves
-                                                                      .easeInOut,
-                                                                  child:
-                                                                      Container(
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .all(
-                                                                            10.0),
-                                                                    width: _isExpanded3
-                                                                        ? screenWidth *
-                                                                            0.2
-                                                                        : 0,
-                                                                    height:
-                                                                        screenHeight *
-                                                                            0.25,
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .center,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: Colors
-                                                                          .black
-                                                                          .withOpacity(
-                                                                              0.5),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              20.0),
-                                                                    ),
-                                                                    child:
-                                                                        Column(
-                                                                      children: [
-                                                                        buildControlRow(
-                                                                          value:
-                                                                              valueContraction,
-                                                                          // Valor de la contracción
-                                                                          imagePathIncrement:
-                                                                              'assets/images/mas.png',
-                                                                          // Imagen del botón de "Más"
-                                                                          imagePathDecrement:
-                                                                              'assets/images/menos.png',
-                                                                          // Imagen del botón de "Menos"
-                                                                          imagePathDisplay:
-                                                                              'assets/images/CONTRACCION.png',
-                                                                          // Imagen que se muestra (Contracción)
-                                                                          onIncrement:
-                                                                              () {
-                                                                            setState(() {
-                                                                              valueContraction += 1.0; // Lógica de incremento
-                                                                            });
-                                                                          },
-                                                                          onDecrement:
-                                                                              () {
-                                                                            setState(() {
-                                                                              if (valueContraction > 0) {
-                                                                                valueContraction -= 1.0; // Lógica de decremento
-                                                                              }
-                                                                            });
-                                                                          },
-                                                                          suffix:
-                                                                              " S",
-                                                                          // Sufijo para mostrar en el texto
-                                                                          screenWidth:
-                                                                              screenWidth,
-                                                                          // Ancho de pantalla
-                                                                          screenHeight:
-                                                                              screenHeight, // Altura de pantalla
-                                                                        ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                screenHeight * 0.02),
-                                                                        buildControlRow(
-                                                                          value:
-                                                                              valuePause,
-                                                                          // Valor de pausa
-                                                                          imagePathIncrement:
-                                                                              'assets/images/mas.png',
-                                                                          // Imagen del botón de "Más"
-                                                                          imagePathDecrement:
-                                                                              'assets/images/menos.png',
-                                                                          // Imagen del botón de "Menos"
-                                                                          imagePathDisplay:
-                                                                              'assets/images/PAUSA.png',
-                                                                          // Imagen que se muestra (Pausa)
-                                                                          onIncrement:
-                                                                              () {
-                                                                            setState(() {
-                                                                              valuePause += 1.0; // Lógica de incremento
-                                                                            });
-                                                                          },
-                                                                          onDecrement:
-                                                                              () {
-                                                                            setState(() {
-                                                                              if (valuePause > 0) {
-                                                                                valuePause -= 1.0; // Lógica de decremento
-                                                                              }
-                                                                            });
-                                                                          },
-                                                                          suffix:
-                                                                              " S",
-                                                                          // Sufijo para mostrar en el texto
-                                                                          screenWidth:
-                                                                              screenWidth,
-                                                                          // Ancho de pantalla
-                                                                          screenHeight:
-                                                                              screenHeight, // Altura de pantalla
-                                                                        ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                screenHeight * 0.02),
-                                                                        buildControlRow(
-                                                                          value:
-                                                                              valueRampa,
-                                                                          // Valor de pausa
-                                                                          imagePathIncrement:
-                                                                              'assets/images/mas.png',
-                                                                          // Imagen del botón de "Más"
-                                                                          imagePathDecrement:
-                                                                              'assets/images/menos.png',
-                                                                          // Imagen del botón de "Menos"
-                                                                          imagePathDisplay:
-                                                                              'assets/images/RAMPA.png',
-                                                                          // Imagen que se muestra (Pausa)
-                                                                          onIncrement:
-                                                                              () {
-                                                                            setState(() {
-                                                                              valueRampa += 1.0; // Lógica de incremento
-                                                                            });
-                                                                          },
-                                                                          onDecrement:
-                                                                              () {
-                                                                            setState(() {
-                                                                              if (valueRampa > 0) {
-                                                                                valueRampa -= 1.0; // Lógica de decremento
-                                                                              }
-                                                                            });
-                                                                          },
-                                                                          suffix:
-                                                                              " S",
-                                                                          // Sufijo para mostrar en el texto
-                                                                          screenWidth:
-                                                                              screenWidth,
-                                                                          // Ancho de pantalla
-                                                                          screenHeight:
-                                                                              screenHeight, // Altura de pantalla
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-
-                                                      // Usamos Expanded para que ocupe el espacio disponible
-                                                      Expanded(
-                                                        child: Stack(
-                                                          children: [
-                                                            // Aquí puedes poner otros widgets dentro del Stack si lo necesitas
-                                                            Positioned(
-                                                              bottom: 0,
-                                                              left:
-                                                                  screenWidth *
-                                                                      0.02,
-                                                              child:
-                                                                  GestureDetector(
-                                                                onTapDown: (_) =>
-                                                                    setState(() =>
-                                                                        scaleFactorReset =
-                                                                            0.90),
-                                                                onTapUp: (_) =>
-                                                                    setState(() =>
-                                                                        scaleFactorReset =
-                                                                            1.0),
-                                                                onTap: () {
-                                                                  _resetScreen(
-                                                                      context);
-                                                                },
-                                                                child:
-                                                                    AnimatedScale(
-                                                                  scale:
-                                                                      scaleFactorReset,
-                                                                  duration: const Duration(
-                                                                      milliseconds:
-                                                                          100),
-                                                                  child:
-                                                                      SizedBox(
-                                                                    child:
-                                                                        ClipOval(
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/RESET.png',
-                                                                        width: screenWidth *
-                                                                            0.1,
-                                                                        height: screenHeight *
-                                                                            0.1,
-                                                                        fit: BoxFit
-                                                                            .contain,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-
-                                                            // Aquí está la imagen de fullscreen en la esquina
-                                                            Positioned(
-                                                              bottom: 0,
-                                                              right: 0,
-                                                              child:
-                                                                  GestureDetector(
-                                                                onTapDown: (_) =>
-                                                                    setState(() =>
-                                                                        scaleFactorFull =
-                                                                            0.90),
-                                                                onTapUp: (_) =>
-                                                                    setState(() =>
-                                                                        scaleFactorFull =
-                                                                            1.0),
-                                                                onTap: () {
-                                                                  setState(() {
-                                                                    _isFullScreen =
-                                                                        !_isFullScreen; // Cambia el estado de pantalla completa
-                                                                  });
-                                                                },
-                                                                child:
-                                                                    AnimatedScale(
-                                                                  scale:
-                                                                      scaleFactorFull,
-                                                                  duration: const Duration(
-                                                                      milliseconds:
-                                                                          100),
-                                                                  child:
-                                                                      ClipOval(
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/fullscreen.png',
-                                                                      width: screenWidth *
-                                                                          0.08,
-                                                                      height:
-                                                                          screenHeight *
-                                                                              0.08,
-                                                                      fit: BoxFit
-                                                                          .scaleDown,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ])),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
-                      
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
               ],
             ),
           ),
@@ -6480,11 +1922,3815 @@ class _PanelViewState extends State<PanelView>
     }
   }
 
+  Widget buildExpandedContent(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    print("MOSTRANDO EXPANDED PARA KEY --->>>>$selectedKey");
+    return Expanded(
+      flex: 9,
+      child: SizedBox(
+          height: screenHeight,
+          width: screenWidth,
+          child: Column(children: [
+            if (!_isFullScreen)
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isExpanded1 =
+                                !_isExpanded1; // Cambia el estado de expansión
+                            rotationAngle1 = _isExpanded1
+                                ? 3.14159
+                                : 0.0; // Cambia la dirección de la flecha (180 grados)
+                          });
+                        },
+                        child: AnimatedRotation(
+                          duration: const Duration(milliseconds: 200),
+                          turns: rotationAngle1 / (2 * 3.14159),
+                          child: SizedBox(
+                            height: screenHeight * 0.15,
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/images/flderecha.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.02),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        child: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          width: _isExpanded1 ? screenWidth * 0.25 : 0,
+                          height: screenHeight * 0.2,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              // Botón "Cliente"
+                              Expanded(
+                                child: GestureDetector(
+                                  onTapDown: selectedKey == null
+                                      ? null
+                                      : (_) => setState(
+                                          () => scaleFactorCliente = 0.90),
+                                  onTapUp: selectedKey == null
+                                      ? null
+                                      : (_) => setState(
+                                          () => scaleFactorCliente = 1.0),
+                                  onTap: selectedKey == null
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            toggleOverlay(0); // Abre el overlay
+                                          });
+                                        },
+                                  child: Opacity(
+                                    opacity: selectedKey == null ? 1.0 : 1.0,
+                                    // Indicación visual
+                                    child: AnimatedScale(
+                                      scale: scaleFactorCliente,
+                                      duration:
+                                          const Duration(milliseconds: 100),
+                                      child: Container(
+                                        width: screenHeight * 0.1,
+                                        height: screenWidth * 0.1,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF494949),
+                                          shape:
+                                              BoxShape.circle, // Forma circular
+                                        ),
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: screenWidth * 0.05,
+                                            height: screenHeight * 0.05,
+                                            child: ClipOval(
+                                              child: Image.asset(
+                                                'assets/images/cliente.png',
+                                                fit: BoxFit.scaleDown,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: screenWidth * 0.01),
+                              // Botón "Equipo 0"
+                              Expanded(
+                                child: AbsorbPointer(
+                                  absorbing: selectedKey == null,
+                                  // Bloquear interacción si no hay selección
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedIndexEquip = 0;
+                                      });
+
+                                      print(
+                                          "🔄 Cambiado al equipo 0 para MCI: $selectedKey");
+                                    },
+                                    child: Opacity(
+                                      opacity: selectedKey == null ? 1.0 : 1.0,
+                                      // Indicación visual
+                                      child: Container(
+                                        width: screenWidth * 0.1,
+                                        height: screenHeight * 0.1,
+                                        decoration: BoxDecoration(
+                                          color: selectedIndexEquip == 0
+                                              ? selectedColor
+                                              : unselectedColor,
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(10.0),
+                                            bottomLeft: Radius.circular(10.0),
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Image.asset(
+                                            'assets/images/chalecoblanco.png',
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: AbsorbPointer(
+                                  absorbing: selectedKey == null,
+                                  // Bloquear interacción si no hay selección
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedIndexEquip = 1;
+                                      });
+
+                                      print(
+                                          "🔄 Cambiado al equipo 1 para MCI: $selectedKey");
+                                    },
+                                    child: Opacity(
+                                      opacity: selectedKey == null ? 1.0 : 1.0,
+                                      // Indicación visual
+                                      child: Container(
+                                        width: screenWidth * 0.1,
+                                        height: screenHeight * 0.1,
+                                        decoration: BoxDecoration(
+                                          color: selectedIndexEquip == 1
+                                              ? selectedColor
+                                              : unselectedColor,
+                                          borderRadius: const BorderRadius.only(
+                                            topRight: Radius.circular(10.0),
+                                            bottomRight: Radius.circular(10.0),
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Image.asset(
+                                            'assets/images/pantalonblanco.png',
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(width: screenWidth * 0.01),
+
+                              // Botón "Repetir"
+                              Expanded(
+                                child: GestureDetector(
+                                  onTapDown: selectedKey == null
+                                      ? null
+                                      : (_) => setState(
+                                          () => scaleFactorRepeat = 0.90),
+                                  onTapUp: selectedKey == null
+                                      ? null
+                                      : (_) => setState(
+                                          () => scaleFactorRepeat = 1.0),
+                                  onTap: selectedKey == null
+                                      ? null
+                                      : () {
+                                          // Acción para botón repetir
+                                        },
+                                  child: Opacity(
+                                    opacity: selectedKey == null ? 1.0 : 1.0,
+                                    // Indicación visual
+                                    child: AnimatedScale(
+                                      scale: scaleFactorRepeat,
+                                      duration:
+                                          const Duration(milliseconds: 100),
+                                      child: Container(
+                                        width: screenHeight * 0.1,
+                                        height: screenWidth * 0.1,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.transparent,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Center(
+                                          child: SizedBox(
+                                            child: ClipOval(
+                                              child: Image.asset(
+                                                'assets/images/repeat.png',
+                                                width: screenHeight * 0.1,
+                                                height: screenWidth * 0.1,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.02),
+                      Container(
+                        padding: const EdgeInsets.all(20.0),
+                        height: screenHeight * 0.2,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            OutlinedButton(
+                              onPressed: selectedKey == null
+                                  ? null // Inhabilitar el botón si selectedKey es null
+                                  : () {
+                                      setState(() {
+                                        toggleOverlay(
+                                            1); // Suponiendo que toggleOverlay abre el overlay
+                                      });
+                                    },
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.all(10.0),
+                                side: const BorderSide(
+                                  width: 1.0,
+                                  color: Color(0xFF2be4f3),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                backgroundColor: const Color(
+                                    0xFF2be4f3), // Mantener color de fondo
+                              ),
+                              child: Text(
+                                (tr(context,
+                                        globalSelectedProgram ?? 'Programas'))
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  // Mantener color del texto
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.01),
+                            Column(
+                              children: [
+                                // Condicional: Si globalSelectedProgram es null, muestra una imagen y texto predeterminados
+                                if (globalSelectedProgram == null)
+                                  Column(
+                                    children: [
+                                      // Texto predeterminado si no se ha seleccionado ningún programa
+                                      Text(
+                                        tr(context, 'Nombre programa')
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          color: const Color(0xFF2be4f3),
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+                                      // Imagen predeterminada si no se ha seleccionado ningún programa
+                                      Image.asset(
+                                        'assets/images/programacreado.png',
+                                        // Imagen predeterminada
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.1,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ],
+                                  ),
+
+                                if (globalSelectedProgram ==
+                                        tr(context, 'Individual')
+                                            .toUpperCase() &&
+                                    allIndividualPrograms.isNotEmpty)
+                                  Column(
+                                    children: [
+                                      // Mostrar el nombre del programa seleccionado o el primer programa por defecto
+                                      Text(
+                                        selectedIndivProgram?['nombre']
+                                                ?.toUpperCase() ??
+                                            (allIndividualPrograms.isNotEmpty
+                                                ? (allIndividualPrograms[0]
+                                                            ['nombre']
+                                                        ?.toUpperCase() ??
+                                                    tr(context,
+                                                            'NOMBRE PROGRAMA')
+                                                        .toUpperCase())
+                                                : tr(context,
+                                                        'No hay programas disponibles')
+                                                    .toUpperCase()),
+                                        style: TextStyle(
+                                          color: const Color(0xFF2be4f3),
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+
+                                      // Imagen del programa seleccionado o la imagen del primer programa por defecto
+                                      GestureDetector(
+                                        onTap: selectedKey == null
+                                            ? null // Deshabilitar el pulsado si selectedKey es null
+                                            : () {
+                                                setState(() {
+                                                  toggleOverlay(2);
+                                                });
+                                              },
+                                        child: Image.asset(
+                                          selectedIndivProgram != null
+                                              ? selectedIndivProgram![
+                                                      'imagen'] ??
+                                                  'assets/images/cliente.png'
+                                              : allIndividualPrograms.isNotEmpty
+                                                  ? allIndividualPrograms[0]
+                                                          ['imagen'] ??
+                                                      'assets/images/cliente.png'
+                                                  : 'assets/images/cliente.png',
+                                          // Imagen por defecto
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.1,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else if (globalSelectedProgram ==
+                                        tr(context, 'Recovery').toUpperCase() &&
+                                    allRecoveryPrograms.isNotEmpty)
+                                  Column(
+                                    children: [
+                                      // Mostrar el nombre del programa seleccionado o el primer programa por defecto
+                                      Text(
+                                        selectedRecoProgram?['nombre']
+                                                ?.toUpperCase() ??
+                                            (allRecoveryPrograms.isNotEmpty
+                                                ? (allRecoveryPrograms[0]
+                                                            ['nombre']
+                                                        ?.toUpperCase() ??
+                                                    tr(context,
+                                                            'NOMBRE PROGRAMA')
+                                                        .toUpperCase())
+                                                : tr(context,
+                                                        'No hay programas disponibles')
+                                                    .toUpperCase()),
+                                        style: TextStyle(
+                                          color: const Color(0xFF2be4f3),
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+
+                                      // Imagen del programa seleccionado o la imagen del primer programa por defecto
+                                      GestureDetector(
+                                        onTap: selectedKey == null
+                                            ? null // Deshabilitar el pulsado si selectedKey es null
+                                            : () {
+                                                setState(() {
+                                                  toggleOverlay(3);
+                                                });
+                                              },
+                                        child: Image.asset(
+                                          selectedRecoProgram != null
+                                              ? selectedRecoProgram![
+                                                      'imagen'] ??
+                                                  'assets/images/cliente.png'
+                                              : allRecoveryPrograms.isNotEmpty
+                                                  ? allRecoveryPrograms[0]
+                                                          ['imagen'] ??
+                                                      'assets/images/cliente.png'
+                                                  : 'assets/images/cliente.png',
+                                          // Imagen por defecto
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.1,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else if (globalSelectedProgram ==
+                                        tr(context, 'Automáticos')
+                                            .toUpperCase() &&
+                                    allAutomaticPrograms.isNotEmpty)
+                                  Column(
+                                    children: [
+                                      // Mostrar el nombre del programa seleccionado o el primer programa por defecto
+                                      Text(
+                                        selectedAutoProgram?[
+                                                    'nombre_programa_automatico']
+                                                ?.toUpperCase() ??
+                                            (allAutomaticPrograms.isNotEmpty
+                                                ? (allAutomaticPrograms[0][
+                                                            'nombre_programa_automatico']
+                                                        ?.toUpperCase() ??
+                                                    tr(context,
+                                                            'NOMBRE PROGRAMA')
+                                                        .toUpperCase())
+                                                : tr(context,
+                                                        'No hay programas disponibles')
+                                                    .toUpperCase()),
+                                        style: TextStyle(
+                                          color: const Color(0xFF2be4f3),
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+
+                                      // Imagen del programa seleccionado o la imagen del primer programa por defecto
+                                      GestureDetector(
+                                        onTap: selectedKey == null
+                                            ? null // Deshabilitar el pulsado si selectedKey es null
+                                            : () {
+                                                setState(() {
+                                                  toggleOverlay(4);
+                                                });
+                                              },
+                                        child: Image.asset(
+                                          selectedAutoProgram != null
+                                              ? selectedAutoProgram![
+                                                      'imagen'] ??
+                                                  'assets/images/cliente.png'
+                                              : allAutomaticPrograms.isNotEmpty
+                                                  ? allAutomaticPrograms[0]
+                                                          ['imagen'] ??
+                                                      'assets/images/cliente.png'
+                                                  : 'assets/images/cliente.png',
+                                          // Imagen por defecto
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.1,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ],
+                            ),
+                            SizedBox(width: screenWidth * 0.01),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (globalSelectedProgram == null)
+                                  Column(
+                                    children: [
+                                      Text(
+                                        "",
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        "",
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else if (globalSelectedProgram ==
+                                        tr(context, 'Individual')
+                                            .toUpperCase() &&
+                                    allIndividualPrograms.isNotEmpty)
+                                  Column(
+                                    children: [
+                                      Text(
+                                        selectedIndivProgram != null
+                                            ? "${selectedIndivProgram!['frecuencia'] != null ? formatNumber(selectedIndivProgram!['frecuencia'] as double) : 'N/A'} Hz"
+                                            : allIndividualPrograms.isNotEmpty
+                                                ? "${formatNumber(allIndividualPrograms[0]['frecuencia'] as double)} Hz"
+                                                : " N/A",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        selectedIndivProgram != null
+                                            ? "${selectedIndivProgram!['pulso'] != null ? formatNumber(selectedIndivProgram!['pulso'] as double) : 'N/A'} ms"
+                                            : allIndividualPrograms.isNotEmpty
+                                                ? "${formatNumber(allIndividualPrograms[0]['pulso'] as double)} ms"
+                                                : "N/A",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else if (globalSelectedProgram ==
+                                        tr(context, 'Recovery').toUpperCase() &&
+                                    allRecoveryPrograms.isNotEmpty)
+                                  Column(
+                                    children: [
+                                      Text(
+                                        selectedRecoProgram != null
+                                            ? "${selectedRecoProgram!['frecuencia'] != null ? formatNumber(selectedRecoProgram!['frecuencia'] as double) : 'N/A'} Hz"
+                                            : allRecoveryPrograms.isNotEmpty
+                                                ? "${formatNumber(allRecoveryPrograms[0]['frecuencia'] as double)} Hz"
+                                                : "N/A",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        selectedRecoProgram != null
+                                            ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : 'N/A'} ms"
+                                            : allRecoveryPrograms.isNotEmpty
+                                                ? "${formatNumber(allRecoveryPrograms[0]['pulso'] as double)} ms"
+                                                : "N/A",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else if (globalSelectedProgram ==
+                                        tr(context, 'Automáticos')
+                                            .toUpperCase() &&
+                                    allAutomaticPrograms.isNotEmpty)
+                                  Column(
+                                    children: [
+                                      Text(
+                                        selectedAutoProgram != null
+                                            ? "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min"
+                                            : allAutomaticPrograms.isNotEmpty
+                                                ? "${formatNumber(allAutomaticPrograms[0]['duracionTotal'] as double)} min"
+                                                : "N/A",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                            SizedBox(width: screenWidth * 0.01),
+                            OutlinedButton(
+                              onPressed: () {},
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.all(10.0),
+                                side: const BorderSide(
+                                    width: 1.0, color: Color(0xFF2be4f3)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                backgroundColor: Colors.transparent,
+                              ),
+                              child: Text(
+                                tr(context, 'Ciclos').toUpperCase(),
+                                style: TextStyle(
+                                  color: const Color(0xFF2be4f3),
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("VIRTUAL TRAINER",
+                                  style: TextStyle(
+                                    color: const Color(0xFF2be4f3),
+                                    fontSize: 15.sp,
+                                  )),
+                              GestureDetector(
+                                onTapDown: (_) =>
+                                    setState(() => scaleFactorTrainer = 0.90),
+                                onTapUp: (_) =>
+                                    setState(() => scaleFactorTrainer = 1.0),
+                                onTap: () {},
+                                child: AnimatedScale(
+                                  scale: scaleFactorTrainer,
+                                  duration: const Duration(milliseconds: 100),
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Center(
+                                      child: SizedBox(
+                                        child: Image.asset(
+                                          height: screenHeight * 0.1,
+                                          'assets/images/virtualtrainer.png',
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: screenWidth * 0.05),
+                          Image.asset(
+                            height: screenHeight * 0.1,
+                            'assets/images/rayoaz.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            Expanded(
+              flex: _isFullScreen ? 1 : 3,
+              child: Padding(
+                padding: EdgeInsets.only(top: _isFullScreen ? 50.0 : 5.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: _isFullScreen ? 1 : 6,
+                      child: Stack(children: [
+                        Row(
+                          children: [
+                            if (selectedIndexEquip == 0) ...[
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (isSessionStarted) ...[
+                                    _buildMuscleRow(
+                                      index: 0,
+                                      imagePathEnabled:
+                                          'assets/images/pec_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/pecazul.png',
+                                      imagePathInactive:
+                                          'assets/images/pec_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 1,
+                                      imagePathEnabled:
+                                          'assets/images/biceps_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/bicepsazul.png',
+                                      imagePathInactive:
+                                          'assets/images/biceps_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 2,
+                                      imagePathEnabled:
+                                          'assets/images/abs_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/absazul.png',
+                                      imagePathInactive:
+                                          'assets/images/abs_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 3,
+                                      imagePathEnabled:
+                                          'assets/images/cua_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/cuazul.png',
+                                      imagePathInactive:
+                                          'assets/images/cua_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 4,
+                                      imagePathEnabled:
+                                          'assets/images/gemelos_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/gemelosazul.png',
+                                      imagePathInactive:
+                                          'assets/images/gemelos_gris.png',
+                                    ),
+                                  ] else if (!isSessionStarted) ...[
+                                    _buildMuscleRow(
+                                      index: 0,
+                                      imagePathEnabled:
+                                          'assets/images/pec_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/pec_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/pec_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 1,
+                                      imagePathEnabled:
+                                          'assets/images/biceps_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/biceps_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/biceps_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 2,
+                                      imagePathEnabled:
+                                          'assets/images/abs_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/abs_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/abs_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 3,
+                                      imagePathEnabled:
+                                          'assets/images/cua_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/cua_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/cua_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 4,
+                                      imagePathEnabled:
+                                          'assets/images/gemelos_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/gemelos_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/gemelos_gris.png',
+                                    ),
+                                  ]
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          // Imagen base del avatar
+                                          Image.asset(
+                                            "assets/images/avatar_frontal.png",
+                                            height: _isFullScreen
+                                                ? screenHeight * 0.65
+                                                : screenHeight * 0.4,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                          if (isSessionStarted) ...[
+                                            if (_isMusculoTrajeInactivo[0]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_pec_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                0]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_pec_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_pecho_azul.png",
+                                                        // Imagen para el estado animado
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[1]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                1]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_naranja.png",
+                                                  // Imagen bloqueada para bíceps
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_biceps_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[2]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                2]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_abs_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[3]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                3]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_cua_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[4]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                4]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_gem_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ] else if (!isSessionStarted) ...[
+                                            if (_isMusculoTrajeInactivo[0]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_pec_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                0]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_pec_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_pec_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[1]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                1]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[2]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                2]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[3]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                3]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[4]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                4]) ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_naranja.png",
+                                                  // Imagen bloqueada para abdominales
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelo_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                          ]
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Image.asset(
+                                                imagePaths[_currentImageIndex]!,
+                                                // Accede al valor en el mapa usando la clave _currentImageIndex
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.25,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              Column(
+                                                children: [
+                                                  // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
+                                                  GestureDetector(
+                                                    onTap: isRunning
+                                                        ? null
+                                                        : () {
+                                                            setState(() {
+                                                              if (time < 30) {
+                                                                // Máximo valor de time es 30
+                                                                time++; // Aumentar el tiempo
+                                                                totalTime = time *
+                                                                    60; // Actualiza el tiempo total en segundos
+                                                                // Calcula el índice de la imagen con el nuevo tiempo
+                                                                _currentImageIndex =
+                                                                    31 - time;
+                                                              }
+                                                            });
+                                                          },
+                                                    child: Image.asset(
+                                                      'assets/images/flecha-arriba.png',
+                                                      height:
+                                                          screenHeight * 0.04,
+                                                      fit: BoxFit.scaleDown,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
+                                                    style: TextStyle(
+                                                      fontSize: 25.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: const Color(
+                                                          0xFF2be4f3), // Color para la sección seleccionada
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: isRunning
+                                                        ? null
+                                                        : () {
+                                                            setState(() {
+                                                              if (time > 1) {
+                                                                // Mínimo valor de time es 1
+                                                                time--; // Disminuir el tiempo
+                                                                totalTime = time *
+                                                                    60; // Actualiza el tiempo total en segundos
+                                                                // Calcula el índice de la imagen con el nuevo tiempo
+                                                                _currentImageIndex =
+                                                                    31 - time;
+                                                              }
+                                                            });
+                                                          },
+                                                    child: Image.asset(
+                                                      'assets/images/flecha-abajo.png',
+                                                      height:
+                                                          screenHeight * 0.04,
+                                                      fit: BoxFit.scaleDown,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: screenHeight * 0.01),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomPaint(
+                                                size: Size(
+                                                  _isFullScreen
+                                                      ? screenWidth * 0.1
+                                                      : screenWidth * 0.1,
+                                                  // Aumentar tamaño si isFullScreen es verdadero
+                                                  _isFullScreen
+                                                      ? screenHeight * 0.03
+                                                      : screenHeight *
+                                                          0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                ),
+                                                painter: LinePainter(
+                                                  progress2:
+                                                      progressContraction,
+                                                  strokeHeight: _isFullScreen
+                                                      ? 20
+                                                      : 15, // Aumentar altura si isFullScreen es verdadero
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: _isFullScreen
+                                                    ? screenWidth * 0.01
+                                                    : screenWidth *
+                                                        0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                              ),
+                                              Text(
+                                                valueContraction
+                                                    .toString()
+                                                    .padLeft(1, '0'),
+                                                style: TextStyle(
+                                                  fontSize: _isFullScreen
+                                                      ? 25.sp
+                                                      : 20.sp,
+                                                  // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.lightGreenAccent
+                                                      .shade400,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomPaint(
+                                                size: Size(
+                                                  _isFullScreen
+                                                      ? screenWidth * 0.1
+                                                      : screenWidth * 0.1,
+                                                  // Aumentar tamaño si isFullScreen es verdadero
+                                                  _isFullScreen
+                                                      ? screenHeight * 0.03
+                                                      : screenHeight *
+                                                          0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                ),
+                                                painter: LinePainter2(
+                                                  progress3: progressPause,
+                                                  strokeHeight: _isFullScreen
+                                                      ? 20
+                                                      : 15, // Aumentar altura si isFullScreen es verdadero
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: _isFullScreen
+                                                    ? screenWidth * 0.01
+                                                    : screenWidth *
+                                                        0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                              ),
+                                              Text(
+                                                valuePause
+                                                    .toString()
+                                                    .padLeft(1, '0'),
+                                                style: TextStyle(
+                                                  fontSize: _isFullScreen
+                                                      ? 25.sp
+                                                      : 20.sp,
+                                                  // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: _isFullScreen
+                                                ? screenHeight * 0.02
+                                                : screenHeight *
+                                                    0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                          ),
+                                          Column(
+                                            children: [
+                                              Text(
+                                                "AVERAGE",
+                                                style: TextStyle(
+                                                  fontSize: _isFullScreen
+                                                      ? 23.sp
+                                                      : 18.sp,
+                                                  // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                  fontWeight: FontWeight.bold,
+                                                  color:
+                                                      const Color(0xFF2be4f3),
+                                                ),
+                                              ),
+                                              CustomPaint(
+                                                size: Size(
+                                                  _isFullScreen
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth * 0.15,
+                                                  // Aumentar tamaño si isFullScreen es verdadero
+                                                  _isFullScreen
+                                                      ? screenHeight * 0.05
+                                                      : screenHeight *
+                                                          0.05, // Aumentar tamaño si isFullScreen es verdadero
+                                                ),
+                                                painter:
+                                                    AverageLineWithTextPainter(
+                                                  average: 100.0 / 100.0,
+                                                  strokeHeight: _isFullScreen
+                                                      ? screenHeight * 0.03
+                                                      : screenHeight * 0.02,
+                                                  // Aumentar altura si isFullScreen es verdadero
+                                                  textStyle: TextStyle(
+                                                    fontSize: _isFullScreen
+                                                        ? 23.sp
+                                                        : 18.sp,
+                                                    // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                    fontWeight: FontWeight.bold,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          // Imagen base del avatar
+                                          Image.asset(
+                                            "assets/images/avatar_post.png",
+                                            height: _isFullScreen
+                                                ? screenHeight * 0.65
+                                                : screenHeight * 0.4,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                          if (isSessionStarted) ...[
+                                            if (_isMusculoTrajeInactivo[5]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_trap_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                5]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_trap_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_trap_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[6]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_dorsal_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                6]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_dorsal_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_dorsal_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[7]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_gris.png",
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                7]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_lumbar_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[8]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gluteos_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                8]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gluteo_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_gluteo_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[9]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                9]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_isquio_azul.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ] else if (!isSessionStarted) ...[
+                                            if (_isMusculoTrajeInactivo[5]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_trap_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                5]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_trap_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_trap_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[6]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_dorsal_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                6]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_dorsal_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_dorsal_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[7]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                7]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[8]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gluteos_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                8]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gluteo_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_gluteo_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoTrajeInactivo[9]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_gris.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoTrajeBloqueado[
+                                                9]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_naranja.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                          ]
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: screenHeight * 0.02),
+                                  Row(
+                                    children: [
+                                      // Botón "Menos"
+                                      CustomIconButton(
+                                        onTap: selectedKey == null
+                                            ? null // Si selectedKey es null, el botón estará deshabilitado
+                                            : () {
+                                                setState(() {
+                                                  // Disminuir el porcentaje de los músculos que no están bloqueados ni inactivos
+                                                  for (int i = 0;
+                                                      i <
+                                                          _isMusculoTrajeBloqueado
+                                                              .length;
+                                                      i++) {
+                                                    if (!_isMusculoTrajeBloqueado[
+                                                            i] &&
+                                                        !_isMusculoTrajeInactivo[
+                                                            i]) {
+                                                      porcentajesMusculoTraje[
+                                                              i] =
+                                                          (porcentajesMusculoTraje[
+                                                                      i] -
+                                                                  1)
+                                                              .clamp(0, 100);
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                        imagePath: 'assets/images/menos.png',
+                                        size: screenHeight * 0.1,
+                                      ),
+
+                                      SizedBox(width: screenWidth * 0.01),
+                                      // Botón de control de sesión (Reproducir/Pausar)
+                                      GestureDetector(
+                                        onTap: selectedKey == null
+                                            ? null // Si selectedKey es null, el botón estará deshabilitado
+                                            : () {
+                                                setState(() {
+                                                  if (isRunning) {
+                                                    // Pausa el temporizador si está corriendo
+                                                    _pauseTimer();
+                                                  } else {
+                                                    // Inicia o reanuda el temporizador si está pausado
+                                                    _startTimer();
+                                                  }
+                                                  isSessionStarted =
+                                                      !isSessionStarted;
+                                                  debugPrint(
+                                                      'isSessionStarted: $isSessionStarted');
+                                                });
+                                              },
+                                        child: SizedBox(
+                                          child: ClipOval(
+                                            child: Image.asset(
+                                              height: screenHeight * 0.15,
+                                              'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
+                                              fit: BoxFit.scaleDown,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: screenWidth * 0.01),
+
+                                      CustomIconButton(
+                                        onTap: selectedKey == null
+                                            ? null // Si selectedKey es null, el botón estará deshabilitado
+                                            : () {
+                                                setState(() {
+                                                  // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
+                                                  for (int i = 0;
+                                                      i <
+                                                          _isMusculoTrajeBloqueado
+                                                              .length;
+                                                      i++) {
+                                                    if (!_isMusculoTrajeBloqueado[
+                                                            i] &&
+                                                        !_isMusculoTrajeInactivo[
+                                                            i]) {
+                                                      porcentajesMusculoTraje[
+                                                              i] =
+                                                          (porcentajesMusculoTraje[
+                                                                      i] +
+                                                                  1)
+                                                              .clamp(0, 100);
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                        imagePath: 'assets/images/mas.png',
+                                        size: screenHeight * 0.1,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (isSessionStarted) ...[
+                                    _buildMuscleRow(
+                                      index: 5,
+                                      imagePathEnabled:
+                                          'assets/images/trap_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/trapazul.png',
+                                      imagePathInactive:
+                                          'assets/images/trap_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 6,
+                                      imagePathEnabled:
+                                          'assets/images/dorsal_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/dorsalazul.png',
+                                      imagePathInactive:
+                                          'assets/images/dorsal_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 7,
+                                      imagePathEnabled:
+                                          'assets/images/lumbar_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/lumbarazul.png',
+                                      imagePathInactive:
+                                          'assets/images/lumbar_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 8,
+                                      imagePathEnabled:
+                                          'assets/images/gluteo_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/gluteoazul.png',
+                                      imagePathInactive:
+                                          'assets/images/gluteo_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 9,
+                                      imagePathEnabled:
+                                          'assets/images/isquio_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/isquioazul.png',
+                                      imagePathInactive:
+                                          'assets/images/isquio_gris.png',
+                                    ),
+                                  ] else if (!isSessionStarted) ...[
+                                    _buildMuscleRow(
+                                      index: 5,
+                                      imagePathEnabled:
+                                          'assets/images/trap_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/trap_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/trap_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 6,
+                                      imagePathEnabled:
+                                          'assets/images/dorsal_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/dorsal_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/dorsal_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 7,
+                                      imagePathEnabled:
+                                          'assets/images/lumbar_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/lumbar_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/lumbar_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 8,
+                                      imagePathEnabled:
+                                          'assets/images/gluteo_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/gluteo_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/gluteo_gris.png',
+                                    ),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow(
+                                      index: 9,
+                                      imagePathEnabled:
+                                          'assets/images/isquio_naranja.png',
+                                      imagePathDisabled:
+                                          'assets/images/isquio_blanco.png',
+                                      imagePathInactive:
+                                          'assets/images/isquio_gris.png',
+                                    ),
+                                  ]
+                                ],
+                              ),
+                            ] else if (selectedIndexEquip == 1) ...[
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (isSessionStarted) ...[
+                                    _buildMuscleRow2(
+                                        index: 0,
+                                        imagePathEnabled:
+                                            'assets/images/biceps_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/bicepsazul.png',
+                                        imagePathInactive:
+                                            'assets/images/biceps_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 1,
+                                        imagePathEnabled:
+                                            'assets/images/abs_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/absazul.png',
+                                        imagePathInactive:
+                                            'assets/images/abs_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 2,
+                                        imagePathEnabled:
+                                            'assets/images/cua_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/cuazul.png',
+                                        imagePathInactive:
+                                            'assets/images/cua_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 3,
+                                        imagePathEnabled:
+                                            'assets/images/gemelos_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gemelosazul.png',
+                                        imagePathInactive:
+                                            'assets/images/gemelos_gris.png'),
+                                  ] else if (!isSessionStarted) ...[
+                                    _buildMuscleRow2(
+                                        index: 0,
+                                        imagePathEnabled:
+                                            'assets/images/biceps_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/biceps_blanco_pantalon.png',
+                                        imagePathInactive:
+                                            'assets/images/biceps_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 1,
+                                        imagePathEnabled:
+                                            'assets/images/abs_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/abs_blanco.png',
+                                        imagePathInactive:
+                                            'assets/images/abs_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 2,
+                                        imagePathEnabled:
+                                            'assets/images/cua_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/cua_blanco_pantalon.png',
+                                        imagePathInactive:
+                                            'assets/images/cua_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 3,
+                                        imagePathEnabled:
+                                            'assets/images/gemelos_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gemelo_blanco_pantalon.png',
+                                        imagePathInactive:
+                                            'assets/images/gemelos_gris.png'),
+                                  ]
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          // Imagen base del avatar
+                                          Image.asset(
+                                            "assets/images/pantalon_frontal.png",
+                                            height: _isFullScreen
+                                                ? screenHeight * 0.65
+                                                : screenHeight * 0.4,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                          if (isSessionStarted) ...[
+                                            if (_isMusculoPantalonInactivo[
+                                                0]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                0]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_biceps_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                1]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_inf_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_sup_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                1]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_inf_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_sup_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_abs_inf_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_abs_sup_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                2]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                2]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_cua_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                3]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                3]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_gem_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ] else if (!isSessionStarted) ...[
+                                            if (_isMusculoPantalonInactivo[
+                                                0]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                0]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_biceps_blanco_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                1]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_inf_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_sup_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                1]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_inf_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_sup_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_inf_blanco.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_abs_sup_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                2]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                2]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_cua_blanco_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                3]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                3]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gemelos_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_gem_blanco_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                          ]
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Image.asset(
+                                                imagePaths[_currentImageIndex]!,
+                                                // Accede al valor en el mapa usando la clave _currentImageIndex
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.25,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              Column(
+                                                children: [
+                                                  // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
+                                                  GestureDetector(
+                                                    onTap: isRunning
+                                                        ? null
+                                                        : () {
+                                                            setState(() {
+                                                              if (time < 30) {
+                                                                // Máximo valor de time es 30
+                                                                time++; // Aumentar el tiempo
+                                                                totalTime = time *
+                                                                    60; // Actualiza el tiempo total en segundos
+                                                                // Calcula el índice de la imagen con el nuevo tiempo
+                                                                _currentImageIndex =
+                                                                    31 - time;
+                                                              }
+                                                            });
+                                                          },
+                                                    child: Image.asset(
+                                                      'assets/images/flecha-arriba.png',
+                                                      height:
+                                                          screenHeight * 0.04,
+                                                      fit: BoxFit.scaleDown,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${time.toString().padLeft(2, '0')}:${seconds.toInt().toString().padLeft(2, '0')}",
+                                                    style: TextStyle(
+                                                      fontSize: 25.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: const Color(
+                                                          0xFF2be4f3), // Color para la sección seleccionada
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: isRunning
+                                                        ? null
+                                                        : () {
+                                                            setState(() {
+                                                              if (time > 1) {
+                                                                // Mínimo valor de time es 1
+                                                                time--; // Disminuir el tiempo
+                                                                totalTime = time *
+                                                                    60; // Actualiza el tiempo total en segundos
+                                                                // Calcula el índice de la imagen con el nuevo tiempo
+                                                                _currentImageIndex =
+                                                                    31 - time;
+                                                              }
+                                                            });
+                                                          },
+                                                    child: Image.asset(
+                                                      'assets/images/flecha-abajo.png',
+                                                      height:
+                                                          screenHeight * 0.04,
+                                                      fit: BoxFit.scaleDown,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: screenHeight * 0.01),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomPaint(
+                                                size: Size(
+                                                  _isFullScreen
+                                                      ? screenWidth * 0.1
+                                                      : screenWidth * 0.1,
+                                                  // Aumentar tamaño si isFullScreen es verdadero
+                                                  _isFullScreen
+                                                      ? screenHeight * 0.03
+                                                      : screenHeight *
+                                                          0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                ),
+                                                painter: LinePainter(
+                                                  progress2:
+                                                      progressContraction,
+                                                  strokeHeight: _isFullScreen
+                                                      ? 20
+                                                      : 15, // Aumentar altura si isFullScreen es verdadero
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: _isFullScreen
+                                                    ? screenWidth * 0.01
+                                                    : screenWidth *
+                                                        0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                              ),
+                                              Text(
+                                                valueContraction
+                                                    .toString()
+                                                    .padLeft(1, '0'),
+                                                style: TextStyle(
+                                                  fontSize: _isFullScreen
+                                                      ? 25.sp
+                                                      : 20.sp,
+                                                  // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.lightGreenAccent
+                                                      .shade400,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomPaint(
+                                                size: Size(
+                                                  _isFullScreen
+                                                      ? screenWidth * 0.1
+                                                      : screenWidth * 0.1,
+                                                  // Aumentar tamaño si isFullScreen es verdadero
+                                                  _isFullScreen
+                                                      ? screenHeight * 0.03
+                                                      : screenHeight *
+                                                          0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                ),
+                                                painter: LinePainter2(
+                                                  progress3: progressPause,
+                                                  strokeHeight: _isFullScreen
+                                                      ? 20
+                                                      : 15, // Aumentar altura si isFullScreen es verdadero
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: _isFullScreen
+                                                    ? screenWidth * 0.01
+                                                    : screenWidth *
+                                                        0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                              ),
+                                              Text(
+                                                valuePause
+                                                    .toString()
+                                                    .padLeft(1, '0'),
+                                                style: TextStyle(
+                                                  fontSize: _isFullScreen
+                                                      ? 25.sp
+                                                      : 20.sp,
+                                                  // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: _isFullScreen
+                                                ? screenHeight * 0.02
+                                                : screenHeight *
+                                                    0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                          ),
+                                          Column(
+                                            children: [
+                                              Text(
+                                                "AVERAGE",
+                                                style: TextStyle(
+                                                  fontSize: _isFullScreen
+                                                      ? 23.sp
+                                                      : 18.sp,
+                                                  // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                  fontWeight: FontWeight.bold,
+                                                  color:
+                                                      const Color(0xFF2be4f3),
+                                                ),
+                                              ),
+                                              CustomPaint(
+                                                size: Size(
+                                                  _isFullScreen
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth * 0.15,
+                                                  // Aumentar tamaño si isFullScreen es verdadero
+                                                  _isFullScreen
+                                                      ? screenHeight * 0.05
+                                                      : screenHeight *
+                                                          0.05, // Aumentar tamaño si isFullScreen es verdadero
+                                                ),
+                                                painter:
+                                                    AverageLineWithTextPainter(
+                                                  average: 100.0 / 100.0,
+                                                  strokeHeight: _isFullScreen
+                                                      ? screenHeight * 0.03
+                                                      : screenHeight * 0.02,
+                                                  // Aumentar altura si isFullScreen es verdadero
+                                                  textStyle: TextStyle(
+                                                    fontSize: _isFullScreen
+                                                        ? 23.sp
+                                                        : 18.sp,
+                                                    // Aumentar tamaño de fuente si isFullScreen es verdadero
+                                                    fontWeight: FontWeight.bold,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          // Imagen base del avatar
+                                          Image.asset(
+                                            "assets/images/pantalon_posterior.png",
+                                            height: _isFullScreen
+                                                ? screenHeight * 0.65
+                                                : screenHeight * 0.4,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          // Superposición de imágenes si `musculosTrajeSelected` es verdadero
+                                          if (isSessionStarted) ...[
+                                            if (_isMusculoPantalonInactivo[
+                                                4]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                4]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_lumbar_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                5]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_sup_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_inf_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                5]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_sup_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_inf_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_glut_inf_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_glut_sup_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                6]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                6]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              // Si el músculo no está bloqueado, muestra la capa animada
+                                              Positioned(
+                                                top: 0,
+                                                child: AnimatedBuilder(
+                                                  animation: _opacityAnimation,
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity: _opacityAnimation
+                                                          .value,
+                                                      child: Image.asset(
+                                                        "assets/images/capa_isquio_azul_pantalon.png",
+                                                        height: _isFullScreen
+                                                            ? screenHeight *
+                                                                0.65
+                                                            : screenHeight *
+                                                                0.4,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ] else if (!isSessionStarted) ...[
+                                            if (_isMusculoPantalonInactivo[
+                                                4]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                4]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_lumbar_blanco_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                5]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_sup_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_inf_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                5]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_sup_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_inf_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_sup_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_glut_inf_blanco.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                            if (_isMusculoPantalonInactivo[
+                                                6]) ...[
+                                              // Si el músculo está inactivo, muestra otra capa
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_gris_pantalon.png",
+                                                  // Imagen para el estado inactivo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else if (_isMusculoPantalonBloqueado[
+                                                6]) ...[
+                                              // Si el músculo está bloqueado, muestra la capa estática bloqueada
+                                              Positioned(
+                                                top: 0,
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_naranja_pantalon.png",
+                                                  // Imagen para el estado bloqueado
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ] else ...[
+                                              Positioned(
+                                                top: 0,
+                                                // Ajusta la posición de la superposición
+                                                child: Image.asset(
+                                                  "assets/images/capa_isquio_blanco_pantalon.png",
+                                                  // Reemplaza con la ruta de la imagen del músculo
+                                                  height: _isFullScreen
+                                                      ? screenHeight * 0.65
+                                                      : screenHeight * 0.4,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                          ]
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: screenHeight * 0.02),
+                                  Row(
+                                    children: [
+                                      // Botón "Menos"
+                                      CustomIconButton(
+                                        onTap: selectedKey == null
+                                            ? null // Si selectedKey es null, el botón estará deshabilitado
+                                            : () {
+                                                setState(() {
+                                                  // Disminuir el porcentaje de los músculos no bloqueados
+                                                  for (int i = 0;
+                                                      i <
+                                                          _isMusculoPantalonBloqueado
+                                                              .length;
+                                                      i++) {
+                                                    if (!_isMusculoPantalonBloqueado[
+                                                            i] &&
+                                                        !_isMusculoPantalonInactivo[
+                                                            i]) {
+                                                      porcentajesMusculoPantalon[
+                                                              i] =
+                                                          (porcentajesMusculoPantalon[
+                                                                      i] -
+                                                                  1)
+                                                              .clamp(0, 100);
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                        imagePath: 'assets/images/menos.png',
+                                        size: screenHeight * 0.1,
+                                      ),
+                                      SizedBox(width: screenWidth * 0.01),
+
+                                      // Botón de control de sesión (Reproducir/Pausar)
+                                      GestureDetector(
+                                        onTap: selectedKey == null
+                                            ? null // Si selectedKey es null, el botón estará deshabilitado
+                                            : () {
+                                                setState(() {
+                                                  if (isRunning) {
+                                                    // Pausa el temporizador si está corriendo
+                                                    _pauseTimer();
+                                                  } else {
+                                                    // Inicia o reanuda el temporizador si está pausado
+                                                    _startTimer();
+                                                  }
+                                                  isSessionStarted =
+                                                      !isSessionStarted;
+                                                  debugPrint(
+                                                      'isSessionStarted: $isSessionStarted');
+                                                });
+                                              },
+                                        child: SizedBox(
+                                          child: ClipOval(
+                                            child: Image.asset(
+                                              height: screenHeight * 0.15,
+                                              'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
+                                              fit: BoxFit.scaleDown,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: screenWidth * 0.01),
+
+                                      // Botón "Más"
+                                      CustomIconButton(
+                                        onTap: selectedKey == null
+                                            ? null // Si selectedKey es null, el botón estará deshabilitado
+                                            : () {
+                                                setState(() {
+                                                  // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
+                                                  for (int i = 0;
+                                                      i <
+                                                          _isMusculoPantalonBloqueado
+                                                              .length;
+                                                      i++) {
+                                                    if (!_isMusculoPantalonBloqueado[
+                                                            i] &&
+                                                        !_isMusculoPantalonInactivo[
+                                                            i]) {
+                                                      porcentajesMusculoPantalon[
+                                                              i] =
+                                                          (porcentajesMusculoPantalon[
+                                                                      i] +
+                                                                  1)
+                                                              .clamp(0, 100);
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                        imagePath: 'assets/images/mas.png',
+                                        size: screenHeight * 0.1,
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (isSessionStarted) ...[
+                                    _buildMuscleRow2(
+                                        index: 4,
+                                        imagePathEnabled:
+                                            'assets/images/lumbar_naranja_pantalon.png',
+                                        imagePathDisabled:
+                                            'assets/images/lumbar_pantalon_azul.png',
+                                        imagePathInactive:
+                                            'assets/images/lumbar_gris_pantalon.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 5,
+                                        imagePathEnabled:
+                                            'assets/images/gluteo_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gluteoazul.png',
+                                        imagePathInactive:
+                                            'assets/images/gluteo_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 6,
+                                        imagePathEnabled:
+                                            'assets/images/isquio_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/isquioazul.png',
+                                        imagePathInactive:
+                                            'assets/images/isquio_gris.png'),
+                                  ] else if (!isSessionStarted) ...[
+                                    _buildMuscleRow2(
+                                        index: 4,
+                                        imagePathEnabled:
+                                            'assets/images/lumbar_naranja_pantalon.png',
+                                        imagePathDisabled:
+                                            'assets/images/lumbar_blanco_pantalon.png',
+                                        imagePathInactive:
+                                            'assets/images/lumbar_gris_pantalon.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 5,
+                                        imagePathEnabled:
+                                            'assets/images/gluteo_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/gluteo_blanco.png',
+                                        imagePathInactive:
+                                            'assets/images/gluteo_gris.png'),
+                                    SizedBox(height: screenHeight * 0.005),
+                                    _buildMuscleRow2(
+                                        index: 6,
+                                        imagePathEnabled:
+                                            'assets/images/isquio_naranja.png',
+                                        imagePathDisabled:
+                                            'assets/images/isquio_blanco_pantalon.png',
+                                        imagePathInactive:
+                                            'assets/images/isquio_gris.png'),
+                                  ]
+                                ],
+                              ),
+                            ]
+                          ],
+                        ),
+                        if (_isFullScreen)
+                          Positioned(
+                            bottom: 0,
+                            // Distancia desde el borde superior
+                            right: 0,
+                            // Distancia desde el borde derecho
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isFullScreen =
+                                      false; // Cambia el estado para ocultar este botón
+                                });
+                              },
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/fullscreen.png',
+                                  width: screenWidth * 0.08,
+                                  // Ajusta el tamaño según sea necesario
+                                  height: screenHeight * 0.08,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ]),
+                    ),
+                    if (!_isFullScreen)
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Primera sección (con las imágenes y el diseño de la primera parte)
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      // Contenedor para las imágenes flizquierda alineadas a la derecha
+                                      Expanded(
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          // Alineación hacia la derecha
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _isExpanded2 =
+                                                    !_isExpanded2; // Cambia el estado de expansión
+                                                rotationAngle2 = _isExpanded2
+                                                    ? 3.14159
+                                                    : 0.0; // Flecha rota 180 grados
+                                              });
+                                            },
+                                            child: AnimatedRotation(
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              turns: rotationAngle2 /
+                                                  (2 * 3.14159),
+                                              child: SizedBox(
+                                                height: screenHeight * 0.15,
+                                                child: ClipOval(
+                                                  child: Image.asset(
+                                                    'assets/images/flizquierda.png',
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: screenWidth * 0.01),
+                                      AnimatedSize(
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10.0),
+                                          width: _isExpanded2
+                                              ? screenWidth * 0.2
+                                              : 0,
+                                          height: screenHeight * 0.2,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                          child: const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  Row(
+                                    children: [
+                                      // Contenedor para las imágenes flizquierda alineadas a la derecha
+                                      Expanded(
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          // Alineación hacia la derecha
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _isExpanded3 =
+                                                    !_isExpanded3; // Cambia el estado de expansión
+                                                rotationAngle3 = _isExpanded3
+                                                    ? 3.14159
+                                                    : 0.0; // Flecha rota 180 grados
+                                              });
+                                            },
+                                            child: AnimatedRotation(
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              turns: rotationAngle3 /
+                                                  (2 * 3.14159),
+                                              child: SizedBox(
+                                                height: screenHeight * 0.15,
+                                                child: ClipOval(
+                                                  child: Image.asset(
+                                                    'assets/images/flizquierda.png',
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: screenWidth * 0.01),
+                                      AnimatedSize(
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10.0),
+                                          width: _isExpanded3
+                                              ? screenWidth * 0.2
+                                              : 0,
+                                          height: screenHeight * 0.25,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              buildControlRow(
+                                                value: valueContraction,
+                                                // Valor de la contracción
+                                                imagePathIncrement:
+                                                    'assets/images/mas.png',
+                                                // Imagen del botón de "Más"
+                                                imagePathDecrement:
+                                                    'assets/images/menos.png',
+                                                // Imagen del botón de "Menos"
+                                                imagePathDisplay:
+                                                    'assets/images/CONTRACCION.png',
+                                                // Imagen que se muestra (Contracción)
+                                                onIncrement: () {
+                                                  setState(() {
+                                                    valueContraction +=
+                                                        1.0; // Lógica de incremento
+                                                  });
+                                                },
+                                                onDecrement: () {
+                                                  setState(() {
+                                                    if (valueContraction > 0) {
+                                                      valueContraction -=
+                                                          1.0; // Lógica de decremento
+                                                    }
+                                                  });
+                                                },
+                                                suffix: " S",
+                                                // Sufijo para mostrar en el texto
+                                                screenWidth: screenWidth,
+                                                // Ancho de pantalla
+                                                screenHeight:
+                                                    screenHeight, // Altura de pantalla
+                                              ),
+                                              SizedBox(
+                                                  height: screenHeight * 0.02),
+                                              buildControlRow(
+                                                value: valuePause,
+                                                // Valor de pausa
+                                                imagePathIncrement:
+                                                    'assets/images/mas.png',
+                                                // Imagen del botón de "Más"
+                                                imagePathDecrement:
+                                                    'assets/images/menos.png',
+                                                // Imagen del botón de "Menos"
+                                                imagePathDisplay:
+                                                    'assets/images/PAUSA.png',
+                                                // Imagen que se muestra (Pausa)
+                                                onIncrement: () {
+                                                  setState(() {
+                                                    valuePause +=
+                                                        1.0; // Lógica de incremento
+                                                  });
+                                                },
+                                                onDecrement: () {
+                                                  setState(() {
+                                                    if (valuePause > 0) {
+                                                      valuePause -=
+                                                          1.0; // Lógica de decremento
+                                                    }
+                                                  });
+                                                },
+                                                suffix: " S",
+                                                // Sufijo para mostrar en el texto
+                                                screenWidth: screenWidth,
+                                                // Ancho de pantalla
+                                                screenHeight:
+                                                    screenHeight, // Altura de pantalla
+                                              ),
+                                              SizedBox(
+                                                  height: screenHeight * 0.02),
+                                              buildControlRow(
+                                                value: valueRampa,
+                                                // Valor de pausa
+                                                imagePathIncrement:
+                                                    'assets/images/mas.png',
+                                                // Imagen del botón de "Más"
+                                                imagePathDecrement:
+                                                    'assets/images/menos.png',
+                                                // Imagen del botón de "Menos"
+                                                imagePathDisplay:
+                                                    'assets/images/RAMPA.png',
+                                                // Imagen que se muestra (Pausa)
+                                                onIncrement: () {
+                                                  setState(() {
+                                                    valueRampa +=
+                                                        1.0; // Lógica de incremento
+                                                  });
+                                                },
+                                                onDecrement: () {
+                                                  setState(() {
+                                                    if (valueRampa > 0) {
+                                                      valueRampa -=
+                                                          1.0; // Lógica de decremento
+                                                    }
+                                                  });
+                                                },
+                                                suffix: " S",
+                                                // Sufijo para mostrar en el texto
+                                                screenWidth: screenWidth,
+                                                // Ancho de pantalla
+                                                screenHeight:
+                                                    screenHeight, // Altura de pantalla
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Usamos Expanded para que ocupe el espacio disponible
+                            Expanded(
+                              child: Stack(
+                                children: [
+                                  // Aquí puedes poner otros widgets dentro del Stack si lo necesitas
+                                  Positioned(
+                                    bottom: 0,
+                                    left: screenWidth * 0.02,
+                                    child: GestureDetector(
+                                      onTapDown: (_) => setState(
+                                          () => scaleFactorReset = 0.90),
+                                      onTapUp: (_) => setState(
+                                          () => scaleFactorReset = 1.0),
+                                      onTap: () {
+                                        _resetScreen(context);
+                                      },
+                                      child: AnimatedScale(
+                                        scale: scaleFactorReset,
+                                        duration:
+                                            const Duration(milliseconds: 100),
+                                        child: SizedBox(
+                                          child: ClipOval(
+                                            child: Image.asset(
+                                              'assets/images/RESET.png',
+                                              width: screenWidth * 0.1,
+                                              height: screenHeight * 0.1,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Aquí está la imagen de fullscreen en la esquina
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTapDown: (_) => setState(
+                                          () => scaleFactorFull = 0.90),
+                                      onTapUp: (_) =>
+                                          setState(() => scaleFactorFull = 1.0),
+                                      onTap: () {
+                                        setState(() {
+                                          _isFullScreen =
+                                              !_isFullScreen; // Cambia el estado de pantalla completa
+                                        });
+                                      },
+                                      child: AnimatedScale(
+                                        scale: scaleFactorFull,
+                                        duration:
+                                            const Duration(milliseconds: 100),
+                                        child: ClipOval(
+                                          child: Image.asset(
+                                            'assets/images/fullscreen.png',
+                                            width: screenWidth * 0.08,
+                                            height: screenHeight * 0.08,
+                                            fit: BoxFit.scaleDown,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                  ],
+                ),
+              ),
+            )
+          ])),
+    );
+  }
+
   Widget _buildMuscleRow({
     required int index,
     required String imagePathEnabled,
     required String imagePathDisabled,
-    required String imagePathInactive, // Imagen inactiva propia para cada fila
+    required String imagePathInactive,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -6492,24 +5738,22 @@ class _PanelViewState extends State<PanelView>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           decoration: BoxDecoration(
-            color:
-                _isMusculoTrajeInactivo[index] // Si está inactivo, color gris
-                    ? Colors.grey.withOpacity(0.5) // Color gris cuando inactivo
-                    : _isMusculoTrajeBloqueado[
-                            index] // Si está bloqueado, color naranja
-                        ? const Color(0xFFFFA500).withOpacity(0.3)
-                        : Colors.transparent,
-            borderRadius: BorderRadius.circular(7.0), // Redondea las esquinas
+            color: _isMusculoTrajeInactivo[index]
+                ? Colors.grey.withOpacity(0.5) // Gris si está inactivo
+                : _isMusculoTrajeBloqueado[index]
+                    ? const Color(0xFFFFA500)
+                        .withOpacity(0.3) // Naranja si está bloqueado
+                    : Colors.transparent,
+            borderRadius: BorderRadius.circular(7.0),
           ),
           child: Row(
             children: [
               // Botón "Más"
               CustomIconButton(
                 onTap: selectedKey == null
-                    ? null // Si selectedKey es null, el botón estará deshabilitado
+                    ? null
                     : () {
                         setState(() {
-                          // Si no está bloqueado ni inactivo, se puede aumentar el contador
                           if (!_isMusculoTrajeBloqueado[index] &&
                               !_isMusculoTrajeInactivo[index]) {
                             porcentajesMusculoTraje[index] =
@@ -6540,10 +5784,8 @@ class _PanelViewState extends State<PanelView>
                     onLongPress: () {
                       setState(() {
                         if (_isMusculoTrajeBloqueado[index]) {
-                          // Cambiar el estado de bloqueado a desbloqueado
                           _isMusculoTrajeBloqueado[index] = false;
                         }
-                        // Cambiar el estado de inactivo
                         _isMusculoTrajeInactivo[index] =
                             !_isMusculoTrajeInactivo[index];
                       });
@@ -6553,21 +5795,36 @@ class _PanelViewState extends State<PanelView>
                       height: _isFullScreen ? 80.0 : 65.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        // Redondear la imagen
-                        child: Image.asset(
-                          // Lógica de selección de la imagen
-                          _isMusculoTrajeBloqueado[index]
-                              ? imagePathEnabled // Si está bloqueado, mostrar la imagen de estado activo
-                              : (_isMusculoTrajeInactivo[
-                                      index] // Si está inactivo
-                                  ? imagePathInactive // Mostrar la imagen inactiva
-                                  : imagePathDisabled), // Si está deshabilitado
-                          fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            // Capa de color sobre la imagen, que cambia de color según el porcentaje
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle, // Forma circular
+                                  color: _getColorForPercentage(
+                                      porcentajesMusculoTraje[index],
+                                      isRunning,
+                                      index),
+                                ),
+                              ),
+                            ),
+                            // Imagen sobre la capa de color
+                            Image.asset(
+                              // Lógica de selección de la imagen
+                              _isMusculoTrajeBloqueado[index]
+                                  ? imagePathEnabled // Si está bloqueado, mostrar la imagen de estado activo
+                                  : (_isMusculoTrajeInactivo[index]
+                                      ? imagePathInactive // Mostrar la imagen inactiva si está inactivo
+                                      : imagePathDisabled),
+                              // Mostrar la imagen deshabilitada
+                              fit: BoxFit.cover,
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  // Texto que muestra el porcentaje
                   Text(
                     '${porcentajesMusculoTraje[index]}%',
                     style: TextStyle(
@@ -6583,7 +5840,7 @@ class _PanelViewState extends State<PanelView>
               // Botón "Menos"
               CustomIconButton(
                 onTap: selectedKey == null
-                    ? null // Si selectedKey es null, el botón estará deshabilitado
+                    ? null
                     : () {
                         setState(() {
                           if (!_isMusculoTrajeBloqueado[index] &&
@@ -6606,6 +5863,27 @@ class _PanelViewState extends State<PanelView>
     );
   }
 
+  Color _getColorForPercentage(int percentage, bool isRunning, int index) {
+    if (!isRunning) {
+      return Colors.transparent; // Si no está en ejecución, no se muestra color
+    }
+
+    // Obtiene los umbrales de porcentaje del grupo muscular correspondiente
+    List<int> umbrales = porcentajesPorGrupoTraje[index];
+
+    // Compara el porcentaje con los umbrales del grupo muscular
+    if (percentage >= umbrales[3]) {
+      return Colors.red.withOpacity(0.6); // Rojo con opacidad del 60%
+    } else if (percentage >= umbrales[2]) {
+      return Colors.yellow.withOpacity(0.6); // Amarillo con opacidad del 60%
+    } else if (percentage >= umbrales[1]) {
+      return Colors.lightGreenAccent
+          .withOpacity(0.6); // Verde claro con opacidad del 60%
+    } else {
+      return Colors.green.withOpacity(0.6); // Verde con opacidad del 60%
+    }
+  }
+
   Widget _buildMuscleRow2({
     required int index,
     required String imagePathEnabled,
@@ -6618,12 +5896,11 @@ class _PanelViewState extends State<PanelView>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           decoration: BoxDecoration(
-            color: _isMusculoPantalonInactivo[
-                    index] // Si está inactivo, color gris
-                ? Colors.grey.withOpacity(0.3) // Color gris cuando inactivo
-                : _isMusculoPantalonBloqueado[
-                        index] // Si está bloqueado, color naranja
-                    ? const Color(0xFFFFA500).withOpacity(0.3)
+            color: _isMusculoPantalonInactivo[index]
+                ? Colors.grey.withOpacity(0.3) // Si está inactivo, color gris
+                : _isMusculoPantalonBloqueado[index]
+                    ? const Color(0xFFFFA500)
+                        .withOpacity(0.3) // Si está bloqueado, color naranja
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(7.0), // Redondea las esquinas
           ),
@@ -6635,7 +5912,6 @@ class _PanelViewState extends State<PanelView>
                     ? null // Si selectedKey es null, el botón estará deshabilitado
                     : () {
                         setState(() {
-                          // Si no está bloqueado ni inactivo, se puede aumentar el contador
                           if (!_isMusculoPantalonBloqueado[index] &&
                               !_isMusculoPantalonInactivo[index]) {
                             porcentajesMusculoPantalon[index] =
@@ -6679,15 +5955,33 @@ class _PanelViewState extends State<PanelView>
                       height: _isFullScreen ? 80.0 : 60.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          // Lógica de selección de la imagen
-                          _isMusculoPantalonBloqueado[index]
-                              ? imagePathEnabled // Si está bloqueado, mostrar la imagen de estado activo
-                              : (_isMusculoPantalonInactivo[
-                                      index] // Si está inactivo
-                                  ? imagePathInactive // Mostrar la imagen inactiva
-                                  : imagePathDisabled), // Si está deshabilitado
-                          fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle, // Forma circular
+                                  color: _isMusculoPantalonInactivo[index]
+                                      ? Colors
+                                          .transparent // Si está inactivo, color transparente
+                                      : _getColorForPercentagePantalon(
+                                          porcentajesMusculoPantalon[index],
+                                          isRunning,
+                                          index), // Si está activo, aplicar el color basado en porcentaje
+                                ),
+                              ),
+                            ),
+                            // Imagen sobre la capa de color
+                            Image.asset(
+                              // Lógica de selección de la imagen
+                              _isMusculoPantalonBloqueado[index]
+                                  ? imagePathEnabled // Si está bloqueado, mostrar la imagen de estado activo
+                                  : (_isMusculoPantalonInactivo[index]
+                                      ? imagePathInactive // Si está inactivo
+                                      : imagePathDisabled), // Si está deshabilitado
+                              fit: BoxFit.cover,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -6729,6 +6023,29 @@ class _PanelViewState extends State<PanelView>
         ),
       ],
     );
+  }
+
+  Color _getColorForPercentagePantalon(
+      int percentage, bool isRunning, int index) {
+    if (!isRunning) {
+      return Colors.transparent; // Si no está en ejecución, no se muestra color
+    }
+
+    // Obtiene los umbrales de porcentaje del grupo muscular correspondiente
+    List<int> umbrales = porcentajesPorGrupoPantalon[index];
+
+    // Compara el porcentaje con los umbrales del grupo muscular
+    if (percentage >= umbrales[3]) {
+      return Colors.red.withOpacity(0.5); // Rojo con opacidad del 60%
+    } else if (percentage >= umbrales[2]) {
+      return Colors.yellowAccent
+          .withOpacity(0.7); // Amarillo con opacidad del 60%
+    } else if (percentage >= umbrales[1]) {
+      return Colors.lightGreenAccent
+          .withOpacity(0.5); // Verde claro con opacidad del 60%
+    } else {
+      return Colors.green.withOpacity(0.5); // Verde con opacidad del 60%
+    }
   }
 
   Widget buildControlRow({
