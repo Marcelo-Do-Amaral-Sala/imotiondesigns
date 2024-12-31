@@ -11,6 +11,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../db/db_helper.dart';
 import '../db/db_helper_pc.dart';
 import '../db/db_helper_traducciones.dart';
+import '../db/db_helper_traducciones_pc.dart';
+import '../db/db_helper_traducciones_web.dart';
 import '../db/db_helper_web.dart';
 import '../servicios/licencia_state.dart';
 import '../servicios/sync.dart';
@@ -62,6 +64,7 @@ class _MainMenuViewState extends State<MainMenuView> {
   void initState() {
     super.initState();
     _initializeDatabase();
+    _initializeDatabaseTraducciones();
     _requestLocationPermissions();
   }
 
@@ -94,6 +97,29 @@ class _MainMenuViewState extends State<MainMenuView> {
       debugPrint("Error al inicializar la base de datos: $e");
     }
   }
+  Future<void> _initializeDatabaseTraducciones() async {
+    try {
+      if (kIsWeb) {
+        debugPrint("Inicializando base de datos para Web...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperTraduccionesWeb().initializeDatabase();
+      } else if (Platform.isAndroid || Platform.isIOS) {
+        debugPrint("Inicializando base de datos para Móviles...");
+        await DatabaseHelperTraducciones().initializeDatabase();
+      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        debugPrint("Inicializando base de datos para Desktop...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperTraduccionesPc().initializeDatabase();
+      } else {
+        throw UnsupportedError(
+            'Plataforma no soportada para la base de datos.');
+      }
+      debugPrint("Base de datos inicializada correctamente.");
+    } catch (e) {
+      debugPrint("Error al inicializar la base de datos: $e");
+    }
+  }
+
 
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {
