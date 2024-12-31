@@ -5,20 +5,23 @@ import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 
-String? globalSelectedProgram;
 String? globalSelectedClient;
 
 class OverlayTipoPrograma extends StatefulWidget {
   final VoidCallback onClose;
+  final Function(String) onProgramSelected;  // Función para pasar el programa seleccionado
 
-  const OverlayTipoPrograma({super.key, required this.onClose});
+  const OverlayTipoPrograma({
+    super.key,
+    required this.onClose,
+    required this.onProgramSelected,  // Recibe la función para seleccionar el programa
+  });
 
   @override
   _OverlayTipoProgramaState createState() => _OverlayTipoProgramaState();
 }
 
-class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
-    with SingleTickerProviderStateMixin {
+class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
   String? selectedProgram;
 
   @override
@@ -37,9 +40,8 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
         padding: const EdgeInsets.all(20.0),
         child: Row(
           children: [
-            // Columna para los ListTiles
             Expanded(
-              flex: 2, // Le da más espacio a esta columna si se necesita
+              flex: 2,
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -58,21 +60,20 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
                 ),
               ),
             ),
-            // Columna para el botón
             Expanded(
-              flex: 1, // Menos espacio que la columna de ListTiles
+              flex: 1,
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: OutlinedButton(
                   onPressed: () {
-                    // Guarda el valor seleccionado en la variable global
-                    globalSelectedProgram = selectedProgram;
-                    widget.onClose(); // Llama al onClose para cerrar el overlay
+                    if (selectedProgram != null) {
+                      widget.onProgramSelected(selectedProgram!);  // Llama a la función para pasar el programa seleccionado
+                    }
+                    widget.onClose();  // Cierra el overlay
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -144,14 +145,13 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma>
   }
 }
 
-Map<String, dynamic>?
-    selectedIndivProgram; // Variable global para el programa seleccionado
 
 class OverlaySeleccionarProgramaIndividual extends StatefulWidget {
   final VoidCallback onClose;
+  final Function(Map<String, dynamic>?) onIndivProgramSelected;
 
   const OverlaySeleccionarProgramaIndividual(
-      {super.key, required this.onClose});
+      {super.key, required this.onClose, required this.onIndivProgramSelected});
 
   @override
   _OverlaySeleccionarProgramaIndividualState createState() =>
@@ -162,9 +162,7 @@ class _OverlaySeleccionarProgramaIndividualState
     extends State<OverlaySeleccionarProgramaIndividual>
     with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> allIndividualPrograms = [];
-
-  // Mapa para controlar el estado de 'long press' de cada programa
-  Map<String, bool> longPressStates = {};
+  String? individualSelectedProgram;
 
   @override
   void initState() {
@@ -254,7 +252,7 @@ class _OverlaySeleccionarProgramaIndividualState
 
           return Padding(
             padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               // Cambiado a start para ajustar desde la izquierda
@@ -267,11 +265,12 @@ class _OverlaySeleccionarProgramaIndividualState
                   // Espacio entre los elementos
                   child: GestureDetector(
                     onTap: () {
-                      // Guardar el programa seleccionado en la variable global
+                      // Aquí solo seleccionamos el programa si no está seleccionado aún
                       setState(() {
-                        selectedIndivProgram = program;
+                        individualSelectedProgram = program['nombre'];
                       });
-                      print('Programa seleccionado: ${program['nombre']}');
+
+                      widget.onIndivProgramSelected(program);  // Llama a la función para pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
@@ -417,7 +416,7 @@ class _OverlaySeleccionarProgramaIndividualState
     );
   }
 
-// Función para construir las filas con los detalles
+  // Función para construir las filas con los detalles
   Widget _buildDetailRow(String label, dynamic value, String suffix) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -449,13 +448,12 @@ class _OverlaySeleccionarProgramaIndividualState
   }
 }
 
-Map<String, dynamic>?
-    selectedRecoProgram; // Variable global para el programa seleccionado
 
 class OverlaySeleccionarProgramaRecovery extends StatefulWidget {
   final VoidCallback onClose;
+  final Function(Map<String, dynamic>?) onRecoProgramSelected;
 
-  const OverlaySeleccionarProgramaRecovery({super.key, required this.onClose});
+  const OverlaySeleccionarProgramaRecovery({super.key, required this.onClose, required this.onRecoProgramSelected});
 
   @override
   _OverlaySeleccionarProgramaRecoveryState createState() =>
@@ -466,6 +464,7 @@ class _OverlaySeleccionarProgramaRecoveryState
     extends State<OverlaySeleccionarProgramaRecovery>
     with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> allRecoveryPrograms = [];
+  String? recoverySelectedProgram;
 
   @override
   void initState() {
@@ -590,11 +589,12 @@ class _OverlaySeleccionarProgramaRecoveryState
                   // Espacio entre los elementos
                   child: GestureDetector(
                     onTap: () {
-                      // Guardar el programa seleccionado en la variable global
+                      // Aquí solo seleccionamos el programa si no está seleccionado aún
                       setState(() {
-                        selectedRecoProgram = program;
+                        recoverySelectedProgram = program['nombre'];
                       });
-                      print('Programa seleccionado: ${program['nombre']}');
+
+                      widget.onRecoProgramSelected(program);  // Llama a la función para pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
@@ -772,13 +772,12 @@ class _OverlaySeleccionarProgramaRecoveryState
   }
 }
 
-Map<String, dynamic>?
-    selectedAutoProgram; // Variable global para el programa seleccionado
 
 class OverlaySeleccionarProgramaAutomatic extends StatefulWidget {
   final VoidCallback onClose;
+  final Function(Map<String, dynamic>?) onAutoProgramSelected;
 
-  const OverlaySeleccionarProgramaAutomatic({super.key, required this.onClose});
+  const OverlaySeleccionarProgramaAutomatic({super.key, required this.onClose, required this.onAutoProgramSelected});
 
   @override
   _OverlaySeleccionarProgramaAutomaticState createState() =>
@@ -789,6 +788,7 @@ class _OverlaySeleccionarProgramaAutomaticState
     extends State<OverlaySeleccionarProgramaAutomatic>
     with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> allAutomaticPrograms = [];
+  String? automaticSelectedProgram;
 
   @override
   void initState() {
@@ -918,12 +918,12 @@ class _OverlaySeleccionarProgramaAutomaticState
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
                   child: GestureDetector(
                     onTap: () {
-                      // Guardar el programa seleccionado en la variable global
+                      // Aquí solo seleccionamos el programa si no está seleccionado aún
                       setState(() {
-                        selectedAutoProgram = program;
+                        automaticSelectedProgram = program['nombre'];
                       });
-                      print(
-                          'Programa seleccionado: ${program['nombre_programa_automatico']}');
+
+                      widget.onAutoProgramSelected(program);  // Llama a la función para pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
