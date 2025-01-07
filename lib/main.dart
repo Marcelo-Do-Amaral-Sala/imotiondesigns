@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/app.dart';
+import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:imotion_designs/src/panel/views/panel_view.dart';
 import 'package:imotion_designs/src/servicios/licencia_state.dart';
 import 'package:imotion_designs/src/servicios/sync.dart';
@@ -49,6 +50,9 @@ void main() async {
           create: (_) => TranslationProvider()
             ..changeLanguage(AppStateIdioma
                 .instance.currentLanguage), // Cargar el idioma guardado
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ClientsProvider(),
         ),
       ],
       child: ScreenUtilInit(

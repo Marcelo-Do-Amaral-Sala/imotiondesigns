@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 
-
 class OverlayTipoPrograma extends StatefulWidget {
   final VoidCallback onClose;
-  final Function(String) onProgramSelected;  // Función para pasar el programa seleccionado
+  final Function(String)
+      onProgramSelected; // Función para pasar el programa seleccionado
 
   const OverlayTipoPrograma({
     super.key,
     required this.onClose,
-    required this.onProgramSelected,  // Recibe la función para seleccionar el programa
+    required this.onProgramSelected, // Recibe la función para seleccionar el programa
   });
 
   @override
@@ -66,13 +67,15 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
                 child: OutlinedButton(
                   onPressed: () {
                     if (selectedProgram != null) {
-                      widget.onProgramSelected(selectedProgram!);  // Llama a la función para pasar el programa seleccionado
+                      widget.onProgramSelected(
+                          selectedProgram!); // Llama a la función para pasar el programa seleccionado
                     }
-                    widget.onClose();  // Cierra el overlay
+                    widget.onClose(); // Cierra el overlay
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -143,7 +146,6 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
     );
   }
 }
-
 
 class OverlaySeleccionarProgramaIndividual extends StatefulWidget {
   final VoidCallback onClose;
@@ -251,7 +253,7 @@ class _OverlaySeleccionarProgramaIndividualState
 
           return Padding(
             padding:
-            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               // Cambiado a start para ajustar desde la izquierda
@@ -269,7 +271,8 @@ class _OverlaySeleccionarProgramaIndividualState
                         individualSelectedProgram = program['nombre'];
                       });
 
-                      widget.onIndivProgramSelected(program);  // Llama a la función para pasar el programa seleccionado
+                      widget.onIndivProgramSelected(
+                          program); // Llama a la función para pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
@@ -447,12 +450,12 @@ class _OverlaySeleccionarProgramaIndividualState
   }
 }
 
-
 class OverlaySeleccionarProgramaRecovery extends StatefulWidget {
   final VoidCallback onClose;
   final Function(Map<String, dynamic>?) onRecoProgramSelected;
 
-  const OverlaySeleccionarProgramaRecovery({super.key, required this.onClose, required this.onRecoProgramSelected});
+  const OverlaySeleccionarProgramaRecovery(
+      {super.key, required this.onClose, required this.onRecoProgramSelected});
 
   @override
   _OverlaySeleccionarProgramaRecoveryState createState() =>
@@ -593,7 +596,8 @@ class _OverlaySeleccionarProgramaRecoveryState
                         recoverySelectedProgram = program['nombre'];
                       });
 
-                      widget.onRecoProgramSelected(program);  // Llama a la función para pasar el programa seleccionado
+                      widget.onRecoProgramSelected(
+                          program); // Llama a la función para pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
@@ -771,12 +775,12 @@ class _OverlaySeleccionarProgramaRecoveryState
   }
 }
 
-
 class OverlaySeleccionarProgramaAutomatic extends StatefulWidget {
   final VoidCallback onClose;
   final Function(Map<String, dynamic>?) onAutoProgramSelected;
 
-  const OverlaySeleccionarProgramaAutomatic({super.key, required this.onClose, required this.onAutoProgramSelected});
+  const OverlaySeleccionarProgramaAutomatic(
+      {super.key, required this.onClose, required this.onAutoProgramSelected});
 
   @override
   _OverlaySeleccionarProgramaAutomaticState createState() =>
@@ -922,7 +926,8 @@ class _OverlaySeleccionarProgramaAutomaticState
                         automaticSelectedProgram = program['nombre'];
                       });
 
-                      widget.onAutoProgramSelected(program);  // Llama a la función para pasar el programa seleccionado
+                      widget.onAutoProgramSelected(
+                          program); // Llama a la función para pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
@@ -1191,12 +1196,12 @@ class _OverlaySeleccionarProgramaAutomaticState
   }
 }
 
-
 class OverlaySeleccionarCliente extends StatefulWidget {
   final VoidCallback onClose;
   final Function(Map<String, dynamic>?) onClientSelected;
 
-  const OverlaySeleccionarCliente({super.key, required this.onClose, required this.onClientSelected});
+  const OverlaySeleccionarCliente(
+      {super.key, required this.onClose, required this.onClientSelected});
 
   @override
   _OverlaySeleccionarClienteState createState() =>
@@ -1271,8 +1276,8 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTextField(
-                    tr(context, 'Nombre').toUpperCase(), _clientNameController, tr(context, 'Introducir nombre')),
+                _buildTextField(tr(context, 'Nombre').toUpperCase(),
+                    _clientNameController, tr(context, 'Introducir nombre')),
                 SizedBox(width: screenWidth * 0.05),
                 _buildDropdown(),
               ],
@@ -1405,13 +1410,11 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                         children: [
                           GestureDetector(
                             onTap: () {
-                              // Guardar el cliente seleccionado en la lista global
-                              setState(() {
-                                selectedClient = client['name'];
-                              });
+                              // Agregar el cliente seleccionado a la lista global
+                              Provider.of<ClientsProvider>(context, listen: false).addClient(client);
 
+                              // Llama a la función para pasar el cliente seleccionado
                               widget.onClientSelected(client);
-                              print('Cliente seleccionado: ${client['name']}');
                               widget.onClose(); // Cerrar el overlay
                             },
                             child: Container(
@@ -1478,5 +1481,24 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
         ),
       ),
     );
+  }
+}
+
+
+class ClientsProvider with ChangeNotifier {
+  List<Map<String, dynamic>> _selectedClients = [];
+
+  List<Map<String, dynamic>> get selectedClients => _selectedClients;
+
+  void addClient(Map<String, dynamic> client) {
+    if (!_selectedClients.any((c) => c['id'] == client['id'])) {
+      _selectedClients.add(client);
+      notifyListeners(); // Notifica a los widgets que están escuchando
+    }
+  }
+
+  void removeClient(Map<String, dynamic> client) {
+    _selectedClients.removeWhere((c) => c['id'] == client['id']);
+    notifyListeners(); // Notifica después de eliminar
   }
 }

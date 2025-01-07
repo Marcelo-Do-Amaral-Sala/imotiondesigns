@@ -257,7 +257,6 @@ class _PanelViewState extends State<PanelView> {
     setState(() {
       clientSelectionMap[key] = client;
     });
-    print("Cliente seleccionado en el padre: $client");
   }
 
   void handleActiveChange(bool newState) {
@@ -368,17 +367,17 @@ class _PanelViewState extends State<PanelView> {
                                                     "❌ El dispositivo $macAddress no está conectado.");
                                               }
                                             },
-
                                             onLongPress: () {
                                               // Limpiar el nombre del cliente y eliminar la selección
-                                              print('Cliente deseleccionado: $clientName');
+                                              print(
+                                                  'Cliente deseleccionado: $clientName');
                                               setState(() {
-                                                clientSelectionMap.remove(macAddress);
+                                                clientSelectionMap
+                                                    .remove(macAddress);
                                                 // Limpiar el nombre del cliente
-                                                clientName = '';      // Limpiar el nombre del cliente
+                                                clientName =
+                                                    ''; // Limpiar el nombre del cliente
                                               });
-
-
                                             },
                                             child: Stack(
                                               children: [
@@ -464,7 +463,10 @@ class _PanelViewState extends State<PanelView> {
                                                                         .center,
                                                                 children: [
                                                                   Text(
-                                                                    clientName.isEmpty ? '' : clientName,
+                                                                    clientName
+                                                                            .isEmpty
+                                                                        ? ''
+                                                                        : clientName,
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -657,7 +659,6 @@ class _PanelViewState extends State<PanelView> {
                                 ),
                               ),
                             ],
-                            Text('$isFullScreen'),
                             Expanded(
                               flex: 9,
                               child: IndexedStack(
@@ -1454,6 +1455,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valueRampa = 1.0;
   double valuePause = 1.0;
 
+  List<Map<String, dynamic>> selectedClients = [];
   List<Map<String, dynamic>> allIndividualPrograms = [];
   List<Map<String, dynamic>> allRecoveryPrograms = [];
   List<Map<String, dynamic>> allAutomaticPrograms = [];
@@ -1634,17 +1636,31 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void onClientSelected(Map<String, dynamic>? client) {
     setState(() {
-      selectedClient = client; // Aquí actualizas el valor seleccionado
+      selectedClient = client; // Actualiza el cliente individual seleccionado
+      if (client != null &&
+          !selectedClients.any((c) => c['id'] == client['id'])) {
+        selectedClients.add(
+            client); // Agrega a la lista de clientes seleccionados si no está en la lista
+      }
     });
-    print("Cliente seleccionado: $selectedClient");
-    widget.onClientSelected(client);
+
+    // Imprime el nombre del cliente seleccionado
+    if (selectedClient != null) {
+      print("Cliente seleccionado: ${selectedClient!['name']}");
+    }
+
+    // Imprime la lista de clientes seleccionados
+    print(
+        "Lista de clientes seleccionados: ${selectedClients.map((c) => c['name']).toList()}");
+
+    widget.onClientSelected(client); // Pasa el cliente seleccionado
   }
 
   void _clearGlobals() {
     setState(() {
       // Restablecer variables globales
       selectedProgram = null;
-      selectedClient=null;
+      selectedClient = null;
 
       isSessionStarted = false;
       _isImagesLoaded = false;
@@ -1894,18 +1910,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     final remainingTime = contractionDuration - elapsedTimeContraction;
 
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      setState(() {
-        elapsedTimeContraction += 0.1;
-        progressContraction =
-            elapsedTimeContraction / contractionDuration; // Progreso ascendente
+      if (mounted) {
+        // Verifica si el widget todavía está montado
+        setState(() {
+          elapsedTimeContraction += 0.1;
+          progressContraction = elapsedTimeContraction /
+              contractionDuration; // Progreso ascendente
 
-        // Si se completó el tiempo de contracción, pasa a la pausa
-        if (elapsedTimeContraction >= contractionDuration) {
-          elapsedTimeContraction = 0.0; // Reinicia el tiempo de contracción
-          isContractionPhase = false;
-          _startPauseTimer(valuePause);
-        }
-      });
+          // Si se completó el tiempo de contracción, pasa a la pausa
+          if (elapsedTimeContraction >= contractionDuration) {
+            elapsedTimeContraction = 0.0; // Reinicia el tiempo de contracción
+            isContractionPhase = false;
+            _startPauseTimer(valuePause);
+          }
+        });
+      }
     });
 
     if (remainingTime <= 0) {
@@ -2079,6 +2098,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    List<Map<String, dynamic>> selectedClients =
+        Provider.of<ClientsProvider>(context).selectedClients;
     return SizedBox(
         height: screenHeight,
         width: screenWidth,
@@ -5737,30 +5758,46 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ),
                                           SizedBox(width: screenWidth * 0.01),
                                           AnimatedSize(
-                                            duration: const Duration(
-                                                milliseconds: 300),
+                                            duration: const Duration(milliseconds: 300),
                                             curve: Curves.easeInOut,
                                             child: Container(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              width: _isExpanded2
-                                                  ? screenWidth * 0.2
-                                                  : 0,
+                                              padding: const EdgeInsets.all(10.0),
+                                              width: _isExpanded2 ? screenWidth * 0.2 : 0,
                                               height: screenHeight * 0.2,
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
-                                                color: Colors.black
-                                                    .withOpacity(0.5),
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
+                                                color: Colors.black.withOpacity(0.5),
+                                                borderRadius: BorderRadius.circular(20.0),
                                               ),
-                                              child: const Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [],
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Clientes seleccionados:',
+                                                    style: TextStyle(color: Colors.white),
+                                                  ),
+                                                  // Condicionalmente mostramos los clientes
+                                                  if (_isExpanded2) ...[
+                                                    // Usamos un `Column` para la lista de clientes
+                                                    Expanded(
+                                                      child: Column(
+                                                        children: selectedClients.map((client) {
+                                                          return Padding(
+                                                            padding: const EdgeInsets.only(bottom: 5.0),
+                                                            child: Text(
+                                                              client['name'] ?? 'N/A',
+                                                              style: TextStyle(color: Colors.white),
+                                                            ),
+                                                          );
+                                                        }).toList(),
+                                                      ),
+                                                    ),
+                                                  ]
+                                                ],
                                               ),
                                             ),
                                           ),
+
                                         ],
                                       ),
                                       SizedBox(height: screenHeight * 0.01),
@@ -6147,18 +6184,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         borderRadius: BorderRadius.circular(10),
                         child: Stack(
                           children: [
-                            // Capa de color sobre la imagen, que cambia de color según el porcentaje
-                            Positioned.fill(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle, // Forma circular
-                                  color: _getColorForPercentage(
-                                      porcentajesMusculoTraje[index],
-                                      isRunning,
-                                      index),
+                            // Capa de color sobre la imagen, solo si no está inactivo
+                            if (!_isMusculoTrajeInactivo[index])
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle, // Forma circular
+                                    color: _getColorForPercentage(
+                                        porcentajesMusculoTraje[index],
+                                        isRunning,
+                                        index),
+                                  ),
                                 ),
                               ),
-                            ),
                             // Imagen sobre la capa de color
                             Image.asset(
                               // Lógica de selección de la imagen
@@ -6313,20 +6351,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         borderRadius: BorderRadius.circular(10),
                         child: Stack(
                           children: [
-                            Positioned.fill(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle, // Forma circular
-                                  color: _isMusculoPantalonInactivo[index]
-                                      ? Colors
-                                          .transparent // Si está inactivo, color transparente
-                                      : _getColorForPercentagePantalon(
-                                          porcentajesMusculoPantalon[index],
-                                          isRunning,
-                                          index), // Si está activo, aplicar el color basado en porcentaje
+                            // Capa de color sobre la imagen, solo si no está inactivo
+                            if (!_isMusculoPantalonInactivo[index])
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle, // Forma circular
+                                    color: _getColorForPercentagePantalon(
+                                        porcentajesMusculoPantalon[index],
+                                        isRunning,
+                                        index), // Si está activo, aplicar el color basado en porcentaje
+                                  ),
                                 ),
                               ),
-                            ),
                             // Imagen sobre la capa de color
                             Image.asset(
                               // Lógica de selección de la imagen
