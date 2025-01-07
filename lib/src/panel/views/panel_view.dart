@@ -33,6 +33,7 @@ class PanelView extends StatefulWidget {
 class _PanelViewState extends State<PanelView> {
   late BleConnectionService bleConnectionService;
   late StreamSubscription _subscription;
+
   bool isDisconnected = true;
   bool isConnected = false;
   bool isActive = false;
@@ -256,13 +257,12 @@ class _PanelViewState extends State<PanelView> {
     setState(() {
       clientSelectionMap[key] = client;
     });
-    print("Cliente seleccionado en el padre: $selectedClient");
+    print("Cliente seleccionado en el padre: $client");
   }
 
-  // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
-  void toggleFullScreen() {
+  void handleActiveChange(bool newState) {
     setState(() {
-      isFullScreen = !isFullScreen;
+      isFullScreen = newState; // Actualiza el valor del booleano
     });
   }
 
@@ -368,6 +368,18 @@ class _PanelViewState extends State<PanelView> {
                                                     "❌ El dispositivo $macAddress no está conectado.");
                                               }
                                             },
+
+                                            onLongPress: () {
+                                              // Limpiar el nombre del cliente y eliminar la selección
+                                              print('Cliente deseleccionado: $clientName');
+                                              setState(() {
+                                                clientSelectionMap.remove(macAddress);
+                                                // Limpiar el nombre del cliente
+                                                clientName = '';      // Limpiar el nombre del cliente
+                                              });
+
+
+                                            },
                                             child: Stack(
                                               children: [
                                                 // Widget principal (contenedor y detalles)
@@ -452,7 +464,7 @@ class _PanelViewState extends State<PanelView> {
                                                                         .center,
                                                                 children: [
                                                                   Text(
-                                                                    clientName,
+                                                                    clientName.isEmpty ? '' : clientName,
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -645,6 +657,7 @@ class _PanelViewState extends State<PanelView> {
                                 ),
                               ),
                             ],
+                            Text('$isFullScreen'),
                             Expanded(
                               flex: 9,
                               child: IndexedStack(
@@ -663,10 +676,9 @@ class _PanelViewState extends State<PanelView> {
                                     onSelectEquip: (index) =>
                                         updateEquipSelection(
                                             selectedKey!, index),
-                                    toggleFullScreen: toggleFullScreen,
-                                    isFullScreen: isFullScreen,
                                     onClientSelected: (client) =>
                                         onClientSelected(selectedKey!, client),
+                                    isFullChanged: handleActiveChange,
                                   );
                                 }).toList(),
                               ),
@@ -1353,18 +1365,17 @@ class ExpandedContentWidget extends StatefulWidget {
   final int? index;
   final String? macAddress;
   final ValueChanged<int> onSelectEquip;
-  final Function toggleFullScreen; // Recibimos el callback como parámetro
-  final bool isFullScreen;
   final ValueChanged<Map<String, dynamic>?> onClientSelected;
+  final ValueChanged<bool> isFullChanged;
 
-  ExpandedContentWidget({
+  const ExpandedContentWidget({
+    super.key,
     required this.index,
     required this.macAddress,
     this.selectedKey,
     required this.onSelectEquip,
-    required this.toggleFullScreen,
-    required this.isFullScreen,
     required this.onClientSelected,
+    required this.isFullChanged,
   });
 
   @override
@@ -1397,7 +1408,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool _isExpanded1 = false;
   bool _isExpanded2 = false;
   bool _isExpanded3 = false;
-  late bool isFullScreen;
+  bool isFullScreen = false;
   bool isPantalonSelected = false;
   bool isOverlayVisible = false;
   bool isRunning = false;
@@ -1577,7 +1588,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _fetchIndividualPrograms();
     _fetchRecoveryPrograms();
     _fetchAutoPrograms();
-    isFullScreen = widget.isFullScreen;
   }
 
   @override
@@ -1597,6 +1607,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     setState(() {
       _isImagesLoaded = true;
     });
+  }
+
+  // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
+  void toggleFullScreen() {
+    setState(() {
+      isFullScreen = !isFullScreen;
+    });
+    widget.isFullChanged(isFullScreen);
   }
 
   void toggleOverlay(int index) {
@@ -1622,17 +1640,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     widget.onClientSelected(client);
   }
 
-  void updateIsFullScreen() {
-    setState(() {
-      isFullScreen =
-          widget.isFullScreen; // Actualizamos el valor local con el del padre
-    });
-  }
-
   void _clearGlobals() {
     setState(() {
       // Restablecer variables globales
       selectedProgram = null;
+      selectedClient=null;
 
       isSessionStarted = false;
       _isImagesLoaded = false;
@@ -1701,9 +1713,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     final dbHelper = DatabaseHelper();
     try {
       final clientData = await dbHelper.getClients();
-      setState(() {
-        allClients = clientData; // Asigna a la lista original
-      });
+      if (mounted) {
+        setState(() {
+          allClients = clientData; // Asigna a la lista original
+        });
+      }
     } catch (e) {
       debugPrint('Error fetching clients: $e');
     }
@@ -1713,23 +1727,22 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     var db = await DatabaseHelper()
         .database; // Obtener la instancia de la base de datos
     try {
-      // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
       final individualProgramData = await DatabaseHelper()
           .obtenerProgramasPredeterminadosPorTipoIndividual(db);
 
       for (var individualProgram in individualProgramData) {
-        // Obtener cronaxias
         var cronaxias = await DatabaseHelper()
             .obtenerCronaxiasPorPrograma(db, individualProgram['id_programa']);
         var grupos = await DatabaseHelper()
             .obtenerGruposPorPrograma(db, individualProgram['id_programa']);
       }
 
-      // Actualizamos el estado con los programas obtenidos
-      setState(() {
-        allIndividualPrograms =
-            individualProgramData; // Asignamos los programas obtenidos a la lista
-      });
+      if (mounted) {
+        setState(() {
+          allIndividualPrograms =
+              individualProgramData; // Asignamos los programas obtenidos a la lista
+        });
+      }
     } catch (e) {
       debugPrint('Error fetching programs: $e');
     }
@@ -1739,24 +1752,22 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     var db = await DatabaseHelper()
         .database; // Obtener la instancia de la base de datos
     try {
-      // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
       final recoveryProgramData = await DatabaseHelper()
           .obtenerProgramasPredeterminadosPorTipoRecovery(db);
 
-      // Iteramos sobre los programas y obtenemos las cronaxias y los grupos de las tablas intermedias
       for (var recoveryProgram in recoveryProgramData) {
-        // Obtener cronaxias
         var cronaxias = await DatabaseHelper()
             .obtenerCronaxiasPorPrograma(db, recoveryProgram['id_programa']);
         var grupos = await DatabaseHelper()
             .obtenerGruposPorPrograma(db, recoveryProgram['id_programa']);
       }
 
-      // Actualizamos el estado con los programas obtenidos
-      setState(() {
-        allRecoveryPrograms =
-            recoveryProgramData; // Asignamos los programas obtenidos a la lista
-      });
+      if (mounted) {
+        setState(() {
+          allRecoveryPrograms =
+              recoveryProgramData; // Asignamos los programas obtenidos a la lista
+        });
+      }
     } catch (e) {
       debugPrint('Error fetching programs: $e');
     }
@@ -1766,18 +1777,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     var db = await DatabaseHelper()
         .database; // Obtener la instancia de la base de datos
     try {
-      // Llamamos a la función que obtiene los programas automáticos y sus subprogramas
       final autoProgramData =
           await DatabaseHelper().obtenerProgramasAutomaticosConSubprogramas(db);
 
-      // Agrupamos los subprogramas por programa automático
       List<Map<String, dynamic>> groupedPrograms =
           _groupProgramsWithSubprograms(autoProgramData);
 
-      setState(() {
-        allAutomaticPrograms =
-            groupedPrograms; // Asigna los programas obtenidos a la lista
-      });
+      if (mounted) {
+        setState(() {
+          allAutomaticPrograms =
+              groupedPrograms; // Asigna los programas obtenidos a la lista
+        });
+      }
     } catch (e) {
       debugPrint('Error fetching programs: $e');
     }
@@ -1805,6 +1816,25 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
 
     return groupedPrograms;
+  }
+
+  void updateContractionAndPauseValues() {
+    if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
+        selectedIndivProgram != null) {
+      valueContraction =
+          (selectedIndivProgram!['contraccion'] as double?) ?? valueContraction;
+      valuePause = (selectedIndivProgram!['pausa'] as double?) ?? valuePause;
+    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
+        selectedRecoProgram != null) {
+      valueContraction =
+          (selectedRecoProgram!['contraccion'] as double?) ?? valueContraction;
+      valuePause = (selectedRecoProgram!['pausa'] as double?) ?? valuePause;
+    } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
+        selectedAutoProgram != null) {
+      valueContraction =
+          (selectedAutoProgram!['contraccion'] as double?) ?? valueContraction;
+      valuePause = (selectedAutoProgram!['pausa'] as double?) ?? valuePause;
+    }
   }
 
   void _startTimer() {
@@ -2003,22 +2033,25 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void onIndivProgramSelected(Map<String, dynamic>? programI) {
     setState(() {
-      selectedIndivProgram = programI; // Aquí actualizas el valor seleccionado
+      selectedIndivProgram = programI; // Actualizas el valor seleccionado
     });
+    updateContractionAndPauseValues(); // Llamada para actualizar contracción y pausa
     print("Programa seleccionado: $selectedIndivProgram");
   }
 
   void onRecoProgramSelected(Map<String, dynamic>? programR) {
     setState(() {
-      selectedRecoProgram = programR; // Aquí actualizas el valor seleccionado
+      selectedRecoProgram = programR; // Actualizas el valor seleccionado
     });
+    updateContractionAndPauseValues(); // Llamada para actualizar contracción y pausa
     print("Programa seleccionado: $selectedRecoProgram");
   }
 
   void onAutoProgramSelected(Map<String, dynamic>? programA) {
     setState(() {
-      selectedAutoProgram = programA; // Aquí actualizas el valor seleccionado
+      selectedAutoProgram = programA; // Actualizas el valor seleccionado
     });
+    updateContractionAndPauseValues(); // Llamada para actualizar contracción y pausa
     print("Programa seleccionado: $selectedAutoProgram");
   }
 
@@ -2046,7 +2079,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    updateIsFullScreen();
     return SizedBox(
         height: screenHeight,
         width: screenWidth,
@@ -3452,21 +3484,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                   ),
                                                   Text(
-                                                    valueContraction
-                                                        .toString()
-                                                        .padLeft(1, '0'),
+                                                    formatNumber(
+                                                        valueContraction ??
+                                                            0.0),
+                                                    // Si es nulo, pasamos 0.0 como valor por defecto
                                                     style: TextStyle(
                                                       fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
-                                                      // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors
                                                           .lightGreenAccent
                                                           .shade400,
                                                     ),
-                                                  ),
+                                                  )
                                                 ],
                                               ),
                                               Row(
@@ -3499,19 +3531,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                   ),
                                                   Text(
-                                                    valuePause
-                                                        .toString()
-                                                        .padLeft(1, '0'),
+                                                    formatNumber(
+                                                        valuePause ?? 0.0),
+                                                    // Si es nulo, pasamos 0.0 como valor por defecto
                                                     style: TextStyle(
                                                       fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
-                                                      // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors.red,
                                                     ),
-                                                  ),
+                                                  )
                                                 ],
                                               ),
                                               SizedBox(
@@ -4964,21 +4995,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                   ),
                                                   Text(
-                                                    valueContraction
-                                                        .toString()
-                                                        .padLeft(1, '0'),
+                                                    formatNumber(
+                                                        valueContraction ??
+                                                            0.0),
+                                                    // Si es nulo, pasamos 0.0 como valor por defecto
                                                     style: TextStyle(
                                                       fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
-                                                      // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors
                                                           .lightGreenAccent
                                                           .shade400,
                                                     ),
-                                                  ),
+                                                  )
                                                 ],
                                               ),
                                               Row(
@@ -5011,19 +5042,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                   ),
                                                   Text(
-                                                    valuePause
-                                                        .toString()
-                                                        .padLeft(1, '0'),
+                                                    formatNumber(
+                                                        valuePause ?? 0.0),
+                                                    // Si es nulo, pasamos 0.0 como valor por defecto
                                                     style: TextStyle(
                                                       fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
-                                                      // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors.red,
                                                     ),
-                                                  ),
+                                                  )
                                                 ],
                                               ),
                                               SizedBox(
@@ -5644,8 +5674,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                 // Distancia desde el borde derecho
                                 child: GestureDetector(
                                   onTap: () {
-                                    widget
-                                        .toggleFullScreen(); // Llamamos a la función toggleFullScreen
+                                    toggleFullScreen(); // Llamamos a la función toggleFullScreen
                                   },
                                   child: ClipOval(
                                     child: Image.asset(
@@ -5818,7 +5847,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         }
                                                       });
                                                     },
-                                                    suffix: " S",
+                                                    suffix: " .s",
                                                     // Sufijo para mostrar en el texto
                                                     screenWidth: screenWidth,
                                                     // Ancho de pantalla
@@ -5854,7 +5883,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         }
                                                       });
                                                     },
-                                                    suffix: " S",
+                                                    suffix: " .s",
                                                     // Sufijo para mostrar en el texto
                                                     screenWidth: screenWidth,
                                                     // Ancho de pantalla
@@ -5890,7 +5919,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         }
                                                       });
                                                     },
-                                                    suffix: " S",
+                                                    suffix: " .s",
                                                     // Sufijo para mostrar en el texto
                                                     screenWidth: screenWidth,
                                                     // Ancho de pantalla
@@ -5951,7 +5980,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           onTapUp: (_) => setState(
                                               () => scaleFactorFull = 1.0),
                                           onTap: () {
-                                            widget.toggleFullScreen();
+                                            toggleFullScreen();
                                           },
                                           child: AnimatedScale(
                                             scale: scaleFactorFull,
@@ -6416,13 +6445,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         SizedBox(width: screenWidth * 0.01),
         // Texto con el valor y el sufijo
         Text(
-          "$value$suffix",
+          "${value.toStringAsFixed(0)}$suffix",
+          // Aquí formateamos el valor para que no tenga decimales
           style: TextStyle(
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
+
         SizedBox(width: screenWidth * 0.01),
         // Botón de "Menos"
         GestureDetector(
