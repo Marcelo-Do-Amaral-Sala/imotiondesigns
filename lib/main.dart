@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/app.dart';
+import 'package:imotion_designs/src/panel/views/panel_view.dart';
 import 'package:imotion_designs/src/servicios/licencia_state.dart';
 import 'package:imotion_designs/src/servicios/sync.dart';
 import 'package:imotion_designs/src/servicios/translation_provider.dart';
@@ -51,7 +52,8 @@ void main() async {
         ),
       ],
       child: ScreenUtilInit(
-        designSize: const Size(1200, 1920), // Tamaño base de la tablet Galaxy A8
+        designSize: const Size(1200, 1920),
+        // Tamaño base de la tablet Galaxy A8
         builder: (context, child) {
           return LayoutBuilder(
             builder: (context, constraints) {

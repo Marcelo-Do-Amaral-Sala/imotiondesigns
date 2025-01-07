@@ -6,6 +6,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 import '../../servicios/licencia_state.dart';
@@ -42,9 +43,8 @@ class _PanelViewState extends State<PanelView> {
   String? grupoKey;
   int? selectedIndex = 0;
   String connectionStatus = "desconectado";
-
   double scaleFactorBack = 1.0;
-
+  Map<String, int> equipSelectionMap = {};
   List<String> successfullyConnectedDevices = [];
 
   final Map<String, String> deviceConnectionStatus = {};
@@ -247,6 +247,13 @@ class _PanelViewState extends State<PanelView> {
     print("🔑 Clave asignada (grupo): $selectedKey");
   }
 
+  void updateEquipSelection(String key, int selectedIndex) {
+    setState(() {
+      equipSelectionMap[key] = selectedIndex;
+    });
+    print("🔄 Equip seleccionado: $selectedIndex para clave $key");
+  }
+
   @override
   void dispose() {
     // Cancelar la suscripción
@@ -311,6 +318,8 @@ class _PanelViewState extends State<PanelView> {
                                           .map((index, mci) {
                                         String macAddress = mci[
                                             'mac']; // Obtener la MAC de cada dispositivo
+                                        int selectedEquip =
+                                            equipSelectionMap[macAddress] ?? 0;
 
                                         return MapEntry(
                                           index,
@@ -400,9 +409,18 @@ class _PanelViewState extends State<PanelView> {
                                                                   .start,
                                                           children: [
                                                             Expanded(
-                                                                flex: 1,
-                                                                child:
-                                                                    Center()),
+                                                              child: Center(
+                                                                child: selectedEquip == 0
+                                                                    ? Image.asset(
+                                                                  'assets/images/chalecoblanco.png',
+                                                                  fit: BoxFit.contain,
+                                                                )
+                                                                    : Image.asset(
+                                                                  'assets/images/pantalonblanco.png',
+                                                                  fit: BoxFit.contain,
+                                                                ),
+                                                              ),
+                                                            ),
                                                             Expanded(
                                                               flex: 2,
                                                               child: Column(
@@ -625,6 +643,8 @@ class _PanelViewState extends State<PanelView> {
                                     selectedKey: selectedKey,
                                     index: index,
                                     macAddress: macAddress,
+                                    onSelectEquip: (index) =>
+                                        updateEquipSelection(selectedKey!, index),
                                   );
                                 }).toList(),
                               ),
@@ -1362,11 +1382,12 @@ class ExpandedContentWidget extends StatefulWidget {
   final String? selectedKey;
   final int? index;
   final String? macAddress;
+  final ValueChanged<int> onSelectEquip;
 
   ExpandedContentWidget({
     required this.index,
     required this.macAddress,
-    this.selectedKey,
+    this.selectedKey, required this.onSelectEquip,
   });
 
   @override
@@ -1605,6 +1626,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
     });
   }
+
+  void selectEquip(int index) {
+    setState(() {
+      selectedIndexEquip = index; // Actualizar índice local
+    });
+    widget.onSelectEquip(index); // Notificar cambio a PanelView
+    print("🔄 Cambiado al equipo $index para clave: ${widget.selectedKey}");
+  }
+
 
   void _clearGlobals() {
     setState(() {
@@ -2024,7 +2054,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    print('Programa Seleccionado: $selectedProgram');
     return SizedBox(
         height: screenHeight,
         width: screenWidth,
@@ -2140,12 +2169,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       // Bloquear interacción si no hay selección
                                       child: GestureDetector(
                                         onTap: () {
-                                          setState(() {
-                                            selectedIndexEquip = 0;
-                                          });
-
-                                          print(
-                                              "🔄 Cambiado al equipo 0 para MCI: $widget.selectedKey");
+                                          selectEquip(0);
                                         },
                                         child: Opacity(
                                           opacity: widget.selectedKey == null
@@ -2183,12 +2207,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       // Bloquear interacción si no hay selección
                                       child: GestureDetector(
                                         onTap: () {
-                                          setState(() {
-                                            selectedIndexEquip = 1;
-                                          });
-
-                                          print(
-                                              "🔄 Cambiado al equipo 1 para MCI: $widget.selectedKey");
+                                          selectEquip(1);
                                         },
                                         child: Opacity(
                                           opacity: widget.selectedKey == null
