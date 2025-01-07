@@ -5,7 +5,6 @@ import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 
-String? globalSelectedClient;
 
 class OverlayTipoPrograma extends StatefulWidget {
   final VoidCallback onClose;
@@ -1192,15 +1191,12 @@ class _OverlaySeleccionarProgramaAutomaticState
   }
 }
 
-Map<String, dynamic>?
-    selectedClient; // Variable global para el programa seleccionado
-// Lista global de clientes seleccionados
-List<Map<String, dynamic>> selectedClientsGlobal = [];
 
 class OverlaySeleccionarCliente extends StatefulWidget {
   final VoidCallback onClose;
+  final Function(Map<String, dynamic>?) onClientSelected;
 
-  const OverlaySeleccionarCliente({super.key, required this.onClose});
+  const OverlaySeleccionarCliente({super.key, required this.onClose, required this.onClientSelected});
 
   @override
   _OverlaySeleccionarClienteState createState() =>
@@ -1215,6 +1211,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
   String selectedOption = 'Todos';
   List<Map<String, dynamic>> selectedClients =
       []; // Lista de clientes seleccionados
+  String? selectedClient;
 
   @override
   void initState() {
@@ -1410,14 +1407,10 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                             onTap: () {
                               // Guardar el cliente seleccionado en la lista global
                               setState(() {
-                                selectedClient = client;
+                                selectedClient = client['name'];
                               });
 
-                              // Agregar el cliente a la lista global
-                              if (!selectedClientsGlobal.contains(client)) {
-                                selectedClientsGlobal.add(client);
-                              }
-
+                              widget.onClientSelected(client);
                               print('Cliente seleccionado: ${client['name']}');
                               widget.onClose(); // Cerrar el overlay
                             },

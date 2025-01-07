@@ -36,7 +36,7 @@ class _PanelViewState extends State<PanelView> {
   bool isDisconnected = true;
   bool isConnected = false;
   bool isActive = false;
-  bool _isFullScreen = false;
+  bool isFullScreen = false;
   bool isRunning = false;
   String? selectedKey;
   String? macAddress;
@@ -45,8 +45,10 @@ class _PanelViewState extends State<PanelView> {
   String connectionStatus = "desconectado";
   double scaleFactorBack = 1.0;
   Map<String, int> equipSelectionMap = {};
-  List<String> successfullyConnectedDevices = [];
+  Map<String, dynamic> clientSelectionMap = {};
 
+  List<String> successfullyConnectedDevices = [];
+  Map<String, dynamic>? selectedClient;
   final Map<String, String> deviceConnectionStatus = {};
   Map<String, String> clientsNames = {};
   Map<String, String> bluetoothNames = {};
@@ -55,8 +57,6 @@ class _PanelViewState extends State<PanelView> {
   Map<String, String?> mciSelectionStatus = {};
   Map<String, String?> temporarySelectionStatus = {};
   Map<String, bool> isSelected = {};
-
-  Map<String, Map<String, String>> mciEquipmentMap = {};
 
   @override
   void initState() {
@@ -211,7 +211,6 @@ class _PanelViewState extends State<PanelView> {
     selectedKey = macAddress;
     print("📱 $macAddress ha sido seleccionado.");
     print("🔑 Clave asignada (dispositivo individual): $selectedKey");
-    mciEquipmentMap[macAddress] = {};
 
     updateDeviceSelection(macAddress, '');
   }
@@ -237,7 +236,6 @@ class _PanelViewState extends State<PanelView> {
     // Seleccionamos los dispositivos del grupo
     groupedDevices[group]?.forEach((deviceMac) {
       isSelected[deviceMac] = true;
-      mciEquipmentMap[deviceMac] = {};
       updateDeviceSelection(deviceMac, group);
       print("📱 $deviceMac del grupo $group ha sido seleccionado.");
     });
@@ -252,6 +250,20 @@ class _PanelViewState extends State<PanelView> {
       equipSelectionMap[key] = selectedIndex;
     });
     print("🔄 Equip seleccionado: $selectedIndex para clave $key");
+  }
+
+  void onClientSelected(String key, Map<String, dynamic>? client) {
+    setState(() {
+      clientSelectionMap[key] = client;
+    });
+    print("Cliente seleccionado en el padre: $selectedClient");
+  }
+
+  // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
+  void toggleFullScreen() {
+    setState(() {
+      isFullScreen = !isFullScreen;
+    });
   }
 
   @override
@@ -306,7 +318,7 @@ class _PanelViewState extends State<PanelView> {
                         flex: 1,
                         child: Column(
                           children: [
-                            if (!_isFullScreen)
+                            if (!isFullScreen) ...[
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.all(10.0),
@@ -320,7 +332,10 @@ class _PanelViewState extends State<PanelView> {
                                             'mac']; // Obtener la MAC de cada dispositivo
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
-
+                                        Map<String, dynamic>? selectedClient =
+                                            clientSelectionMap[macAddress];
+                                        String clientName =
+                                            selectedClient?['name'] ?? '';
                                         return MapEntry(
                                           index,
                                           GestureDetector(
@@ -410,15 +425,20 @@ class _PanelViewState extends State<PanelView> {
                                                           children: [
                                                             Expanded(
                                                               child: Center(
-                                                                child: selectedEquip == 0
-                                                                    ? Image.asset(
-                                                                  'assets/images/chalecoblanco.png',
-                                                                  fit: BoxFit.contain,
-                                                                )
-                                                                    : Image.asset(
-                                                                  'assets/images/pantalonblanco.png',
-                                                                  fit: BoxFit.contain,
-                                                                ),
+                                                                child: selectedEquip ==
+                                                                        0
+                                                                    ? Image
+                                                                        .asset(
+                                                                        'assets/images/chalecoblanco.png',
+                                                                        fit: BoxFit
+                                                                            .contain,
+                                                                      )
+                                                                    : Image
+                                                                        .asset(
+                                                                        'assets/images/pantalonblanco.png',
+                                                                        fit: BoxFit
+                                                                            .contain,
+                                                                      ),
                                                               ),
                                                             ),
                                                             Expanded(
@@ -432,11 +452,7 @@ class _PanelViewState extends State<PanelView> {
                                                                         .center,
                                                                 children: [
                                                                   Text(
-                                                                    selectedClientsGlobal
-                                                                            .isEmpty
-                                                                        ? ''
-                                                                        : selectedClientsGlobal[0]['name'] ??
-                                                                            'No Name',
+                                                                    clientName,
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -628,6 +644,7 @@ class _PanelViewState extends State<PanelView> {
                                   ),
                                 ),
                               ),
+                            ],
                             Expanded(
                               flex: 9,
                               child: IndexedStack(
@@ -644,7 +661,12 @@ class _PanelViewState extends State<PanelView> {
                                     index: index,
                                     macAddress: macAddress,
                                     onSelectEquip: (index) =>
-                                        updateEquipSelection(selectedKey!, index),
+                                        updateEquipSelection(
+                                            selectedKey!, index),
+                                    toggleFullScreen: toggleFullScreen,
+                                    isFullScreen: isFullScreen,
+                                    onClientSelected: (client) =>
+                                        onClientSelected(selectedKey!, client),
                                   );
                                 }).toList(),
                               ),
@@ -770,17 +792,7 @@ class _PanelViewState extends State<PanelView> {
                                                         'A'),
                                                     Expanded(
                                                       flex: 1,
-                                                      child: Center(
-                                                          /* child: Image.asset(
-                                                          (mciEquipMapping[
-                                                                          macAddress] ??
-                                                                      0) ==
-                                                                  0
-                                                              ? 'assets/images/chalecoblanco.png'
-                                                              : 'assets/images/pantalonblanco.png',
-                                                          fit: BoxFit.scaleDown,
-                                                        ),*/
-                                                          ),
+                                                      child: Center(),
                                                     ),
                                                     Expanded(
                                                       flex: 2,
@@ -792,22 +804,6 @@ class _PanelViewState extends State<PanelView> {
                                                             CrossAxisAlignment
                                                                 .center,
                                                         children: [
-                                                          Text(
-                                                            selectedClientsGlobal
-                                                                    .isEmpty
-                                                                ? ''
-                                                                : selectedClientsGlobal[
-                                                                            0][
-                                                                        'name'] ??
-                                                                    'No Name',
-                                                            style: TextStyle(
-                                                              fontSize: 14.sp,
-                                                              color: const Color(
-                                                                  0xFF28E2F5),
-                                                            ),
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                          ),
                                                           Text(
                                                             bluetoothNames[
                                                                     macAddress] ??
@@ -948,17 +944,7 @@ class _PanelViewState extends State<PanelView> {
                                                         'B'),
                                                     Expanded(
                                                       flex: 1,
-                                                      child: Center(
-                                                          /* child: Image.asset(
-                                                          (mciEquipMapping[
-                                                                          macAddress] ??
-                                                                      0) ==
-                                                                  0
-                                                              ? 'assets/images/chalecoblanco.png'
-                                                              : 'assets/images/pantalonblanco.png',
-                                                          fit: BoxFit.scaleDown,
-                                                        ),*/
-                                                          ),
+                                                      child: Center(),
                                                     ),
                                                     Expanded(
                                                       flex: 2,
@@ -970,22 +956,6 @@ class _PanelViewState extends State<PanelView> {
                                                             CrossAxisAlignment
                                                                 .center,
                                                         children: [
-                                                          Text(
-                                                            selectedClientsGlobal
-                                                                    .isEmpty
-                                                                ? ''
-                                                                : selectedClientsGlobal[
-                                                                            0][
-                                                                        'name'] ??
-                                                                    'No Name',
-                                                            style: TextStyle(
-                                                              fontSize: 14.sp,
-                                                              color: const Color(
-                                                                  0xFF28E2F5),
-                                                            ),
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                          ),
                                                           Text(
                                                             bluetoothNames[
                                                                     macAddress] ??
@@ -1383,11 +1353,18 @@ class ExpandedContentWidget extends StatefulWidget {
   final int? index;
   final String? macAddress;
   final ValueChanged<int> onSelectEquip;
+  final Function toggleFullScreen; // Recibimos el callback como parámetro
+  final bool isFullScreen;
+  final ValueChanged<Map<String, dynamic>?> onClientSelected;
 
   ExpandedContentWidget({
     required this.index,
     required this.macAddress,
-    this.selectedKey, required this.onSelectEquip,
+    this.selectedKey,
+    required this.onSelectEquip,
+    required this.toggleFullScreen,
+    required this.isFullScreen,
+    required this.onClientSelected,
   });
 
   @override
@@ -1420,7 +1397,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool _isExpanded1 = false;
   bool _isExpanded2 = false;
   bool _isExpanded3 = false;
-  bool _isFullScreen = false;
+  late bool isFullScreen;
   bool isPantalonSelected = false;
   bool isOverlayVisible = false;
   bool isRunning = false;
@@ -1433,6 +1410,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Map<String, dynamic>? selectedIndivProgram;
   Map<String, dynamic>? selectedRecoProgram;
   Map<String, dynamic>? selectedAutoProgram;
+  Map<String, dynamic>? selectedClient;
   int overlayIndex = -1;
   int selectedIndexEquip = 0;
   int totalTime = 25 * 60;
@@ -1599,6 +1577,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _fetchIndividualPrograms();
     _fetchRecoveryPrograms();
     _fetchAutoPrograms();
+    isFullScreen = widget.isFullScreen;
   }
 
   @override
@@ -1635,12 +1614,25 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("🔄 Cambiado al equipo $index para clave: ${widget.selectedKey}");
   }
 
+  void onClientSelected(Map<String, dynamic>? client) {
+    setState(() {
+      selectedClient = client; // Aquí actualizas el valor seleccionado
+    });
+    print("Cliente seleccionado: $selectedClient");
+    widget.onClientSelected(client);
+  }
+
+  void updateIsFullScreen() {
+    setState(() {
+      isFullScreen =
+          widget.isFullScreen; // Actualizamos el valor local con el del padre
+    });
+  }
 
   void _clearGlobals() {
     setState(() {
       // Restablecer variables globales
       selectedProgram = null;
-      selectedClientsGlobal = [];
 
       isSessionStarted = false;
       _isImagesLoaded = false;
@@ -2054,6 +2046,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    updateIsFullScreen();
     return SizedBox(
         height: screenHeight,
         width: screenWidth,
@@ -2061,7 +2054,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           children: [
             Column(
               children: [
-                if (!_isFullScreen)
+                if (!isFullScreen) ...[
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.all(10.0),
@@ -2727,14 +2720,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       ),
                     ),
                   ),
+                ],
                 Expanded(
-                  flex: _isFullScreen ? 1 : 3,
+                  flex: isFullScreen ? 1 : 3,
                   child: Padding(
-                    padding: EdgeInsets.only(top: _isFullScreen ? 50.0 : 5.0),
+                    padding: EdgeInsets.only(top: isFullScreen ? 50.0 : 5.0),
                     child: Row(
                       children: [
                         Expanded(
-                          flex: _isFullScreen ? 1 : 6,
+                          flex: isFullScreen ? 1 : 6,
                           child: Stack(children: [
                             Row(
                               children: [
@@ -2855,7 +2849,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Imagen base del avatar
                                               Image.asset(
                                                 "assets/images/avatar_frontal.png",
-                                                height: _isFullScreen
+                                                height: isFullScreen
                                                     ? screenHeight * 0.65
                                                     : screenHeight * 0.4,
                                                 fit: BoxFit.cover,
@@ -2870,7 +2864,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_pec_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -2884,7 +2878,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_pec_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -2905,7 +2899,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           child: Image.asset(
                                                             "assets/images/capa_pecho_azul.png",
                                                             // Imagen para el estado animado
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -2925,7 +2919,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -2938,7 +2932,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_naranja.png",
                                                       // Imagen bloqueada para bíceps
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -2958,7 +2952,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_biceps_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -2978,7 +2972,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -2991,7 +2985,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3011,7 +3005,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_abs_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3031,7 +3025,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3044,7 +3038,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3064,7 +3058,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_cua_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3084,7 +3078,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3097,7 +3091,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3117,7 +3111,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_gem_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3138,7 +3132,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_pec_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3151,7 +3145,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_pec_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3164,7 +3158,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_pec_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3179,7 +3173,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3192,7 +3186,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3205,7 +3199,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3220,7 +3214,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3233,7 +3227,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3246,7 +3240,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3261,7 +3255,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3274,7 +3268,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3287,7 +3281,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3302,7 +3296,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3315,7 +3309,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_naranja.png",
                                                       // Imagen bloqueada para abdominales
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3328,7 +3322,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelo_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3434,11 +3428,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 children: [
                                                   CustomPaint(
                                                     size: Size(
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenWidth * 0.1
                                                           : screenWidth * 0.1,
                                                       // Aumentar tamaño si isFullScreen es verdadero
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenHeight * 0.03
                                                           : screenHeight *
                                                               0.02, // Aumentar tamaño si isFullScreen es verdadero
@@ -3446,13 +3440,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     painter: LinePainter(
                                                       progress2:
                                                           progressContraction,
-                                                      strokeHeight: _isFullScreen
+                                                      strokeHeight: isFullScreen
                                                           ? 20
                                                           : 15, // Aumentar altura si isFullScreen es verdadero
                                                     ),
                                                   ),
                                                   SizedBox(
-                                                    width: _isFullScreen
+                                                    width: isFullScreen
                                                         ? screenWidth * 0.01
                                                         : screenWidth *
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
@@ -3462,7 +3456,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         .toString()
                                                         .padLeft(1, '0'),
                                                     style: TextStyle(
-                                                      fontSize: _isFullScreen
+                                                      fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
                                                       // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -3482,24 +3476,24 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 children: [
                                                   CustomPaint(
                                                     size: Size(
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenWidth * 0.1
                                                           : screenWidth * 0.1,
                                                       // Aumentar tamaño si isFullScreen es verdadero
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenHeight * 0.03
                                                           : screenHeight *
                                                               0.02, // Aumentar tamaño si isFullScreen es verdadero
                                                     ),
                                                     painter: LinePainter2(
                                                       progress3: progressPause,
-                                                      strokeHeight: _isFullScreen
+                                                      strokeHeight: isFullScreen
                                                           ? 20
                                                           : 15, // Aumentar altura si isFullScreen es verdadero
                                                     ),
                                                   ),
                                                   SizedBox(
-                                                    width: _isFullScreen
+                                                    width: isFullScreen
                                                         ? screenWidth * 0.01
                                                         : screenWidth *
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
@@ -3509,7 +3503,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         .toString()
                                                         .padLeft(1, '0'),
                                                     style: TextStyle(
-                                                      fontSize: _isFullScreen
+                                                      fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
                                                       // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -3521,7 +3515,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ],
                                               ),
                                               SizedBox(
-                                                height: _isFullScreen
+                                                height: isFullScreen
                                                     ? screenHeight * 0.02
                                                     : screenHeight *
                                                         0.01, // Aumentar el espacio si isFullScreen es verdadero
@@ -3531,7 +3525,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   Text(
                                                     "AVERAGE",
                                                     style: TextStyle(
-                                                      fontSize: _isFullScreen
+                                                      fontSize: isFullScreen
                                                           ? 23.sp
                                                           : 18.sp,
                                                       // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -3543,27 +3537,26 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   ),
                                                   CustomPaint(
                                                     size: Size(
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenWidth * 0.15
                                                           : screenWidth * 0.15,
                                                       // Aumentar tamaño si isFullScreen es verdadero
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenHeight * 0.05
                                                           : screenHeight *
                                                               0.05, // Aumentar tamaño si isFullScreen es verdadero
                                                     ),
                                                     painter:
                                                         AverageLineWithTextPainter(
-                                                      average: 100.0 / 100.0,
-                                                      strokeHeight:
-                                                          _isFullScreen
-                                                              ? screenHeight *
-                                                                  0.03
-                                                              : screenHeight *
-                                                                  0.02,
+                                                      average: calculateAverage(
+                                                              porcentajesMusculoTraje) /
+                                                          100.0,
+                                                      strokeHeight: isFullScreen
+                                                          ? screenHeight * 0.03
+                                                          : screenHeight * 0.02,
                                                       // Aumentar altura si isFullScreen es verdadero
                                                       textStyle: TextStyle(
-                                                        fontSize: _isFullScreen
+                                                        fontSize: isFullScreen
                                                             ? 23.sp
                                                             : 18.sp,
                                                         // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -3584,7 +3577,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Imagen base del avatar
                                               Image.asset(
                                                 "assets/images/avatar_post.png",
-                                                height: _isFullScreen
+                                                height: isFullScreen
                                                     ? screenHeight * 0.65
                                                     : screenHeight * 0.4,
                                                 fit: BoxFit.cover,
@@ -3599,7 +3592,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_trap_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3613,7 +3606,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_trap_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3634,7 +3627,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_trap_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3654,7 +3647,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_dorsal_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3668,7 +3661,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_dorsal_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3689,7 +3682,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_dorsal_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3708,7 +3701,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     top: 0,
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_gris.png",
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3722,7 +3715,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3743,7 +3736,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_lumbar_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3763,7 +3756,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gluteos_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3777,7 +3770,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gluteo_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3798,7 +3791,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_gluteo_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3818,7 +3811,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3832,7 +3825,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3853,7 +3846,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_isquio_azul.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -3874,7 +3867,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_trap_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3888,7 +3881,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_trap_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3901,7 +3894,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_trap_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3916,7 +3909,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_dorsal_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3930,7 +3923,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_dorsal_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3943,7 +3936,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_dorsal_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3958,7 +3951,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3972,7 +3965,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -3985,7 +3978,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4000,7 +3993,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gluteos_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4014,7 +4007,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gluteo_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4027,7 +4020,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gluteo_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4042,7 +4035,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_gris.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4056,7 +4049,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_naranja.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4069,7 +4062,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4376,7 +4369,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Imagen base del avatar
                                               Image.asset(
                                                 "assets/images/pantalon_frontal.png",
-                                                height: _isFullScreen
+                                                height: isFullScreen
                                                     ? screenHeight * 0.65
                                                     : screenHeight * 0.4,
                                                 fit: BoxFit.cover,
@@ -4391,7 +4384,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4405,7 +4398,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4426,7 +4419,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_biceps_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -4446,7 +4439,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_inf_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4457,7 +4450,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_sup_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4471,7 +4464,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_inf_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4482,7 +4475,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_sup_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4503,7 +4496,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_abs_inf_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -4527,7 +4520,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_abs_sup_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -4547,7 +4540,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4561,7 +4554,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4582,7 +4575,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_cua_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -4602,7 +4595,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4616,7 +4609,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4637,7 +4630,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_gem_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -4658,7 +4651,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4672,7 +4665,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4684,7 +4677,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_biceps_blanco_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4699,7 +4692,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_inf_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4710,7 +4703,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_sup_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4724,7 +4717,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_inf_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4735,7 +4728,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_sup_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4747,7 +4740,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_inf_blanco.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4759,7 +4752,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_abs_sup_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4774,7 +4767,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4788,7 +4781,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4800,7 +4793,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_cua_blanco_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4815,7 +4808,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4829,7 +4822,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gemelos_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4841,7 +4834,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_gem_blanco_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -4947,11 +4940,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 children: [
                                                   CustomPaint(
                                                     size: Size(
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenWidth * 0.1
                                                           : screenWidth * 0.1,
                                                       // Aumentar tamaño si isFullScreen es verdadero
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenHeight * 0.03
                                                           : screenHeight *
                                                               0.02, // Aumentar tamaño si isFullScreen es verdadero
@@ -4959,13 +4952,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     painter: LinePainter(
                                                       progress2:
                                                           progressContraction,
-                                                      strokeHeight: _isFullScreen
+                                                      strokeHeight: isFullScreen
                                                           ? 20
                                                           : 15, // Aumentar altura si isFullScreen es verdadero
                                                     ),
                                                   ),
                                                   SizedBox(
-                                                    width: _isFullScreen
+                                                    width: isFullScreen
                                                         ? screenWidth * 0.01
                                                         : screenWidth *
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
@@ -4975,7 +4968,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         .toString()
                                                         .padLeft(1, '0'),
                                                     style: TextStyle(
-                                                      fontSize: _isFullScreen
+                                                      fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
                                                       // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -4995,24 +4988,24 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 children: [
                                                   CustomPaint(
                                                     size: Size(
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenWidth * 0.1
                                                           : screenWidth * 0.1,
                                                       // Aumentar tamaño si isFullScreen es verdadero
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenHeight * 0.03
                                                           : screenHeight *
                                                               0.02, // Aumentar tamaño si isFullScreen es verdadero
                                                     ),
                                                     painter: LinePainter2(
                                                       progress3: progressPause,
-                                                      strokeHeight: _isFullScreen
+                                                      strokeHeight: isFullScreen
                                                           ? 20
                                                           : 15, // Aumentar altura si isFullScreen es verdadero
                                                     ),
                                                   ),
                                                   SizedBox(
-                                                    width: _isFullScreen
+                                                    width: isFullScreen
                                                         ? screenWidth * 0.01
                                                         : screenWidth *
                                                             0.01, // Aumentar el espacio si isFullScreen es verdadero
@@ -5022,7 +5015,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         .toString()
                                                         .padLeft(1, '0'),
                                                     style: TextStyle(
-                                                      fontSize: _isFullScreen
+                                                      fontSize: isFullScreen
                                                           ? 25.sp
                                                           : 20.sp,
                                                       // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -5034,7 +5027,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ],
                                               ),
                                               SizedBox(
-                                                height: _isFullScreen
+                                                height: isFullScreen
                                                     ? screenHeight * 0.02
                                                     : screenHeight *
                                                         0.01, // Aumentar el espacio si isFullScreen es verdadero
@@ -5044,7 +5037,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   Text(
                                                     "AVERAGE",
                                                     style: TextStyle(
-                                                      fontSize: _isFullScreen
+                                                      fontSize: isFullScreen
                                                           ? 23.sp
                                                           : 18.sp,
                                                       // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -5056,27 +5049,26 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   ),
                                                   CustomPaint(
                                                     size: Size(
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenWidth * 0.15
                                                           : screenWidth * 0.15,
                                                       // Aumentar tamaño si isFullScreen es verdadero
-                                                      _isFullScreen
+                                                      isFullScreen
                                                           ? screenHeight * 0.05
                                                           : screenHeight *
                                                               0.05, // Aumentar tamaño si isFullScreen es verdadero
                                                     ),
                                                     painter:
                                                         AverageLineWithTextPainter(
-                                                      average: 100.0 / 100.0,
-                                                      strokeHeight:
-                                                          _isFullScreen
-                                                              ? screenHeight *
-                                                                  0.03
-                                                              : screenHeight *
-                                                                  0.02,
+                                                      average: calculateAverage(
+                                                              porcentajesMusculoPantalon) /
+                                                          100.0,
+                                                      strokeHeight: isFullScreen
+                                                          ? screenHeight * 0.03
+                                                          : screenHeight * 0.02,
                                                       // Aumentar altura si isFullScreen es verdadero
                                                       textStyle: TextStyle(
-                                                        fontSize: _isFullScreen
+                                                        fontSize: isFullScreen
                                                             ? 23.sp
                                                             : 18.sp,
                                                         // Aumentar tamaño de fuente si isFullScreen es verdadero
@@ -5097,7 +5089,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Imagen base del avatar
                                               Image.asset(
                                                 "assets/images/pantalon_posterior.png",
-                                                height: _isFullScreen
+                                                height: isFullScreen
                                                     ? screenHeight * 0.65
                                                     : screenHeight * 0.4,
                                                 fit: BoxFit.cover,
@@ -5112,7 +5104,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5126,7 +5118,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5147,7 +5139,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_lumbar_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -5167,7 +5159,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_sup_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5178,7 +5170,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_inf_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5192,7 +5184,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_sup_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5203,7 +5195,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_inf_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5224,7 +5216,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_glut_inf_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -5248,7 +5240,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_glut_sup_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -5268,7 +5260,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5282,7 +5274,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5303,7 +5295,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                   .value,
                                                           child: Image.asset(
                                                             "assets/images/capa_isquio_azul_pantalon.png",
-                                                            height: _isFullScreen
+                                                            height: isFullScreen
                                                                 ? screenHeight *
                                                                     0.65
                                                                 : screenHeight *
@@ -5324,7 +5316,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5338,7 +5330,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5351,7 +5343,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_lumbar_blanco_pantalon.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5366,7 +5358,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_sup_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5377,7 +5369,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_inf_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5391,7 +5383,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_sup_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5402,7 +5394,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_inf_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5414,8 +5406,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     // Ajusta la posición de la superposición
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_sup_blanco.png",
-                                                      // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5427,7 +5418,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_glut_inf_blanco.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5442,7 +5433,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_gris_pantalon.png",
                                                       // Imagen para el estado inactivo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5456,7 +5447,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_naranja_pantalon.png",
                                                       // Imagen para el estado bloqueado
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5469,7 +5460,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       "assets/images/capa_isquio_blanco_pantalon.png",
                                                       // Reemplaza con la ruta de la imagen del músculo
-                                                      height: _isFullScreen
+                                                      height: isFullScreen
                                                           ? screenHeight * 0.65
                                                           : screenHeight * 0.4,
                                                       fit: BoxFit.cover,
@@ -5645,7 +5636,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                 ]
                               ],
                             ),
-                            if (_isFullScreen)
+                            if (isFullScreen)
                               Positioned(
                                 bottom: 0,
                                 // Distancia desde el borde superior
@@ -5653,10 +5644,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                 // Distancia desde el borde derecho
                                 child: GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      _isFullScreen =
-                                          false; // Cambia el estado para ocultar este botón
-                                    });
+                                    widget
+                                        .toggleFullScreen(); // Llamamos a la función toggleFullScreen
                                   },
                                   child: ClipOval(
                                     child: Image.asset(
@@ -5671,7 +5660,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               ),
                           ]),
                         ),
-                        if (!_isFullScreen)
+                        if (!isFullScreen)
                           Expanded(
                             flex: 2,
                             child: Column(
@@ -5962,10 +5951,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           onTapUp: (_) => setState(
                                               () => scaleFactorFull = 1.0),
                                           onTap: () {
-                                            setState(() {
-                                              _isFullScreen =
-                                                  !_isFullScreen; // Cambia el estado de pantalla completa
-                                            });
+                                            widget.toggleFullScreen();
                                           },
                                           child: AnimatedScale(
                                             scale: scaleFactorFull,
@@ -6007,7 +5993,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       onProgramSelected,
                       onIndivProgramSelected,
                       onRecoProgramSelected,
-                      onAutoProgramSelected),
+                      onAutoProgramSelected,
+                      onClientSelected),
                 ),
               ),
           ],
@@ -6020,11 +6007,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     Function(Map<String, dynamic>?) onIndivProgramSelected,
     Function(Map<String, dynamic>?) onRecoProgramSelected,
     Function(Map<String, dynamic>?) onAutoProgramSelected,
+    Function(Map<String, dynamic>?) onClientSelected,
   ) {
     switch (overlayIndex) {
       case 0:
         return OverlaySeleccionarCliente(
           onClose: () => toggleOverlay(0),
+          onClientSelected: onClientSelected,
         );
       case 1:
         return OverlayTipoPrograma(
@@ -6095,7 +6084,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/mas.png',
-                size: _isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ? 55.0 : 45.0,
                 isDisabled: _isMusculoTrajeBloqueado[index] ||
                     _isMusculoTrajeInactivo[index],
               ),
@@ -6123,8 +6112,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       });
                     },
                     child: SizedBox(
-                      width: _isFullScreen ? 80.0 : 65.0,
-                      height: _isFullScreen ? 80.0 : 65.0,
+                      width: isFullScreen ? 80.0 : 65.0,
+                      height: isFullScreen ? 80.0 : 65.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Stack(
@@ -6160,7 +6149,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                   Text(
                     '${porcentajesMusculoTraje[index]}%',
                     style: TextStyle(
-                      fontSize: _isFullScreen ? 18.0.sp : 17.0.sp,
+                      fontSize: isFullScreen ? 18.0.sp : 17.0.sp,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF2be4f3),
                     ),
@@ -6184,7 +6173,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/menos.png',
-                size: _isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ? 55.0 : 45.0,
                 isDisabled: _isMusculoTrajeBloqueado[index] ||
                     _isMusculoTrajeInactivo[index],
               ),
@@ -6214,6 +6203,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     } else {
       return Colors.green.withOpacity(0.6); // Verde con opacidad del 60%
     }
+  }
+
+  double calculateAverage(List<int> porcentajesMusculoTraje) {
+    double sum =
+        porcentajesMusculoTraje.fold(0, (prev, element) => prev + element);
+    return sum / porcentajesMusculoTraje.length;
   }
 
   Widget _buildMuscleRow2({
@@ -6253,7 +6248,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/mas.png',
-                size: _isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ? 55.0 : 45.0,
                 isDisabled: _isMusculoPantalonBloqueado[index] ||
                     _isMusculoPantalonInactivo[index],
               ),
@@ -6283,8 +6278,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       });
                     },
                     child: SizedBox(
-                      width: _isFullScreen ? 80.0 : 60.0,
-                      height: _isFullScreen ? 80.0 : 60.0,
+                      width: isFullScreen ? 80.0 : 60.0,
+                      height: isFullScreen ? 80.0 : 60.0,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Stack(
@@ -6322,7 +6317,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                   Text(
                     '${porcentajesMusculoPantalon[index]}%',
                     style: TextStyle(
-                      fontSize: _isFullScreen ? 18.0.sp : 17.sp,
+                      fontSize: isFullScreen ? 18.0.sp : 17.sp,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF2be4f3),
                     ),
@@ -6346,7 +6341,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/menos.png',
-                size: _isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ? 55.0 : 45.0,
                 isDisabled: _isMusculoPantalonBloqueado[index] ||
                     _isMusculoPantalonInactivo[index],
               ),
@@ -6378,6 +6373,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     } else {
       return Colors.green.withOpacity(0.5); // Verde con opacidad del 60%
     }
+  }
+
+  double calculateAverage2(List<int> porcentajesMusculoPantalon) {
+    double sum =
+        porcentajesMusculoPantalon.fold(0, (prev, element) => prev + element);
+    return sum / porcentajesMusculoPantalon.length;
   }
 
   Widget buildControlRow({
