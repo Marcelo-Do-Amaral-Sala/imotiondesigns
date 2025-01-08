@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 import 'package:platform/platform.dart';
 
 import '../../../utils/translation_utils.dart';
@@ -53,6 +54,11 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
   List<String> parsedData = [];
   String licenciaMac = '';
   List<Map<String, dynamic>> mcis = [];
+  bool isOverlayVisible = false;
+  int overlayIndex = -1;
+  String? overlayMac;
+  bool? overlayMacBle;
+  String? overlayEstado;
 
   @override
   void initState() {
@@ -74,13 +80,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     });
   }
 
-  void _tapMci(Map<String, dynamic> mciData) {
-    // Asegúrate de que los datos se pasen correctamente como Map<String, String>
-    final mciStringData =
-        mciData.map((key, value) => MapEntry(key, value.toString()));
+  void toggleOverlay(int index) {
+    setState(() {
+      isOverlayVisible = !isOverlayVisible;
+      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
+    });
 
-    debugPrint(
-        'MCI Data: ${mciStringData.toString()}'); // Imprime todos los datos del cliente
+    // Imprime el estado de isOverlayVisible después de actualizarlo
+    debugPrint('isOverlayVisible después de toggleOverlay: $isOverlayVisible');
   }
 
   // Método para detectar el sistema operativo
@@ -485,329 +492,370 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
               ],
             ),
           ),
-          // Aquí agregamos un nuevo Expanded que ocupe el espacio restante debajo
-          Positioned(
-            top: screenHeight * 0.25,
-            // Ajusta este valor según lo que necesites
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.05,
-                vertical: screenHeight * 0.05,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Columna que contiene los dos primeros Expanded y el botón
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          tr(context, 'Datos licencia').toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF2be4f3),
+          Stack(children: [
+            Positioned(
+              top: screenHeight * 0.25,
+              // Ajusta este valor según lo que necesites
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.05,
+                  vertical: screenHeight * 0.05,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Columna que contiene los dos primeros Expanded y el botón
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            tr(context, 'Datos licencia').toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2be4f3),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        Row(
-                          children: [
-                            // Primer Expanded: Formulario izquierdo
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      tr(context, 'Nº de licencia')
-                                          .toUpperCase(),
-                                      style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _nLicenciaController,
-                                      keyboardType: TextInputType.text,
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                        hintText: tr(
-                                            context, 'Introducir nº licencia'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: screenHeight * 0.02),
-                                  Text(tr(context, 'Nombre').toUpperCase(),
-                                      style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _nameController,
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                          hintText: 'Introducir nombre'),
-                                    ),
-                                  ),
-                                  SizedBox(height: screenHeight * 0.02),
-                                  Text(tr(context, 'Dirección').toUpperCase(),
-                                      style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _adressController,
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                        hintText:
-                                            tr(context, 'Introducir dirección'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: screenHeight * 0.02),
-                                  Text(tr(context, 'Ciudad').toUpperCase(),
-                                      style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _cityController,
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                        hintText:
-                                            tr(context, 'Introducir ciudad'),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.05),
-                            // Segundo Expanded: Formulario derecho
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(tr(context, 'Provincia').toUpperCase(),
-                                      style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _provinciaController,
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                        hintText:
-                                            tr(context, 'Introducir provincia'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: screenHeight * 0.02),
-                                  Text(tr(context, 'País').toUpperCase(),
-                                      style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _countryController,
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                        hintText:
-                                            tr(context, 'Introducir país'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: screenHeight * 0.02),
-                                  Text(tr(context, 'Teléfono').toUpperCase(),
-                                      style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _phoneController,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        LengthLimitingTextInputFormatter(3),
-                                      ],
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                        hintText:
-                                            tr(context, 'Introducir teléfono'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: screenHeight * 0.02),
-                                  Text('E-MAIL', style: _labelStyle),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    decoration: _inputDecoration(),
-                                    child: TextField(
-                                      controller: _emailController,
-                                      keyboardType: TextInputType.emailAddress,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.deny(
-                                            RegExp(r'\s')),
-                                      ],
-                                      style: _inputTextStyle,
-                                      decoration: _inputDecorationStyle(
-                                        hintText:
-                                            tr(context, 'Introducir e-mail'),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight * 0.05),
-                        // OutlinedButton debajo de los dos Expanded
-                        Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          SizedBox(height: screenHeight * 0.02),
+                          Row(
                             children: [
-                              OutlinedButton(
-                                onPressed: _validarLicencia,
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.all(10.0),
-                                  side: const BorderSide(
-                                      width: 1.0, color: Color(0xFF2be4f3)),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(7),
-                                  ),
-                                  backgroundColor: Colors.transparent,
-                                ),
-                                child: Text(
-                                  tr(context, 'Validar licencia').toUpperCase(),
-                                  style: TextStyle(
-                                    color: const Color(0xFF2be4f3),
-                                    fontSize: 17.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
+                              // Primer Expanded: Formulario izquierdo
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        tr(context, 'Nº de licencia')
+                                            .toUpperCase(),
+                                        style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _nLicenciaController,
+                                        keyboardType: TextInputType.text,
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                          hintText: tr(context,
+                                              'Introducir nº licencia'),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Text(tr(context, 'Nombre').toUpperCase(),
+                                        style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _nameController,
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                            hintText: 'Introducir nombre'),
+                                      ),
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Text(tr(context, 'Dirección').toUpperCase(),
+                                        style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _adressController,
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                          hintText: tr(
+                                              context, 'Introducir dirección'),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Text(tr(context, 'Ciudad').toUpperCase(),
+                                        style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _cityController,
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                          hintText:
+                                              tr(context, 'Introducir ciudad'),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              if (AppState.instance.isLicenciaValida)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20.0),
-                                  child: Text(
-                                    tr(context, 'Licencia validada')
-                                        .toUpperCase(),
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontSize: 22.sp,
-                                      fontWeight: FontWeight.bold,
+                              SizedBox(width: screenWidth * 0.05),
+                              // Segundo Expanded: Formulario derecho
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(tr(context, 'Provincia').toUpperCase(),
+                                        style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _provinciaController,
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                          hintText: tr(
+                                              context, 'Introducir provincia'),
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Text(tr(context, 'País').toUpperCase(),
+                                        style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _countryController,
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                          hintText:
+                                              tr(context, 'Introducir país'),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Text(tr(context, 'Teléfono').toUpperCase(),
+                                        style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _phoneController,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                          LengthLimitingTextInputFormatter(3),
+                                        ],
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                          hintText: tr(
+                                              context, 'Introducir teléfono'),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Text('E-MAIL', style: _labelStyle),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      decoration: _inputDecoration(),
+                                      child: TextField(
+                                        controller: _emailController,
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s')),
+                                        ],
+                                        style: _inputTextStyle,
+                                        decoration: _inputDecorationStyle(
+                                          hintText:
+                                              tr(context, 'Introducir e-mail'),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                              ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.05),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      // Ajusta el tamaño del Column a su contenido
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      // Alinea el texto y el contenedor al inicio
-                      children: [
-                        Text(
-                          tr(context, 'Nº de licencia').toUpperCase(),
-                          // Texto fijo
-                          style: TextStyle(
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF2be4f3),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Expanded(
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                children: [
-                                  // Encabezado de la tabla
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      buildCell('MAC'),
-                                      buildCell(
-                                        tr(context, 'Tipo').toUpperCase(),
-                                      ),
-                                      buildCell(
-                                        tr(context, 'Estado').toUpperCase(),
-                                      ),
-                                    ],
+                          SizedBox(height: screenHeight * 0.05),
+                          // OutlinedButton debajo de los dos Expanded
+                          Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                OutlinedButton(
+                                  onPressed: _validarLicencia,
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.all(10.0),
+                                    side: const BorderSide(
+                                        width: 1.0, color: Color(0xFF2be4f3)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    backgroundColor: Colors.transparent,
                                   ),
-                                  SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.01),
-                                  Expanded(
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        children:
-                                            AppState.instance.mcis.map((row) {
-                                          // Obtenemos los valores necesarios de la fila de "row"
-                                          String mac = row['mac'] ?? ''; // MAC
-                                          bool macBle = row['macBle'] ??
-                                              false; // macBle (booleano)
-                                          String estado = AppState
-                                                      .instance.bloqueada ==
-                                                  '1'
-                                              ? 'Bloqueada'
-                                              : 'Activa'; // Estado basado en la propiedad bloqueada de AppState
-
-                                          // Construir y retornar las filas de la tabla
-                                          return Column(
-                                            children: [
-                                              DataRowWidget(
-                                                mac: mac,
-                                                macBle: macBle,
-                                                estado: estado,
-                                                onTap: () {
-                                                  _tapMci(
-                                                      row); // Método para manejar el tap en la fila
-                                                },
-                                              ),
-                                              SizedBox(
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.01),
-                                            ],
-                                          );
-                                        }).toList(),
+                                  child: Text(
+                                    tr(context, 'Validar licencia')
+                                        .toUpperCase(),
+                                    style: TextStyle(
+                                      color: const Color(0xFF2be4f3),
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                if (AppState.instance.isLicenciaValida)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    child: Text(
+                                      tr(context, 'Licencia validada')
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 22.sp,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.05),
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        // Ajusta el tamaño del Column a su contenido
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        // Alinea el texto y el contenedor al inicio
+                        children: [
+                          Text(
+                            tr(context, 'Nº de licencia').toUpperCase(),
+                            // Texto fijo
+                            style: TextStyle(
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2be4f3),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Expanded(
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  children: [
+                                    // Encabezado de la tabla
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        buildCell('MAC'),
+                                        buildCell(
+                                          tr(context, 'Tipo').toUpperCase(),
+                                        ),
+                                        buildCell(
+                                          tr(context, 'Estado').toUpperCase(),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.01),
+                                    Expanded(
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          children:
+                                              AppState.instance.mcis.map((row) {
+                                            String mac =
+                                                row['mac'] ?? ''; // MAC
+                                            bool macBle = row['macBle'] ??
+                                                false; // macBle
+                                            String estado = AppState
+                                                        .instance.bloqueada ==
+                                                    '1'
+                                                ? 'Bloqueada'
+                                                : 'Activa'; // Estado basado en la propiedad bloqueada
+
+                                            return Column(
+                                              children: [
+                                                DataRowWidget(
+                                                  mac: mac,
+                                                  macBle: macBle,
+                                                  estado: estado,
+                                                  onTap: () {
+                                                    setState(() {
+                                                      // Actualizar los valores del overlay
+                                                      // Establece las variables del overlay aquí
+                                                      overlayMac = mac;
+                                                      overlayMacBle = macBle;
+                                                      overlayEstado = estado;
+                                                      toggleOverlay(
+                                                          0); // Llamar a toggleOverlay con el nuevo estado
+                                                    });
+                                                  },
+                                                ),
+                                                SizedBox(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.01),
+                                              ],
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
+            if (isOverlayVisible)
+              Positioned(
+                top: screenHeight * 0.2,
+                bottom: screenHeight * 0.2,
+                right: screenWidth * 0.1,
+                left: screenWidth * 0.1,
+                child: Align(
+                    alignment: Alignment.center,
+                    child: _getOverlayWidget(overlayIndex, overlayMac,
+                        overlayMacBle, overlayEstado)),
+              ),
+          ]),
         ],
       ),
     );
+  }
+
+  Widget _getOverlayWidget(
+      int overlayIndex, String? mac, bool? macBle, String? estado) {
+    switch (overlayIndex) {
+      case 0:
+        // Verificamos si los valores son nulos y asignamos valores predeterminados
+        return OverlayMciInfo(
+          mac: mac ?? 'Desconocido',
+          // Si mac es nulo, usamos 'Desconocido'
+          macBle: macBle ?? false,
+          // Si macBle es nulo, usamos false
+          estado: estado ?? 'Desconocido',
+          // Si estado es nulo, usamos 'Desconocido'
+          onClose: () => toggleOverlay(0),
+        );
+      default:
+        return Container(); // Si el índice no es 0, no se muestra nada
+    }
   }
 
   // Función para crear las celdas de la tabla
@@ -873,27 +921,32 @@ class _DataRowWidgetState extends State<DataRowWidget> {
             });
           }
         });
-        _showConfirmationDialog(context);
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: isPressed ? Colors.blue.withOpacity(0.1) : Colors.transparent,
-          border: Border.all(
-            color: const Color.fromARGB(255, 3, 236, 244),
+      child: Stack(
+        children: [
+          // El contenido principal del DataRowWidget
+          Container(
+            decoration: BoxDecoration(
+              color:
+                  isPressed ? Colors.blue.withOpacity(0.1) : Colors.transparent,
+              border: Border.all(
+                color: const Color.fromARGB(255, 3, 236, 244),
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildCell(widget.mac),
+                // Mostrar la MAC
+                buildCell(widget.macBle ? 'BLE' : 'BT'),
+                // Mostrar el tipo de conexión
+                buildCell(widget.estado),
+                // Mostrar el estado
+              ],
+            ),
           ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            buildCell(widget.mac),
-            // Mostrar la MAC
-            buildCell(widget.macBle ? 'BLE' : 'BT'),
-            // Mostrar el tipo de conexión
-            buildCell(widget.estado),
-            // Mostrar el estado
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -919,6 +972,12 @@ TextStyle get _labelStyle => TextStyle(
 TextStyle get _inputTextStyle =>
     TextStyle(color: Colors.white, fontSize: 14.sp);
 
+TextStyle get _dropdownHintStyle =>
+    TextStyle(color: Colors.white, fontSize: 14.sp);
+
+TextStyle get _dropdownItemStyle =>
+    TextStyle(color: Colors.white, fontSize: 15.sp);
+
 InputDecoration _inputDecorationStyle(
     {String hintText = '', bool enabled = true}) {
   return InputDecoration(
@@ -935,82 +994,4 @@ InputDecoration _inputDecorationStyle(
 BoxDecoration _inputDecoration() {
   return BoxDecoration(
       color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
-}
-
-void _showConfirmationDialog(
-  BuildContext context,
-) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(
-            color: Color(0xFF2be4f3),
-          ),
-          borderRadius: BorderRadius.circular(7),
-        ),
-        backgroundColor: const Color(0xFF2E2E2E),
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.5,
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height *
-                0.55, // Fijar altura máxima
-          ),
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            // Centra todo en el eje vertical
-            children: [
-              SingleChildScrollView(
-                child: Center(
-                  // Usa el widget Center para centrar el contenido
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'INFO MCI',
-                        style: TextStyle(
-                            color: const Color(0xFF2be4f3),
-                            fontSize: 30.sp,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                            decorationColor: const Color(0xFF2be4f3)),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    'CERRAR',
-                    style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
 }

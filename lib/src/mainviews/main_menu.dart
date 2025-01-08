@@ -319,7 +319,6 @@ class _MainMenuViewState extends State<MainMenuView> {
     257: 'assets/images/seleccion_cliente.png',
   };
 
-
   @override
   void initState() {
     super.initState();
@@ -341,12 +340,13 @@ class _MainMenuViewState extends State<MainMenuView> {
       await precacheImage(AssetImage(path), context); // Pre-carga la imagen
     }
 
-    // Cambia el estado una vez que todas las imágenes estén precargadas
-    setState(() {
-      _isImagesLoaded = true;
-    });
+    if (mounted) {
+      // Cambia el estado una vez que todas las imágenes estén precargadas
+      setState(() {
+        _isImagesLoaded = true;
+      });
+    }
   }
-
 
   void toggleOverlay(int index) {
     setState(() {
@@ -377,6 +377,7 @@ class _MainMenuViewState extends State<MainMenuView> {
       debugPrint("Error al inicializar la base de datos: $e");
     }
   }
+
   Future<void> _initializeDatabaseTraducciones() async {
     try {
       if (kIsWeb) {
@@ -399,7 +400,6 @@ class _MainMenuViewState extends State<MainMenuView> {
       debugPrint("Error al inicializar la base de datos: $e");
     }
   }
-
 
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {

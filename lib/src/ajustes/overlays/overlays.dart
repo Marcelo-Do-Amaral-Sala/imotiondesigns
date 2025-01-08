@@ -389,12 +389,15 @@ class OverlayIdioma extends StatefulWidget {
   @override
   _OverlayIdiomaState createState() => _OverlayIdiomaState();
 }
+
 class _OverlayIdiomaState extends State<OverlayIdioma> {
   String? _selectedLanguage;
   Map<String, String> _translations = {};
-  Map<String, Map<String, String>> _translationsCache = {}; // Caché de traducciones
+  Map<String, Map<String, String>> _translationsCache =
+      {}; // Caché de traducciones
   final SyncService _syncService = SyncService();
-  final DatabaseHelperTraducciones _dbHelperTraducciones = DatabaseHelperTraducciones();
+  final DatabaseHelperTraducciones _dbHelperTraducciones =
+      DatabaseHelperTraducciones();
 
   final Map<String, String> _languageMap = {
     'ESPAÑOL': 'es',
@@ -424,10 +427,12 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
   // Consultar el caché y luego la base de datos si es necesario
   void _fetchLocalTranslations(String language) async {
     final provider = Provider.of<TranslationProvider>(context, listen: false);
-    await provider.changeLanguage(language); // Cambiar el idioma usando el provider
+    await provider
+        .changeLanguage(language); // Cambiar el idioma usando el provider
 
     setState(() {
-      _translations = provider.translations; // Obtener las traducciones actualizadas
+      _translations =
+          provider.translations; // Obtener las traducciones actualizadas
     });
   }
 
@@ -491,14 +496,16 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                 child: OutlinedButton(
                   onPressed: () {
                     if (_selectedLanguage != null) {
-                      _changeAppLanguage(_selectedLanguage!); // Cambia el idioma seleccionado
+                      _changeAppLanguage(
+                          _selectedLanguage!); // Cambia el idioma seleccionado
                       setState(() {});
                     }
                     widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -569,8 +576,6 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
     );
   }
 }
-
-
 
 class OverlayServicio extends StatefulWidget {
   final VoidCallback onClose;
@@ -2291,5 +2296,403 @@ class _OverlayVitaState extends State<OverlayVita>
       ),
       onClose: widget.onClose,
     );
+  }
+}
+
+class OverlayMciInfo extends StatefulWidget {
+  final String mac;
+  final bool macBle;
+  final String estado;
+  final VoidCallback onClose;
+
+  const OverlayMciInfo({
+    Key? key,
+    required this.mac,
+    required this.macBle,
+    required this.estado,
+    required this.onClose,
+  }) : super(key: key);
+
+  @override
+  _OverlayMciInfoState createState() => _OverlayMciInfoState();
+}
+
+class _OverlayMciInfoState extends State<OverlayMciInfo> {
+  late String selectedEstado;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedEstado = widget.estado;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return MainOverlay(
+      title: Text(
+        'MCI',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 34.sp,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF2be4f3),
+        ),
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+        child: Column(
+          children: [
+            // Primer Expanded para MAC y Dropdown de estado
+            Expanded(
+              flex: 1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      'MAC. ${widget.mac}',
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 25.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Estado'.toUpperCase(),
+                          style: _labelStyle,
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: AbsorbPointer(  // Bloquea la interacción
+                            child: DropdownButton<String>(
+                              hint: Text('Seleccione', style: _dropdownHintStyle),
+                              value: selectedEstado,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'Activa',
+                                  child: Text('Activa', style: _dropdownItemStyle),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Inactiva',
+                                  child: Text('Inactiva', style: _dropdownItemStyle),
+                                ),
+                              ],
+                              onChanged: null,  // Bloquea la acción de cambio
+                              dropdownColor: const Color(0xFF313030),
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Color(0xFF2be4f3),
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        )
+
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  // Contenedor oscuro 1
+                  Expanded(
+                      child: Column(
+                    children: [
+                      Text(
+                        'INFO',
+                        style: TextStyle(
+                          color: const Color(0xFF2be4f3),
+                          fontSize: 25.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                      SizedBox(height: screenHeight * 0.01),
+                      Container(
+                        height: screenHeight * 0.2,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 46, 46, 46),
+                          borderRadius: BorderRadius.circular(7.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            children: [
+                              // Primera columna
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Fila para C:
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'C: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          // Espacio vacío para agregar el dato
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight*0.01),
+                                    // Espacio entre las filas
+                                    // Fila para T:
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'T: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight*0.01),
+
+                                    // Fila para CT:
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'CT: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight*0.01),
+
+                                    // Fila para CP:
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'CP: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Espacio entre columnas
+                              SizedBox(width: screenWidth*0.01),
+                              // Espacio entre la primera y segunda columna
+
+                              // Segunda columna
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Fila para V:
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'V: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight*0.01),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'LS: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight*0.01),
+                                    // Fila para FS:
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'FS: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: screenHeight*0.01),
+                                    // Fila para TS:
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'TS: ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15.sp,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+                  SizedBox(width: screenWidth * 0.05),
+                  Expanded(
+                      child: Column(
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(10.0),
+                          side: const BorderSide(
+                              width: 1.0, color: Color(0xFF2be4f3)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          backgroundColor: Colors.transparent,
+                        ),
+                        child: Text(
+                          tr(context, 'Recarga').toUpperCase(),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.01),
+                      Container(
+                        height: screenHeight * 0.2,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 46, 46, 46),
+                          borderRadius: BorderRadius.circular(7.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(),
+                        ),
+                      ),
+                    ],
+                  )),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      onClose: widget.onClose,
+    );
+  }
+
+  // Ajustes de estilos para simplificar
+  TextStyle get _labelStyle => TextStyle(
+      color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
+
+  TextStyle get _inputTextStyle =>
+      TextStyle(color: Colors.white, fontSize: 14.sp);
+
+  TextStyle get _dropdownHintStyle =>
+      TextStyle(color: Colors.white, fontSize: 14.sp);
+
+  TextStyle get _dropdownItemStyle =>
+      TextStyle(color: Colors.white, fontSize: 15.sp);
+
+  BoxDecoration _inputDecoration() {
+    return BoxDecoration(
+        color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
   }
 }
