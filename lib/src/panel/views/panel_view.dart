@@ -318,6 +318,7 @@ class _PanelViewState extends State<PanelView> {
                         child: Column(
                           children: [
                             if (!isFullScreen) ...[
+
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.all(10.0),
@@ -1385,7 +1386,10 @@ class ExpandedContentWidget extends StatefulWidget {
 
 class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     with SingleTickerProviderStateMixin {
-  // Crear la instancia de PanelView usando el GlobalKey
+
+  late ClientsProvider? _clientsProvider;
+
+
 
   late PanelView panelView = PanelView(
     key: panelViewKey,
@@ -1590,6 +1594,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _fetchIndividualPrograms();
     _fetchRecoveryPrograms();
     _fetchAutoPrograms();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _clientsProvider = Provider.of<ClientsProvider>(context, listen: false);
+      });
+    });
   }
 
   @override
@@ -2074,6 +2083,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("Programa seleccionado: $selectedAutoProgram");
   }
 
+
+
   @override
   void dispose() {
     if (kDebugMode) {
@@ -2091,6 +2102,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (kDebugMode) {
       print("🔧 Controlador de opacidad liberado.");
     }
+
+    if (_clientsProvider != null) {
+      _clientsProvider!.clearSelectedClientsSilently(); // Limpia sin notificar
+      if (kDebugMode) {
+        print("📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
+      }
+    }
+
     super.dispose();
   }
 
@@ -5771,33 +5790,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               ),
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Clientes seleccionados:',
-                                                    style: TextStyle(color: Colors.white),
-                                                  ),
-                                                  // Condicionalmente mostramos los clientes
-                                                  if (_isExpanded2) ...[
-                                                    // Usamos un `Column` para la lista de clientes
-                                                    Expanded(
-                                                      child: Column(
-                                                        children: selectedClients.map((client) {
-                                                          return Padding(
-                                                            padding: const EdgeInsets.only(bottom: 5.0),
-                                                            child: Text(
-                                                              client['name'] ?? 'N/A',
-                                                              style: TextStyle(color: Colors.white),
-                                                            ),
-                                                          );
-                                                        }).toList(),
-                                                      ),
+                                                children: selectedClients.map((client) {
+                                                  // Asume que cada cliente tiene una clave "name" para mostrar su nombre.
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0), // Espaciado entre textos
+                                                    child: Text(
+                                                      client['name'] ?? 'Sin nombre', // Muestra "Sin nombre" si no tiene clave "name"
+                                                      style: TextStyle(fontSize: 16, color: Colors.white), // Ajusta el estilo del texto si es necesario
                                                     ),
-                                                  ]
-                                                ],
+                                                  );
+                                                }).toList(),
                                               ),
                                             ),
                                           ),
-
                                         ],
                                       ),
                                       SizedBox(height: screenHeight * 0.01),

@@ -1410,7 +1410,6 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                         children: [
                           GestureDetector(
                             onTap: () {
-                              // Agregar el cliente seleccionado a la lista global
                               Provider.of<ClientsProvider>(context, listen: false).addClient(client);
 
                               // Llama a la función para pasar el cliente seleccionado
@@ -1484,21 +1483,22 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
   }
 }
 
-
 class ClientsProvider with ChangeNotifier {
   List<Map<String, dynamic>> _selectedClients = [];
-
   List<Map<String, dynamic>> get selectedClients => _selectedClients;
-
   void addClient(Map<String, dynamic> client) {
     if (!_selectedClients.any((c) => c['id'] == client['id'])) {
       _selectedClients.add(client);
       notifyListeners(); // Notifica a los widgets que están escuchando
     }
   }
-
   void removeClient(Map<String, dynamic> client) {
     _selectedClients.removeWhere((c) => c['id'] == client['id']);
     notifyListeners(); // Notifica después de eliminar
   }
+  void clearSelectedClientsSilently() {
+    selectedClients.clear(); // Limpia los datos sin notificar
+  }
 }
+
+
