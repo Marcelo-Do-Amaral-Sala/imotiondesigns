@@ -1420,7 +1420,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                               decoration: BoxDecoration(
                                 color: Colors.transparent,
                                 border: Border.all(
-                                  color: const Color.fromARGB(255, 3, 236, 244),
+                                  color: const Color(0xFF2be4f3),
                                 ),
                                 borderRadius: BorderRadius.circular(10),
                               ),

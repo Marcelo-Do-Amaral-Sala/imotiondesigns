@@ -33,7 +33,7 @@ class PanelView extends StatefulWidget {
 class _PanelViewState extends State<PanelView> {
   late BleConnectionService bleConnectionService;
   late StreamSubscription _subscription;
-
+  late ClientsProvider? _clientsProvider;
   bool isDisconnected = true;
   bool isConnected = false;
   bool isActive = false;
@@ -76,6 +76,11 @@ class _PanelViewState extends State<PanelView> {
       });
     });
     initializeMcis(AppState.instance.mcis);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _clientsProvider = Provider.of<ClientsProvider>(context, listen: false);
+      });
+    });
   }
 
   void initializeMcis(List<Map<String, dynamic>> mcisList) {
@@ -188,12 +193,18 @@ class _PanelViewState extends State<PanelView> {
     }
   }
 
-  // Método para actualizar los valores de macAddress y grupoKey
   void updateDeviceSelection(String mac, String group) {
     setState(() {
-      macAddress = mac;
-      grupoKey = group;
+      macAddress = mac; // Actualizamos el macAddress
+      grupoKey =
+          group; // Actualizamos la clave del grupo (vacío para selección individual)
     });
+
+    if (group.isEmpty) {
+      print("🔄 Dispositivo individual seleccionado: $mac");
+    } else {
+      print("🔄 Dispositivo $mac del grupo $group seleccionado.");
+    }
   }
 
   void _handleIndividualSelection(String macAddress) {
@@ -213,7 +224,9 @@ class _PanelViewState extends State<PanelView> {
     print("📱 $macAddress ha sido seleccionado.");
     print("🔑 Clave asignada (dispositivo individual): $selectedKey");
 
-    updateDeviceSelection(macAddress, '');
+    // Actualizamos la selección del dispositivo individual
+    updateDeviceSelection(
+        macAddress, ''); // El grupo es vacío para selección individual
   }
 
   void _handleGroupSelection(String group) {
@@ -221,10 +234,10 @@ class _PanelViewState extends State<PanelView> {
 
     // Agrupar dispositivos por grupo
     Map<String, List<String>> groupedDevices = {};
-    mciSelectionStatus.forEach((deviceMac, group) {
-      if (group != null && group.isNotEmpty) {
-        groupedDevices.putIfAbsent(group, () => []);
-        groupedDevices[group]!.add(deviceMac);
+    mciSelectionStatus.forEach((deviceMac, deviceGroup) {
+      if (deviceGroup != null && deviceGroup.isNotEmpty) {
+        groupedDevices.putIfAbsent(deviceGroup, () => []);
+        groupedDevices[deviceGroup]!.add(deviceMac);
       }
     });
 
@@ -234,16 +247,36 @@ class _PanelViewState extends State<PanelView> {
       print("✖️ El dispositivo $key ha sido deseleccionado.");
     });
 
+    // Asignar índices según el grupo
+    int indexForGroup = group == "A"
+        ? 0
+        : group == "B"
+            ? 1
+            : -1;
+
     // Seleccionamos los dispositivos del grupo
     groupedDevices[group]?.forEach((deviceMac) {
       isSelected[deviceMac] = true;
-      updateDeviceSelection(deviceMac, group);
+      equipSelectionMap[deviceMac] =
+          indexForGroup; // Actualiza el índice para el dispositivo
+
+      // Agregar un print para ver cómo se actualiza equipSelectionMap
+      print("🔄 equipSelectionMap actualizado: $deviceMac -> $indexForGroup");
+
+      updateDeviceSelection(deviceMac, group); // Pasa el macAddress y el group
       print("📱 $deviceMac del grupo $group ha sido seleccionado.");
     });
+
+    // Mostrar el índice asignado para el grupo
+    print("🔢 Índice asignado para el grupo $group: $indexForGroup");
 
     // Asignamos la clave para el grupo
     selectedKey = groupedDevices[group]?.join('-') ?? '';
     print("🔑 Clave asignada (grupo): $selectedKey");
+
+    // Asignamos el índice global del grupo
+    selectedIndex = indexForGroup; // Establecemos el índice del grupo
+    print("📊 Índice global del grupo seleccionado: $selectedIndex");
   }
 
   void updateEquipSelection(String key, int selectedIndex) {
@@ -318,7 +351,6 @@ class _PanelViewState extends State<PanelView> {
                         child: Column(
                           children: [
                             if (!isFullScreen) ...[
-
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.all(10.0),
@@ -352,11 +384,22 @@ class _PanelViewState extends State<PanelView> {
 
                                                   if (group == null ||
                                                       group.isEmpty) {
+                                                    // Selección individual
                                                     _handleIndividualSelection(
                                                         macAddress);
                                                   } else {
+                                                    // Selección por grupo
                                                     _handleGroupSelection(
                                                         group);
+
+                                                    // Asignar el índice global del grupo
+                                                    selectedIndex = group == "A"
+                                                        ? 0
+                                                        : group == "B"
+                                                            ? 1
+                                                            : index;
+                                                    print(
+                                                        "📊 Índice global del grupo seleccionado: $selectedIndex");
                                                   }
 
                                                   // Mostrar índice del dispositivo seleccionado
@@ -369,15 +412,27 @@ class _PanelViewState extends State<PanelView> {
                                               }
                                             },
                                             onLongPress: () {
-                                              // Limpiar el nombre del cliente y eliminar la selección
+                                              // Imprime el cliente deseleccionado
                                               print(
                                                   'Cliente deseleccionado: $clientName');
+
                                               setState(() {
+                                                // Elimina el cliente de la selección local
                                                 clientSelectionMap
                                                     .remove(macAddress);
-                                                // Limpiar el nombre del cliente
-                                                clientName =
-                                                    ''; // Limpiar el nombre del cliente
+
+                                                // Limpia el nombre del cliente
+                                                clientName = '';
+
+                                                // Limpia la lista de clientes seleccionados en el Provider
+                                                if (_clientsProvider != null) {
+                                                  _clientsProvider!
+                                                      .clearSelectedClientsSilently(); // Método personalizado para limpiar sin notificar
+                                                  if (kDebugMode) {
+                                                    print(
+                                                        "📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
+                                                  }
+                                                }
                                               });
                                             },
                                             child: Stack(
@@ -713,8 +768,8 @@ class _PanelViewState extends State<PanelView> {
               }
 
               return Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                height: MediaQuery.of(context).size.height * 0.7,
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.of(context).size.height * 0.6,
                 padding:
                     const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
                 decoration: BoxDecoration(
@@ -764,6 +819,13 @@ class _PanelViewState extends State<PanelView> {
                                                     macAddress] ==
                                                 'A';
 
+                                        int selectedEquip =
+                                            equipSelectionMap[macAddress] ?? 0;
+                                        Map<String, dynamic>? selectedClient =
+                                            clientSelectionMap[macAddress];
+                                        String clientName =
+                                            selectedClient?['name'] ?? '';
+
                                         return Padding(
                                           padding: EdgeInsets.only(
                                             bottom: MediaQuery.of(context)
@@ -775,7 +837,7 @@ class _PanelViewState extends State<PanelView> {
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.15,
+                                                0.1,
                                             height: MediaQuery.of(context)
                                                     .size
                                                     .height *
@@ -805,8 +867,20 @@ class _PanelViewState extends State<PanelView> {
                                                         setState,
                                                         'A'),
                                                     Expanded(
-                                                      flex: 1,
-                                                      child: Center(),
+                                                      child: Center(
+                                                        child:
+                                                            selectedEquip == 0
+                                                                ? Image.asset(
+                                                                    'assets/images/chalecoblanco.png',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                  )
+                                                                : Image.asset(
+                                                                    'assets/images/pantalonblanco.png',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                  ),
+                                                      ),
                                                     ),
                                                     Expanded(
                                                       flex: 2,
@@ -818,6 +892,18 @@ class _PanelViewState extends State<PanelView> {
                                                             CrossAxisAlignment
                                                                 .center,
                                                         children: [
+                                                          Text(
+                                                            clientName.isEmpty
+                                                                ? ''
+                                                                : clientName,
+                                                            style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              color: const Color(
+                                                                  0xFF28E2F5),
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
                                                           Text(
                                                             bluetoothNames[
                                                                     macAddress] ??
@@ -909,7 +995,12 @@ class _PanelViewState extends State<PanelView> {
                                       itemBuilder: (context, index) {
                                         var mci = AppState.instance.mcis[index];
                                         String macAddress = mci['mac'];
-
+                                        int selectedEquip =
+                                            equipSelectionMap[macAddress] ?? 0;
+                                        Map<String, dynamic>? selectedClient =
+                                            clientSelectionMap[macAddress];
+                                        String clientName =
+                                            selectedClient?['name'] ?? '';
                                         // Verificar si está seleccionado para el grupo B
                                         bool isSelected =
                                             temporarySelectionStatus[
@@ -927,7 +1018,7 @@ class _PanelViewState extends State<PanelView> {
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.15,
+                                                0.1,
                                             height: MediaQuery.of(context)
                                                     .size
                                                     .height *
@@ -957,8 +1048,20 @@ class _PanelViewState extends State<PanelView> {
                                                         setState,
                                                         'B'),
                                                     Expanded(
-                                                      flex: 1,
-                                                      child: Center(),
+                                                      child: Center(
+                                                        child:
+                                                            selectedEquip == 0
+                                                                ? Image.asset(
+                                                                    'assets/images/chalecoblanco.png',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                  )
+                                                                : Image.asset(
+                                                                    'assets/images/pantalonblanco.png',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                  ),
+                                                      ),
                                                     ),
                                                     Expanded(
                                                       flex: 2,
@@ -970,6 +1073,18 @@ class _PanelViewState extends State<PanelView> {
                                                             CrossAxisAlignment
                                                                 .center,
                                                         children: [
+                                                          Text(
+                                                            clientName.isEmpty
+                                                                ? ''
+                                                                : clientName,
+                                                            style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              color: const Color(
+                                                                  0xFF28E2F5),
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
                                                           Text(
                                                             bluetoothNames[
                                                                     macAddress] ??
@@ -1042,10 +1157,10 @@ class _PanelViewState extends State<PanelView> {
                         children: [
                           OutlinedButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // Cierra el diálogo
-                              setState(() {
+                              /* setState(() {
                                 temporarySelectionStatus.clear();
-                              });
+                              });*/
+                              Navigator.of(context).pop(); // Cierra el diálogo
                             },
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.red),
@@ -1386,10 +1501,7 @@ class ExpandedContentWidget extends StatefulWidget {
 
 class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     with SingleTickerProviderStateMixin {
-
   late ClientsProvider? _clientsProvider;
-
-
 
   late PanelView panelView = PanelView(
     key: panelViewKey,
@@ -2083,8 +2195,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("Programa seleccionado: $selectedAutoProgram");
   }
 
-
-
   @override
   void dispose() {
     if (kDebugMode) {
@@ -2106,7 +2216,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (_clientsProvider != null) {
       _clientsProvider!.clearSelectedClientsSilently(); // Limpia sin notificar
       if (kDebugMode) {
-        print("📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
+        print(
+            "📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
       }
     }
 
@@ -2185,7 +2296,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ? null
                                           : (_) => setState(
                                               () => scaleFactorCliente = 1.0),
-                                      onTap: widget.selectedKey == null
+                                      onTap: widget.selectedKey == null ||
+                                              isRunning
                                           ? null
                                           : () {
                                               setState(() {
@@ -2230,7 +2342,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                   // Botón "Equipo 0"
                                   Expanded(
                                     child: AbsorbPointer(
-                                      absorbing: widget.selectedKey == null,
+                                      absorbing: widget.selectedKey == null ||
+                                          isRunning,
                                       // Bloquear interacción si no hay selección
                                       child: GestureDetector(
                                         onTap: () {
@@ -2268,7 +2381,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                   ),
                                   Expanded(
                                     child: AbsorbPointer(
-                                      absorbing: widget.selectedKey == null,
+                                      absorbing: widget.selectedKey == null ||
+                                          isRunning,
                                       // Bloquear interacción si no hay selección
                                       child: GestureDetector(
                                         onTap: () {
@@ -2318,7 +2432,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ? null
                                           : (_) => setState(
                                               () => scaleFactorRepeat = 1.0),
-                                      onTap: widget.selectedKey == null
+                                      onTap: widget.selectedKey == null ||
+                                              isRunning
                                           ? null
                                           : () {
                                               // Acción para botón repetir
@@ -2373,7 +2488,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 OutlinedButton(
-                                  onPressed: widget.selectedKey == null
+                                  onPressed: widget.selectedKey == null ||
+                                          isRunning
                                       ? null // Inhabilitar el botón si selectedKey es null
                                       : () {
                                           setState(() {
@@ -2464,7 +2580,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                           // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null
+                                            onTap: widget.selectedKey == null ||
+                                                    isRunning
                                                 ? null // Deshabilitar el pulsado si selectedKey es null
                                                 : () {
                                                     setState(() {
@@ -2520,7 +2637,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                           // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null
+                                            onTap: widget.selectedKey == null ||
+                                                    isRunning
                                                 ? null // Deshabilitar el pulsado si selectedKey es null
                                                 : () {
                                                     setState(() {
@@ -2577,7 +2695,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                           // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null
+                                            onTap: widget.selectedKey == null ||
+                                                    isRunning
                                                 ? null // Deshabilitar el pulsado si selectedKey es null
                                                 : () {
                                                     setState(() {
@@ -5777,26 +5896,69 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ),
                                           SizedBox(width: screenWidth * 0.01),
                                           AnimatedSize(
-                                            duration: const Duration(milliseconds: 300),
+                                            duration: const Duration(
+                                                milliseconds: 300),
                                             curve: Curves.easeInOut,
                                             child: Container(
-                                              padding: const EdgeInsets.all(10.0),
-                                              width: _isExpanded2 ? screenWidth * 0.2 : 0,
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
+                                              width: _isExpanded2
+                                                  ? screenWidth * 0.2
+                                                  : 0,
                                               height: screenHeight * 0.2,
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
-                                                color: Colors.black.withOpacity(0.5),
-                                                borderRadius: BorderRadius.circular(20.0),
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
+                                                borderRadius:
+                                                    BorderRadius.circular(20.0),
                                               ),
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                children: selectedClients.map((client) {
-                                                  // Asume que cada cliente tiene una clave "name" para mostrar su nombre.
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.spaceAround,
+                                                children: selectedClients
+                                                    .map((client) {
                                                   return Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0), // Espaciado entre textos
-                                                    child: Text(
-                                                      client['name'] ?? 'Sin nombre', // Muestra "Sin nombre" si no tiene clave "name"
-                                                      style: TextStyle(fontSize: 16, color: Colors.white), // Ajusta el estilo del texto si es necesario
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 8.0),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          client['name'].toString().toUpperCase() ??
+                                                              'Sin nombre',
+                                                          style: TextStyle(
+                                                            fontSize: 15.sp,
+                                                            color: const Color(0xFF2be4f3),
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Image.asset(
+                                                              width:
+                                                                  screenWidth *
+                                                                      0.05,
+                                                              'assets/images/EKCAL.png',
+                                                              fit: BoxFit
+                                                                  .scaleDown,
+                                                            ),
+                                                            SizedBox(width: screenWidth * 0.01),
+                                                            Text(
+                                                              client['counter1']
+                                                                      ?.toString() ??
+                                                                  '0',
+                                                              // Asegúrate de que el contador esté disponible
+                                                              style: TextStyle(
+                                                                  fontSize: 15.sp,
+                                                                  color: Colors
+                                                                      .white),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
                                                     ),
                                                   );
                                                 }).toList(),
