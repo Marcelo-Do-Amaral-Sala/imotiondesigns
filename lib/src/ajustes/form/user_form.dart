@@ -277,30 +277,6 @@ class UserDataFormState extends State<UserDataForm> {
                           ],
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.02),
-                      OutlinedButton(
-                        onPressed: () {
-                          //_addBonos(context);
-                        }, // Mantener vacío para que InkWell funcione
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(10.0),
-                          side: const BorderSide(
-                              width: 1.0, color: Color(0xFF2be4f3)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          backgroundColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          tr(context, 'Reset password').toUpperCase(),
-                          style: TextStyle(
-                            color: const Color(0xFF2be4f3),
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.05),

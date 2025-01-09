@@ -1,7 +1,22 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../../utils/translation_utils.dart';
+import '../db/db_helper.dart';
+import '../db/db_helper_pc.dart';
+import '../db/db_helper_traducciones.dart';
+import '../db/db_helper_traducciones_pc.dart';
+import '../db/db_helper_traducciones_web.dart';
+import '../db/db_helper_web.dart';
+import '../servicios/sync.dart';
+import '../servicios/translation_provider.dart'; // Asegúrate de tener esta importación para manejar la base de datos.
 
 class LoginView extends StatefulWidget {
   final Function() onNavigateToMainMenu;
@@ -23,6 +38,97 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _user = TextEditingController();
   final TextEditingController _pwd = TextEditingController();
   String _errorMessage = ''; // Para almacenar el mensaje de error
+  Map<String, String> _translations = {};
+  final SyncService _syncService = SyncService();
+  final DatabaseHelperTraducciones _dbHelperTraducciones =
+  DatabaseHelperTraducciones();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initializeDatabase();
+    _initializeDatabaseTraducciones();
+    _requestLocationPermissions();
+  }
+
+  Future<void> _initializeDatabase() async {
+    try {
+      if (kIsWeb) {
+        debugPrint("Inicializando base de datos para Web...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperWeb().initializeDatabase();
+      } else if (Platform.isAndroid || Platform.isIOS) {
+        debugPrint("Inicializando base de datos para Móviles...");
+        await DatabaseHelper().initializeDatabase();
+      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        debugPrint("Inicializando base de datos para Desktop...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperPC().initializeDatabase();
+      } else {
+        throw UnsupportedError(
+            'Plataforma no soportada para la base de datos.');
+      }
+      debugPrint("Base de datos inicializada correctamente.");
+    } catch (e) {
+      debugPrint("Error al inicializar la base de datos: $e");
+    }
+  }
+
+  Future<void> _initializeDatabaseTraducciones() async {
+    try {
+      if (kIsWeb) {
+        debugPrint("Inicializando base de datos para Web...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperTraduccionesWeb().initializeDatabase();
+      } else if (Platform.isAndroid || Platform.isIOS) {
+        debugPrint("Inicializando base de datos para Móviles...");
+        await DatabaseHelperTraducciones().initializeDatabase();
+      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        debugPrint("Inicializando base de datos para Desktop...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperTraduccionesPc().initializeDatabase();
+      } else {
+        throw UnsupportedError(
+            'Plataforma no soportada para la base de datos.');
+      }
+      debugPrint("Base de datos inicializada correctamente.");
+    } catch (e) {
+      debugPrint("Error al inicializar la base de datos: $e");
+    }
+  }
+
+  Future<void> _requestLocationPermissions() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      PermissionStatus permission = PermissionStatus.denied;
+
+      if (Platform.isAndroid) {
+        permission = await Permission.locationWhenInUse.request();
+        if (permission == PermissionStatus.granted) {
+          permission = await Permission.locationAlways.request();
+        }
+      } else if (Platform.isIOS) {
+        permission = await Permission.locationWhenInUse.request();
+        if (permission == PermissionStatus.granted) {
+          permission = await Permission.locationAlways.request();
+        }
+      }
+
+      if (permission == PermissionStatus.denied ||
+          permission == PermissionStatus.permanentlyDenied) {
+        debugPrint("Permiso de ubicación denegado o denegado permanentemente.");
+        openAppSettings();
+      } else {
+        debugPrint("Permisos de ubicación concedidos.");
+      }
+    }
+  }
+
+  // Función de traducción utilitaria
+  String tr(BuildContext context, String key) {
+    return Provider.of<TranslationProvider>(context, listen: false)
+        .translate(key);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +179,7 @@ class _LoginViewState extends State<LoginView> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: [
                                           Expanded(
                                             child: Text(
@@ -135,11 +241,13 @@ class _LoginViewState extends State<LoginView> {
                                       child: TextField(
                                         controller: _pwd,
                                         keyboardType: TextInputType.text,
-                                        obscureText: true, // Esto oculta siempre el texto
+                                        obscureText: true,
+                                        // Esto oculta siempre el texto
                                         style: _inputTextStyle,
                                         decoration: _inputDecorationStyle(
                                           hintText: tr(context, ''),
-                                          suffixIcon: Icon(Icons.visibility_off),
+                                          suffixIcon:
+                                              Icon(Icons.visibility_off),
                                         ),
                                       ),
                                     ),
@@ -160,9 +268,17 @@ class _LoginViewState extends State<LoginView> {
                                 ),
                               // Botón de inicio de sesión
                               OutlinedButton(
-                                onPressed: () {
-                                  _validateLogin();
+                                onPressed: () async {
+                                  // Cerrar el teclado
+                                  FocusScope.of(context).unfocus();
+
+                                  // Esperar un pequeño retraso para asegurar que el teclado se cierre
+                                  await Future.delayed(const Duration(milliseconds: 300));
+
+                                  // Llamar a la función de validación
+                                  await _validateLogin();
                                 },
+
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.all(10.0),
                                   side: const BorderSide(
@@ -210,17 +326,51 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  // Función para validar la contraseña y el usuario
-  void _validateLogin() {
-    setState(() {
-      if (_pwd.text != "admin") {
-        _errorMessage = "Contraseña incorrecta"; // Establecer mensaje de error
-      } else {
-        _errorMessage = ''; // Limpiar el mensaje de error
-        widget.onNavigateToMainMenu(); // Navegar al menú principal
+  Future<void> _validateLogin() async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    String username = _user.text.trim();
+    String password = _pwd.text.trim();
+
+    // Verificar en la base de datos si las credenciales del usuario son correctas
+    bool userExists = await dbHelper.checkUserCredentials(username, password);
+
+    if (userExists) {
+      // Si las credenciales son correctas, limpiar el mensaje de error
+      setState(() {
+        _errorMessage = ''; // Limpiar error
+      });
+
+      // Obtener el userId después de la autenticación
+      int userId = await dbHelper.getUserIdByUsername(username); // Asegúrate de tener esta función
+
+      // Obtener el tipo de perfil del usuario
+      String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId);
+
+      // Imprimir el userId y el tipo de perfil en consola
+      print('User ID: $userId');
+      print('Tipo de Perfil: $tipoPerfil');
+
+      // Guardar el userId y tipo de perfil en SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setInt('user_id', userId); // Guardar el userId
+      if (tipoPerfil != null) {
+        prefs.setString('user_tipo_perfil', tipoPerfil); // Guardar el tipo de perfil
       }
-    });
+
+      // Retraso antes de navegar
+      await Future.delayed(const Duration(seconds: 1)); // Retraso de 1 segundo
+
+      // Navegar al menú principal
+      widget.onNavigateToMainMenu();
+    } else {
+      // Si las credenciales son incorrectas, mostrar el mensaje de error
+      setState(() {
+        _errorMessage = "Usuario o contraseña incorrectos"; // Mostrar error
+      });
+    }
   }
+
+
 }
 
 // Ajustes de estilos para simplificar

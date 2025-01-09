@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 110,
+      version: 111,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
@@ -3660,6 +3660,40 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     )
   ''');
 
+// Inserción en la tabla 'usuarios'
+    int usuarioId = await db.insert('usuarios', {
+      'name': 'Administrador', // Nombre del usuario
+      'email': '', // Correo electrónico
+      'gender': 'Hombre', // Género
+      'phone': '', // Teléfono
+      'pwd': 'admin', // Contraseña (en un caso real, no deberías guardarla como texto claro)
+      'user': 'admin', // Nombre de usuario
+      'status': 'Activo', // Estado
+      'birthdate': '', // Fecha de nacimiento
+      'altadate': DateTime.now().toString(), // Fecha de alta, usando la fecha actual
+      'controlsesiones': 'No', // Control de sesiones
+      'controltiempo': 'Sí', // Control de tiempo
+    });
+
+    print('Usuario insertado con ID: $usuarioId'); // Mostrar el ID del usuario insertado
+
+// Inserción en la tabla 'tipos_perfil' (insertamos el perfil "Ambos")
+    int perfilId = await db.insert('tipos_perfil', {
+      'tipo': 'Ambos', // Tipo de perfil
+    });
+
+    print('Perfil "Ambos" insertado con ID: $perfilId'); // Mostrar el ID del perfil insertado
+
+// Inserción en la tabla 'usuario_perfil' para asociar el usuario con el perfil
+    await db.insert('usuario_perfil', {
+      'usuario_id': usuarioId, // ID del usuario recién insertado
+      'perfil_id': perfilId,   // ID del perfil "Ambos"
+    });
+
+    print('Relación entre usuario y perfil insertada');
+
+
+
     await db.execute('''
       CREATE TABLE IF NOT EXISTS videotutoriales (
         id_tutorial INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -3677,7 +3711,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 110) {
+    if (oldVersion < 111) {
       print("ONPUGRADE EJECUTADIO");
     }
   }
@@ -4100,6 +4134,16 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       return result.first;
     }
     return null;
+  }
+
+  Future<bool> checkUserCredentials(String username, String password) async {
+    final db = await database; // Asegúrate de que la base de datos esté inicializada
+    final List<Map<String, dynamic>> result = await db.query(
+      'usuarios',
+      where: 'user = ? AND pwd = ?',
+      whereArgs: [username, password],
+    );
+    return result.isNotEmpty;
   }
 
   // Obtener el cliente más reciente (con el id más alto)
@@ -4539,6 +4583,23 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
     return null; // Si no se encuentra el tipo de perfil, devuelve null
   }
+  Future<int> getUserIdByUsername(String username) async {
+    final db = await database;
+
+    // Consulta para obtener el ID del usuario a partir del nombre de usuario
+    final result = await db.rawQuery('''
+    SELECT id
+    FROM usuarios
+    WHERE user = ?
+  ''', [username]);
+
+    if (result.isNotEmpty) {
+      return result.first['id'] as int; // Retorna el ID del usuario
+    }
+
+    throw Exception('Usuario no encontrado');
+  }
+
 
 
   // Obtener el cliente más reciente (con el id más alto)

@@ -166,7 +166,7 @@ class AdminsDataState extends State<AdminsData> {
       'name': name, // Nombre con la primera letra en mayúscula
       'email': _emailController.text,
       'phone': _phoneController.text,
-      'pwd': 'admin',
+      'pwd': '0000',
       'gender': selectedGender,
       'altadate': _altaDate,
       'controlsesiones': selectedControlSesiones,
@@ -211,6 +211,31 @@ class AdminsDataState extends State<AdminsData> {
       ),
     );
   }
+  Future<void> _updatePassword() async {
+    try {
+      // Crear el mapa con solo el campo pwd
+      final clientData = {'pwd': '0000'};
+
+      // Actualizar el usuario en la base de datos
+      DatabaseHelper dbHelper = DatabaseHelper();
+      await dbHelper.updateUser(userId!, clientData);
+
+    } catch (e) {
+      print('Error al actualizar la contraseña: $e');
+      // Mostrar un SnackBar de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tr(context, 'Error al resetear la contraseña').toUpperCase(),
+            style: TextStyle(color: Colors.white, fontSize: 17.sp),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
 
   Future<void> _deleteUsers(BuildContext context, int userId) async {
     showDialog(
@@ -284,6 +309,91 @@ class AdminsDataState extends State<AdminsData> {
                     // Cierra el diálogo después de confirmar el borrado
                     Navigator.of(context).pop();
                     widget.onClose();
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side: const BorderSide(
+                      width: 1.0,
+                      color: Colors.red,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                  child: Text(
+                    tr(context, '¡Sí, estoy seguro!').toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _resetPwd(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF494949),
+          // Color de fondo del diálogo
+          title: Text(
+            tr(context, 'Resetear contraseña').toUpperCase(),
+            style: TextStyle(
+                color: const Color(0xFF2be4f3),
+                fontSize: 30.sp,
+                fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center, // Color del texto
+          ),
+          content: Text(
+            tr(context, '¿Reestablecer contraseña a 0000?')
+                .toUpperCase(),
+            style: TextStyle(color: Colors.white, fontSize: 20.sp),
+            textAlign: TextAlign.center, // Color del texto
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side: const BorderSide(
+                      width: 1.0,
+                      color: Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    tr(context, 'Cancelar').toUpperCase(),
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () async {
+                    _updatePassword();
+                    Navigator.of(context).pop();
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
@@ -397,7 +507,7 @@ class AdminsDataState extends State<AdminsData> {
                       SizedBox(width: screenWidth * 0.02),
                       OutlinedButton(
                         onPressed: () {
-                          //_addBonos(context);
+                          _resetPwd(context);
                         }, // Mantener vacío para que InkWell funcione
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.all(10.0),

@@ -51,7 +51,6 @@ class DatabaseHelperPC {
     await database; // Esto asegura que la base de datos esté inicializada
   }
 
-
   Future<void> _onCreate(Database db, int version) async {
     // Crear la tabla clientes
     await db.execute('''
@@ -443,7 +442,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -611,33 +610,33 @@ class DatabaseHelperPC {
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Modificar valores específicos de cronaxias basándonos en su ID
         // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
         final nuevoValor = (cronaxiaId ==
-                1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+            1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
             ? 200 // Nuevo valor para 'frecuencia'
             : (cronaxiaId ==
-                    2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-                ? 250 // Nuevo valor para 'rampa'
-                : (cronaxiaId == 3) // ID = 3 'pulso'
-                    ? 200
-                    : (cronaxiaId == 4) // ID = 4 'contracción'
-                        ? 400
-                        : (cronaxiaId == 5) // ID = 5 'pausa'
-                            ? 300
-                            : (cronaxiaId == 6) // ID = 6 'tipo'
-                                ? 150
-                                : (cronaxiaId == 7) // ID = 7 'equipamiento'
-                                    ? 350
-                                    : (cronaxiaId == 8) // ID = 8 'otro'
-                                        ? 400
-                                        : (cronaxiaId == 9)
-                                            ? 150
-                                            : (cronaxiaId == 10)
-                                                ? 150
-                                                : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+            2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+            ? 250 // Nuevo valor para 'rampa'
+            : (cronaxiaId == 3) // ID = 3 'pulso'
+            ? 200
+            : (cronaxiaId == 4) // ID = 4 'contracción'
+            ? 400
+            : (cronaxiaId == 5) // ID = 5 'pausa'
+            ? 300
+            : (cronaxiaId == 6) // ID = 6 'tipo'
+            ? 150
+            : (cronaxiaId == 7) // ID = 7 'equipamiento'
+            ? 350
+            : (cronaxiaId == 8) // ID = 8 'otro'
+            ? 400
+            : (cronaxiaId == 9)
+            ? 150
+            : (cronaxiaId == 10)
+            ? 150
+            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -698,7 +697,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -763,7 +762,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -828,7 +827,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -892,7 +891,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -957,7 +956,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1022,7 +1021,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1087,7 +1086,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1152,7 +1151,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1216,7 +1215,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1281,7 +1280,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1345,7 +1344,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1410,7 +1409,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1475,7 +1474,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1540,7 +1539,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1604,7 +1603,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1668,7 +1667,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1728,19 +1727,19 @@ class DatabaseHelperPC {
       for (var cronaxia in cronaxiasQuery) {
         final cronaxiaId = cronaxia['id'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Modificar valores específicos de cronaxias basándonos en su ID
         // Aquí puedes definir los nuevos valores según el ID de cada cronaxia
         final nuevoValor = (cronaxiaId ==
-                1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
+            1) // Suponiendo que la cronaxia con ID = 1 es 'frecuencia'
             ? 375 // Nuevo valor para 'frecuencia'
             : (cronaxiaId ==
-                    2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
-                ? 400 // Nuevo valor para 'rampa'
-                : (cronaxiaId == 3) // ID = 3 'pulso'
-                    ? 400
-                    : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
+            2) // Suponiendo que la cronaxia con ID = 2 es 'rampa'
+            ? 400 // Nuevo valor para 'rampa'
+            : (cronaxiaId == 3) // ID = 3 'pulso'
+            ? 400
+            : valorCronaxia; // Para otras cronaxias, mantenemos el valor predeterminado
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1808,7 +1807,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1872,7 +1871,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -1936,7 +1935,7 @@ class DatabaseHelperPC {
         final cronaxiaId = cronaxia['id'];
         final nombreCronaxia = cronaxia['nombre'];
         final valorCronaxia =
-            cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
+        cronaxia['valor']; // Usamos el valor predeterminado de la cronaxia
 
         // Relacionar la cronaxia con el programa en la tabla programa_cronaxia
         await txn.insert('programa_cronaxia', {
@@ -2142,7 +2141,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2315,7 +2314,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2484,7 +2483,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2507,7 +2506,7 @@ class DatabaseHelperPC {
           'nombre': 'FUERZA',
           'imagen': 'assets/images/STRENGTH.png',
           'descripcion':
-              'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
+          'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2633,7 +2632,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2656,7 +2655,7 @@ class DatabaseHelperPC {
           'nombre': 'HIPERTROFIA',
           'imagen': 'assets/images/HIPERTROFIA.png',
           'descripcion':
-              'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
+          'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2787,7 +2786,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2810,7 +2809,7 @@ class DatabaseHelperPC {
           'nombre': 'RESISTENCIA 1',
           'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
+          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2909,6 +2908,7 @@ class DatabaseHelperPC {
           },
         ];
 
+
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
           subprogramas[i]['orden'] =
@@ -2942,7 +2942,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -2965,7 +2965,7 @@ class DatabaseHelperPC {
           'nombre': 'RESISTENCIA 2',
           'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
+          'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -3109,7 +3109,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3132,7 +3132,7 @@ class DatabaseHelperPC {
           'nombre': 'CARDIO',
           'imagen': 'assets/images/CARDIO.png',
           'descripcion':
-              'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
+          'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -3294,7 +3294,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3317,7 +3317,7 @@ class DatabaseHelperPC {
           'nombre': 'CROSS MAX',
           'imagen': 'assets/images/CROSSMAX.png',
           'descripcion':
-              'Programa experto. Entrenamiento para la mejora de la condición física.',
+          'Programa experto. Entrenamiento para la mejora de la condición física.',
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -3461,7 +3461,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3570,6 +3570,7 @@ class DatabaseHelperPC {
           },
         ];
 
+
         // Asignamos un orden a cada subprograma
         for (int i = 0; i < subprogramas.length; i++) {
           subprogramas[i]['orden'] =
@@ -3602,7 +3603,7 @@ class DatabaseHelperPC {
           // Si el subprograma existe en la tabla de Programas, obtenemos su nombre
           String nombreSubprograma = result.isNotEmpty
               ? result.first['nombre']
-                  as String // Aquí hacemos el cast explícito a String
+          as String // Aquí hacemos el cast explícito a String
               : 'Desconocido';
 
           print('Subprograma: $nombreSubprograma');
@@ -3620,20 +3621,22 @@ class DatabaseHelperPC {
     });
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        gender TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        pwd TEXT NOT NULL,
-        status TEXT NOT NULL,
-        birthdate TEXT NOT NULL,
-        altadate TEXT TEXT NOT NULL,
-        controlsesiones TEXT NOT NULL,
-        controltiempo TEXT NOT NULL
-      )
-    ''');
+  CREATE TABLE usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    gender TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    pwd TEXT NOT NULL,
+    user TEXT NOT NULL,
+    status TEXT NOT NULL,
+    birthdate TEXT NOT NULL,
+    altadate TEXT NOT NULL,
+    controlsesiones TEXT NOT NULL,
+    controltiempo TEXT NOT NULL
+  )
+''');
+
 
     await db.execute('''
 CREATE TABLE IF NOT EXISTS tipos_perfil (
@@ -3663,6 +3666,40 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     )
   ''');
 
+// Inserción en la tabla 'usuarios'
+    int usuarioId = await db.insert('usuarios', {
+      'name': 'Administrador', // Nombre del usuario
+      'email': '', // Correo electrónico
+      'gender': 'Hombre', // Género
+      'phone': '', // Teléfono
+      'pwd': 'admin', // Contraseña (en un caso real, no deberías guardarla como texto claro)
+      'user': 'admin', // Nombre de usuario
+      'status': 'Activo', // Estado
+      'birthdate': '', // Fecha de nacimiento
+      'altadate': DateTime.now().toString(), // Fecha de alta, usando la fecha actual
+      'controlsesiones': 'No', // Control de sesiones
+      'controltiempo': 'Sí', // Control de tiempo
+    });
+
+    print('Usuario insertado con ID: $usuarioId'); // Mostrar el ID del usuario insertado
+
+// Inserción en la tabla 'tipos_perfil' (insertamos el perfil "Ambos")
+    int perfilId = await db.insert('tipos_perfil', {
+      'tipo': 'Ambos', // Tipo de perfil
+    });
+
+    print('Perfil "Ambos" insertado con ID: $perfilId'); // Mostrar el ID del perfil insertado
+
+// Inserción en la tabla 'usuario_perfil' para asociar el usuario con el perfil
+    await db.insert('usuario_perfil', {
+      'usuario_id': usuarioId, // ID del usuario recién insertado
+      'perfil_id': perfilId,   // ID del perfil "Ambos"
+    });
+
+    print('Relación entre usuario y perfil insertada');
+
+
+
     await db.execute('''
       CREATE TABLE IF NOT EXISTS videotutoriales (
         id_tutorial INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -3672,28 +3709,16 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       );
     ''');
     await db.insert('videotutoriales', {
-      'nombre': 'LICENCIA',
-      'imagen': 'assets/images/RELAX.png',
+      'nombre':'LICENCIA',
+      'imagen':'assets/images/RELAX.png',
       'video': 'assets/videos/tutorial.mp4'
     });
+
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 107) {
+    if (oldVersion < 111) {
       print("ONPUGRADE EJECUTADIO");
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS videotutoriales (
-        id_tutorial INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        imagen TEXT,
-        video TEXT
-      );
-    ''');
-      await db.insert('videotutoriales', {
-        'nombre': 'LICENCIA',
-        'imagen': 'assets/images/RELAX.png',
-        'video': 'assets/videos/tutorial.mp4'
-      });
     }
   }
 
@@ -3707,7 +3732,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
         'clientes',
         client,
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
     } catch (e) {
       print('Error inserting client: $e');
@@ -3725,7 +3750,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
           'grupo_muscular_id': grupoMuscularId,
         },
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
       return true; // Si la inserción fue exitosa, retorna true
     } catch (e) {
@@ -3781,8 +3806,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
 // Insertar relación entre un programa automático y subprogramas
-  Future<bool> insertAutomaticProgram(
-      int programaId, List<Map<String, dynamic>> subprogramas) async {
+  Future<bool> insertAutomaticProgram(int programaId,
+      List<Map<String, dynamic>> subprogramas) async {
     final db = await database;
     try {
       // Ahora insertamos los subprogramas relacionados
@@ -3809,8 +3834,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
 // Función para insertar las cronaxias por defecto
-  Future<void> insertarCronaxiasPorDefecto(
-      int programaId, String tipoEquipamiento) async {
+  Future<void> insertarCronaxiasPorDefecto(int programaId,
+      String tipoEquipamiento) async {
     final db = await database;
 
     // Obtén las cronaxias asociadas al tipo de equipamiento para el programa recién creado
@@ -3818,7 +3843,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
         where: 'tipo_equipamiento = ?', whereArgs: [tipoEquipamiento]);
 
     print(
-        'Cronaxias encontradas para el tipo de equipamiento $tipoEquipamiento: ${cronaxias.length}');
+        'Cronaxias encontradas para el tipo de equipamiento $tipoEquipamiento: ${cronaxias
+            .length}');
 
     // Iterar sobre las cronaxias encontradas
     for (var cronaxia in cronaxias) {
@@ -3846,8 +3872,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
 // Función para insertar los grupos musculares por defecto
-  Future<void> insertarGruposMuscularesPorDefecto(
-      int programaId, String tipoEquipamiento) async {
+  Future<void> insertarGruposMuscularesPorDefecto(int programaId,
+      String tipoEquipamiento) async {
     final db = await database;
 
     // Obtén los grupos musculares asociados al tipo de equipamiento para el programa recién creado
@@ -3857,7 +3883,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
         whereArgs: [tipoEquipamiento]);
 
     print(
-        'Grupos musculares encontrados para el tipo de equipamiento $tipoEquipamiento: ${gruposMusculares.length}');
+        'Grupos musculares encontrados para el tipo de equipamiento $tipoEquipamiento: ${gruposMusculares
+            .length}');
 
     // Iterar sobre los grupos musculares encontrados
     for (var grupoMuscular in gruposMusculares) {
@@ -3992,8 +4019,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
   // Función para actualizar una cronaxia
-  Future<void> updateCronaxia(
-      int programaId, int cronaxiaId, double valor) async {
+  Future<void> updateCronaxia(int programaId, int cronaxiaId,
+      double valor) async {
     final db = await database;
 
     // Verifica si la cronaxia existe en la tabla
@@ -4023,8 +4050,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
 // Función para actualizar los grupos musculares asociados a un programa
-  Future<void> actualizarGruposMusculares(
-      int programaId, List<int> nuevosGruposMuscularesIds) async {
+  Future<void> actualizarGruposMusculares(int programaId,
+      List<int> nuevosGruposMuscularesIds) async {
     final db = await database;
 
     // Empezamos una transacción para asegurar que todas las operaciones se ejecuten de manera atómica
@@ -4051,9 +4078,10 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
   Future<int> actualizarUsuario(int id, Map<String, dynamic> usuario) async {
     final db = await database;
-    return await db
-        .update('usuarios', usuario, where: 'id = ?', whereArgs: [id]);
+    return await db.update(
+        'usuarios', usuario, where: 'id = ?', whereArgs: [id]);
   }
+
 
   /*METODOS GET DE LA BBDD*/
 
@@ -4077,6 +4105,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     }
     return null;
   }
+
 
   // Obtener todos los clientes
   Future<List<Map<String, dynamic>>> getClients() async {
@@ -4111,6 +4140,16 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       return result.first;
     }
     return null;
+  }
+
+  Future<bool> checkUserCredentials(String username, String password) async {
+    final db = await database; // Asegúrate de que la base de datos esté inicializada
+    final List<Map<String, dynamic>> result = await db.query(
+      'usuarios',
+      where: 'user = ? AND pwd = ?',
+      whereArgs: [username, password],
+    );
+    return result.isNotEmpty;
   }
 
   // Obtener el cliente más reciente (con el id más alto)
@@ -4154,7 +4193,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   Future<List<Map<String, dynamic>>> getGruposMusculares() async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+    await db.query('grupos_musculares');
     return result;
   }
 
@@ -4202,10 +4241,10 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
   Future<List<Map<String, dynamic>>>
-      obtenerProgramasPredeterminadosPorTipoIndividual(Database db) async {
+  obtenerProgramasPredeterminadosPorTipoIndividual(Database db) async {
     // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
     final List<Map<String, dynamic>> programasConDetalles =
-        await db.rawQuery('''
+    await db.rawQuery('''
     SELECT 
       p.id_programa,
       p.nombre AS nombre,
@@ -4287,10 +4326,10 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
   Future<List<Map<String, dynamic>>>
-      obtenerProgramasPredeterminadosPorTipoRecovery(Database db) async {
+  obtenerProgramasPredeterminadosPorTipoRecovery(Database db) async {
     // Consulta que une los datos de programas, cronaxias, y grupos musculares, filtrando solo los programas de tipo 'Individual'
     final List<Map<String, dynamic>> programasConDetalles =
-        await db.rawQuery('''
+    await db.rawQuery('''
     SELECT 
       p.id_programa,
       p.nombre AS nombre,
@@ -4443,13 +4482,14 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     return gruposMusculares;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(
-      Database db, String tipoEquipamiento) async {
+  Future<List<Map<String, dynamic>>> obtenerCronaxiaPorEquipamiento(Database db,
+      String tipoEquipamiento) async {
     // Verifica que el tipo de equipamiento sea válido
     if (tipoEquipamiento != 'BIO-SHAPE' && tipoEquipamiento != 'BIO-JACKET') {
       throw ArgumentError(
           'Tipo de equipamiento inválido. Debe ser "BIO-SHAPE" o "BIO-JACKET".');
     }
+
 
     // Realiza la consulta en la base de datos
     List<Map<String, dynamic>> cronaxias = await db.query(
@@ -4458,14 +4498,17 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       whereArgs: [tipoEquipamiento], // Argumento del filtro
     );
 
+
     // Itera sobre los resultados e imprime cada grupo muscular y su tipo de equipamiento
-    for (var grupo in cronaxias) {}
+    for (var grupo in cronaxias) {
+
+    }
 
     return cronaxias;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(
-      Database db, int programaId) async {
+  Future<List<Map<String, dynamic>>> obtenerGruposPorPrograma(Database db,
+      int programaId) async {
     final List<Map<String, dynamic>> grupos = await db.rawQuery('''
       SELECT g.id, g.nombre, g.imagen, g.tipo_equipamiento
       FROM grupos_musculares_equipamiento g
@@ -4476,8 +4519,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     return grupos;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(
-      Database db, int programaId) async {
+  Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(Database db,
+      int programaId) async {
     return await db.rawQuery('''
     SELECT c.nombre, pc.valor
     FROM programa_cronaxia AS pc
@@ -4513,8 +4556,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
   // Método para obtener los usuarios por tipo de perfil
-  Future<List<Map<String, dynamic>>> getUsuariosPorTipoPerfil(
-      String tipoPerfil) async {
+  Future<List<Map<String, dynamic>>> getUsuariosPorTipoPerfil(String tipoPerfil) async {
     final db = await database;
 
     // Consulta para obtener los usuarios con un tipo de perfil específico
@@ -4542,12 +4584,12 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
     if (result.isNotEmpty) {
       // Asegúrate de convertir a String, en caso de que el valor no sea null
-      return result.first['tipo']
-          as String?; // Convertimos explícitamente a String?
+      return result.first['tipo'] as String?; // Convertimos explícitamente a String?
     }
 
     return null; // Si no se encuentra el tipo de perfil, devuelve null
   }
+
 
   // Obtener el cliente más reciente (con el id más alto)
   Future<Map<String, dynamic>?> getMostRecentUser() async {
@@ -4577,6 +4619,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     );
     return result;
   }
+
 
   /*METODOS DE BORRADO DE BBD*/
 
@@ -4610,6 +4653,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       whereArgs: [id],
     );
   }
+
+
 
   // Eliminar un bono por ID
   Future<void> deleteBono(int id) async {
@@ -4646,8 +4691,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
   // Método para obtener el SHA del archivo en GitHub
-  static Future<String?> _getFileSha(
-      String owner, String repo, String fileName, String token) async {
+  static Future<String?> _getFileSha(String owner, String repo, String fileName,
+      String token) async {
     String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';
 
     final response = await http.get(
@@ -4670,21 +4715,18 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   static Future<void> uploadDatabaseToGitHub(String licenseNumber) async {
     try {
       // Cargar el token desde el archivo .env
-      String? token =
-          dotenv.env['GITHUB_TOKEN']; // Obtener el token desde el .env
+      String? token = dotenv.env['GITHUB_TOKEN']; // Obtener el token desde el .env
 
       // Asegurarse de que el token esté presente
       if (token == null || token.isEmpty) {
-        throw Exception(
-            'El token de GitHub no está configurado correctamente en el archivo .env');
+        throw Exception('El token de GitHub no está configurado correctamente en el archivo .env');
       }
 
       // Obtener la copia de seguridad de la base de datos
       File backupFile = await backupDatabase();
 
       // Incluir el número de licencia en el nombre del archivo
-      String fileName =
-          'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
+      String fileName = 'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
       String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
       String repo = 'backups'; // Repositorio de GitHub
 
@@ -4693,48 +4735,44 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       String contentBase64 = base64Encode(fileBytes);
 
       // Print para ver el contenido antes de subirlo
-      print(
-          "Contenido a subir (base64, tamaño ${contentBase64.length} caracteres): $contentBase64");
+      print("Contenido a subir (base64, tamaño ${contentBase64.length} caracteres): $contentBase64");
 
       // Verificar si el archivo ya existe en el repositorio
       String? fileSha = await _getFileSha(owner, repo, fileName, token);
 
       // Construir la URL de la API de GitHub para subir el archivo
-      String url =
-          'https://api.github.com/repos/$owner/$repo/contents/$fileName';
+      String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';
 
       // Realizar la solicitud PUT para subir o actualizar el archivo
       final response = await http.put(
         Uri.parse(url),
         headers: {
-          'Authorization': 'token $token',
-          // Usar el token cargado desde el .env
+          'Authorization': 'token $token', // Usar el token cargado desde el .env
           'Accept': 'application/vnd.github.v3+json',
         },
         body: jsonEncode({
           'message': 'Subida o actualización de copia de seguridad',
           'content': contentBase64,
-          'sha': fileSha,
-          // Si el archivo ya existe, pasamos el SHA para actualizarlo
+          'sha': fileSha, // Si el archivo ya existe, pasamos el SHA para actualizarlo
         }),
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         print('Copia de seguridad subida o actualizada exitosamente en GitHub');
       } else {
-        throw Exception(
-            'Error al subir o actualizar la copia de seguridad: ${response.body}');
+        throw Exception('Error al subir o actualizar la copia de seguridad: ${response.body}');
       }
     } catch (e) {
       print('Error al subir o actualizar la copia de seguridad a GitHub: $e');
     }
   }
 
-  static Future<void> downloadDatabaseFromGitHub(String licenseNumber) async {
+
+  static Future<void> downloadDatabaseFromGitHub(String licenseNumber ) async {
     try {
       // Cargar el token desde el archivo .env
-      String? token =
-          dotenv.env['GITHUB_TOKEN']; // Obtener el token desde el .env
+      String? token = dotenv
+          .env['GITHUB_TOKEN']; // Obtener el token desde el .env
 
       // Asegurarse de que el token esté presente
       if (token == null || token.isEmpty) {
@@ -4742,14 +4780,12 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
             'El token de GitHub no está configurado correctamente en el archivo .env');
       }
 
-      String fileName =
-          'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
+      String fileName = 'database_v25_$licenseNumber.db'; // Nombre del archivo con el número de licencia
       String owner = 'Marcelo-Do-Amaral-Sala'; // Usuario de GitHub
       String repo = 'backups'; // Repositorio de GitHub
 
       // Construir la URL de la API de GitHub
-      String url =
-          'https://api.github.com/repos/$owner/$repo/contents/$fileName';
+      String url = 'https://api.github.com/repos/$owner/$repo/contents/$fileName';
 
       // Realizar la solicitud GET para obtener el archivo
       final response = await http.get(
@@ -4777,8 +4813,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
         base64Content = base64Content.replaceAll('\n', '');
 
         // **Nuevo: Imprimir el contenido base64 descargado para depuración**
-        print(
-            "Contenido descargado (base64, tamaño ${base64Content.length} caracteres): $base64Content");
+        print("Contenido descargado (base64, tamaño ${base64Content
+            .length} caracteres): $base64Content");
 
         // Verificar que el contenido base64 no esté vacío
         if (base64Content.isEmpty) {
@@ -4794,8 +4830,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
         }
 
         // **Nuevo: Verificar la estructura del archivo descargado**
-        if (fileBytes.length < 1024) {
-          // Verifica que el archivo sea lo suficientemente grande
+        if (fileBytes.length <
+            1024) { // Verifica que el archivo sea lo suficientemente grande
           throw Exception(
               'El archivo descargado es muy pequeño, probablemente está corrupto.');
         }
@@ -4821,4 +4857,5 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       print('Error al descargar la copia de seguridad desde GitHub: $e');
     }
   }
+
 }
