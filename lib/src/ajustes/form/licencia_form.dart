@@ -384,6 +384,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SizedBox.expand(

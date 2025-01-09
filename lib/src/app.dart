@@ -9,18 +9,21 @@ import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
 import 'ajustes/menus/ajustes_menu.dart';
 import 'ajustes/menus/gestion_menu.dart';
 import 'clients/clients_main_view.dart';
+import 'mainviews/login.dart';
 
 class App extends StatefulWidget {
   final double screenWidth;
   final double screenHeight;
-  App({Key? key, required this.screenWidth, required this.screenHeight}) : super(key: key);
+
+  App({Key? key, required this.screenWidth, required this.screenHeight})
+      : super(key: key);
 
   @override
   _AppState createState() => _AppState();
 }
 
 class _AppState extends State<App> {
-  String currentView = 'mainMenu';
+  String currentView = 'login';
   Key? panelViewKey = UniqueKey(); // Clave única solo para PanelView
   Map<String, dynamic>? selectedMciData;
 
@@ -54,10 +57,13 @@ class _AppState extends State<App> {
         switch (currentView) {
           case 'panel':
             viewToDisplay = PanelView(
-              key: panelViewKey, // Usar la clave única para PanelView
+              key: panelViewKey,
+              // Usar la clave única para PanelView
               onBack: () => navigateTo('mainMenu'),
-              onReset: () => navigateTo('panel'), // Manejo de reinicio solo para Panel
-              screenWidth: screenWidth, // Pasa el tamaño disponible
+              onReset: () => navigateTo('panel'),
+              // Manejo de reinicio solo para Panel
+              screenWidth: screenWidth,
+              // Pasa el tamaño disponible
               screenHeight: screenHeight,
             );
             break;
@@ -90,7 +96,8 @@ class _AppState extends State<App> {
               onBack: () => navigateTo('mainMenu'),
               onNavigatetoLicencia: () => navigateTo('licencia'),
               onNavigatetoGestion: () => navigateTo('gestion'),
-              screenWidth: screenWidth, // Pasa el tamaño disponible
+              screenWidth: screenWidth,
+              // Pasa el tamaño disponible
               screenHeight: screenHeight,
             );
             break;
@@ -112,13 +119,21 @@ class _AppState extends State<App> {
             );
             break;
           case 'mainMenu':
-          default:
             viewToDisplay = MainMenuView(
               onNavigateToPanel: () => navigateTo('panel'),
               onNavigateToClients: () => navigateTo('clients'),
               onNavigateToPrograms: () => navigateTo('programs'),
               onNavigateToAjustes: () => navigateTo('ajustes'),
               onNavigateToTutoriales: () => navigateTo('tutoriales'),
+              screenWidth: screenWidth,
+              // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'login':
+          default:
+            viewToDisplay = LoginView(
+              onNavigateToMainMenu: () => navigateTo('mainMenu'),
               screenWidth: screenWidth, // Pasa el tamaño disponible
               screenHeight: screenHeight,
             );
@@ -130,7 +145,7 @@ class _AppState extends State<App> {
             textTheme: GoogleFonts.oswaldTextTheme(),
           ),
           home: Scaffold(
-            resizeToAvoidBottomInset: true,
+            resizeToAvoidBottomInset: false,
             body: viewToDisplay,
           ),
         );

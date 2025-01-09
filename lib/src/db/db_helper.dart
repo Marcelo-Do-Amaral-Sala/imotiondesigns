@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 107,
+      version: 110,
       // Incrementamos la versión a 3
       onCreate: _onCreate,
       // Método que se ejecuta solo al crear la base de datos
@@ -3615,20 +3615,22 @@ class DatabaseHelper {
     });
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        gender TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        pwd TEXT NOT NULL,
-        status TEXT NOT NULL,
-        birthdate TEXT NOT NULL,
-        altadate TEXT TEXT NOT NULL,
-        controlsesiones TEXT NOT NULL,
-        controltiempo TEXT NOT NULL
-      )
-    ''');
+  CREATE TABLE usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    gender TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    pwd TEXT NOT NULL,
+    user TEXT NOT NULL,
+    status TEXT NOT NULL,
+    birthdate TEXT NOT NULL,
+    altadate TEXT NOT NULL,
+    controlsesiones TEXT NOT NULL,
+    controltiempo TEXT NOT NULL
+  )
+''');
+
 
     await db.execute('''
 CREATE TABLE IF NOT EXISTS tipos_perfil (
@@ -3675,22 +3677,8 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 107) {
+    if (oldVersion < 110) {
       print("ONPUGRADE EJECUTADIO");
-      await db.execute('''
-      CREATE TABLE IF NOT EXISTS videotutoriales (
-        id_tutorial INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        imagen TEXT,
-        video TEXT
-      );
-    ''');
-      await db.insert('videotutoriales', {
-        'nombre':'LICENCIA',
-        'imagen':'assets/images/RELAX.png',
-        'video': 'assets/videos/tutorial.mp4'
-      });
-
     }
   }
 

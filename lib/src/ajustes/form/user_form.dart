@@ -16,6 +16,7 @@ class UserDataForm extends StatefulWidget {
 
 class UserDataFormState extends State<UserDataForm> {
   final _nameController = TextEditingController();
+  final _userController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
 
@@ -95,6 +96,7 @@ class UserDataFormState extends State<UserDataForm> {
     // Verificar que los campos no estén vacíos
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
+        _userController.text.isEmpty ||
         _phoneController.text.isEmpty ||
         selectedGender == null ||
         selectedOption == null ||
@@ -129,7 +131,8 @@ class UserDataFormState extends State<UserDataForm> {
       'name': name, // Nombre con la primera letra en mayúscula
       'email': _emailController.text,
       'phone': _phoneController.text,
-      'pwd': 'admin',
+      'pwd': '0000',
+      'user': _userController.text,
       'gender': selectedGender,
       'altadate': _altaDate,
       'controlsesiones': selectedControlSesiones,
@@ -178,6 +181,7 @@ class UserDataFormState extends State<UserDataForm> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox.expand(
+
       child: Padding(
         padding: EdgeInsets.symmetric(
           vertical: screenHeight * 0.03,
@@ -247,6 +251,27 @@ class UserDataFormState extends State<UserDataForm> {
                                 dropdownColor: const Color(0xFF313030),
                                 icon: const Icon(Icons.arrow_drop_down,
                                     color: Color(0xFF2be4f3), size: 30),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.02),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(tr(context, 'Usuario').toUpperCase(),
+                                style: _labelStyle),
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: _inputDecoration(),
+                              child: TextField(
+                                controller: _userController,
+                                style: _inputTextStyle,
+                                decoration: _inputDecorationStyle(
+                                  hintText: tr(context, 'Nombre de usuario'),
+                                ),
                               ),
                             ),
                           ],

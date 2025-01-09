@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
@@ -12,6 +14,9 @@ import '../../db/db_helper.dart';
 import '../../servicios/licencia_state.dart';
 import '../custom/border_neon.dart';
 import '../custom/linear_custom.dart';
+import 'package:http/http.dart' as http;
+
+
 
 class PanelView extends StatefulWidget {
   final VoidCallback onBack;
@@ -31,6 +36,7 @@ class PanelView extends StatefulWidget {
 }
 
 class _PanelViewState extends State<PanelView> {
+
   late BleConnectionService bleConnectionService;
   late StreamSubscription _subscription;
   late ClientsProvider? _clientsProvider;
@@ -62,6 +68,7 @@ class _PanelViewState extends State<PanelView> {
   @override
   void initState() {
     super.initState();
+
     initializeAndConnectBLE();
     _subscription = bleConnectionService.deviceUpdates.listen((update) {
       final macAddress = update['macAddress'];
@@ -311,7 +318,6 @@ class _PanelViewState extends State<PanelView> {
     if (kDebugMode) {
       print("💡 Recursos BLE liberados.");
     }
-
     super.dispose();
     if (kDebugMode) {
       print("🚀 dispose() ejecutado correctamente.");
@@ -715,6 +721,7 @@ class _PanelViewState extends State<PanelView> {
                                 ),
                               ),
                             ],
+                            Text('$isFullScreen', style: const TextStyle(fontSize: 1,color: Colors.transparent),),
                             Expanded(
                               flex: 9,
                               child: IndexedStack(
@@ -1533,7 +1540,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool isSessionStarted = false;
   bool _isImagesLoaded = false;
   GlobalKey<_PanelViewState> panelViewKey = GlobalKey<_PanelViewState>();
-
+  String modulo =
+      "imotion21"; // Cambia "moduloEjemplo" por el valor real del módulo.
+  List<String> prvideos = List.filled(
+      30, ""); // Inicializamos la lista prvideos con 30 elementos vacíos.
+  List<String> invideos = List.filled(30, "");
   String? selectedProgram;
   Map<String, dynamic>? selectedIndivProgram;
   Map<String, dynamic>? selectedRecoProgram;
@@ -1731,6 +1742,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       _isImagesLoaded = true;
     });
   }
+
+
 
   // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
   void toggleFullScreen() {
@@ -5915,7 +5928,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               ),
                                               child: Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.spaceAround,
+                                                    MainAxisAlignment
+                                                        .spaceAround,
                                                 children: selectedClients
                                                     .map((client) {
                                                   return Padding(
@@ -5928,11 +5942,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          client['name'].toString().toUpperCase() ??
+                                                          client['name']
+                                                                  .toString()
+                                                                  .toUpperCase() ??
                                                               'Sin nombre',
                                                           style: TextStyle(
                                                             fontSize: 15.sp,
-                                                            color: const Color(0xFF2be4f3),
+                                                            color: const Color(
+                                                                0xFF2be4f3),
                                                           ),
                                                         ),
                                                         Row(
@@ -5945,14 +5962,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               fit: BoxFit
                                                                   .scaleDown,
                                                             ),
-                                                            SizedBox(width: screenWidth * 0.01),
+                                                            SizedBox(
+                                                                width:
+                                                                    screenWidth *
+                                                                        0.01),
                                                             Text(
                                                               client['counter1']
                                                                       ?.toString() ??
                                                                   '0',
                                                               // Asegúrate de que el contador esté disponible
                                                               style: TextStyle(
-                                                                  fontSize: 15.sp,
+                                                                  fontSize:
+                                                                      15.sp,
                                                                   color: Colors
                                                                       .white),
                                                             ),
@@ -6855,11 +6876,11 @@ class BleConnectionService {
       // Esperar que termine el escaneo o pase el tiempo límite
       await Future.any([
         scanCompleter.future,
-        Future.delayed(const Duration(seconds: 10), () async {
+        Future.delayed(const Duration(seconds: 5), () async {
           if (_scanStream != null) {
             await _scanStream?.cancel();
             print(
-                "⏳ Escaneo BLE cancelado automáticamente después de 10 segundos.");
+                "⏳ Escaneo BLE cancelado automáticamente después de 5 segundos.");
           }
           if (!scanCompleter.isCompleted) scanCompleter.complete();
         }),
@@ -7145,7 +7166,7 @@ class BleConnectionService {
         if (!isConnected) {
           // Verificar si el dispositivo está publicándose antes de intentar reconectar
           final isAdvertising = await _isDeviceAdvertising(macAddress);
-
+          _startScan();
           if (isAdvertising) {
             print(
                 "⚠️ Dispositivo $macAddress está encendido pero desconectado. Intentando reconectar...");
