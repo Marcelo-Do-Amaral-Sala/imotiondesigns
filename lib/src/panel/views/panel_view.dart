@@ -16,8 +16,6 @@ import '../custom/border_neon.dart';
 import '../custom/linear_custom.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class PanelView extends StatefulWidget {
   final VoidCallback onBack;
   final VoidCallback onReset; // Nuevo callback para reiniciar
@@ -36,7 +34,6 @@ class PanelView extends StatefulWidget {
 }
 
 class _PanelViewState extends State<PanelView> {
-
   late BleConnectionService bleConnectionService;
   late StreamSubscription _subscription;
   late ClientsProvider? _clientsProvider;
@@ -68,7 +65,6 @@ class _PanelViewState extends State<PanelView> {
   @override
   void initState() {
     super.initState();
-
     initializeAndConnectBLE();
     _subscription = bleConnectionService.deviceUpdates.listen((update) {
       final macAddress = update['macAddress'];
@@ -181,7 +177,7 @@ class _PanelViewState extends State<PanelView> {
 
       await Future.delayed(const Duration(seconds: 4));
 
-      // Iniciar la verificación periódica de conexión
+/*      // Iniciar la verificación periódica de conexión
       debugPrint("⌚--->>>Iniciando verificación de conexión periódica");
       bleConnectionService
           .startPeriodicConnectionCheck((macAddress, isConnected) {
@@ -193,7 +189,7 @@ class _PanelViewState extends State<PanelView> {
             isConnected ? 'conectado' : 'desconectado';
           });
         }
-      });
+      });*/
     } else {
       debugPrint(
           "⚠️--->>>Ningún dispositivo fue conectado exitosamente. Saltando inicialización de seguridad y operaciones.");
@@ -721,7 +717,11 @@ class _PanelViewState extends State<PanelView> {
                                 ),
                               ),
                             ],
-                            Text('$isFullScreen', style: const TextStyle(fontSize: 1,color: Colors.transparent),),
+                            Text(
+                              '$isFullScreen',
+                              style: const TextStyle(
+                                  fontSize: 1, color: Colors.transparent),
+                            ),
                             Expanded(
                               flex: 9,
                               child: IndexedStack(
@@ -734,16 +734,18 @@ class _PanelViewState extends State<PanelView> {
 
                                   // Crear el widget para cada contenido con su estado independiente
                                   return ExpandedContentWidget(
-                                    selectedKey: selectedKey,
-                                    index: index,
-                                    macAddress: macAddress,
-                                    onSelectEquip: (index) =>
-                                        updateEquipSelection(
-                                            selectedKey!, index),
-                                    onClientSelected: (client) =>
-                                        onClientSelected(selectedKey!, client),
-                                    isFullChanged: handleActiveChange,
-                                  );
+                                      selectedKey: selectedKey,
+                                      index: index,
+                                      macAddress: macAddress,
+                                      onSelectEquip: (index) =>
+                                          updateEquipSelection(
+                                              selectedKey!, index),
+                                      onClientSelected: (client) =>
+                                          onClientSelected(
+                                              selectedKey!, client),
+                                      isFullChanged: handleActiveChange,
+                                      bleConnectionService:
+                                          bleConnectionService);
                                 }).toList(),
                               ),
                             ),
@@ -1331,6 +1333,7 @@ class _PanelViewState extends State<PanelView> {
                     ),
                     OutlinedButton(
                       onPressed: () async {
+                        // Verifica si la sesión se ha iniciado antes de detenerla
                         widget.onBack();
                         Navigator.of(context)
                             .pop(); // Cierra el diálogo de confirmación
@@ -1491,6 +1494,7 @@ class ExpandedContentWidget extends StatefulWidget {
   final ValueChanged<int> onSelectEquip;
   final ValueChanged<Map<String, dynamic>?> onClientSelected;
   final ValueChanged<bool> isFullChanged;
+  final BleConnectionService bleConnectionService;
 
   const ExpandedContentWidget({
     super.key,
@@ -1500,6 +1504,7 @@ class ExpandedContentWidget extends StatefulWidget {
     required this.onSelectEquip,
     required this.onClientSelected,
     required this.isFullChanged,
+    required this.bleConnectionService,
   });
 
   @override
@@ -1509,7 +1514,6 @@ class ExpandedContentWidget extends StatefulWidget {
 class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     with SingleTickerProviderStateMixin {
   late ClientsProvider? _clientsProvider;
-
   late PanelView panelView = PanelView(
     key: panelViewKey,
     onBack: () {
@@ -1538,6 +1542,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool isRunning = false;
   bool isContractionPhase = true;
   bool isSessionStarted = false;
+  bool isElectroOn = false;
   bool _isImagesLoaded = false;
   GlobalKey<_PanelViewState> panelViewKey = GlobalKey<_PanelViewState>();
   String modulo =
@@ -1581,6 +1586,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valueContraction = 1.0;
   double valueRampa = 1.0;
   double valuePause = 1.0;
+  double contractionDuration = 0.0;
 
   List<Map<String, dynamic>> selectedClients = [];
   List<Map<String, dynamic>> allIndividualPrograms = [];
@@ -1743,8 +1749,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
-
-
   // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
   void toggleFullScreen() {
     setState(() {
@@ -1792,6 +1796,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void _clearGlobals() {
     setState(() {
+      // Verifica si la sesión se ha iniciado antes de detenerla
+      isElectroOn = false;
+
       // Restablecer variables globales
       selectedProgram = null;
       selectedClient = null;
@@ -1973,21 +1980,32 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         selectedIndivProgram != null) {
       valueContraction =
           (selectedIndivProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause = (selectedIndivProgram!['pausa'] as double?) ?? valuePause;
+      valuePause =
+          (selectedIndivProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa =
+          (selectedIndivProgram!['rampa'] as double?) ?? valueRampa;
     } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
         selectedRecoProgram != null) {
       valueContraction =
           (selectedRecoProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause = (selectedRecoProgram!['pausa'] as double?) ?? valuePause;
+      valuePause =
+          (selectedRecoProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa =
+          (selectedRecoProgram!['rampa'] as double?) ?? valueRampa;
     } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
         selectedAutoProgram != null) {
       valueContraction =
           (selectedAutoProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause = (selectedAutoProgram!['pausa'] as double?) ?? valuePause;
+      valuePause =
+          (selectedAutoProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa =
+          (selectedAutoProgram!['rampa'] as double?) ?? valueRampa;
     }
   }
 
-  void _startTimer() {
+
+  void _startTimer(String macAddress, List<int> porcentajesMusculoTraje,
+      List<int> porcentajesMusculoPantalon) {
     if (isRunning) return; // Evita iniciar si ya está corriendo
 
     setState(() {
@@ -1999,12 +2017,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Inicia o reanuda el temporizador principal
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {
-          // Calcula el tiempo transcurrido y el progreso
           elapsedTime = pausedTime +
               DateTime.now().difference(startTime).inSeconds.toDouble();
           progress = 1.0 - (elapsedTime / totalTime); // Reducir el progreso
 
-          // Actualiza los minutos y segundos
           seconds = (totalTime - elapsedTime).toInt() % 60;
           time = (totalTime - elapsedTime).toInt() ~/ 60;
 
@@ -2014,22 +2030,31 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
           // Detiene el temporizador al alcanzar el tiempo total
           if (elapsedTime >= totalTime) {
-            _pauseTimer();
+            _pauseTimer(macAddress);
           }
         });
       });
 
       // Reanuda el temporizador de contracción o pausa
       if (isContractionPhase) {
-        _startContractionTimer(valueContraction);
+        _startContractionTimer(valueContraction, macAddress,
+            porcentajesMusculoTraje, porcentajesMusculoPantalon);
       } else {
-        _startPauseTimer(valuePause);
+        _startPauseTimer(valuePause, macAddress, porcentajesMusculoTraje,
+            porcentajesMusculoPantalon);
       }
     });
   }
 
-  void _pauseTimer() {
+  void _pauseTimer(String macAddress) {
     setState(() {
+      // Verifica si la sesión se ha iniciado antes de detenerla
+      if (isElectroOn) {
+        widget.bleConnectionService._stopElectrostimulationSession(macAddress);
+        setState(() {
+          isElectroOn = false; // Al detener la sesión, actualizamos la bandera
+        });
+      }
       isRunning = false;
       pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
       _timer.cancel();
@@ -2037,63 +2062,207 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
-  void _startContractionTimer(double contractionDuration) {
+  void _startContractionTimer(double contractionDuration, String macAddress,
+      List<int> porcentajesMusculoTraje, List<int> porcentajesMusculoPantalon) {
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
+
+    // Verifica si la sesión se ha iniciado antes de detenerla
+    if (!isElectroOn) {
+      if (selectedIndexEquip == 0) {
+        // Si selectedEquipIndex es 0, usar el traje
+        startFullElectrostimulationTrajeProcess(
+            macAddress, porcentajesMusculoTraje, selectedProgram);
+      } else if (selectedIndexEquip == 1) {
+        // Si selectedEquipIndex es 1, usar el pantalón
+        startFullElectrostimulationPantalonProcess(
+            macAddress, porcentajesMusculoPantalon, selectedProgram);
+      }
+
+      setState(() {
+        isElectroOn = true; // Al iniciar la sesión, actualizamos la bandera
+      });
+    }
 
     // Calcula el progreso restante
     final remainingTime = contractionDuration - elapsedTimeContraction;
 
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) {
-        // Verifica si el widget todavía está montado
         setState(() {
           elapsedTimeContraction += 0.1;
-          progressContraction = elapsedTimeContraction /
-              contractionDuration; // Progreso ascendente
+          progressContraction = elapsedTimeContraction / contractionDuration;
 
           // Si se completó el tiempo de contracción, pasa a la pausa
           if (elapsedTimeContraction >= contractionDuration) {
             elapsedTimeContraction = 0.0; // Reinicia el tiempo de contracción
             isContractionPhase = false;
-            _startPauseTimer(valuePause);
+            _startPauseTimer(valuePause, macAddress, porcentajesMusculoTraje,
+                porcentajesMusculoPantalon);
           }
         });
       }
     });
 
     if (remainingTime <= 0) {
-      // Si no queda tiempo en esta fase, pasa inmediatamente a la siguiente
       elapsedTimeContraction = 0.0;
       isContractionPhase = false;
-      _startPauseTimer(valuePause);
+      _startPauseTimer(valuePause, macAddress, porcentajesMusculoTraje,
+          porcentajesMusculoPantalon);
     }
   }
 
-  void _startPauseTimer(double pauseDuration) {
+  void _startPauseTimer(double pauseDuration, String macAddress,
+      List<int> porcentajesMusculoTraje, List<int> porcentajesMusculoPantalon) {
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
 
+    // Verifica si la sesión se ha iniciado antes de detenerla
+    if (isElectroOn) {
+      widget.bleConnectionService._stopElectrostimulationSession(macAddress);
+      setState(() {
+        isElectroOn = false; // Al detener la sesión, actualizamos la bandera
+      });
+    }
     // Calcula el progreso restante
     final remainingTime = pauseDuration - elapsedTimePause;
 
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      setState(() {
-        elapsedTimePause += 0.1;
-        progressPause = elapsedTimePause / pauseDuration; // Progreso ascendente
+      if (mounted) {
+        setState(() {
+          elapsedTimePause += 0.1;
+          progressPause = elapsedTimePause / pauseDuration;
 
-        // Si se completó el tiempo de pausa, pasa a la contracción
-        if (elapsedTimePause >= pauseDuration) {
-          elapsedTimePause = 0.0; // Reinicia el tiempo de pausa
-          isContractionPhase = true;
-          _startContractionTimer(valueContraction);
-        }
-      });
+          // Si se completó el tiempo de pausa, pasa a la contracción
+          if (elapsedTimePause >= pauseDuration) {
+            elapsedTimePause = 0.0; // Reinicia el tiempo de pausa
+            isContractionPhase = true;
+            _startContractionTimer(valueContraction, macAddress,
+                porcentajesMusculoTraje, porcentajesMusculoPantalon);
+          }
+        });
+      }
     });
 
     if (remainingTime <= 0) {
-      // Si no queda tiempo en esta fase, pasa inmediatamente a la siguiente
       elapsedTimePause = 0.0;
       isContractionPhase = true;
-      _startContractionTimer(valueContraction);
+      _startContractionTimer(valueContraction, macAddress,
+          porcentajesMusculoTraje, porcentajesMusculoPantalon);
+    }
+  }
+
+  Future<void> startFullElectrostimulationTrajeProcess(
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    String? selectedProgram,
+  ) async {
+    try {
+      if (porcentajesMusculoTraje.length != 10) {
+        debugPrint(
+            "❌ La lista porcentajesMusculoTraje debe tener 10 elementos.");
+        return;
+      }
+
+      // Paso 1: Obtener los valores de los canales
+      List<int> valoresCanales = List.generate(10, (canal) {
+        int valorCanal = porcentajesMusculoTraje[canal];
+        return (valorCanal >= 0) ? valorCanal : 0;
+      });
+
+      debugPrint(
+          "-------------------------*************Valores de los canales: $valoresCanales");
+
+      // Paso 2: Obtener frecuencia, rampa y anchura de pulso
+      Map<String, double> settings = getProgramSettings(selectedProgram);
+      double frecuencia = settings['frecuencia'] ?? 50;
+      double rampa = settings['rampa'] ?? 30;
+      double pulso = settings['pulso'] ?? 0;
+
+      debugPrint(
+          "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso ms");
+
+      // Paso 3: Iniciar la sesión de electroestimulación
+      bool isElectroOn =
+          await widget.bleConnectionService._startElectrostimulationSession(
+        macAddress,
+        valoresCanales,
+        frecuencia,
+        rampa,
+        pulso: pulso, // Pasar anchura de pulso
+      );
+
+      if (isElectroOn) {
+        setState(() {
+          isElectroOn = true;
+        });
+        debugPrint("✅ Proceso de electroestimulación iniciado correctamente.");
+      } else {
+        debugPrint(
+            "❌ Error al iniciar el proceso completo de electroestimulación.");
+      }
+    } catch (e) {
+      debugPrint("❌ Error en el proceso completo: $e");
+    }
+  }
+
+  Future<void> startFullElectrostimulationPantalonProcess(
+    String macAddress,
+    List<int> porcentajesMusculoPantalon,
+    String? selectedProgram,
+  ) async {
+    try {
+      // Verificar que la lista tiene 7 elementos, es importante para evitar errores de índice
+      if (porcentajesMusculoPantalon.length != 7) {
+        debugPrint(
+            "❌ La lista porcentajesMusculoPantalon debe tener 7 elementos.");
+        return;
+      }
+
+      // Paso 1: Obtener los valores de los canales directamente desde porcentajesMusculoPantalon
+      List<int> valoresCanales = List.generate(7, (canal) {
+        // Asignar el valor directamente desde la lista porcentajesMusculoPantalon
+        int valorCanal = porcentajesMusculoPantalon[canal];
+
+        // Si el valor está fuera de rango o es "Limitador activado", asignamos un valor por defecto
+        if (valorCanal < 0) {
+          return 0; // Si el valor es negativo o no válido, asignar 0
+        } else {
+          return valorCanal; // Si el valor es válido, asignar el valor directamente
+        }
+      });
+
+      debugPrint("✅ Valores de los canales: $valoresCanales");
+
+      // Paso 2: Obtener la frecuencia, rampa y anchura de pulso del programa seleccionado
+      Map<String, double> settings = getProgramSettings(selectedProgram);
+      double frecuencia = settings['frecuencia'] ?? 50; // Valor por defecto
+      double rampa = settings['rampa'] ?? 30; // Valor por defecto
+      double pulso = settings['pulso'] ?? 20; // Valor por defecto
+
+      debugPrint(
+          "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso ms");
+
+      // Paso 3: Iniciar la sesión de electroestimulación con los valores obtenidos
+      bool isElectroOn =
+          await widget.bleConnectionService._startElectrostimulationSession(
+        macAddress,
+        valoresCanales,
+        frecuencia,
+        rampa,
+        pulso: pulso, // Pasar el pulso al servicio
+      );
+
+      if (isElectroOn) {
+        setState(() {
+          isElectroOn = true;
+        });
+        debugPrint("'$isElectroOn'");
+        debugPrint("✅ Proceso de electroestimulación iniciado correctamente.");
+      } else {
+        debugPrint(
+            "❌ Error al iniciar el proceso completo de electroestimulación.");
+      }
+    } catch (e) {
+      debugPrint("❌ Error en el proceso completo: $e");
     }
   }
 
@@ -2153,8 +2322,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       ),
                     ),
                     OutlinedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         _clearGlobals();
+                        await widget.bleConnectionService
+                            ._stopElectrostimulationSession(widget.macAddress!);
                       },
                       style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.red),
@@ -2224,6 +2395,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _opacityController.dispose();
     if (kDebugMode) {
       print("🔧 Controlador de opacidad liberado.");
+    }
+    // Verifica si la sesión se ha iniciado antes de detenerla
+    if (isElectroOn) {
+      widget.bleConnectionService
+          ._stopElectrostimulationSession(widget.macAddress!);
+      setState(() {
+        isElectroOn = false; // Al detener la sesión, actualizamos la bandera
+      });
     }
 
     if (_clientsProvider != null) {
@@ -4321,11 +4500,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     setState(() {
                                                       if (isRunning) {
                                                         // Pausa el temporizador si está corriendo
-                                                        _pauseTimer();
+                                                        _pauseTimer(
+                                                            widget.macAddress!);
+
                                                       } else {
-                                                        // Inicia o reanuda el temporizador si está pausado
-                                                        _startTimer();
+                                                        _startTimer(
+                                                            widget.macAddress!,
+                                                            porcentajesMusculoTraje,
+                                                            porcentajesMusculoPantalon);
                                                       }
+                                                      isElectroOn=!isElectroOn;
                                                       isSessionStarted =
                                                           !isSessionStarted;
                                                       debugPrint(
@@ -5718,11 +5902,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     setState(() {
                                                       if (isRunning) {
                                                         // Pausa el temporizador si está corriendo
-                                                        _pauseTimer();
+                                                        _pauseTimer(
+                                                            widget.macAddress!);
                                                       } else {
                                                         // Inicia o reanuda el temporizador si está pausado
-                                                        _startTimer();
+                                                        _startTimer(
+                                                            widget.macAddress!,
+                                                            porcentajesMusculoTraje,
+                                                            porcentajesMusculoPantalon);
                                                       }
+                                                      isElectroOn=!isElectroOn;
                                                       isSessionStarted =
                                                           !isSessionStarted;
                                                       debugPrint(
@@ -6301,6 +6490,67 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         : number.toStringAsFixed(2);
   }
 
+  // Función para obtener la frecuencia y la rampa del programa seleccionado
+  Map<String, double> getProgramSettings(String? selectedProgram) {
+    double frecuencia = 0;
+    double rampa = valueRampa;
+    double pulso = 0; // Nuevo parámetro
+
+    if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
+        allIndividualPrograms.isNotEmpty) {
+      if (selectedIndivProgram != null) {
+        frecuencia = selectedIndivProgram!['frecuencia'] != null
+            ? selectedIndivProgram!['frecuencia'] as double
+            : 0;
+        rampa = selectedIndivProgram!['rampa'] != null
+            ? selectedIndivProgram!['rampa'] as double
+            : 0;
+        pulso = selectedIndivProgram!['pulso'] != null
+            ? selectedIndivProgram!['pulso'] as double
+            : 0;
+      } else {
+        frecuencia = allIndividualPrograms.isNotEmpty
+            ? allIndividualPrograms[0]['frecuencia'] as double
+            : 0;
+        rampa = allIndividualPrograms.isNotEmpty
+            ? allIndividualPrograms[0]['rampa'] as double
+            : 0;
+        pulso = allIndividualPrograms.isNotEmpty
+            ? allIndividualPrograms[0]['pulso'] as double
+            : 0;
+      }
+    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
+        allRecoveryPrograms.isNotEmpty) {
+      if (selectedRecoProgram != null) {
+        frecuencia = selectedRecoProgram!['frecuencia'] != null
+            ? selectedRecoProgram!['frecuencia'] as double
+            : 0;
+        rampa = selectedRecoProgram!['rampa'] != null
+            ? selectedRecoProgram!['rampa'] as double
+            : 0;
+        pulso = selectedRecoProgram!['pulso'] != null
+            ? selectedRecoProgram!['pulso'] as double
+            : 0;
+      } else {
+        frecuencia = allRecoveryPrograms.isNotEmpty
+            ? allRecoveryPrograms[0]['frecuencia'] as double
+            : 0;
+        rampa = allRecoveryPrograms.isNotEmpty
+            ? allRecoveryPrograms[0]['rampa'] as double
+            : 0;
+        pulso = allRecoveryPrograms.isNotEmpty
+            ? allRecoveryPrograms[0]['pulso'] as double
+            : 0;
+      }
+    }
+
+    return {
+      'frecuencia': frecuencia,
+      'rampa': rampa,
+      'pulso': pulso, // Devuelve el nuevo valor
+    };
+  }
+
   Widget _buildMuscleRow({
     required int index,
     required String imagePathEnabled,
@@ -6334,6 +6584,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             porcentajesMusculoTraje[index] =
                                 (porcentajesMusculoTraje[index] + 1)
                                     .clamp(0, 100);
+                          } else if (_isMusculoTrajeInactivo[index]) {
+                            // Si está inactivo, poner el porcentaje a 0
+                            porcentajesMusculoTraje[index] = 0;
                           }
                         });
                       },
@@ -6363,6 +6616,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         }
                         _isMusculoTrajeInactivo[index] =
                             !_isMusculoTrajeInactivo[index];
+
+                        // Si se pone inactivo, poner el porcentaje a 0
+                        if (_isMusculoTrajeInactivo[index]) {
+                          porcentajesMusculoTraje[index] = 0;
+                        }
                       });
                     },
                     child: SizedBox(
@@ -6424,6 +6682,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             porcentajesMusculoTraje[index] =
                                 (porcentajesMusculoTraje[index] - 1)
                                     .clamp(0, 100);
+                          } else if (_isMusculoTrajeInactivo[index]) {
+                            // Si está inactivo, poner el porcentaje a 0
+                            porcentajesMusculoTraje[index] = 0;
                           }
                         });
                       },
@@ -6499,6 +6760,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             porcentajesMusculoPantalon[index] =
                                 (porcentajesMusculoPantalon[index] + 1)
                                     .clamp(0, 100);
+                          } else if (_isMusculoPantalonInactivo[index]) {
+                            // Si está inactivo, poner el porcentaje a 0
+                            porcentajesMusculoPantalon[index] = 0;
                           }
                         });
                       },
@@ -6530,6 +6794,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         // Cambiar el estado de inactivo
                         _isMusculoPantalonInactivo[index] =
                             !_isMusculoPantalonInactivo[index];
+                        // Si se pone inactivo, poner el porcentaje a 0
+                        if (_isMusculoPantalonInactivo[index]) {
+                          porcentajesMusculoPantalon[index] = 0;
+                        }
                       });
                     },
                     child: SizedBox(
@@ -6591,6 +6859,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             porcentajesMusculoPantalon[index] =
                                 (porcentajesMusculoPantalon[index] - 1)
                                     .clamp(0, 100);
+                          } else if (_isMusculoPantalonInactivo[index]) {
+                            // Si está inactivo, poner el porcentaje a 0
+                            porcentajesMusculoPantalon[index] = 0;
                           }
                         });
                       },
@@ -6876,7 +7147,7 @@ class BleConnectionService {
       // Esperar que termine el escaneo o pase el tiempo límite
       await Future.any([
         scanCompleter.future,
-        Future.delayed(const Duration(seconds: 5), () async {
+        Future.delayed(const Duration(seconds: 3), () async {
           if (_scanStream != null) {
             await _scanStream?.cancel();
             print(
@@ -7033,118 +7304,107 @@ class BleConnectionService {
         debugPrint(
             "🔒--->>>Fase de inicialización de seguridad completada para $macAddress.");
 
-        // Obtener la información del dispositivo (FUN_INFO)
-        final deviceInfo = await getDeviceInfo(macAddress)
-            .timeout(const Duration(seconds: 15));
-        final parsedInfo = parseDeviceInfo(deviceInfo);
-        debugPrint(parsedInfo);
+        // Procesar información general del dispositivo
+        await _processDeviceInfo(macAddress);
 
-        // Obtener el nombre del Bluetooth (FUN_GET_NAMEBT)
-        final nameBt = await getBluetoothName(macAddress)
-            .timeout(const Duration(seconds: 15));
-        ;
-        debugPrint("🅱️ Nombre del Bluetooth ($macAddress): $nameBt");
-        updateBluetoothName(
-            macAddress, nameBt.isNotEmpty ? nameBt : "No disponible");
-
-        // Obtener los parámetros de la batería (FUN_GET_PARAMBAT)
-        final batteryParameters = await getBatteryParameters(macAddress)
-            .timeout(const Duration(seconds: 15));
-        ;
-        final parsedBattery = parseBatteryParameters(batteryParameters);
-        debugPrint(parsedBattery);
-        updateBatteryStatus(
-            macAddress, batteryParameters['batteryStatusRaw'] ?? -1);
-
-        // Obtener contadores de tarifa
-        final counters = await getTariffCounters(macAddress)
-            .timeout(const Duration(seconds: 15));
-        ;
-        final parsedCounters = parseTariffCounters(counters);
-        debugPrint(parsedCounters);
-
-        // Operaciones con electroestimulador
-        for (int mode = 0; mode < 3; mode++) {
-          final state = await getElectrostimulatorState(
-              macAddress, 1, mode); // Endpoint 1 como ejemplo
-          final parsedState = parseElectrostimulatorState(state, mode);
-          debugPrint(parsedState);
-        }
-
-        // Ejecutar sesión de electroestimulación
-        final runSuccess = await runElectrostimulationSession(
-          macAddress: macAddress,
-          endpoint: 1,
-          limitador: 0,
-          rampa: 30,
-          frecuencia: 50,
-          deshabilitaElevador: 0,
-          nivelCanales: 100,
-          anchuraPulsoComun: 0,
-          anchuraPulsosPorCanal: List.generate(
-              10, (index) => 20), // Ancho de pulso para cada canal
-        );
-
-        if (runSuccess) {
-          debugPrint(
-              "✅ Sesión de electroestimulación iniciada correctamente en $macAddress.");
-        } else {
-          debugPrint(
-              "❌ Error al iniciar la sesión de electroestimulación en $macAddress.");
-        }
-
-        // Controlar canales individuales
-        final response = await controlElectrostimulatorChannel(
-          macAddress: macAddress,
-          endpoint: 1,
-          canal: 1,
-          modo: 0,
-          valor: 50, // Fijar el nivel en 50%
-        );
-
-        final parsedResponse = parseChannelControlResponse(response);
-        debugPrint(parsedResponse);
-
-        // Controlar todos los canales
-        final response2 = await controlAllElectrostimulatorChannels(
-          macAddress: macAddress,
-          endpoint: 1,
-          modo: 0,
-          valoresCanales: [
-            50,
-            60,
-            70,
-            80,
-            90,
-            50,
-            60,
-            70,
-            80,
-            90
-          ], // Valores para todos los canales
-        );
-
-        final parsedResponse2 = parseAllChannelsResponse(response2);
-        debugPrint(parsedResponse2);
-
-        // Detener la sesión después de 5 segundos
-        await Future.delayed(const Duration(seconds: 5));
-
-        final stopSuccess = await stopElectrostimulationSession(
-          macAddress: macAddress,
-          endpoint: 1,
-        );
-
-        if (stopSuccess) {
-          debugPrint(
-              "✅ Sesión de electroestimulación detenida correctamente en $macAddress.");
-        } else {
-          debugPrint(
-              "❌ Error al detener la sesión de electroestimulación en $macAddress.");
-        }
+        // Procesar electroestimulación (canales y sesiones)
+        //await _processElectrostimulation(macAddress);
       } catch (e) {
         debugPrint("❌--->>>Error al procesar el dispositivo $macAddress: $e");
       }
+    }
+  }
+
+  Future<void> _processDeviceInfo(String macAddress) async {
+    try {
+      // Obtener la información del dispositivo (FUN_INFO)
+      final deviceInfo =
+          await getDeviceInfo(macAddress).timeout(const Duration(seconds: 15));
+      final parsedInfo = parseDeviceInfo(deviceInfo);
+      debugPrint(parsedInfo);
+
+      // Obtener el nombre del Bluetooth (FUN_GET_NAMEBT)
+      final nameBt = await getBluetoothName(macAddress)
+          .timeout(const Duration(seconds: 15));
+      debugPrint("🅱️ Nombre del Bluetooth ($macAddress): $nameBt");
+      updateBluetoothName(
+          macAddress, nameBt.isNotEmpty ? nameBt : "No disponible");
+
+      // Obtener los parámetros de la batería (FUN_GET_PARAMBAT)
+      final batteryParameters = await getBatteryParameters(macAddress)
+          .timeout(const Duration(seconds: 15));
+      final parsedBattery = parseBatteryParameters(batteryParameters);
+      debugPrint(parsedBattery);
+      updateBatteryStatus(
+          macAddress, batteryParameters['batteryStatusRaw'] ?? -1);
+
+      // Obtener contadores de tarifa
+      final counters = await getTariffCounters(macAddress)
+          .timeout(const Duration(seconds: 15));
+      final parsedCounters = parseTariffCounters(counters);
+      debugPrint(parsedCounters);
+    } catch (e) {
+      debugPrint(
+          "❌ Error al procesar la información general de $macAddress: $e");
+    }
+  }
+
+  Future<bool> _startElectrostimulationSession(
+    String macAddress,
+    List<int> valoresCanales,
+    double frecuencia,
+    double rampa, {
+    double pulso = 0, // Nuevo parámetro con valor por defecto
+  }) async {
+    try {
+      final runSuccess = await runElectrostimulationSession(
+        macAddress: macAddress,
+        endpoint: 1,
+        limitador: 0,
+        rampa: rampa,
+        frecuencia: frecuencia,
+        deshabilitaElevador: 0,
+        nivelCanales: valoresCanales,
+        pulso: pulso.toInt(),
+        // Usar el valor de anchura de pulso
+        anchuraPulsosPorCanal:
+            List.generate(10, (index) => pulso.toInt()), // Usar un valor común
+      );
+
+      if (runSuccess) {
+        debugPrint(
+            "✅ Sesión de electroestimulación iniciada correctamente en $macAddress.");
+        return true;
+      } else {
+        debugPrint(
+            "❌ Error al iniciar la sesión de electroestimulación en $macAddress.");
+        return false;
+      }
+    } catch (e) {
+      debugPrint(
+          "❌ Error al procesar la electroestimulación de $macAddress: $e");
+      return false;
+    }
+  }
+
+// Función para detener la sesión de electroestimulación
+  Future<void> _stopElectrostimulationSession(String macAddress) async {
+    try {
+      final stopSuccess = await stopElectrostimulationSession(
+        macAddress: macAddress,
+        endpoint: 1,
+      );
+
+      if (stopSuccess) {
+        debugPrint(
+            "✅ Sesión de electroestimulación detenida correctamente en $macAddress.");
+      } else {
+        debugPrint(
+            "❌ Error al detener la sesión de electroestimulación en $macAddress.");
+      }
+    } catch (e) {
+      debugPrint(
+          "❌ Error al detener la electroestimulación de $macAddress: $e");
     }
   }
 
@@ -8010,11 +8270,11 @@ $endpoints
     required String macAddress,
     required int endpoint,
     required int limitador,
-    required int rampa,
-    required int frecuencia,
+    required double rampa,
+    required double frecuencia,
     required int deshabilitaElevador,
-    required int nivelCanales,
-    required int anchuraPulsoComun,
+    required List<int> nivelCanales, // Recibimos una lista de enteros
+    required int pulso,
     required List<int> anchuraPulsosPorCanal,
   }) async {
     final characteristicRx = QualifiedCharacteristic(
@@ -8043,11 +8303,19 @@ $endpoints
     requestPacket[0] = 0x12; // FUN_RUN_EMS
     requestPacket[1] = endpoint;
     requestPacket[2] = limitador;
-    requestPacket[3] = rampa;
-    requestPacket[4] = frecuencia;
+    requestPacket[3] = rampa.toInt();
+    requestPacket[4] = frecuencia.toInt();
     requestPacket[5] = deshabilitaElevador;
-    requestPacket[6] = nivelCanales;
-    requestPacket[7] = anchuraPulsoComun;
+
+    // Asignar los valores de los canales al paquete de solicitud
+    for (int i = 0; i < nivelCanales.length; i++) {
+      requestPacket[6 + i] =
+          nivelCanales[i]; // Cada canal recibe su valor respectivo
+    }
+
+    requestPacket[7] = pulso;
+
+    // Asignar los valores de anchura de pulso por canal
     for (int i = 0; i < 10; i++) {
       requestPacket[8 + i] = anchuraPulsosPorCanal[i];
     }

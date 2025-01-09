@@ -358,22 +358,22 @@ class _OverlaySeleccionarProgramaIndividualState
                         SizedBox(height: screenHeight * 0.03),
                         _buildDetailRow(
                             '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
-                            pulso,
+                            frecuencia,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
                             '${tr(context, "Rampa").toUpperCase()}: ',
-                            pulso,
+                            rampa,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
                             '${tr(context, "Pausa").toUpperCase()}: ',
-                            pulso,
+                            pausa,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
                             '${tr(context, "Contracción").toUpperCase()}: ',
-                            pulso,
+                            contraccion,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
@@ -683,22 +683,22 @@ class _OverlaySeleccionarProgramaRecoveryState
                         SizedBox(height: screenHeight * 0.03),
                         _buildDetailRow(
                             '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
-                            pulso,
+                            frecuencia,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
                             '${tr(context, "Rampa").toUpperCase()}: ',
-                            pulso,
+                            rampa,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
                             '${tr(context, "Pausa").toUpperCase()}: ',
-                            pulso,
+                            pausa,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
                             '${tr(context, "Contracción").toUpperCase()}: ',
-                            pulso,
+                            contraccion,
                             ' μs'),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
