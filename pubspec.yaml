@@ -342,6 +342,10 @@ flutter:
     - assets/images/1.png
     - assets/images/seleccion_cliente.png
     - assets/images/EKCAL.png
+    - assets/images/ojo1.png
+    - assets/images/ojo2.png
+    - assets/images/apagar.png
+    - assets/images/back2.png
     - .env
     - assets/traduccionesv25.json
     - assets/videos/tutorial.mp4

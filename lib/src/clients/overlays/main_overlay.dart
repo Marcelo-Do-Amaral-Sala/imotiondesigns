@@ -4,12 +4,13 @@ class MainOverlay extends StatefulWidget {
   final Widget title;
   final Widget content;
   final VoidCallback onClose;
+  final bool isChangePwdView;
 
   const MainOverlay({
     Key? key,
     required this.content,
     required this.onClose,
-    required this.title,
+    required this.title,  this.isChangePwdView = false,
   }) : super(key: key);
 
   @override
@@ -65,19 +66,20 @@ class _MainOverlayState extends State<MainOverlay> {
           Center(
             child: widget.title,
           ),
-          Positioned(
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: IconButton(
-              onPressed: closeOverlay,
-              icon: const Icon(
-                Icons.close_sharp,
-                color: Colors.white,
-                size: 50,
+          if (!widget.isChangePwdView) // Mostrar el botón solo si isChangePwdView es false
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: IconButton(
+                onPressed: closeOverlay,
+                icon: const Icon(
+                  Icons.close_sharp,
+                  color: Colors.white,
+                  size: 50,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

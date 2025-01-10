@@ -2400,9 +2400,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (isElectroOn) {
       widget.bleConnectionService
           ._stopElectrostimulationSession(widget.macAddress!);
-      setState(() {
+      if(mounted) {
+        setState(() {
         isElectroOn = false; // Al detener la sesión, actualizamos la bandera
       });
+      }
     }
 
     if (_clientsProvider != null) {
@@ -6712,10 +6714,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (percentage >= umbrales[3]) {
       return Colors.red.withOpacity(0.6); // Rojo con opacidad del 60%
     } else if (percentage >= umbrales[2]) {
-      return Colors.yellow.withOpacity(0.6); // Amarillo con opacidad del 60%
+      return Colors.yellow.withOpacity(0.9); // Amarillo con opacidad del 60%
     } else if (percentage >= umbrales[1]) {
-      return Colors.lightGreenAccent
-          .withOpacity(0.6); // Verde claro con opacidad del 60%
+      return Colors.lightGreenAccent.shade400
+          .withOpacity(0.8); // Verde claro con opacidad del 60%
     } else {
       return Colors.green.withOpacity(0.6); // Verde con opacidad del 60%
     }
@@ -6888,15 +6890,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
     // Compara el porcentaje con los umbrales del grupo muscular
     if (percentage >= umbrales[3]) {
-      return Colors.red.withOpacity(0.5); // Rojo con opacidad del 60%
+      return Colors.red.withOpacity(0.6); // Rojo con opacidad del 60%
     } else if (percentage >= umbrales[2]) {
-      return Colors.yellowAccent
-          .withOpacity(0.7); // Amarillo con opacidad del 60%
+      return Colors.yellow.withOpacity(0.9); // Amarillo con opacidad del 60%
     } else if (percentage >= umbrales[1]) {
-      return Colors.lightGreenAccent
-          .withOpacity(0.5); // Verde claro con opacidad del 60%
+      return Colors.lightGreenAccent.shade400
+          .withOpacity(0.8); // Verde claro con opacidad del 60%
     } else {
-      return Colors.green.withOpacity(0.5); // Verde con opacidad del 60%
+      return Colors.green.withOpacity(0.6); // Verde con opacidad del 60%
     }
   }
 
