@@ -107,7 +107,7 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
         option,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 22.sp,
+          fontSize: 24.sp,
           fontWeight: FontWeight.normal,
         ),
       ),
@@ -127,8 +127,8 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
         });
       },
       child: Container(
-        width: 22.0,
-        height: 22.0,
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: MediaQuery.of(context).size.height * 0.04,
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,

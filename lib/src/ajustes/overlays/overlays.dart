@@ -460,7 +460,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(vertical:30.0, horizontal: 30.0),
         child: Column(
           children: [
             Row(
@@ -473,7 +473,12 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: _languageMap.keys.take(3).map((language) {
-                      return buildCustomCheckboxTile(language);
+                      return Column(
+                        children: [
+                          buildCustomCheckboxTile(language),
+                           SizedBox(height: MediaQuery.of(context).size.height*0.02), // Espacio entre filas
+                        ],
+                      );
                     }).toList(),
                   ),
                 ),
@@ -484,7 +489,12 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: _languageMap.keys.skip(3).map((language) {
-                      return buildCustomCheckboxTile(language);
+                      return Column(
+                        children: [
+                          buildCustomCheckboxTile(language),
+                          SizedBox(height: MediaQuery.of(context).size.height*0.02),
+                        ],
+                      );
                     }).toList(),
                   ),
                 ),
@@ -537,7 +547,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
         language,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 22.sp,
+          fontSize: 24.sp,
           fontWeight: FontWeight.normal,
         ),
       ),
@@ -557,8 +567,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
         });
       },
       child: Container(
-        width: 22.0,
-        height: 22.0,
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: MediaQuery.of(context).size.height * 0.04,
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -883,12 +893,14 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 Text(
                   tr(context, 'Debes completar el formulario para continuar')
                       .toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
+                const Spacer(),
                 OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog

@@ -42,6 +42,7 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Fondo

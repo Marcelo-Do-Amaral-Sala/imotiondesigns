@@ -148,7 +148,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+               const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -208,6 +208,7 @@ class _MainMenuViewState extends State<MainMenuView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SizedBox.expand(

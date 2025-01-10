@@ -329,12 +329,14 @@ class _OverlayCrearState extends State<OverlayCrear>
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 Text(
                   tr(context, 'Debes completar el formulario para continuar')
                       .toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
+                const Spacer(),
                 OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog

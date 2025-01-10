@@ -86,6 +86,7 @@ class _ClientsViewState extends State<ClientsView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SizedBox.expand(

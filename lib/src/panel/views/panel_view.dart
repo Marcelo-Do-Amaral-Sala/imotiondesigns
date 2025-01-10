@@ -326,6 +326,7 @@ class _PanelViewState extends State<PanelView> {
     double screenHeight = MediaQuery.of(context).size.height;
     bool isConnected = bleConnectionService.isConnected;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Fondo de la imagen
@@ -1179,7 +1180,7 @@ class _PanelViewState extends State<PanelView> {
                               backgroundColor: Colors.red,
                             ),
                             child: Text(
-                              'Cancelar'.toUpperCase(),
+                              tr(context, 'Cancelar').toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 17.sp,
@@ -1218,7 +1219,7 @@ class _PanelViewState extends State<PanelView> {
                               backgroundColor: const Color(0xFF2be4f3),
                             ),
                             child: Text(
-                              'Definir grupos'.toUpperCase(),
+                              tr(context, 'Definir grupos').toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 17.sp,
@@ -1303,12 +1304,14 @@ class _PanelViewState extends State<PanelView> {
                   ),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 Text(
                   tr(context, '¿Quieres salir del panel?').toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1980,29 +1983,22 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         selectedIndivProgram != null) {
       valueContraction =
           (selectedIndivProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause =
-          (selectedIndivProgram!['pausa'] as double?) ?? valuePause;
-      valueRampa =
-          (selectedIndivProgram!['rampa'] as double?) ?? valueRampa;
+      valuePause = (selectedIndivProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa = (selectedIndivProgram!['rampa'] as double?) ?? valueRampa;
     } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
         selectedRecoProgram != null) {
       valueContraction =
           (selectedRecoProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause =
-          (selectedRecoProgram!['pausa'] as double?) ?? valuePause;
-      valueRampa =
-          (selectedRecoProgram!['rampa'] as double?) ?? valueRampa;
+      valuePause = (selectedRecoProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa = (selectedRecoProgram!['rampa'] as double?) ?? valueRampa;
     } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
         selectedAutoProgram != null) {
       valueContraction =
           (selectedAutoProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause =
-          (selectedAutoProgram!['pausa'] as double?) ?? valuePause;
-      valueRampa =
-          (selectedAutoProgram!['rampa'] as double?) ?? valueRampa;
+      valuePause = (selectedAutoProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa = (selectedAutoProgram!['rampa'] as double?) ?? valueRampa;
     }
   }
-
 
   void _startTimer(String macAddress, List<int> porcentajesMusculoTraje,
       List<int> porcentajesMusculoPantalon) {
@@ -2295,12 +2291,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 Text(
                   tr(context, '¿Quieres resetear todo?').toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+               const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -2400,10 +2397,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (isElectroOn) {
       widget.bleConnectionService
           ._stopElectrostimulationSession(widget.macAddress!);
-      if(mounted) {
+      if (mounted) {
         setState(() {
-        isElectroOn = false; // Al detener la sesión, actualizamos la bandera
-      });
+          isElectroOn = false; // Al detener la sesión, actualizamos la bandera
+        });
       }
     }
 
@@ -4504,14 +4501,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         // Pausa el temporizador si está corriendo
                                                         _pauseTimer(
                                                             widget.macAddress!);
-
                                                       } else {
                                                         _startTimer(
                                                             widget.macAddress!,
                                                             porcentajesMusculoTraje,
                                                             porcentajesMusculoPantalon);
                                                       }
-                                                      isElectroOn=!isElectroOn;
+                                                      isElectroOn =
+                                                          !isElectroOn;
                                                       isSessionStarted =
                                                           !isSessionStarted;
                                                       debugPrint(
@@ -5913,7 +5910,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             porcentajesMusculoTraje,
                                                             porcentajesMusculoPantalon);
                                                       }
-                                                      isElectroOn=!isElectroOn;
+                                                      isElectroOn =
+                                                          !isElectroOn;
                                                       isSessionStarted =
                                                           !isSessionStarted;
                                                       debugPrint(
@@ -7019,7 +7017,7 @@ class BleConnectionService {
   void updateMacAddresses(List<String> macAddresses) {
     targetDeviceIds = macAddresses;
     if (_foundDeviceWaitingToConnect) {
-      _startScan(); // Reinicia el escaneo con la nueva lista de MACs
+      //_startScan(); // Reinicia el escaneo con la nueva lista de MACs
     }
   }
 
@@ -7272,8 +7270,6 @@ class BleConnectionService {
             break;
         }
       });
-
-      await Future.delayed(const Duration(seconds: 1));
 
       // Reintentar si no se tuvo éxito
       if (!success && attemptCount < maxAttempts) {

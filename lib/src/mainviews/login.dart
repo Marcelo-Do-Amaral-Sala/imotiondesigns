@@ -244,7 +244,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

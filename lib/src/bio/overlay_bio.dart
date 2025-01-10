@@ -16,7 +16,7 @@ class OverlayBioimpedancia extends StatefulWidget {
 
 class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
     with SingleTickerProviderStateMixin {
-  bool isBodyPro = false;
+  bool isBodyPro = true;
   String? selectedGender;
   bool isOverlayVisible = false; // Controla la visibilidad del overlay
   int overlayIndex = -1; // -1 indica que no hay overlay visible

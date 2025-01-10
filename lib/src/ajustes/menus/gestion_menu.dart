@@ -44,6 +44,7 @@ class _GestionMenuViewState extends State<GestionMenuView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Fondo
