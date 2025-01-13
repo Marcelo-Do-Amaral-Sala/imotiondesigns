@@ -429,11 +429,12 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
     final provider = Provider.of<TranslationProvider>(context, listen: false);
     await provider
         .changeLanguage(language); // Cambiar el idioma usando el provider
-
-    setState(() {
-      _translations =
-          provider.translations; // Obtener las traducciones actualizadas
-    });
+    if (mounted) {
+      setState(() {
+        _translations =
+            provider.translations; // Obtener las traducciones actualizadas
+      });
+    }
   }
 
   void _changeAppLanguage(String language) {
@@ -460,7 +461,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.symmetric(vertical:30.0, horizontal: 30.0),
+        padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
         child: Column(
           children: [
             Row(
@@ -476,7 +477,9 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                       return Column(
                         children: [
                           buildCustomCheckboxTile(language),
-                           SizedBox(height: MediaQuery.of(context).size.height*0.02), // Espacio entre filas
+                          SizedBox(
+                              height: MediaQuery.of(context).size.height *
+                                  0.02), // Espacio entre filas
                         ],
                       );
                     }).toList(),
@@ -492,7 +495,9 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                       return Column(
                         children: [
                           buildCustomCheckboxTile(language),
-                          SizedBox(height: MediaQuery.of(context).size.height*0.02),
+                          SizedBox(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.02),
                         ],
                       );
                     }).toList(),
@@ -2386,21 +2391,26 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                         Container(
                           alignment: Alignment.center,
                           decoration: _inputDecoration(),
-                          child: AbsorbPointer(  // Bloquea la interacción
+                          child: AbsorbPointer(
+                            // Bloquea la interacción
                             child: DropdownButton<String>(
-                              hint: Text('Seleccione', style: _dropdownHintStyle),
+                              hint:
+                                  Text('Seleccione', style: _dropdownHintStyle),
                               value: selectedEstado,
                               items: [
                                 DropdownMenuItem(
                                   value: 'Activa',
-                                  child: Text('Activa', style: _dropdownItemStyle),
+                                  child:
+                                      Text('Activa', style: _dropdownItemStyle),
                                 ),
                                 DropdownMenuItem(
                                   value: 'Inactiva',
-                                  child: Text('Inactiva', style: _dropdownItemStyle),
+                                  child: Text('Inactiva',
+                                      style: _dropdownItemStyle),
                                 ),
                               ],
-                              onChanged: null,  // Bloquea la acción de cambio
+                              onChanged: null,
+                              // Bloquea la acción de cambio
                               dropdownColor: const Color(0xFF313030),
                               icon: const Icon(
                                 Icons.arrow_drop_down,
@@ -2410,7 +2420,6 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                             ),
                           ),
                         )
-
                       ],
                     ),
                   )
@@ -2471,7 +2480,7 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: screenHeight*0.01),
+                                    SizedBox(height: screenHeight * 0.01),
                                     // Espacio entre las filas
                                     // Fila para T:
                                     Row(
@@ -2493,7 +2502,7 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: screenHeight*0.01),
+                                    SizedBox(height: screenHeight * 0.01),
 
                                     // Fila para CT:
                                     Row(
@@ -2515,7 +2524,7 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: screenHeight*0.01),
+                                    SizedBox(height: screenHeight * 0.01),
 
                                     // Fila para CP:
                                     Row(
@@ -2542,7 +2551,7 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                               ),
 
                               // Espacio entre columnas
-                              SizedBox(width: screenWidth*0.01),
+                              SizedBox(width: screenWidth * 0.01),
                               // Espacio entre la primera y segunda columna
 
                               // Segunda columna
@@ -2570,7 +2579,7 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: screenHeight*0.01),
+                                    SizedBox(height: screenHeight * 0.01),
                                     Row(
                                       children: [
                                         Text(
@@ -2590,7 +2599,7 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: screenHeight*0.01),
+                                    SizedBox(height: screenHeight * 0.01),
                                     // Fila para FS:
                                     Row(
                                       children: [
@@ -2611,7 +2620,7 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: screenHeight*0.01),
+                                    SizedBox(height: screenHeight * 0.01),
                                     // Fila para TS:
                                     Row(
                                       children: [

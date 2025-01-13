@@ -1,6 +1,5 @@
 import 'dart:io';
 
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,13 +18,11 @@ import '../db/db_helper_web.dart';
 import '../servicios/sync.dart';
 import '../servicios/translation_provider.dart'; // Asegúrate de tener esta importación para manejar la base de datos.
 
-
 class LoginView extends StatefulWidget {
   final Function() onNavigateToMainMenu;
   final Function() onNavigateToChangePwd;
   final double screenWidth;
   final double screenHeight;
-
 
   const LoginView({
     Key? key,
@@ -35,11 +32,9 @@ class LoginView extends StatefulWidget {
     required this.onNavigateToChangePwd,
   }) : super(key: key);
 
-
   @override
   State<LoginView> createState() => _LoginViewState();
 }
-
 
 class _LoginViewState extends State<LoginView> {
   final TextEditingController _user = TextEditingController();
@@ -48,20 +43,16 @@ class _LoginViewState extends State<LoginView> {
   Map<String, String> _translations = {};
   final SyncService _syncService = SyncService();
   final DatabaseHelperTraducciones _dbHelperTraducciones =
-  DatabaseHelperTraducciones();
-
+      DatabaseHelperTraducciones();
 
   List<Map<String, dynamic>> allAdmins = []; // Lista original de clientes
   List<Map<String, dynamic>> filteredAdmins = []; // Lista filtrada
 
-
   int? userId;
   String? userTipoPerfil;
 
-
   bool _isPasswordHidden = true;
   double scaleFactorBack = 1.0;
-
 
   @override
   void initState() {
@@ -73,7 +64,6 @@ class _LoginViewState extends State<LoginView> {
     _fetchAdmins();
     _checkUserProfile();
   }
-
 
   Future<void> _initializeDatabase() async {
     try {
@@ -98,7 +88,6 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
-
   Future<void> _initializeDatabaseTraducciones() async {
     try {
       if (kIsWeb) {
@@ -122,11 +111,9 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
-
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {
       PermissionStatus permission = PermissionStatus.denied;
-
 
       if (Platform.isAndroid) {
         permission = await Permission.locationWhenInUse.request();
@@ -140,7 +127,6 @@ class _LoginViewState extends State<LoginView> {
         }
       }
 
-
       if (permission == PermissionStatus.denied ||
           permission == PermissionStatus.permanentlyDenied) {
         debugPrint("Permiso de ubicación denegado o denegado permanentemente.");
@@ -151,18 +137,16 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
-
   Future<void> _fetchAdmins() async {
     final dbHelper = DatabaseHelper();
     try {
       // Obtener los usuarios cuyo perfil es "Administrador" o "Ambos"
       final adminData =
-      await dbHelper.getUsuariosPorTipoPerfil('Administrador');
+          await dbHelper.getUsuariosPorTipoPerfil('Administrador');
       final adminDataEntrenador =
-      await dbHelper.getUsuariosPorTipoPerfil('Entrenador');
+          await dbHelper.getUsuariosPorTipoPerfil('Entrenador');
       // También podemos obtener usuarios con el tipo de perfil 'Ambos' si es necesario
       final adminDataAmbos = await dbHelper.getUsuariosPorTipoPerfil('Ambos');
-
 
       // Combina todas las listas
       final allAdminData = [
@@ -171,14 +155,12 @@ class _LoginViewState extends State<LoginView> {
         ...adminDataEntrenador
       ];
 
-
       // Imprime la información de todos los usuarios obtenidos
       print('Información de todos los usuarios:');
       for (var admin in allAdminData) {
         print(
             admin); // Asegúrate de que admin tenga un formato imprimible (e.g., Map<String, dynamic>)
       }
-
 
       setState(() {
         allAdmins = allAdminData; // Asigna los usuarios filtrados
@@ -189,13 +171,11 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
-
   Future<void> _checkUserProfile() async {
     // Obtener el userId desde SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId =
         prefs.getInt('user_id'); // Guardamos el userId en la variable de clase
-
 
     if (userId != null) {
       // Obtener el tipo de perfil del usuario usando el userId
@@ -208,12 +188,10 @@ class _LoginViewState extends State<LoginView> {
       // Si no se encuentra el userId en SharedPreferences
       print('No se encontró el userId en SharedPreferences.');
 
-
       // Aquí puedes agregar un flujo para navegar al login si no hay usuario
       // widget.onNavigateToLogin();
     }
   }
-
 
   Future<void> _closeApp(BuildContext context) async {
     showDialog(
@@ -236,7 +214,7 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               children: [
                 Text(
-                  tr(context, '¿Cerrar aplicación?').toUpperCase(),
+                  ('¿${tr(context, 'Cerrar aplicación')}?').toUpperCase(),
                   style: TextStyle(
                     color: const Color(0xFF2be4f3),
                     fontSize: 30.sp,
@@ -299,12 +277,10 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -350,7 +326,7 @@ class _LoginViewState extends State<LoginView> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: [
                                           Expanded(
                                             child: Text(
@@ -421,11 +397,12 @@ class _LoginViewState extends State<LoginView> {
                                               onTap: () {
                                                 setState(() {
                                                   _isPasswordHidden =
-                                                  !_isPasswordHidden; // Cambiar la visibilidad
+                                                      !_isPasswordHidden; // Cambiar la visibilidad
                                                 });
                                               },
                                               child: Container(
-                                                padding: const EdgeInsets.only(right: 10.0),
+                                                padding: const EdgeInsets.only(
+                                                    right: 10.0),
                                                 width: screenWidth * 0.01,
                                                 // Ajustar tamaño si es necesario
                                                 height: screenHeight * 0.01,
@@ -434,7 +411,6 @@ class _LoginViewState extends State<LoginView> {
                                                       ? 'assets/images/ojo1.png' // Imagen para "ocultar"
                                                       : 'assets/images/ojo2.png',
                                                   // Imagen para "mostrar"
-
 
                                                   fit: BoxFit.scaleDown,
                                                 ),
@@ -463,11 +439,9 @@ class _LoginViewState extends State<LoginView> {
                                   // Cerrar el teclado
                                   FocusScope.of(context).unfocus();
 
-
                                   // Esperar un pequeño retraso para asegurar que el teclado se cierre
                                   await Future.delayed(
                                       const Duration(milliseconds: 300));
-
 
                                   // Llamar a la función de validación
                                   await _validateLogin();
@@ -550,16 +524,13 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-
   Future<void> _validateLogin() async {
     DatabaseHelper dbHelper = DatabaseHelper();
     String username = _user.text.trim();
     String password = _pwd.text.trim();
 
-
     // Verificar en la base de datos si las credenciales del usuario son correctas
     bool userExists = await dbHelper.checkUserCredentials(username, password);
-
 
     if (userExists) {
       // Si las credenciales son correctas, limpiar el mensaje de error
@@ -567,28 +538,22 @@ class _LoginViewState extends State<LoginView> {
         _errorMessage = ''; // Limpiar error
       });
 
-
       // Obtener el userId después de la autenticación
       int userId = await dbHelper.getUserIdByUsername(username);
 
-
       // Obtener el tipo de perfil del usuario
       String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId);
-
 
       // Imprimir el userId y el tipo de perfil en consola
       print('User ID: $userId');
       print('Tipo de Perfil: $tipoPerfil');
 
-
       // Guardar el userId y tipo de perfil en SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
 
       // Limpiar los valores anteriores antes de guardar nuevos datos
       await prefs.remove('user_id');
       await prefs.remove('user_tipo_perfil');
-
 
       // Guardar los nuevos valores
       prefs.setInt('user_id', userId); // Guardar el userId
@@ -597,12 +562,10 @@ class _LoginViewState extends State<LoginView> {
             'user_tipo_perfil', tipoPerfil); // Guardar el tipo de perfil
       }
 
-
       // Imprimir los datos guardados para verificar
       print('Nuevo user_id guardado: ${prefs.getInt('user_id')}');
       print(
           'Nuevo user_tipo_perfil guardado: ${prefs.getString('user_tipo_perfil')}');
-
 
       // Si la contraseña es "0000", navega a cambiar la contraseña
       if (password == "0000") {
@@ -617,21 +580,19 @@ class _LoginViewState extends State<LoginView> {
     } else {
       // Si las credenciales son incorrectas, mostrar el mensaje de error
       setState(() {
-        _errorMessage = "Usuario o contraseña incorrectos"; // Mostrar error
+        _errorMessage =
+            tr(context, 'Usuario o contraseña incorrectos'); // Mostrar error
       });
     }
   }
 }
 
-
 // Ajustes de estilos para simplificar
 TextStyle get _labelStyle => TextStyle(
     color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold);
 
-
 TextStyle get _inputTextStyle =>
     TextStyle(color: Colors.white, fontSize: 17.sp);
-
 
 InputDecoration _inputDecorationStyle(
     {String hintText = '', bool enabled = true, Widget? suffixIcon}) {
@@ -649,11 +610,8 @@ InputDecoration _inputDecorationStyle(
   );
 }
 
-
 BoxDecoration _inputDecoration() {
   return BoxDecoration(
       color: Colors.black12.withOpacity(0.2),
       borderRadius: BorderRadius.circular(7));
 }
-
-

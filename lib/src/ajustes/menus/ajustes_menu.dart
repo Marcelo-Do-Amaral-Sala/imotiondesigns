@@ -291,7 +291,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                 ),
                               ),
                             ),
-                            if (overlayIndex == 2)
+                            /*if (overlayIndex == 2)
                               Positioned(
                                 bottom: 0,
                                 right: 0,
@@ -352,7 +352,7 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                     ),
                                   ],
                                 ),
-                              ),
+                              ),*/
                           ],
                         ),
                       ),

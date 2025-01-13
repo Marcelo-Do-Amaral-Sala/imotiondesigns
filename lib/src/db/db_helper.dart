@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -3670,7 +3671,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       'user': 'admin', // Nombre de usuario
       'status': 'Activo', // Estado
       'birthdate': '', // Fecha de nacimiento
-      'altadate': DateTime.now().toString(), // Fecha de alta, usando la fecha actual
+      'altadate': DateFormat('dd/MM/yyyy').format(DateTime.now()), // Fecha de alta, usando la fecha actual
       'controlsesiones': 'No', // Control de sesiones
       'controltiempo': 'Sí', // Control de tiempo
     });

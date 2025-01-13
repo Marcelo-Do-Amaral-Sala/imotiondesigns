@@ -353,7 +353,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          tr(context, "Grupos activos añadidos correctamente").toUpperCase(),
+          tr(context, "Grupos añadidos correctamente").toUpperCase(),
           style: TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
         backgroundColor: Colors.green,

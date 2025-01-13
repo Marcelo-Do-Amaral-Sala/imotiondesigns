@@ -2376,6 +2376,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("Programa seleccionado: $selectedAutoProgram");
   }
 
+// Función auxiliar para llamar la función asíncrona en dispose
+  void _stopElectrostimulationSessionAsync(String macAddress) async {
+    await widget.bleConnectionService._stopElectrostimulationSession(macAddress);
+  }
+
   @override
   void dispose() {
     if (kDebugMode) {
@@ -2393,27 +2398,24 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (kDebugMode) {
       print("🔧 Controlador de opacidad liberado.");
     }
+
     // Verifica si la sesión se ha iniciado antes de detenerla
     if (isElectroOn) {
-      widget.bleConnectionService
-          ._stopElectrostimulationSession(widget.macAddress!);
-      if (mounted) {
-        setState(() {
-          isElectroOn = false; // Al detener la sesión, actualizamos la bandera
-        });
-      }
+      // Llamar la función asíncrona usando una función auxiliar
+      _stopElectrostimulationSessionAsync(widget.macAddress!);
     }
 
     if (_clientsProvider != null) {
       _clientsProvider!.clearSelectedClientsSilently(); // Limpia sin notificar
       if (kDebugMode) {
-        print(
-            "📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
+        print("📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
       }
     }
 
     super.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {

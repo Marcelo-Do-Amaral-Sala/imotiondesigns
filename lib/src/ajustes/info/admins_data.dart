@@ -24,6 +24,7 @@ class AdminsData extends StatefulWidget {
 
 class AdminsDataState extends State<AdminsData> {
   final _nameController = TextEditingController();
+  final _userController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   String? selectedOption;
@@ -48,6 +49,7 @@ class AdminsDataState extends State<AdminsData> {
   void dispose() {
     // Mantén los controladores abiertos para preservar su estado
     _nameController.dispose();
+    _userController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     super.dispose();
@@ -114,6 +116,7 @@ class AdminsDataState extends State<AdminsData> {
       setState(() {
         // Actualizar los campos del formulario con los datos del usuario
         _nameController.text = updatedAdminData['name'] ?? '';
+        _userController.text = updatedAdminData['user'] ?? '';
         _emailController.text = updatedAdminData['email'] ?? '';
         _phoneController.text = updatedAdminData['phone'].toString();
         selectedGender = updatedAdminData['gender'];
@@ -131,6 +134,7 @@ class AdminsDataState extends State<AdminsData> {
   void _updateUserData() async {
     // Asegurarse de que todos los campos requeridos estén completos
     if (_nameController.text.isEmpty ||
+        _userController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _phoneController.text.isEmpty ||
         selectedGender == null ||
@@ -165,8 +169,8 @@ class AdminsDataState extends State<AdminsData> {
     final clientData = {
       'name': name, // Nombre con la primera letra en mayúscula
       'email': _emailController.text,
+      'user': _userController.text,
       'phone': _phoneController.text,
-      'pwd': '0000',
       'gender': selectedGender,
       'altadate': _altaDate,
       'controlsesiones': selectedControlSesiones,
@@ -499,6 +503,27 @@ class AdminsDataState extends State<AdminsData> {
                                 dropdownColor: const Color(0xFF313030),
                                 icon: const Icon(Icons.arrow_drop_down,
                                     color: Color(0xFF2be4f3), size: 30),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.02),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(tr(context, 'Nombre').toUpperCase(),
+                                style: _labelStyle),
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: _inputDecoration(),
+                              child: TextField(
+                                controller: _nameController,
+                                style: _inputTextStyle,
+                                decoration: _inputDecorationStyle(
+                                  hintText: tr(context, 'Introducir nombre'),
+                                ),
                               ),
                             ),
                           ],

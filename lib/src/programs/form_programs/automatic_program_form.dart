@@ -695,7 +695,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               color: Colors.white,
                               child: Text(
                                 tr(context,
-                                    "¡Estás a un paso de terminar!\nSolo falta añadir una descripción para guardar tu programa."),
+                                    "¡Estás a un paso de terminar! Solo falta añadir una descripción para guardar tu programa"),
                                 style: TextStyle(
                                   fontSize: 25.sp,
                                   // Tamaño de la fuente
@@ -725,7 +725,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                               hintText:
-                                                  'Añadir una descripción'),
+                                                  tr(context, 'Añadir una descripción')),
                                           maxLines: 4,
                                           keyboardType: TextInputType.text,
                                           // Asegura que el teclado sea de tipo texto

@@ -7,14 +7,10 @@ import '../../utils/translation_utils.dart';
 import '../clients/overlays/main_overlay.dart';
 import '../db/db_helper.dart';
 
-
-
-
 class ChangePwdView extends StatefulWidget {
   final Function() onNavigateToMainMenu;
   final double screenWidth;
   final double screenHeight;
-
 
   const ChangePwdView({
     Key? key,
@@ -23,11 +19,9 @@ class ChangePwdView extends StatefulWidget {
     required this.screenHeight,
   }) : super(key: key);
 
-
   @override
   State<ChangePwdView> createState() => _ChangePwdViewState();
 }
-
 
 class _ChangePwdViewState extends State<ChangePwdView> {
   bool isOverlayVisible = false;
@@ -35,13 +29,11 @@ class _ChangePwdViewState extends State<ChangePwdView> {
   Map<String, String>? clientData;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
 
-
   @override
   void initState() {
     super.initState();
     toggleOverlay(0);
   }
-
 
   void toggleOverlay(int index) {
     setState(() {
@@ -49,7 +41,6 @@ class _ChangePwdViewState extends State<ChangePwdView> {
       overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +111,6 @@ class _ChangePwdViewState extends State<ChangePwdView> {
     );
   }
 
-
   Widget _getOverlayWidget(int overlayIndex) {
     switch (overlayIndex) {
       case 0:
@@ -134,29 +124,27 @@ class _ChangePwdViewState extends State<ChangePwdView> {
   }
 }
 
-
 class OverlayChangePwd extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onNavigateToMainMenu;
 
-
   const OverlayChangePwd({
     Key? key,
-    required this.onClose, required this.onNavigateToMainMenu,
+    required this.onClose,
+    required this.onNavigateToMainMenu,
   }) : super(key: key);
-
 
   @override
   _OverlayChangePwdState createState() => _OverlayChangePwdState();
 }
-
 
 class _OverlayChangePwdState extends State<OverlayChangePwd> {
   final TextEditingController _pwd = TextEditingController();
   final TextEditingController _pwd2 = TextEditingController();
   int? userId;
   String? userTipoPerfil;
-
+  bool _isPasswordHidden = true;
+  bool _isPassword2Hidden = true;
 
   @override
   void initState() {
@@ -164,12 +152,11 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
     _checkUserProfile();
   }
 
-
   Future<void> _checkUserProfile() async {
     // Obtener el userId desde SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId = prefs.getInt('user_id'); // Guardamos el userId en la variable de clase
-
+    userId =
+        prefs.getInt('user_id'); // Guardamos el userId en la variable de clase
 
     if (userId != null) {
       // Obtener el tipo de perfil del usuario usando el userId
@@ -181,20 +168,14 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
     } else {
       // Si no se encuentra el userId en SharedPreferences
       print('No se encontró el userId en SharedPreferences.');
-
-
     }
   }
-
-
-
 
   Future<void> _updatePassword() async {
     if (userId == null) {
       print('UserId no disponible.');
       return;
     }
-
 
     // Verificamos si las contraseñas coinciden
     if (_pwd.text != _pwd2.text) {
@@ -213,7 +194,6 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
       }
       return;
     }
-
 
     // Verificamos que la nueva contraseña no sea "0000"
     if (_pwd.text == '0000') {
@@ -234,42 +214,38 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
       return;
     }
 
-
     try {
       // Crear el mapa con solo el campo pwd
       final clientData = {'pwd': _pwd.text};
       print('Datos a actualizar en la base de datos: $clientData');
 
-
       // Actualizar el usuario en la base de datos
       DatabaseHelper dbHelper = DatabaseHelper();
       await dbHelper.updateUser(userId!, clientData);
-      print('Contraseña actualizada correctamente para el usuario con ID $userId.');
-
+      print(
+          'Contraseña actualizada correctamente para el usuario con ID $userId.');
 
       // Guardar el userId y tipo de perfil en SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       print('SharedPreferences obtenidas: ${prefs.getKeys()}');
-
 
       // Limpiar los valores anteriores antes de guardar nuevos datos
       await prefs.remove('user_id');
       await prefs.remove('user_tipo_perfil');
       print('Valores previos de user_id y user_tipo_perfil eliminados.');
 
-
       // Guardar el nuevo userId en SharedPreferences
       prefs.setInt('user_id', userId!); // Guardar el userId
       print('Nuevo user_id guardado: ${prefs.getInt('user_id')}');
 
-
       // Obtener el tipo de perfil actualizado para el usuario
       String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId!);
       if (tipoPerfil != null) {
-        prefs.setString('user_tipo_perfil', tipoPerfil); // Guardar el tipo de perfil
-        print('Nuevo user_tipo_perfil guardado: ${prefs.getString('user_tipo_perfil')}');
+        prefs.setString(
+            'user_tipo_perfil', tipoPerfil); // Guardar el tipo de perfil
+        print(
+            'Nuevo user_tipo_perfil guardado: ${prefs.getString('user_tipo_perfil')}');
       }
-
 
       // Mostrar mensaje de éxito antes de desmontar el widget
       if (mounted) {
@@ -284,7 +260,6 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
           ),
         );
       }
-
 
       // Navegar al menú principal
       widget.onNavigateToMainMenu();
@@ -306,24 +281,10 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
 
     return MainOverlay(
       title: Text(
@@ -351,10 +312,33 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
                     decoration: _inputDecoration(),
                     child: TextField(
                       controller: _pwd,
-                      obscureText: true,
+                      keyboardType: TextInputType.text,
+                      obscureText: _isPasswordHidden,
+                      // Controlamos la visibilidad aquí
                       style: _inputTextStyle,
                       decoration: _inputDecorationStyle(
                         hintText: tr(context, ''),
+                        suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isPasswordHidden =
+                                !_isPasswordHidden; // Cambiar la visibilidad
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(right: 10.0),
+                              width: screenWidth * 0.01,
+                              // Ajustar tamaño si es necesario
+                              height: screenHeight * 0.01,
+                              child: Image.asset(
+                                _isPasswordHidden
+                                    ? 'assets/images/ojo1.png' // Imagen para "ocultar"
+                                    : 'assets/images/ojo2.png',
+                                // Imagen para "mostrar"
+
+                                fit: BoxFit.scaleDown,
+                              ),
+                            )),
                       ),
                     ),
                   ),
@@ -365,7 +349,7 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(tr(context, 'Repetir nueva contraseña').toUpperCase(),
+                  Text(tr(context, 'Repetir contraseña').toUpperCase(),
                       style: _labelStyle),
                   SizedBox(height: screenHeight * 0.02),
                   Container(
@@ -373,10 +357,33 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
                     decoration: _inputDecoration(),
                     child: TextField(
                       controller: _pwd2,
-                      obscureText: true,
+                      keyboardType: TextInputType.text,
+                      obscureText: _isPassword2Hidden,
+                      // Controlamos la visibilidad aquí
                       style: _inputTextStyle,
                       decoration: _inputDecorationStyle(
                         hintText: tr(context, ''),
+                        suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isPassword2Hidden =
+                                    !_isPassword2Hidden; // Cambiar la visibilidad
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(right: 10.0),
+                              width: screenWidth * 0.01,
+                              // Ajustar tamaño si es necesario
+                              height: screenHeight * 0.01,
+                              child: Image.asset(
+                                _isPassword2Hidden
+                                    ? 'assets/images/ojo1.png' // Imagen para "ocultar"
+                                    : 'assets/images/ojo2.png',
+                                // Imagen para "mostrar"
+
+                                fit: BoxFit.scaleDown,
+                              ),
+                            )),
                       ),
                     ),
                   ),
@@ -388,14 +395,11 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
                 // Cerrar el teclado
                 FocusScope.of(context).unfocus();
 
-
                 // Esperar un pequeño retraso para asegurar que el teclado se cierre
                 await Future.delayed(const Duration(milliseconds: 300));
 
-
                 // Actualizar la contraseña
                 await _updatePassword();
-
 
                 // Luego de ejecutar _updatePassword, cierra el overlay
                 if (mounted) {
@@ -411,7 +415,7 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
                 backgroundColor: Colors.transparent,
               ),
               child: Text(
-                tr(context, 'Cambiar').toUpperCase(),
+                tr(context, 'Entrar').toUpperCase(),
                 style: TextStyle(
                   color: const Color(0xFF2be4f3),
                   fontSize: 25.sp,
@@ -420,8 +424,6 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
                 textAlign: TextAlign.center,
               ),
             ),
-
-
           ],
         ),
       ),
@@ -430,26 +432,21 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
     );
   }
 
-
 // Ajustes de estilos para simplificar
   TextStyle get _labelStyle => TextStyle(
       color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
 
-
   TextStyle get _inputTextStyle =>
       TextStyle(color: Colors.white, fontSize: 14.sp);
-
 
   TextStyle get _dropdownHintStyle =>
       TextStyle(color: Colors.white, fontSize: 14.sp);
 
-
   TextStyle get _dropdownItemStyle =>
       TextStyle(color: Colors.white, fontSize: 15.sp);
 
-
   InputDecoration _inputDecorationStyle(
-      {String hintText = '', bool enabled = true}) {
+      {String hintText = '', bool enabled = true, Widget? suffixIcon}) {
     return InputDecoration(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
       filled: true,
@@ -458,17 +455,12 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
       hintText: hintText,
       hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
       enabled: enabled,
+      suffixIcon: suffixIcon,
     );
   }
-
 
   BoxDecoration _inputDecoration() {
     return BoxDecoration(
         color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
   }
 }
-
-
-
-
-

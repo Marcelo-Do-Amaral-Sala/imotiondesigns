@@ -140,7 +140,7 @@ class _MainMenuViewState extends State<MainMenuView> {
             child: Column(
               children: [
                 Text(
-                  tr(context, '¿Cerrar sesión?').toUpperCase(),
+                  ('¿${tr(context, 'Cerrar sesión')}?').toUpperCase(),
                   style: TextStyle(
                     color: const Color(0xFF2be4f3),
                     fontSize: 30.sp,
