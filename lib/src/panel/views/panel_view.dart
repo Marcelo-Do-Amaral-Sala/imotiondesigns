@@ -1556,6 +1556,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double scaleFactorCliente = 1.0;
   double scaleFactorRepeat = 1.0;
   double scaleFactorTrainer = 1.0;
+  double scaleFactorRayo = 1.0;
   double scaleFactorReset = 1.0;
   double scaleFactorMas = 1.0;
   double scaleFactorMenos = 1.0;
@@ -1805,6 +1806,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       scaleFactorCliente = 1.0;
       scaleFactorRepeat = 1.0;
       scaleFactorTrainer = 1.0;
+      scaleFactorRayo = 1.0;
       scaleFactorReset = 1.0;
       scaleFactorMas = 1.0;
       scaleFactorMenos = 1.0;
@@ -2030,6 +2032,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void _pauseTimer(String macAddress) {
     setState(() {
+      if (isElectroOn) {
+        widget.bleConnectionService._stopElectrostimulationSession(macAddress);
+      }
       isRunning = false;
       pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
       _timer.cancel();
@@ -2173,21 +2178,39 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         return false;
       }
 
-      // Paso 1: Validar y obtener los valores de los canales
-      List<int> valoresCanales = List.generate(10, (canal) {
-        int valorCanal = porcentajesMusculoTraje[canal];
-        return (valorCanal >= 0) ? valorCanal : 0;
-      });
+      List<int> valoresCanales = List.filled(10, 0); // Inicializamos la lista de valoresCanales con ceros.
 
-      debugPrint("🔢 Valores de los canales: $valoresCanales");
+      // Asignar los valores de porcentajesMusculoTraje a los canales
+      valoresCanales[0] = porcentajesMusculoTraje[5] * 10;
+      valoresCanales[1] = porcentajesMusculoTraje[6] * 10;
+      valoresCanales[2] = porcentajesMusculoTraje[7] * 10;
+      valoresCanales[3] = porcentajesMusculoTraje[8] * 10;
+      valoresCanales[4] = porcentajesMusculoTraje[9] * 10;
+      valoresCanales[5] = porcentajesMusculoTraje[0] * 10;
+      valoresCanales[6] = porcentajesMusculoTraje[2] * 10;
+      valoresCanales[7] = porcentajesMusculoTraje[3] * 10;
+      valoresCanales[8] = porcentajesMusculoTraje[1] * 10;
+      valoresCanales[9] = porcentajesMusculoTraje[4] * 10;
+
+      // Debug: Mostrar los porcentajes y los valores asignados a cada canal
+      for (int i = 0; i < 10; i++) {
+        debugPrint("🔢 Canal ${i + 1}: ${valoresCanales[i]} (Porcentaje: ${porcentajesMusculoTraje[i]}%)");
+      }
 
       // Paso 2: Obtener frecuencia, rampa y anchura de pulso
       Map<String, double> settings = getProgramSettings(selectedProgram);
-      double frecuencia = settings['frecuencia'] ?? 50;
-      double rampa = settings['rampa'] ?? 30;
+      double frecuencia = settings['frecuencia'] ?? 0;
+      double rampa = settings['rampa'] ?? 0;
       double pulso = settings['pulso'] ?? 0;
 
-      debugPrint("✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso ms");
+      frecuencia *= 10;
+      // Ajustar la rampa multiplicándola por 100ms
+      rampa *= 100;
+      // Ajustar la anchura de pulso multiplicándola por 5 microsegundos
+      pulso *= 5;
+
+      debugPrint(
+          "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso µs");
 
       // Paso 3: Iniciar la sesión de electroestimulación primero
       bool isElectroOn = await widget.bleConnectionService._startElectrostimulationSession(
@@ -2201,7 +2224,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (isElectroOn) {
         // Paso 4: Controlar todos los canales después de iniciar la sesión
         int modo = 0; // 0: Absoluto
-        Map<String, dynamic> response = await widget.bleConnectionService.controlAllElectrostimulatorChannels(
+        Map<String, dynamic> response = await widget.bleConnectionService
+            .controlAllElectrostimulatorChannels(
           macAddress: macAddress,
           endpoint: 1, // Asumiendo que el endpoint es 1
           modo: modo,
@@ -2230,7 +2254,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
 
-  Future<void> startFullElectrostimulationPantalonProcess(
+  Future<bool> startFullElectrostimulationPantalonProcess(
     String macAddress,
     List<int> porcentajesMusculoPantalon,
     String? selectedProgram,
@@ -2240,7 +2264,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (porcentajesMusculoPantalon.length != 7) {
         debugPrint(
             "❌ La lista porcentajesMusculoPantalon debe tener 7 elementos.");
-        return;
+        return false;
       }
 
       // Paso 1: Obtener los valores de los canales directamente desde porcentajesMusculoPantalon
@@ -2264,31 +2288,56 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       double rampa = settings['rampa'] ?? 30; // Valor por defecto
       double pulso = settings['pulso'] ?? 20; // Valor por defecto
 
+      // Ajustar la rampa multiplicándola por 100ms
+      rampa *= 100;
+
+      // Ajustar la anchura de pulso multiplicándola por 5 microsegundos
+      pulso *= 5;
+
       debugPrint(
           "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso ms");
 
-      // Paso 3: Iniciar la sesión de electroestimulación con los valores obtenidos
+      // Paso 3: Iniciar la sesión de electroestimulación primero
       bool isElectroOn =
           await widget.bleConnectionService._startElectrostimulationSession(
         macAddress,
         valoresCanales,
         frecuencia,
         rampa,
-        pulso: pulso, // Pasar el pulso al servicio
+        pulso: pulso,
       );
 
       if (isElectroOn) {
+        // Paso 4: Controlar todos los canales después de iniciar la sesión
+        int modo = 0; // 0: Absoluto
+        Map<String, dynamic> response = await widget.bleConnectionService
+            .controlAllElectrostimulatorChannels(
+          macAddress: macAddress,
+          endpoint: 1, // Asumiendo que el endpoint es 1
+          modo: modo,
+          valoresCanales: valoresCanales,
+        );
+
+        debugPrint(
+            "📡 Respuesta de controlAllElectrostimulatorChannels: $response");
+
+        if (response['resultado'] != "OK") {
+          debugPrint("❌ Error al configurar los canales.");
+          return false;
+        }
+
         setState(() {
           isElectroOn = true;
         });
-        debugPrint("'$isElectroOn'");
-        debugPrint("✅ Proceso de electroestimulación iniciado correctamente.");
+        return true;
       } else {
         debugPrint(
             "❌ Error al iniciar el proceso completo de electroestimulación.");
+        return false;
       }
     } catch (e) {
       debugPrint("❌ Error en el proceso completo: $e");
+      return false;
     }
   }
 
@@ -2454,12 +2503,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (kDebugMode) {
       print("🧹 Limpiando recursos del widget...");
     }
-
-    // Detener la sesión de electroestimulación si está activa
-    if (isElectroOn) {
-      _stopElectrostimulationSessionAsync(widget.macAddress!);
-    }
-
     // Cancelar el temporizador principal
     _timer.cancel();
     if (kDebugMode) {
@@ -3166,10 +3209,44 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                 ],
                               ),
                               SizedBox(width: screenWidth * 0.05),
-                              Image.asset(
-                                height: screenHeight * 0.1,
-                                'assets/images/rayoaz.png',
-                                fit: BoxFit.contain,
+                              GestureDetector(
+                                onTapDown: (_) =>
+                                    setState(() => scaleFactorRayo = 0.90),
+                                onTapUp: (_) =>
+                                    setState(() => scaleFactorRayo = 1.0),
+                                onTap: () async {
+                                  // Aquí llamamos a la función getPulseMeter al hacer tap
+                                  try {
+                                    // lamamos a la función que obtiene los datos del pulsómetro
+                                    final response = await widget
+                                        .bleConnectionService
+                                        ._getSignalCable(widget.macAddress!, 1);
+                                    // Mostrar los datos en consola o en la UI
+                                    debugPrint(
+                                        "📊 Datos del pulsómetro: $response");
+                                  } catch (e) {
+                                    debugPrint(
+                                        "❌ Error al obtener datos del pulsómetro: $e");
+                                  }
+                                },
+                                child: AnimatedScale(
+                                  scale: scaleFactorRayo,
+                                  duration: const Duration(milliseconds: 100),
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Center(
+                                      child: SizedBox(
+                                        child: Image.asset(
+                                          height: screenHeight * 0.1,
+                                          'assets/images/rayoaz.png',
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -7515,6 +7592,7 @@ class BleConnectionService {
       debugPrint("⏲️ No había timers activos para el estado.");
     }
 
+
     if (_scanStream != null) {
       _scanStream?.cancel();
       if (kDebugMode) {
@@ -8336,18 +8414,34 @@ $endpoints
     requestPacket[0] = 0x12; // FUN_RUN_EMS
     requestPacket[1] = endpoint;
     requestPacket[2] = limitador;
+
+// Multiplicamos la rampa por 100ms
     requestPacket[3] = (rampa * 100).toInt(); // Rampa en x100ms
+
+// Multiplicamos la frecuencia por 10 (ya que la frecuencia está en x10Hz)
     requestPacket[4] = (frecuencia * 10).toInt(); // Frecuencia en x10 Hz
+
     requestPacket[5] = deshabilitaElevador;
 
     for (int i = 0; i < nivelCanales.length; i++) {
-      requestPacket[6 + i] = nivelCanales[i];
+      // Si el nivel es 255, lo dejamos igual; si no, lo ajustamos.
+      requestPacket[6 + i] = (nivelCanales[i] == 255)
+          ? nivelCanales[i]
+          : nivelCanales[i].clamp(0, 100);
     }
 
-    requestPacket[7] = pulso;
-
-    for (int i = 0; i < 10; i++) {
-      requestPacket[8 + i] = anchuraPulsosPorCanal[i];
+// Ajustar la anchura de pulso común si es 0
+    if (requestPacket[7] == 0) {
+      // Multiplicamos por 5 microsegundos (µs) la anchura de pulso por canal
+      requestPacket[8] = requestPacket[9] = requestPacket[10] =
+          requestPacket[11] = requestPacket[12] = requestPacket[13] =
+              requestPacket[14] = requestPacket[15] = requestPacket[16] =
+                  requestPacket[17] = anchuraPulsosPorCanal[0] * 5;
+    } else {
+      // Si no es 0, usamos los valores proporcionados para cada canal multiplicados por 5µs
+      for (int i = 0; i < 10; i++) {
+        requestPacket[8 + i] = anchuraPulsosPorCanal[i] * 5;
+      }
     }
 
     try {
@@ -8382,7 +8476,7 @@ $endpoints
           "📤 FUN_RUN_EMS enviado a $macAddress para endpoint $endpoint.");
 
       final result =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -8393,8 +8487,6 @@ $endpoints
       rethrow;
     }
   }
-
-
 
   Future<bool> stopElectrostimulationSession({
     required String macAddress,
@@ -8911,7 +9003,7 @@ $canales
       notificationSubscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
-        if (data.isNotEmpty && data[0] == 0x21) {
+        if (data.isNotEmpty && data[0] == 0x32) {
           // FUN_GET_PULSOS_R recibido
           final response = {
             'endpoint': data[1],
@@ -8922,6 +9014,8 @@ $canales
           completer.complete(response);
           debugPrint(
               "📥 FUN_GET_PULSOS_R recibido desde $macAddress: $response");
+        } else {
+          debugPrint("❌ Error: Datos inesperados recibidos.");
         }
       });
 
@@ -8935,7 +9029,7 @@ $canales
 
       // Esperar la respuesta con timeout
       final response =
-          await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 15));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -8945,6 +9039,37 @@ $canales
       notificationSubscription?.cancel();
       debugPrint("❌ Error al obtener datos del pulsómetro: $e");
       rethrow;
+    }
+  }
+
+  Future<bool> _getSignalCable(
+    String macAddress,
+    int endpoint,
+  ) async {
+    try {
+      // Llamar a getPulseMeter para obtener los datos del pulsómetro
+      final pulseMeterResponse = await getPulseMeter(
+        macAddress: macAddress,
+        endpoint: endpoint,
+      );
+      final status = pulseMeterResponse['status'];
+      final bps = pulseMeterResponse['bps'];
+      final SpO2 = pulseMeterResponse['SpO2'];
+
+      debugPrint(
+          "📡 Datos del pulsómetro recibidos: Status = $status, BPS = $bps, SpO2 = $SpO2");
+
+      // Validar que el sensor esté operando correctamente
+      if (status != "OK") {
+        debugPrint("❌ Error: El pulsómetro no está operativo. Estado: $status");
+        return false;
+      }
+
+      // Si el pulsómetro está OK, se retorna true indicando éxito
+      return true;
+    } catch (e) {
+      debugPrint("❌ Error al obtener datos del pulsómetro de $macAddress: $e");
+      return false;
     }
   }
 
