@@ -114,10 +114,10 @@ class _PanelViewState extends State<PanelView> {
       mciKeys[macAddress] = ValueKey(
           macAddress); // Generar y asignar ValueKey para cada dispositivo
     }
+
     // Suponiendo que tienes direcciones MAC separadas por algún delimitador (por ejemplo, coma)
     for (var grupo in mciSelectionStatus.values) {
       if (grupo != null) {
-        // Dividir las direcciones MAC si están separadas por coma (o cualquier otro delimitador)
         List<String> macAddresses =
             grupo.split(','); // Ajusta según el formato real de tus datos
         String grupoKey = macAddresses
@@ -149,7 +149,6 @@ class _PanelViewState extends State<PanelView> {
           // Actualizar el estado de conexión en la UI
           deviceConnectionStatus[macAddress] =
               success ? 'conectado' : 'desconectado';
-          success ? 'conectado' : 'desconectado';
         });
       }
 
@@ -174,22 +173,9 @@ class _PanelViewState extends State<PanelView> {
       await Future.delayed(const Duration(seconds: 2));
 
       await bleConnectionService.processConnectedDevices();
+      await Future.delayed(const Duration(seconds: 2));
 
-      await Future.delayed(const Duration(seconds: 4));
-
-/*      // Iniciar la verificación periódica de conexión
-      debugPrint("⌚--->>>Iniciando verificación de conexión periódica");
-      bleConnectionService
-          .startPeriodicConnectionCheck((macAddress, isConnected) {
-        if (mounted) {
-          setState(() {
-            // Actualizar el estado de conexión en la UI
-            deviceConnectionStatus[macAddress] =
-                isConnected ? 'conectado' : 'desconectado';
-            isConnected ? 'conectado' : 'desconectado';
-          });
-        }
-      });*/
+      //await bleConnectionService.executePeriodically(successfullyConnectedDevices, 1, 0);
     } else {
       debugPrint(
           "⚠️--->>>Ningún dispositivo fue conectado exitosamente. Saltando inicialización de seguridad y operaciones.");
@@ -1414,12 +1400,12 @@ class _PanelViewState extends State<PanelView> {
           entry.value == true && mciSelectionStatus[entry.key] == group);
       return groupSelected
           ? 1.0
-          : 0.3; // Si está seleccionado, opacidad 1.0, sino 0.3
+          : 0.5; // Si está seleccionado, opacidad 1.0, sino 0.3
     } else {
       // Si el dispositivo no pertenece a ningún grupo, solo depende de si está seleccionado
       return isSelected[macAddress] == true
           ? 1.0
-          : 0.3; // Si está seleccionado, opacidad 1.0, sino 0.3
+          : 0.5; // Si está seleccionado, opacidad 1.0, sino 0.3
     }
   }
 }
@@ -2044,13 +2030,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void _pauseTimer(String macAddress) {
     setState(() {
-      // Verifica si la sesión se ha iniciado antes de detenerla
-      if (isElectroOn) {
-        widget.bleConnectionService._stopElectrostimulationSession(macAddress);
-        setState(() {
-          isElectroOn = false; // Al detener la sesión, actualizamos la bandera
-        });
-      }
       isRunning = false;
       pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
       _timer.cancel();
@@ -2058,39 +2037,53 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
-  void _startContractionTimer(double contractionDuration, String macAddress,
-      List<int> porcentajesMusculoTraje, List<int> porcentajesMusculoPantalon) {
+  void _startContractionTimer(
+    double contractionDuration,
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    List<int> porcentajesMusculoPantalon,
+  ) {
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
 
-    // Verifica si la sesión se ha iniciado antes de detenerla
+    // Verificar y sincronizar con el estado BLE
     if (!isElectroOn) {
-      if (selectedIndexEquip == 0) {
-        // Si selectedEquipIndex es 0, usar el traje
-        startFullElectrostimulationTrajeProcess(
-            macAddress, porcentajesMusculoTraje, selectedProgram);
-      } else if (selectedIndexEquip == 1) {
-        // Si selectedEquipIndex es 1, usar el pantalón
-        startFullElectrostimulationPantalonProcess(
-            macAddress, porcentajesMusculoPantalon, selectedProgram);
-      }
+      startFullElectrostimulationTrajeProcess(
+              macAddress, porcentajesMusculoTraje, selectedProgram)
+          .then((success) {
+        if (success) {
+          setState(() {
+            isElectroOn = true; // Actualizar estado local
+          });
 
-      setState(() {
-        isElectroOn = true; // Al iniciar la sesión, actualizamos la bandera
+          // Una vez confirmada la sesión, iniciar el temporizador de contracción
+          _startContractionPhase(contractionDuration, macAddress,
+              porcentajesMusculoTraje, porcentajesMusculoPantalon);
+        } else {
+          debugPrint(
+              "❌ Error al iniciar la electroestimulación durante la fase de contracción.");
+        }
       });
+    } else {
+      // Si ya está activo, inicia directamente el temporizador
+      _startContractionPhase(contractionDuration, macAddress,
+          porcentajesMusculoTraje, porcentajesMusculoPantalon);
     }
+  }
 
-    // Calcula el progreso restante
-    final remainingTime = contractionDuration - elapsedTimeContraction;
-
+  void _startContractionPhase(
+    double contractionDuration,
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    List<int> porcentajesMusculoPantalon,
+  ) {
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) {
         setState(() {
           elapsedTimeContraction += 0.1;
           progressContraction = elapsedTimeContraction / contractionDuration;
 
-          // Si se completó el tiempo de contracción, pasa a la pausa
           if (elapsedTimeContraction >= contractionDuration) {
-            elapsedTimeContraction = 0.0; // Reinicia el tiempo de contracción
+            elapsedTimeContraction = 0.0;
             isContractionPhase = false;
             _startPauseTimer(valuePause, macAddress, porcentajesMusculoTraje,
                 porcentajesMusculoPantalon);
@@ -2098,38 +2091,51 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         });
       }
     });
+  }
 
-    if (remainingTime <= 0) {
-      elapsedTimeContraction = 0.0;
-      isContractionPhase = false;
-      _startPauseTimer(valuePause, macAddress, porcentajesMusculoTraje,
+  void _startPauseTimer(
+    double pauseDuration,
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    List<int> porcentajesMusculoPantalon,
+  ) {
+    _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
+
+    if (isElectroOn) {
+      widget.bleConnectionService
+          ._stopElectrostimulationSession(macAddress)
+          .then((_) {
+        setState(() {
+          isElectroOn = false; // Actualizar estado local
+        });
+
+        // Una vez confirmada la pausa, iniciar el temporizador de pausa
+        _startPausePhase(pauseDuration, macAddress, porcentajesMusculoTraje,
+            porcentajesMusculoPantalon);
+      }).catchError((e) {
+        debugPrint(
+            "❌ Error al detener la electroestimulación durante la fase de pausa: $e");
+      });
+    } else {
+      _startPausePhase(pauseDuration, macAddress, porcentajesMusculoTraje,
           porcentajesMusculoPantalon);
     }
   }
 
-  void _startPauseTimer(double pauseDuration, String macAddress,
-      List<int> porcentajesMusculoTraje, List<int> porcentajesMusculoPantalon) {
-    _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
-
-    // Verifica si la sesión se ha iniciado antes de detenerla
-    if (isElectroOn) {
-      widget.bleConnectionService._stopElectrostimulationSession(macAddress);
-      setState(() {
-        isElectroOn = false; // Al detener la sesión, actualizamos la bandera
-      });
-    }
-    // Calcula el progreso restante
-    final remainingTime = pauseDuration - elapsedTimePause;
-
+  void _startPausePhase(
+    double pauseDuration,
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    List<int> porcentajesMusculoPantalon,
+  ) {
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) {
         setState(() {
           elapsedTimePause += 0.1;
           progressPause = elapsedTimePause / pauseDuration;
 
-          // Si se completó el tiempo de pausa, pasa a la contracción
           if (elapsedTimePause >= pauseDuration) {
-            elapsedTimePause = 0.0; // Reinicia el tiempo de pausa
+            elapsedTimePause = 0.0;
             isContractionPhase = true;
             _startContractionTimer(valueContraction, macAddress,
                 porcentajesMusculoTraje, porcentajesMusculoPantalon);
@@ -2137,35 +2143,43 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         });
       }
     });
-
-    if (remainingTime <= 0) {
-      elapsedTimePause = 0.0;
-      isContractionPhase = true;
-      _startContractionTimer(valueContraction, macAddress,
-          porcentajesMusculoTraje, porcentajesMusculoPantalon);
-    }
   }
 
-  Future<void> startFullElectrostimulationTrajeProcess(
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    String? selectedProgram,
-  ) async {
+  Future<void> executePeriodically(
+      List<String> macAddresses, int endpoint, int mode) async {
+    // El temporizador que ejecutará la función cada 5 segundos
+    Timer.periodic(Duration(seconds: 5), (timer) async {
+      try {
+        for (var macAddress in macAddresses) {
+          // Llamada a la función getElectrostimulatorState con los parámetros deseados
+          await widget.bleConnectionService
+              .getElectrostimulatorState(macAddress, endpoint, mode);
+        }
+      } catch (e) {
+        // Manejo de errores en caso de que algo falle
+        debugPrint("Error al ejecutar la función periódicamente: $e");
+      }
+    });
+  }
+
+  Future<bool> startFullElectrostimulationTrajeProcess(
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      String? selectedProgram,
+      ) async {
     try {
       if (porcentajesMusculoTraje.length != 10) {
-        debugPrint(
-            "❌ La lista porcentajesMusculoTraje debe tener 10 elementos.");
-        return;
+        debugPrint("❌ La lista porcentajesMusculoTraje debe tener 10 elementos.");
+        return false;
       }
 
-      // Paso 1: Obtener los valores de los canales
+      // Paso 1: Validar y obtener los valores de los canales
       List<int> valoresCanales = List.generate(10, (canal) {
         int valorCanal = porcentajesMusculoTraje[canal];
         return (valorCanal >= 0) ? valorCanal : 0;
       });
 
-      debugPrint(
-          "-------------------------*************Valores de los canales: $valoresCanales");
+      debugPrint("🔢 Valores de los canales: $valoresCanales");
 
       // Paso 2: Obtener frecuencia, rampa y anchura de pulso
       Map<String, double> settings = getProgramSettings(selectedProgram);
@@ -2173,32 +2187,48 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       double rampa = settings['rampa'] ?? 30;
       double pulso = settings['pulso'] ?? 0;
 
-      debugPrint(
-          "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso ms");
+      debugPrint("✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso ms");
 
-      // Paso 3: Iniciar la sesión de electroestimulación
-      bool isElectroOn =
-          await widget.bleConnectionService._startElectrostimulationSession(
+      // Paso 3: Iniciar la sesión de electroestimulación primero
+      bool isElectroOn = await widget.bleConnectionService._startElectrostimulationSession(
         macAddress,
         valoresCanales,
         frecuencia,
         rampa,
-        pulso: pulso, // Pasar anchura de pulso
+        pulso: pulso,
       );
 
       if (isElectroOn) {
+        // Paso 4: Controlar todos los canales después de iniciar la sesión
+        int modo = 0; // 0: Absoluto
+        Map<String, dynamic> response = await widget.bleConnectionService.controlAllElectrostimulatorChannels(
+          macAddress: macAddress,
+          endpoint: 1, // Asumiendo que el endpoint es 1
+          modo: modo,
+          valoresCanales: valoresCanales,
+        );
+
+        debugPrint("📡 Respuesta de controlAllElectrostimulatorChannels: $response");
+
+        if (response['resultado'] != "OK") {
+          debugPrint("❌ Error al configurar los canales.");
+          return false;
+        }
+
         setState(() {
           isElectroOn = true;
         });
-        debugPrint("✅ Proceso de electroestimulación iniciado correctamente.");
+        return true;
       } else {
-        debugPrint(
-            "❌ Error al iniciar el proceso completo de electroestimulación.");
+        debugPrint("❌ Error al iniciar el proceso completo de electroestimulación.");
+        return false;
       }
     } catch (e) {
       debugPrint("❌ Error en el proceso completo: $e");
+      return false;
     }
   }
+
 
   Future<void> startFullElectrostimulationPantalonProcess(
     String macAddress,
@@ -2262,6 +2292,34 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
+  Future<void> stopElectrostimulationTrajeProcess(String macAddress) async {
+    try {
+      // Verificar si la electroestimulación está activa
+      if (isElectroOn) {
+        debugPrint(
+            "🛑 Deteniendo la electroestimulación en el dispositivo $macAddress...");
+
+        // Llamar al servicio para detener la sesión de electroestimulación
+        await widget.bleConnectionService
+            ._stopElectrostimulationSession(macAddress);
+
+        // Actualizar el estado de la UI
+        setState(() {
+          isElectroOn =
+              false; // Cambiar la bandera para reflejar que está detenida
+        });
+
+        debugPrint(
+            "✅ Electroestimulación detenida correctamente en $macAddress.");
+      } else {
+        debugPrint(
+            "⚠️ No hay ninguna sesión de electroestimulación activa para detener.");
+      }
+    } catch (e) {
+      debugPrint("❌ Error al detener la electroestimulación: $e");
+    }
+  }
+
   Future<void> _resetScreen(BuildContext context) async {
     showDialog(
       context: context,
@@ -2297,7 +2355,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                   style: TextStyle(color: Colors.white, fontSize: 25.sp),
                   textAlign: TextAlign.center,
                 ),
-               const Spacer(),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -2376,9 +2434,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("Programa seleccionado: $selectedAutoProgram");
   }
 
-// Función auxiliar para llamar la función asíncrona en dispose
-  void _stopElectrostimulationSessionAsync(String macAddress) async {
-    await widget.bleConnectionService._stopElectrostimulationSession(macAddress);
+// Función auxiliar para detener la electroestimulación de forma asíncrona
+  Future<void> _stopElectrostimulationSessionAsync(String macAddress) async {
+    try {
+      await widget.bleConnectionService
+          ._stopElectrostimulationSession(macAddress);
+      if (kDebugMode) {
+        print("🛑 Sesión de electroestimulación detenida correctamente.");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("❌ Error al detener la sesión de electroestimulación: $e");
+      }
+    }
   }
 
   @override
@@ -2387,10 +2455,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       print("🧹 Limpiando recursos del widget...");
     }
 
-    // Cancelar el timer
+    // Detener la sesión de electroestimulación si está activa
+    if (isElectroOn) {
+      _stopElectrostimulationSessionAsync(widget.macAddress!);
+    }
+
+    // Cancelar el temporizador principal
     _timer.cancel();
     if (kDebugMode) {
-      print("⏲️ Timer cancelado.");
+      print("⏲️ Temporizador principal cancelado.");
+    }
+
+    // Cancelar el temporizador de fase (contracción/pausa)
+    _phaseTimer?.cancel();
+    if (kDebugMode) {
+      print("⏲️ Temporizador de fase cancelado.");
     }
 
     // Liberar el controlador de opacidad
@@ -2399,23 +2478,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       print("🔧 Controlador de opacidad liberado.");
     }
 
-    // Verifica si la sesión se ha iniciado antes de detenerla
-    if (isElectroOn) {
-      // Llamar la función asíncrona usando una función auxiliar
-      _stopElectrostimulationSessionAsync(widget.macAddress!);
-    }
-
+    // Limpiar la lista de clientes seleccionados del Provider
     if (_clientsProvider != null) {
       _clientsProvider!.clearSelectedClientsSilently(); // Limpia sin notificar
       if (kDebugMode) {
-        print("📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
+        print(
+            "📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
       }
     }
 
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -3738,24 +3811,23 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     children: [
                                                       // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
                                                       GestureDetector(
-                                                        onTap: isRunning
-                                                            ? null
-                                                            : () {
-                                                                setState(() {
-                                                                  if (time <
-                                                                      30) {
-                                                                    // Máximo valor de time es 30
-                                                                    time++; // Aumentar el tiempo
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    // Calcula el índice de la imagen con el nuevo tiempo
-                                                                    _currentImageIndex =
-                                                                        31 -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                        onTap: () {
+                                                          setState(() {
+                                                            if (time < 30) {
+                                                              // Máximo valor de time es 30
+                                                              time++; // Aumentar el tiempo
+                                                              totalTime = time *
+                                                                  60; // Actualiza el tiempo total en segundos
+                                                              // Calcula el índice de la imagen con el nuevo tiempo
+                                                              _currentImageIndex =
+                                                                  31 - time;
+
+                                                              // Imprime el tiempo actualizado en consola
+                                                              print(
+                                                                  'Tiempo actualizado: $time minutos (${totalTime}s)');
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-arriba.png',
                                                           height: screenHeight *
@@ -3774,24 +3846,23 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         ),
                                                       ),
                                                       GestureDetector(
-                                                        onTap: isRunning
-                                                            ? null
-                                                            : () {
-                                                                setState(() {
-                                                                  if (time >
-                                                                      1) {
-                                                                    // Mínimo valor de time es 1
-                                                                    time--; // Disminuir el tiempo
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    // Calcula el índice de la imagen con el nuevo tiempo
-                                                                    _currentImageIndex =
-                                                                        31 -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                        onTap: () {
+                                                          setState(() {
+                                                            if (time > 1) {
+                                                              // Mínimo valor de time es 1
+                                                              time--; // Disminuir el tiempo
+                                                              totalTime = time *
+                                                                  60; // Actualiza el tiempo total en segundos
+                                                              // Calcula el índice de la imagen con el nuevo tiempo
+                                                              _currentImageIndex =
+                                                                  31 - time;
+
+                                                              // Imprime el tiempo actualizado en consola
+                                                              print(
+                                                                  'Tiempo actualizado: $time minutos (${totalTime}s)');
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-abajo.png',
                                                           height: screenHeight *
@@ -5254,24 +5325,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     children: [
                                                       // Flecha hacia arriba para aumentar el tiempo (si el cronómetro no está corriendo)
                                                       GestureDetector(
-                                                        onTap: isRunning
-                                                            ? null
-                                                            : () {
-                                                                setState(() {
-                                                                  if (time <
-                                                                      30) {
-                                                                    // Máximo valor de time es 30
-                                                                    time++; // Aumentar el tiempo
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    // Calcula el índice de la imagen con el nuevo tiempo
-                                                                    _currentImageIndex =
-                                                                        31 -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                        onTap: () {
+                                                          setState(() {
+                                                            if (time < 30) {
+                                                              // Máximo valor de time es 30
+                                                              time++; // Aumentar el tiempo
+                                                              totalTime = time *
+                                                                  60; // Actualiza el tiempo total en segundos
+                                                              // Calcula el índice de la imagen con el nuevo tiempo
+                                                              _currentImageIndex =
+                                                                  31 - time;
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-arriba.png',
                                                           height: screenHeight *
@@ -5290,24 +5356,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         ),
                                                       ),
                                                       GestureDetector(
-                                                        onTap: isRunning
-                                                            ? null
-                                                            : () {
-                                                                setState(() {
-                                                                  if (time >
-                                                                      1) {
-                                                                    // Mínimo valor de time es 1
-                                                                    time--; // Disminuir el tiempo
-                                                                    totalTime =
-                                                                        time *
-                                                                            60; // Actualiza el tiempo total en segundos
-                                                                    // Calcula el índice de la imagen con el nuevo tiempo
-                                                                    _currentImageIndex =
-                                                                        31 -
-                                                                            time;
-                                                                  }
-                                                                });
-                                                              },
+                                                        onTap: () {
+                                                          setState(() {
+                                                            if (time > 1) {
+                                                              // Mínimo valor de time es 1
+                                                              time--; // Disminuir el tiempo
+                                                              totalTime = time *
+                                                                  60; // Actualiza el tiempo total en segundos
+                                                              // Calcula el índice de la imagen con el nuevo tiempo
+                                                              _currentImageIndex =
+                                                                  31 - time;
+                                                            }
+                                                          });
+                                                        },
                                                         child: Image.asset(
                                                           'assets/images/flecha-abajo.png',
                                                           height: screenHeight *
@@ -6586,6 +6647,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             porcentajesMusculoTraje[index] =
                                 (porcentajesMusculoTraje[index] + 1)
                                     .clamp(0, 100);
+                            // Llamar a la función con modo 1 (Más)
                           } else if (_isMusculoTrajeInactivo[index]) {
                             // Si está inactivo, poner el porcentaje a 0
                             porcentajesMusculoTraje[index] = 0;
@@ -6684,6 +6746,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             porcentajesMusculoTraje[index] =
                                 (porcentajesMusculoTraje[index] - 1)
                                     .clamp(0, 100);
+                            // Llamar a la función con modo 2 (Menos)
                           } else if (_isMusculoTrajeInactivo[index]) {
                             // Si está inactivo, poner el porcentaje a 0
                             porcentajesMusculoTraje[index] = 0;
@@ -6982,7 +7045,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 class BleConnectionService {
   // Variables de estado
   bool _foundDeviceWaitingToConnect = false;
-  bool _scanStarted = false;
   final bool _connected = false;
   Timer? _connectionCheckTimer; // Timer para el chequeo periódico de conexión
   List<String> targetDeviceIds = []; // Lista para almacenar las direcciones MAC
@@ -7008,6 +7070,9 @@ class BleConnectionService {
   final Uuid txCharacteristicUuid =
       Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
   StreamSubscription<List<int>>? notificationSubscription;
+  Map<String, Timer> _keepAliveTimers = {};
+
+  final Map<String, Timer> deviceTimers = {};
 
   BleConnectionService(List<String> macAddresses) {
     targetDeviceIds =
@@ -7152,7 +7217,7 @@ class BleConnectionService {
           if (_scanStream != null) {
             await _scanStream?.cancel();
             print(
-                "⏳ Escaneo BLE cancelado automáticamente después de 5 segundos.");
+                "⏳ Escaneo BLE cancelado automáticamente después de 3 segundos.");
           }
           if (!scanCompleter.isCompleted) scanCompleter.complete();
         }),
@@ -7288,125 +7353,6 @@ class BleConnectionService {
     return success;
   }
 
-  Future<void> processConnectedDevices() async {
-    if (connectedDevices.isEmpty) {
-      debugPrint("⚠️ Ningún dispositivo conectado. Abortando operaciones.");
-      return;
-    }
-
-    debugPrint("✅ Dispositivos conectados: $connectedDevices");
-
-    for (final macAddress in connectedDevices) {
-      try {
-        // Inicialización de seguridad
-        await _initializeSecurity(macAddress);
-        debugPrint(
-            "🔒--->>>Fase de inicialización de seguridad completada para $macAddress.");
-
-        // Procesar información general del dispositivo
-        await _processDeviceInfo(macAddress);
-
-        // Procesar electroestimulación (canales y sesiones)
-        //await _processElectrostimulation(macAddress);
-      } catch (e) {
-        debugPrint("❌--->>>Error al procesar el dispositivo $macAddress: $e");
-      }
-    }
-  }
-
-  Future<void> _processDeviceInfo(String macAddress) async {
-    try {
-      // Obtener la información del dispositivo (FUN_INFO)
-      final deviceInfo =
-          await getDeviceInfo(macAddress).timeout(const Duration(seconds: 15));
-      final parsedInfo = parseDeviceInfo(deviceInfo);
-      debugPrint(parsedInfo);
-
-      // Obtener el nombre del Bluetooth (FUN_GET_NAMEBT)
-      final nameBt = await getBluetoothName(macAddress)
-          .timeout(const Duration(seconds: 15));
-      debugPrint("🅱️ Nombre del Bluetooth ($macAddress): $nameBt");
-      updateBluetoothName(
-          macAddress, nameBt.isNotEmpty ? nameBt : "No disponible");
-
-      // Obtener los parámetros de la batería (FUN_GET_PARAMBAT)
-      final batteryParameters = await getBatteryParameters(macAddress)
-          .timeout(const Duration(seconds: 15));
-      final parsedBattery = parseBatteryParameters(batteryParameters);
-      debugPrint(parsedBattery);
-      updateBatteryStatus(
-          macAddress, batteryParameters['batteryStatusRaw'] ?? -1);
-
-      // Obtener contadores de tarifa
-      final counters = await getTariffCounters(macAddress)
-          .timeout(const Duration(seconds: 15));
-      final parsedCounters = parseTariffCounters(counters);
-      debugPrint(parsedCounters);
-    } catch (e) {
-      debugPrint(
-          "❌ Error al procesar la información general de $macAddress: $e");
-    }
-  }
-
-  Future<bool> _startElectrostimulationSession(
-    String macAddress,
-    List<int> valoresCanales,
-    double frecuencia,
-    double rampa, {
-    double pulso = 0, // Nuevo parámetro con valor por defecto
-  }) async {
-    try {
-      final runSuccess = await runElectrostimulationSession(
-        macAddress: macAddress,
-        endpoint: 1,
-        limitador: 0,
-        rampa: rampa,
-        frecuencia: frecuencia,
-        deshabilitaElevador: 0,
-        nivelCanales: valoresCanales,
-        pulso: pulso.toInt(),
-        // Usar el valor de anchura de pulso
-        anchuraPulsosPorCanal:
-            List.generate(10, (index) => pulso.toInt()), // Usar un valor común
-      );
-
-      if (runSuccess) {
-        debugPrint(
-            "✅ Sesión de electroestimulación iniciada correctamente en $macAddress.");
-        return true;
-      } else {
-        debugPrint(
-            "❌ Error al iniciar la sesión de electroestimulación en $macAddress.");
-        return false;
-      }
-    } catch (e) {
-      debugPrint(
-          "❌ Error al procesar la electroestimulación de $macAddress: $e");
-      return false;
-    }
-  }
-
-// Función para detener la sesión de electroestimulación
-  Future<void> _stopElectrostimulationSession(String macAddress) async {
-    try {
-      final stopSuccess = await stopElectrostimulationSession(
-        macAddress: macAddress,
-        endpoint: 1,
-      );
-
-      if (stopSuccess) {
-        debugPrint(
-            "✅ Sesión de electroestimulación detenida correctamente en $macAddress.");
-      } else {
-        debugPrint(
-            "❌ Error al detener la sesión de electroestimulación en $macAddress.");
-      }
-    } catch (e) {
-      debugPrint(
-          "❌ Error al detener la electroestimulación de $macAddress: $e");
-    }
-  }
-
   void startPeriodicConnectionCheck(
       void Function(String macAddress, bool isConnected)
           onConnectionStatusChange) {
@@ -7425,7 +7371,7 @@ class BleConnectionService {
         if (!isConnected) {
           // Verificar si el dispositivo está publicándose antes de intentar reconectar
           final isAdvertising = await _isDeviceAdvertising(macAddress);
-          _startScan();
+          //_startScan();
           if (isAdvertising) {
             print(
                 "⚠️ Dispositivo $macAddress está encendido pero desconectado. Intentando reconectar...");
@@ -7556,6 +7502,18 @@ class BleConnectionService {
             "⏲️ No había un timer activo para la verificación de conexión.");
       }
     }
+    if (_keepAliveTimers.isNotEmpty) {
+      // Cancelar todos los temporizadores
+      _keepAliveTimers.forEach((macAddress, timer) {
+        timer.cancel();
+        debugPrint("⏲️ Timer de estado de electro cancelado para $macAddress.");
+      });
+
+      // Limpiar el mapa de temporizadores
+      _keepAliveTimers.clear();
+    } else {
+      debugPrint("⏲️ No había timers activos para el estado.");
+    }
 
     if (_scanStream != null) {
       _scanStream?.cancel();
@@ -7608,6 +7566,63 @@ class BleConnectionService {
   }
 
   bool get isConnected => _connected;
+
+  Future<void> processConnectedDevices() async {
+    if (connectedDevices.isEmpty) {
+      debugPrint("⚠️ Ningún dispositivo conectado. Abortando operaciones.");
+      return;
+    }
+
+    debugPrint("✅ Dispositivos conectados: $connectedDevices");
+
+    for (final macAddress in connectedDevices) {
+      try {
+        // Inicialización de seguridad
+        await _initializeSecurity(macAddress);
+        debugPrint(
+            "🔒--->>>Fase de inicialización de seguridad completada para $macAddress.");
+
+        // Procesar información general del dispositivo
+        await _processDeviceInfo(macAddress);
+      } catch (e) {
+        debugPrint("❌--->>>Error al procesar el dispositivo $macAddress: $e");
+      }
+    }
+  }
+
+  Future<void> _processDeviceInfo(String macAddress) async {
+    try {
+      // Obtener la información del dispositivo (FUN_INFO)
+      final deviceInfo =
+          await getDeviceInfo(macAddress).timeout(const Duration(seconds: 15));
+      final parsedInfo = parseDeviceInfo(deviceInfo);
+      debugPrint(parsedInfo);
+
+      // Obtener el nombre del Bluetooth (FUN_GET_NAMEBT)
+      final nameBt = await getBluetoothName(macAddress)
+          .timeout(const Duration(seconds: 15));
+      debugPrint("🅱️ Nombre del Bluetooth ($macAddress): $nameBt");
+      updateBluetoothName(
+          macAddress, nameBt.isNotEmpty ? nameBt : "No disponible");
+
+      // Obtener los parámetros de la batería (FUN_GET_PARAMBAT)
+      final batteryParameters = await getBatteryParameters(macAddress)
+          .timeout(const Duration(seconds: 15));
+      final parsedBattery = parseBatteryParameters(batteryParameters);
+      debugPrint(parsedBattery);
+      updateBatteryStatus(
+          macAddress, batteryParameters['batteryStatusRaw'] ?? -1);
+
+      // Obtener contadores de tarifa
+      final counters = await getTariffCounters(macAddress)
+          .timeout(const Duration(seconds: 15));
+      final parsedCounters = parseTariffCounters(counters);
+      debugPrint(parsedCounters);
+    } catch (e) {
+      debugPrint(
+          "❌ Error al procesar la información general de $macAddress: $e");
+    }
+  }
 
   // Inicialización de la seguridad
   Future<void> _initializeSecurity(String macAddress) async {
@@ -8174,94 +8189,121 @@ $endpoints
 // Función para parsear los datos de la respuesta
   Map<String, dynamic> _parseElectrostimulatorState(List<int> data, int mode) {
     final endpoint = data[1];
-    final state = data[2];
-    final batteryStatus = data[3];
+    final state = _mapState(data[2]); // Mapear el estado según lo definido
+    final batteryStatus =
+        _mapBatteryStatus(data[3]); // Mapear estado de batería
     final frequency = data[4];
-    final ramp = data[5];
+    final ramp = data[5]; // Convertir rampa a milisegundos
+    final pulseWidth =
+        data[6] == 0 ? "Cronaxia" : data[6] * 5; // Ancho de pulso en µs
+    final temperature = ((data[7] << 8) | data[8]) / 10.0; // Temperatura en ºC
     final limitador = data[9] == 0 ? "No" : "Sí";
 
     if (mode == 0) {
-      // Modo 0: temperatura y niveles de canal
+      // Modo 0: Estado, niveles de canal y temperatura
       return {
         'endpoint': endpoint,
         'state': state,
-        'batteryStatus': _mapBatteryStatus(batteryStatus),
+        'batteryStatus': batteryStatus,
         'frequency': frequency,
-        'ramp': ramp * 100,
-        'temperature': (data[7] << 8) | data[8],
+        'ramp': ramp,
+        'pulseWidth': pulseWidth,
+        'temperature': temperature,
         'limitador': limitador,
-        'channelLevels': data.sublist(10, 20),
+        'channelLevels': List.generate(10, (index) => data[index]),
       };
     } else if (mode == 1 || mode == 2) {
-      // Modo 1: tensión batería / Modo 2: tensión elevador
+      // Modo 1: Tensión batería / Modo 2: Tensión elevador
       final voltageType = mode == 1 ? "Tensión batería" : "Tensión elevador";
       return {
         'endpoint': endpoint,
         'state': state,
-        'batteryStatus': _mapBatteryStatus(batteryStatus),
+        'batteryStatus': batteryStatus,
         'frequency': frequency,
-        'ramp': ramp * 100,
-        voltageType: (data[7] << 8) | data[8],
+        'ramp': ramp,
+        'pulseWidth': pulseWidth,
+        'temperature': temperature,
         'limitador': limitador,
-        'pulseWidths': data.sublist(10, 20),
+        voltageType: ((data[7] << 8) | data[8]) / 10.0, // Tensión en voltios
+        'channelLevels': List.generate(10, (index) => data[10 + index]),
       };
     } else {
       throw ArgumentError("Modo inválido.");
     }
   }
 
-// Mapear el estado de la batería
-  String _mapBatteryStatus(int status) {
-    switch (status) {
-      case 0:
-        return "Muy baja";
-      case 1:
-        return "Baja";
-      case 2:
-        return "Media";
-      case 3:
-        return "Alta";
-      case 4:
-        return "Llena";
-      default:
-        return "Desconocido";
+  Future<void> executePeriodically(
+      List<String> macAddresses, int endpoint, int mode) async {
+    // El temporizador que ejecutará la función cada 5 segundos
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
+      try {
+        for (var macAddress in macAddresses) {
+          // Llamada a la función getElectrostimulatorState con los parámetros deseados
+          await getElectrostimulatorState(macAddress, endpoint, mode);
+        }
+      } catch (e) {
+        // Manejo de errores en caso de que algo falle
+        debugPrint("Error al ejecutar la función periódicamente: $e");
+      }
+    });
+  }
+
+  Future<bool> _startElectrostimulationSession(
+    String macAddress,
+    List<int> valoresCanales,
+    double frecuencia,
+    double rampa, {
+    double pulso = 0, // Nuevo parámetro con valor por defecto
+  }) async {
+    try {
+      final runSuccess = await runElectrostimulationSession(
+        macAddress: macAddress,
+        endpoint: 1,
+        limitador: 0,
+        rampa: rampa,
+        frecuencia: frecuencia,
+        deshabilitaElevador: 0,
+        nivelCanales: valoresCanales,
+        pulso: pulso.toInt(),
+        // Usar el valor de anchura de pulso
+        anchuraPulsosPorCanal:
+            List.generate(10, (index) => pulso.toInt()), // Usar un valor común
+      );
+
+      if (runSuccess) {
+        debugPrint(
+            "✅ Sesión de electroestimulación iniciada correctamente en $macAddress.");
+        return true;
+      } else {
+        debugPrint(
+            "❌ Error al iniciar la sesión de electroestimulación en $macAddress.");
+        return false;
+      }
+    } catch (e) {
+      debugPrint(
+          "❌ Error al procesar la electroestimulación de $macAddress: $e");
+      return false;
     }
   }
 
-  String parseElectrostimulatorState(Map<String, dynamic> state, int mode) {
-    final endpoint = state['endpoint'];
-    final batteryStatus = state['batteryStatus'];
-    final frequency = state['frequency'];
-    final ramp = state['ramp'];
-    final limitador = state['limitador'];
+// Función para detener la sesión de electroestimulación
+  Future<void> _stopElectrostimulationSession(String macAddress) async {
+    try {
+      final stopSuccess = await stopElectrostimulationSession(
+        macAddress: macAddress,
+        endpoint: 1,
+      );
 
-    if (mode == 0) {
-      final temperature = state['temperature'];
-      final channelLevels = state['channelLevels'] as List<int>;
-      return '''
-⚡ Estado del electroestimulador (Modo 0):
-- Endpoint: $endpoint
-- Estado batería: $batteryStatus
-- Frecuencia: $frequency Hz
-- Rampa: ${ramp}ms
-- Temperatura: ${temperature / 10} °C
-- Limitador: $limitador
-- Niveles de canal: ${channelLevels.join(', ')}
-''';
-    } else {
-      final voltageType = mode == 1 ? "Tensión batería" : "Tensión elevador";
-      final voltage = state[voltageType];
-      final pulseWidths = state['pulseWidths'] as List<int>;
-      return '''
-⚡ Estado del electroestimulador (Modo $mode):
-- Endpoint: $endpoint
-- Estado batería: $batteryStatus
-- Frecuencia: $frequency Hz
-- Rampa: ${ramp}ms
-- $voltageType: ${voltage / 10} V
-- Limitador: $limitador
-- Ancho de pulso (μs): ${pulseWidths.map((v) => v * 5).join(', ')}
-''';
+      if (stopSuccess) {
+        debugPrint(
+            "✅ Sesión de electroestimulación detenida correctamente en $macAddress.");
+      } else {
+        debugPrint(
+            "❌ Error al detener la sesión de electroestimulación en $macAddress.");
+      }
+    } catch (e) {
+      debugPrint(
+          "❌ Error al detener la electroestimulación de $macAddress: $e");
     }
   }
 
@@ -8272,7 +8314,7 @@ $endpoints
     required double rampa,
     required double frecuencia,
     required int deshabilitaElevador,
-    required List<int> nivelCanales, // Recibimos una lista de enteros
+    required List<int> nivelCanales,
     required int pulso,
     required List<int> anchuraPulsosPorCanal,
   }) async {
@@ -8282,57 +8324,48 @@ $endpoints
       deviceId: macAddress,
     );
 
-    final characteristicTx = QualifiedCharacteristic(
-      serviceId: serviceUuid,
-      characteristicId: txCharacteristicUuid,
-      deviceId: macAddress,
-    );
-
     // Validar parámetros
-    if (endpoint < 1 || endpoint > 4) {
-      throw ArgumentError("El endpoint debe estar entre 1 y 4.");
-    }
+    if (endpoint < 1 || endpoint > 4) throw ArgumentError("Endpoint inválido.");
     if (anchuraPulsosPorCanal.length != 10) {
       throw ArgumentError(
-          "La lista de anchuras de pulso debe contener exactamente 10 valores.");
+          "Debe haber exactamente 10 valores de anchura de pulso.");
     }
 
-    // Crear el paquete de solicitud FUN_RUN_EMS
+    // Crear el paquete
     final List<int> requestPacket = List.filled(20, 0);
     requestPacket[0] = 0x12; // FUN_RUN_EMS
     requestPacket[1] = endpoint;
     requestPacket[2] = limitador;
-    requestPacket[3] = rampa.toInt();
-    requestPacket[4] = frecuencia.toInt();
+    requestPacket[3] = (rampa * 100).toInt(); // Rampa en x100ms
+    requestPacket[4] = (frecuencia * 10).toInt(); // Frecuencia en x10 Hz
     requestPacket[5] = deshabilitaElevador;
 
-    // Asignar los valores de los canales al paquete de solicitud
     for (int i = 0; i < nivelCanales.length; i++) {
-      requestPacket[6 + i] =
-          nivelCanales[i]; // Cada canal recibe su valor respectivo
+      requestPacket[6 + i] = nivelCanales[i];
     }
 
     requestPacket[7] = pulso;
 
-    // Asignar los valores de anchura de pulso por canal
     for (int i = 0; i < 10; i++) {
       requestPacket[8 + i] = anchuraPulsosPorCanal[i];
     }
 
     try {
-      // Cancelar cualquier suscripción activa previa
       notificationSubscription?.cancel();
       notificationSubscription = null;
-
       // Completer para manejar la respuesta
       final completer = Completer<bool>();
 
-      // Suscribirse a las notificaciones para recibir FUN_RUN_EMS_R
       notificationSubscription = flutterReactiveBle
-          .subscribeToCharacteristic(characteristicTx)
+          .subscribeToCharacteristic(
+        QualifiedCharacteristic(
+          serviceId: serviceUuid,
+          characteristicId: txCharacteristicUuid,
+          deviceId: macAddress,
+        ),
+      )
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x13) {
-          // FUN_RUN_EMS_R recibido
           final retorno = data[2];
           final result = retorno == 1;
           completer.complete(result);
@@ -8340,8 +8373,7 @@ $endpoints
               "📥 FUN_RUN_EMS_R recibido desde $macAddress: ${result ? "OK" : "FAIL"}");
         }
       });
-
-      // Enviar la solicitud FUN_RUN_EMS
+      // Enviar el comando
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
@@ -8349,20 +8381,20 @@ $endpoints
       debugPrint(
           "📤 FUN_RUN_EMS enviado a $macAddress para endpoint $endpoint.");
 
-      // Esperar la respuesta con timeout
       final result =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
       return result;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
+      debugPrint("❌ Error en runElectrostimulationSession: $e");
       notificationSubscription?.cancel();
-      debugPrint("❌ Error al iniciar sesión de electroestimulación: $e");
       rethrow;
     }
   }
+
+
 
   Future<bool> stopElectrostimulationSession({
     required String macAddress,
@@ -8926,6 +8958,41 @@ $canales
         return "Sensor no capta";
       case 3:
         return "OK";
+      default:
+        return "Desconocido";
+    }
+  }
+
+  String _mapState(int state) {
+    const states = {
+      0: "POWER OFF",
+      1: "CHARGE",
+      2: "STOP",
+      3: "RUN RAMPA",
+      4: "RUN",
+      10: "CLOSING",
+      100: "LIMITE TARIFA",
+      101: "ERROR POR FALLO INTERNO",
+      102: "ERROR FALLO ELEVADOR",
+      103: "ERROR SOBRE-TEMPERATURA",
+      104: "ERROR TENSIÓN ALIMENTACIÓN FUERA DEL RANGO",
+    };
+    return states[state] ?? "Estado desconocido";
+  }
+
+// Mapear el estado de la batería
+  String _mapBatteryStatus(int status) {
+    switch (status) {
+      case 0:
+        return "Muy baja";
+      case 1:
+        return "Baja";
+      case 2:
+        return "Media";
+      case 3:
+        return "Alta";
+      case 4:
+        return "Llena";
       default:
         return "Desconocido";
     }

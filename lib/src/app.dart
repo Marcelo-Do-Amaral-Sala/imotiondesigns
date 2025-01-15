@@ -29,7 +29,7 @@ class App extends StatefulWidget {
 
 
 class _AppState extends State<App> with WidgetsBindingObserver{
-  String currentView = 'login';
+  String currentView = 'mainMenu';
   Key? panelViewKey = UniqueKey(); // Clave única solo para PanelView
   Map<String, dynamic>? selectedMciData;
 
