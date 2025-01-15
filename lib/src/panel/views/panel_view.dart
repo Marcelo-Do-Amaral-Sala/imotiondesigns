@@ -1693,8 +1693,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   @override
   void initState() {
     super.initState();
-    print("PanelViewKey: $panelViewKey");
-    print("currentStatus: $currentStatus");
     currentStatus = 'Estado inicial para ${widget.macAddress}';
     _currentImageIndex = imagePaths.length - time;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {});
@@ -2043,31 +2041,54 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   void _startContractionTimer(
-    double contractionDuration,
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    List<int> porcentajesMusculoPantalon,
-  ) {
+      double contractionDuration,
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      List<int> porcentajesMusculoPantalon,
+      ) {
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
 
     // Verificar y sincronizar con el estado BLE
     if (!isElectroOn) {
-      startFullElectrostimulationTrajeProcess(
-              macAddress, porcentajesMusculoTraje, selectedProgram)
-          .then((success) {
-        if (success) {
-          setState(() {
-            isElectroOn = true; // Actualizar estado local
-          });
+      if (selectedIndexEquip == 0) {
+        // Si el índice seleccionado es 0, iniciar la sesión para traje
+        startFullElectrostimulationTrajeProcess(
+            macAddress, porcentajesMusculoTraje, selectedProgram)
+            .then((success) {
+          if (success) {
+            setState(() {
+              isElectroOn = true; // Actualizar estado local
+            });
 
-          // Una vez confirmada la sesión, iniciar el temporizador de contracción
-          _startContractionPhase(contractionDuration, macAddress,
-              porcentajesMusculoTraje, porcentajesMusculoPantalon);
-        } else {
-          debugPrint(
-              "❌ Error al iniciar la electroestimulación durante la fase de contracción.");
-        }
-      });
+            // Una vez confirmada la sesión, iniciar el temporizador de contracción
+            _startContractionPhase(contractionDuration, macAddress,
+                porcentajesMusculoTraje, porcentajesMusculoPantalon);
+          } else {
+            debugPrint(
+                "❌ Error al iniciar la electroestimulación para traje durante la fase de contracción.");
+          }
+        });
+      } else if (selectedIndexEquip == 1) {
+        // Si el índice seleccionado es 1, iniciar la sesión para pantalón
+        startFullElectrostimulationPantalonProcess(
+            macAddress, porcentajesMusculoPantalon, selectedProgram)
+            .then((success) {
+          if (success) {
+            setState(() {
+              isElectroOn = true; // Actualizar estado local
+            });
+
+            // Una vez confirmada la sesión, iniciar el temporizador de contracción
+            _startContractionPhase(contractionDuration, macAddress,
+                porcentajesMusculoTraje, porcentajesMusculoPantalon);
+          } else {
+            debugPrint(
+                "❌ Error al iniciar la electroestimulación para pantalón durante la fase de contracción.");
+          }
+        });
+      } else {
+        debugPrint("❌ Índice seleccionado no válido: $selectedIndex");
+      }
     } else {
       // Si ya está activo, inicia directamente el temporizador
       _startContractionPhase(contractionDuration, macAddress,
@@ -2178,23 +2199,23 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         return false;
       }
 
-      List<int> valoresCanales = List.filled(10, 0); // Inicializamos la lista de valoresCanales con ceros.
+      List<int> valoresCanalesTraje = List.filled(10, 0); // Inicializamos la lista de valoresCanales con ceros.
 
       // Asignar los valores de porcentajesMusculoTraje a los canales
-      valoresCanales[0] = porcentajesMusculoTraje[5] * 10;
-      valoresCanales[1] = porcentajesMusculoTraje[6] * 10;
-      valoresCanales[2] = porcentajesMusculoTraje[7] * 10;
-      valoresCanales[3] = porcentajesMusculoTraje[8] * 10;
-      valoresCanales[4] = porcentajesMusculoTraje[9] * 10;
-      valoresCanales[5] = porcentajesMusculoTraje[0] * 10;
-      valoresCanales[6] = porcentajesMusculoTraje[2] * 10;
-      valoresCanales[7] = porcentajesMusculoTraje[3] * 10;
-      valoresCanales[8] = porcentajesMusculoTraje[1] * 10;
-      valoresCanales[9] = porcentajesMusculoTraje[4] * 10;
+      valoresCanalesTraje[0] = porcentajesMusculoTraje[5] * 10;
+      valoresCanalesTraje[1] = porcentajesMusculoTraje[6] * 10;
+      valoresCanalesTraje[2] = porcentajesMusculoTraje[7] * 10;
+      valoresCanalesTraje[3] = porcentajesMusculoTraje[8] * 10;
+      valoresCanalesTraje[4] = porcentajesMusculoTraje[9] * 10;
+      valoresCanalesTraje[5] = porcentajesMusculoTraje[0] * 10;
+      valoresCanalesTraje[6] = porcentajesMusculoTraje[2] * 10;
+      valoresCanalesTraje[7] = porcentajesMusculoTraje[3] * 10;
+      valoresCanalesTraje[8] = porcentajesMusculoTraje[1] * 10;
+      valoresCanalesTraje[9] = porcentajesMusculoTraje[4] * 10;
 
       // Debug: Mostrar los porcentajes y los valores asignados a cada canal
       for (int i = 0; i < 10; i++) {
-        debugPrint("🔢 Canal ${i + 1}: ${valoresCanales[i]} (Porcentaje: ${porcentajesMusculoTraje[i]}%)");
+        debugPrint("🔢 Canal ${i + 1}: ${valoresCanalesTraje[i]} (Porcentaje: ${porcentajesMusculoTraje[i]}%)");
       }
 
       // Paso 2: Obtener frecuencia, rampa y anchura de pulso
@@ -2215,7 +2236,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Paso 3: Iniciar la sesión de electroestimulación primero
       bool isElectroOn = await widget.bleConnectionService._startElectrostimulationSession(
         macAddress,
-        valoresCanales,
+        valoresCanalesTraje,
         frecuencia,
         rampa,
         pulso: pulso,
@@ -2229,7 +2250,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           macAddress: macAddress,
           endpoint: 1, // Asumiendo que el endpoint es 1
           modo: modo,
-          valoresCanales: valoresCanales,
+          valoresCanales: valoresCanalesTraje,
         );
 
         debugPrint("📡 Respuesta de controlAllElectrostimulatorChannels: $response");
@@ -2255,67 +2276,71 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
 
   Future<bool> startFullElectrostimulationPantalonProcess(
-    String macAddress,
-    List<int> porcentajesMusculoPantalon,
-    String? selectedProgram,
-  ) async {
+      String macAddress,
+      List<int> porcentajesMusculoPantalon,
+      String? selectedProgram,
+      ) async {
     try {
-      // Verificar que la lista tiene 7 elementos, es importante para evitar errores de índice
+      // Verificar que la lista tiene exactamente 7 elementos
       if (porcentajesMusculoPantalon.length != 7) {
         debugPrint(
-            "❌ La lista porcentajesMusculoPantalon debe tener 7 elementos.");
+            "❌ La lista porcentajesMusculoPantalon debe tener exactamente 7 elementos.");
         return false;
       }
 
-      // Paso 1: Obtener los valores de los canales directamente desde porcentajesMusculoPantalon
-      List<int> valoresCanales = List.generate(7, (canal) {
-        // Asignar el valor directamente desde la lista porcentajesMusculoPantalon
-        int valorCanal = porcentajesMusculoPantalon[canal];
+      List<int> valoresCanalesPantalon = List.filled(10, 0); // Inicializamos la lista de valoresCanales con ceros.
 
-        // Si el valor está fuera de rango o es "Limitador activado", asignamos un valor por defecto
-        if (valorCanal < 0) {
-          return 0; // Si el valor es negativo o no válido, asignar 0
-        } else {
-          return valorCanal; // Si el valor es válido, asignar el valor directamente
-        }
-      });
+// Asignar los valores de porcentajesMusculoPantalon a los canales
+      valoresCanalesPantalon[0] = 0; // Forzar valor 0 en el índice 0
+      valoresCanalesPantalon[1] = 0; // Forzar valor 0 en el índice 1
+      valoresCanalesPantalon[2] = porcentajesMusculoPantalon[4] * 10;
+      valoresCanalesPantalon[3] = porcentajesMusculoPantalon[5] * 10;
+      valoresCanalesPantalon[4] = porcentajesMusculoPantalon[6] * 10;
+      valoresCanalesPantalon[5] = 0; // Forzar valor 0 en el índice 5
+      valoresCanalesPantalon[6] = porcentajesMusculoPantalon[1] * 10;
+      valoresCanalesPantalon[7] = porcentajesMusculoPantalon[2] * 10;
+      valoresCanalesPantalon[8] = porcentajesMusculoPantalon[0] * 10;
+      valoresCanalesPantalon[9] = porcentajesMusculoPantalon[3] * 10;
 
-      debugPrint("✅ Valores de los canales: $valoresCanales");
+// Debug: Mostrar los valores asignados
+      for (int i = 0; i < valoresCanalesPantalon.length; i++) {
+        debugPrint(
+            "🔢 Canal ${i + 1}: ${valoresCanalesPantalon[i]} (Porcentaje: ${i < porcentajesMusculoPantalon.length ? porcentajesMusculoPantalon[i] : 0}%)");
+      }
 
-      // Paso 2: Obtener la frecuencia, rampa y anchura de pulso del programa seleccionado
+
+      // Paso 2: Obtener configuración del programa seleccionado
       Map<String, double> settings = getProgramSettings(selectedProgram);
       double frecuencia = settings['frecuencia'] ?? 50; // Valor por defecto
       double rampa = settings['rampa'] ?? 30; // Valor por defecto
       double pulso = settings['pulso'] ?? 20; // Valor por defecto
 
-      // Ajustar la rampa multiplicándola por 100ms
+      // Ajustar los valores según las conversiones necesarias
       rampa *= 100;
-
-      // Ajustar la anchura de pulso multiplicándola por 5 microsegundos
       pulso *= 5;
 
       debugPrint(
-          "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso ms");
+          "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso µs");
 
-      // Paso 3: Iniciar la sesión de electroestimulación primero
+      // Paso 3: Iniciar la sesión de electroestimulación
       bool isElectroOn =
-          await widget.bleConnectionService._startElectrostimulationSession(
+      await widget.bleConnectionService._startElectrostimulationSession(
         macAddress,
-        valoresCanales,
+        valoresCanalesPantalon,
         frecuencia,
         rampa,
         pulso: pulso,
       );
 
       if (isElectroOn) {
-        // Paso 4: Controlar todos los canales después de iniciar la sesión
+        // Paso 4: Controlar los canales
         int modo = 0; // 0: Absoluto
         Map<String, dynamic> response = await widget.bleConnectionService
             .controlAllElectrostimulatorChannels(
           macAddress: macAddress,
-          endpoint: 1, // Asumiendo que el endpoint es 1
+          endpoint: 1,
           modo: modo,
-          valoresCanales: valoresCanales,
+          valoresCanales: valoresCanalesPantalon,
         );
 
         debugPrint(
@@ -2340,6 +2365,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       return false;
     }
   }
+
 
   Future<void> stopElectrostimulationTrajeProcess(String macAddress) async {
     try {
@@ -8697,10 +8723,11 @@ $endpoints
       throw ArgumentError(
           "El modo debe ser 0 (absoluto), 1 (incrementa), 2 (decrementa), o 3 (solo retorna valores).");
     }
-    if (valoresCanales.length != 10) {
+    if (valoresCanales.length != 7 && valoresCanales.length != 10) {
       throw ArgumentError(
-          "Debe haber exactamente 10 valores para los canales.");
+          "La lista de valoresCanales debe tener exactamente 7 o 10 elementos.");
     }
+
     if (valoresCanales.any((valor) => valor < 0 || valor > 100)) {
       throw ArgumentError(
           "Todos los valores de los canales deben estar entre 0 y 100.");
