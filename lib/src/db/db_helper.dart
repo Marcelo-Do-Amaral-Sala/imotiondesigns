@@ -4405,8 +4405,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     return programas;
   }
 
-  Future<List<Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(
-      Database db) async {
+  Future<List<Map<String, dynamic>>> obtenerProgramasAutomaticosConSubprogramas(Database db) async {
     try {
       // Consulta los programas automáticos
       final List<Map<String, dynamic>> programas = await db.rawQuery('''
@@ -4419,7 +4418,9 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       for (var programa in programas) {
         // Obtiene los subprogramas relacionados con el programa actual
         final List<Map<String, dynamic>> subprogramas = await db.rawQuery('''
-        SELECT pa.id_programa_automatico, pa.id_programa_relacionado, pr.nombre, pa.orden, pa.ajuste, pa.duracion 
+        SELECT pa.id_programa_automatico, pa.id_programa_relacionado, pr.nombre, 
+               pa.orden, pa.ajuste, pa.duracion, pr.imagen,
+               pr.frecuencia, pr.pulso, pr.rampa, pr.contraccion, pr.pausa
         FROM Programas_Automaticos_Subprogramas pa
         JOIN programas_predeterminados pr ON pr.id_programa = pa.id_programa_relacionado
         WHERE pa.id_programa_automatico = ?

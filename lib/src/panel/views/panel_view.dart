@@ -1520,6 +1520,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   late Timer _timer;
   late DateTime startTime;
   Timer? _phaseTimer;
+  Timer? timerSub;
   String currentStatus = '';
   bool isTimeless = false;
   bool _isExpanded1 = false;
@@ -1529,6 +1530,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool isPantalonSelected = false;
   bool isOverlayVisible = false;
   bool isRunning = false;
+  bool isRunningSub = false;
   bool isContractionPhase = true;
   bool isSessionStarted = false;
   bool isElectroOn = false;
@@ -1547,11 +1549,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   int overlayIndex = -1;
   int selectedIndexEquip = 0;
   int totalTime = 25 * 60;
+  int previousTotalTime = 0;
   int time = 25;
   int _currentImageIndex = 0;
-
   int? selectedIndex = 0;
-
+  int remainingTime = 0;
+  int currentSubprogramIndex = 0;
+  int pausedSubprogramIndex = 0;
   double scaleFactorFull = 1.0;
   double scaleFactorCliente = 1.0;
   double scaleFactorRepeat = 1.0;
@@ -1567,6 +1571,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double strokeWidth = 20.0;
   double strokeHeight = 20.0;
   double elapsedTime = 0.0;
+  double elapsedTimeSub = 0.0;
   double pausedTime = 0.0;
   double seconds = 0.0;
   double progressContraction = 0.0;
@@ -1578,6 +1583,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valuePause = 1.0;
   double contractionDuration = 0.0;
 
+  Map<int, double> subprogramElapsedTime = {};  // Almacena elapsedTimeSub para cada subprograma
+  Map<int, int> subprogramRemainingTime = {};
   List<Map<String, dynamic>> selectedClients = [];
   List<Map<String, dynamic>> allIndividualPrograms = [];
   List<Map<String, dynamic>> allRecoveryPrograms = [];
@@ -1821,6 +1828,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Restablecer el estado de la imagen y su índice
       _currentImageIndex = 31 - 25;
+      currentSubprogramIndex = 0;
 
       // Restablecer la lista de músculos inactivos
       _isMusculoTrajeInactivo.fillRange(0, 10, false);
@@ -1829,6 +1837,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Restablecer los bloqueos de músculos
       _isMusculoTrajeBloqueado.fillRange(0, 10, false);
       _isMusculoPantalonBloqueado.fillRange(0, 7, false);
+
+      subprogramElapsedTime={};
+      subprogramRemainingTime={};
 
       // Restablecer los porcentajes
       porcentajesMusculoTraje.fillRange(0, 10, 0);
@@ -1840,6 +1851,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       valuePause = 1.0;
 
       elapsedTime = 0.0;
+      elapsedTimeSub = 0.0;
       time = 25;
       seconds = 0.0;
       progress = 1.0;
@@ -1850,6 +1862,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       startTime = DateTime.now();
       pausedTime = 0.0;
       _phaseTimer?.cancel();
+      timerSub?.cancel();
       _timer.cancel();
     });
     Navigator.of(context).pop();
@@ -1979,10 +1992,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       valueRampa = (selectedRecoProgram!['rampa'] as double?) ?? valueRampa;
     } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
         selectedAutoProgram != null) {
-      valueContraction =
-          (selectedAutoProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause = (selectedAutoProgram!['pausa'] as double?) ?? valuePause;
-      valueRampa = (selectedAutoProgram!['rampa'] as double?) ?? valueRampa;
+      totalTime = (selectedAutoProgram!['duracion']) ?? totalTime;
+      valueContraction = (selectedAutoProgram!['subprogramas']
+              [currentSubprogramIndex]['contraccion'] as double?) ??
+          valueContraction;
+      valuePause = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
+              ['pausa'] as double?) ??
+          valuePause;
+      valueRampa = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
+              ['rampa'] as double?) ??
+          valueRampa;
     }
   }
 
@@ -2016,7 +2035,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           }
         });
       });
-
+      startSubprogramTimer();
       // Reanuda el temporizador de contracción o pausa
       if (isContractionPhase) {
         _startContractionTimer(valueContraction, macAddress,
@@ -2028,6 +2047,28 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
+  void _updateTime(int newTime) {
+    setState(() {
+      if (newTime < 1) newTime = 1; // Tiempo mínimo de 1 minuto
+      if (newTime > 30) newTime = 30; // Tiempo máximo de 30 minutos
+
+      // Reinicia el tiempo transcurrido
+      //elapsedTime = 0;
+
+      // Actualiza el tiempo en minutos
+      time = newTime;
+
+      // Actualiza totalTime a segundos (newTime en minutos * 60)
+      totalTime = time * 60;
+
+      // Reinicia el startTime para que el temporizador comience desde cero
+      startTime = DateTime.now();
+
+      // Calcula el nuevo índice de la imagen según el tiempo
+      _currentImageIndex = 31 - time;
+    });
+  }
+
   void _pauseTimer(String macAddress) {
     setState(() {
       if (isElectroOn) {
@@ -2036,16 +2077,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       isRunning = false;
       pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
       _timer.cancel();
-      _phaseTimer?.cancel();
+      stopSubprogramTimer(); // Detiene el temporizador de subprograma
+      _phaseTimer?.cancel(); // Detiene el temporizador de fase
     });
+
   }
 
   void _startContractionTimer(
-      double contractionDuration,
-      String macAddress,
-      List<int> porcentajesMusculoTraje,
-      List<int> porcentajesMusculoPantalon,
-      ) {
+    double contractionDuration,
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    List<int> porcentajesMusculoPantalon,
+  ) {
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
 
     // Verificar y sincronizar con el estado BLE
@@ -2053,7 +2096,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (selectedIndexEquip == 0) {
         // Si el índice seleccionado es 0, iniciar la sesión para traje
         startFullElectrostimulationTrajeProcess(
-            macAddress, porcentajesMusculoTraje, selectedProgram)
+                macAddress, porcentajesMusculoTraje, selectedProgram)
             .then((success) {
           if (success) {
             setState(() {
@@ -2071,7 +2114,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       } else if (selectedIndexEquip == 1) {
         // Si el índice seleccionado es 1, iniciar la sesión para pantalón
         startFullElectrostimulationPantalonProcess(
-            macAddress, porcentajesMusculoPantalon, selectedProgram)
+                macAddress, porcentajesMusculoPantalon, selectedProgram)
             .then((success) {
           if (success) {
             setState(() {
@@ -2171,6 +2214,83 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
+  void startSubprogramTimer() {
+    // Verificar si selectedAutoProgram es nulo y usar allAutoPrograms[0] si es el caso
+    var programToUse = selectedAutoProgram ?? allAutomaticPrograms[0];
+
+    // Verificar si la lista 'subprogramas' está vacía
+    if (programToUse['subprogramas'].isEmpty) {
+      print("La lista de subprogramas está vacía.");
+      return; // Salir de la función si la lista está vacía
+    }
+
+    // Validar que el índice actual está dentro de la lista de subprogramas
+    if (currentSubprogramIndex < programToUse['subprogramas'].length) {
+      // Obtener la duración en minutos del subprograma actual y convertirla a segundos
+      double durationInMinutes = programToUse['subprogramas'][currentSubprogramIndex]['duracion'] as double;
+
+      // Inicializar o recuperar los tiempos para el subprograma actual
+      if (!subprogramElapsedTime.containsKey(currentSubprogramIndex)) {
+        subprogramElapsedTime[currentSubprogramIndex] = 0.0;  // Si no tiene valor, inicializar
+      }
+      if (!subprogramRemainingTime.containsKey(currentSubprogramIndex)) {
+        subprogramRemainingTime[currentSubprogramIndex] = (durationInMinutes * 60).toInt();  // Duración en segundos
+      }
+
+      // Actualizar remainingTime y elapsedTimeSub para el subprograma actual
+      remainingTime = subprogramRemainingTime[currentSubprogramIndex]!;
+      elapsedTimeSub = subprogramElapsedTime[currentSubprogramIndex]!;
+
+      print("Iniciando subprograma $currentSubprogramIndex con duración: $remainingTime segundos");
+
+      // Iniciar temporizador para este subprograma
+      timerSub = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (remainingTime > 0) {
+          if (mounted) {
+            setState(() {
+              remainingTime--;
+              elapsedTimeSub += 1.0; // Aumentar el tiempo transcurrido en segundos
+              subprogramRemainingTime[currentSubprogramIndex] = remainingTime;  // Actualizar remainingTime en el mapa
+              subprogramElapsedTime[currentSubprogramIndex] = elapsedTimeSub;  // Actualizar elapsedTime en el mapa
+            });
+          }
+        } else {
+          timer.cancel();
+          print("Subprograma $currentSubprogramIndex completado.");
+
+          // Pasar al siguiente subprograma
+          currentSubprogramIndex++;
+          updateContractionAndPauseValues();
+          startSubprogramTimer();
+        }
+      });
+    } else {
+      // Si se terminaron todos los subprogramas
+      print("Todos los subprogramas completados.");
+      // Aquí puedes agregar una acción al finalizar todos los subprogramas
+    }
+  }
+
+
+  void stopSubprogramTimer() {
+    timerSub?.cancel();
+    if (mounted) {
+      setState(() {
+        isRunning = false;
+      });
+    }
+
+    // Guardar el estado actual del subprograma
+    var programToUse = selectedAutoProgram ?? allAutomaticPrograms[0];
+
+    // Guardar el tiempo transcurrido en el mapa para el subprograma actual
+    subprogramElapsedTime[currentSubprogramIndex] = elapsedTimeSub;
+    subprogramRemainingTime[currentSubprogramIndex] = remainingTime;
+
+    print("Temporizador detenido. Tiempo transcurrido: $elapsedTimeSub segundos.");
+  }
+
+
   Future<void> executePeriodically(
       List<String> macAddresses, int endpoint, int mode) async {
     // El temporizador que ejecutará la función cada 5 segundos
@@ -2189,17 +2309,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Future<bool> startFullElectrostimulationTrajeProcess(
-      String macAddress,
-      List<int> porcentajesMusculoTraje,
-      String? selectedProgram,
-      ) async {
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    String? selectedProgram,
+  ) async {
     try {
       if (porcentajesMusculoTraje.length != 10) {
-        debugPrint("❌ La lista porcentajesMusculoTraje debe tener 10 elementos.");
+        debugPrint(
+            "❌ La lista porcentajesMusculoTraje debe tener 10 elementos.");
         return false;
       }
 
-      List<int> valoresCanalesTraje = List.filled(10, 0); // Inicializamos la lista de valoresCanales con ceros.
+      List<int> valoresCanalesTraje = List.filled(
+          10, 0); // Inicializamos la lista de valoresCanales con ceros.
 
       // Asignar los valores de porcentajesMusculoTraje a los canales
       valoresCanalesTraje[0] = porcentajesMusculoTraje[5] * 10;
@@ -2215,7 +2337,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Debug: Mostrar los porcentajes y los valores asignados a cada canal
       for (int i = 0; i < 10; i++) {
-        debugPrint("🔢 Canal ${i + 1}: ${valoresCanalesTraje[i]} (Porcentaje: ${porcentajesMusculoTraje[i]}%)");
+        debugPrint(
+            "🔢 Canal ${i + 1}: ${valoresCanalesTraje[i]} (Porcentaje: ${porcentajesMusculoTraje[i]}%)");
       }
 
       // Paso 2: Obtener frecuencia, rampa y anchura de pulso
@@ -2234,7 +2357,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso µs");
 
       // Paso 3: Iniciar la sesión de electroestimulación primero
-      bool isElectroOn = await widget.bleConnectionService._startElectrostimulationSession(
+      bool isElectroOn =
+          await widget.bleConnectionService._startElectrostimulationSession(
         macAddress,
         valoresCanalesTraje,
         frecuencia,
@@ -2253,7 +2377,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           valoresCanales: valoresCanalesTraje,
         );
 
-        debugPrint("📡 Respuesta de controlAllElectrostimulatorChannels: $response");
+        debugPrint(
+            "📡 Respuesta de controlAllElectrostimulatorChannels: $response");
 
         if (response['resultado'] != "OK") {
           debugPrint("❌ Error al configurar los canales.");
@@ -2265,7 +2390,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         });
         return true;
       } else {
-        debugPrint("❌ Error al iniciar el proceso completo de electroestimulación.");
+        debugPrint(
+            "❌ Error al iniciar el proceso completo de electroestimulación.");
         return false;
       }
     } catch (e) {
@@ -2274,12 +2400,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
-
   Future<bool> startFullElectrostimulationPantalonProcess(
-      String macAddress,
-      List<int> porcentajesMusculoPantalon,
-      String? selectedProgram,
-      ) async {
+    String macAddress,
+    List<int> porcentajesMusculoPantalon,
+    String? selectedProgram,
+  ) async {
     try {
       // Verificar que la lista tiene exactamente 7 elementos
       if (porcentajesMusculoPantalon.length != 7) {
@@ -2288,7 +2413,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         return false;
       }
 
-      List<int> valoresCanalesPantalon = List.filled(10, 0); // Inicializamos la lista de valoresCanales con ceros.
+      List<int> valoresCanalesPantalon = List.filled(
+          10, 0); // Inicializamos la lista de valoresCanales con ceros.
 
 // Asignar los valores de porcentajesMusculoPantalon a los canales
       valoresCanalesPantalon[0] = 0; // Forzar valor 0 en el índice 0
@@ -2308,7 +2434,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             "🔢 Canal ${i + 1}: ${valoresCanalesPantalon[i]} (Porcentaje: ${i < porcentajesMusculoPantalon.length ? porcentajesMusculoPantalon[i] : 0}%)");
       }
 
-
       // Paso 2: Obtener configuración del programa seleccionado
       Map<String, double> settings = getProgramSettings(selectedProgram);
       double frecuencia = settings['frecuencia'] ?? 50; // Valor por defecto
@@ -2324,7 +2449,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Paso 3: Iniciar la sesión de electroestimulación
       bool isElectroOn =
-      await widget.bleConnectionService._startElectrostimulationSession(
+          await widget.bleConnectionService._startElectrostimulationSession(
         macAddress,
         valoresCanalesPantalon,
         frecuencia,
@@ -2365,7 +2490,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       return false;
     }
   }
-
 
   Future<void> stopElectrostimulationTrajeProcess(String macAddress) async {
     try {
@@ -2539,6 +2663,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _phaseTimer?.cancel();
     if (kDebugMode) {
       print("⏲️ Temporizador de fase cancelado.");
+    }
+
+    timerSub?.cancel();
+    if (kDebugMode) {
+      print("⏲️ Temporizador de subprogramas cancelado.");
     }
 
     // Liberar el controlador de opacidad
@@ -3007,61 +3136,119 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         allAutomaticPrograms.isNotEmpty)
                                       Column(
                                         children: [
-                                          // Mostrar el nombre del programa seleccionado o el primer programa por defecto
-                                          Text(
-                                            selectedAutoProgram?[
-                                                        'nombre_programa_automatico']
-                                                    ?.toUpperCase() ??
-                                                (allAutomaticPrograms.isNotEmpty
-                                                    ? (allAutomaticPrograms[0][
-                                                                'nombre_programa_automatico']
-                                                            ?.toUpperCase() ??
-                                                        tr(context,
-                                                                'NOMBRE PROGRAMA')
-                                                            .toUpperCase())
-                                                    : tr(context,
-                                                            'No hay programas disponibles')
-                                                        .toUpperCase()),
-                                            style: TextStyle(
-                                              color: const Color(0xFF2be4f3),
-                                              fontSize: 15.sp,
-                                            ),
-                                          ),
+                                          // Si isRunning es true, mostrar el primer subprograma
+                                          if (selectedAutoProgram != null &&
+                                              selectedAutoProgram![
+                                                      'subprogramas']
+                                                  .isNotEmpty)
+                                            Column(
+                                              children: [
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: '${selectedAutoProgram!['nombre_programa_automatico']?.toUpperCase() ?? tr(context, 'Programa automático desconocido').toUpperCase()} ',
+                                                        style: TextStyle(
+                                                          color: const Color(0xFF2be4f3),
+                                                          fontSize: 15.sp,
+                                                          fontWeight:FontWeight.bold,
+                                                        ),
+                                                      ),
+                                            
+                                                    ],
+                                                  ),
+                                                ),
 
-                                          // Imagen del programa seleccionado o la imagen del primer programa por defecto
-                                          GestureDetector(
-                                            onTap: widget.selectedKey == null ||
-                                                    isRunning
-                                                ? null // Deshabilitar el pulsado si selectedKey es null
-                                                : () {
-                                                    setState(() {
-                                                      toggleOverlay(4);
-                                                    });
-                                                  },
-                                            child: Image.asset(
-                                              selectedAutoProgram != null
-                                                  ? selectedAutoProgram![
-                                                          'imagen'] ??
-                                                      'assets/images/cliente.png'
-                                                  : allAutomaticPrograms
-                                                          .isNotEmpty
-                                                      ? allAutomaticPrograms[0]
-                                                              ['imagen'] ??
-                                                          'assets/images/cliente.png'
-                                                      : 'assets/images/cliente.png',
-                                              // Imagen por defecto
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.1,
-                                              fit: BoxFit.contain,
+                                                GestureDetector(
+                                                  onTap: widget.selectedKey ==
+                                                              null ||
+                                                          isRunning
+                                                      ? null // Deshabilitar el pulsado si selectedKey es null
+                                                      : () {
+                                                          setState(() {
+                                                            toggleOverlay(4);
+                                                          });
+                                                        },
+                                                  child: Image.asset(
+                                                    selectedAutoProgram![
+                                                                    'subprogramas']
+                                                                [
+                                                                currentSubprogramIndex]
+                                                            ['imagen'] ??
+                                                        'assets/images/programacreado.png',
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.1,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          // Si isRunning es false, mostrar el programa automático
+                                          else
+                                            Column(
+                                              children: [
+                                                Text(
+                                                  selectedAutoProgram?[
+                                                              'nombre_programa_automatico']
+                                                          ?.toUpperCase() ??
+                                                      (allAutomaticPrograms
+                                                              .isNotEmpty
+                                                          ? (allAutomaticPrograms[
+                                                                          0][
+                                                                      'nombre_programa_automatico']
+                                                                  ?.toUpperCase() ??
+                                                              tr(context,
+                                                                      'NOMBRE PROGRAMA')
+                                                                  .toUpperCase())
+                                                          : tr(context,
+                                                                  'No hay programas disponibles')
+                                                              .toUpperCase()),
+                                                  style: TextStyle(
+                                                    color:
+                                                        const Color(0xFF2be4f3),
+                                                    fontSize: 15.sp,
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: widget.selectedKey ==
+                                                              null ||
+                                                          isRunning
+                                                      ? null // Deshabilitar el pulsado si selectedKey es null
+                                                      : () {
+                                                          setState(() {
+                                                            toggleOverlay(4);
+                                                          });
+                                                        },
+                                                  child: Image.asset(
+                                                    selectedAutoProgram != null
+                                                        ? selectedAutoProgram![
+                                                                'imagen'] ??
+                                                            'assets/images/cliente.png'
+                                                        : allAutomaticPrograms
+                                                                .isNotEmpty
+                                                            ? allAutomaticPrograms[
+                                                                        0][
+                                                                    'imagen'] ??
+                                                                'assets/images/cliente.png'
+                                                            : 'assets/images/cliente.png',
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.1,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
                                         ],
-                                      )
+                                      ),
                                   ],
                                 ),
-                                SizedBox(width: screenWidth * 0.01),
+                                SizedBox(width: screenWidth * 0.005),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -3154,18 +3341,104 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         allAutomaticPrograms.isNotEmpty)
                                       Column(
                                         children: [
-                                          Text(
-                                            selectedAutoProgram != null
-                                                ? "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min"
-                                                : allAutomaticPrograms
-                                                        .isNotEmpty
-                                                    ? "${formatNumber(allAutomaticPrograms[0]['duracionTotal'] as double)} min"
-                                                    : "N/A",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15.sp,
+                                          // Si isRunning es true y hay subprogramas, mostrar la frecuencia y pulso del primer subprograma
+                                          if (selectedAutoProgram != null &&
+                                              selectedAutoProgram![
+                                                      'subprogramas']
+                                                  .isNotEmpty)
+                                            Column(
+                                              children: [
+                                                // Mostrar frecuencia y pulso del subprograma
+                                                Column(
+                                                  children: [
+                                                    Text.rich(
+                                                      TextSpan(
+                                                        children: [
+                                                          TextSpan(
+                                                            text: ' ${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['orden']  ?? tr(context, 'Subprograma desconocido')}${'. '}',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 15.sp, // Tamaño más pequeño para el nombre del subprograma
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text: '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 15.sp, // Tamaño más pequeño para el nombre del subprograma
+                                                              decoration: TextDecoration.underline,
+                                                              decorationColor: Colors.white,
+                                                              ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // Frecuencia
+                                                    Text(
+                                                      selectedAutoProgram !=
+                                                                  null &&
+                                                              selectedAutoProgram![
+                                                                      'subprogramas']
+                                                                  .isNotEmpty
+                                                          ? "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] as double) : 'N/A'} Hz"
+                                                          : "N/A",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15.sp,
+                                                      ),
+                                                    ),
+                                                    // Pulso
+                                                    Text(
+                                                      selectedAutoProgram !=
+                                                                  null &&
+                                                              selectedAutoProgram![
+                                                                      'subprogramas']
+                                                                  .isNotEmpty
+                                                          ? "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] as double) : 'N/A'} ms"
+                                                          : "N/A",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15.sp,
+                                                      ),
+                                                    ),
+                                                    // Tiempo restante dinámico
+                                                    Text(
+                                                      selectedAutoProgram !=
+                                                                  null &&
+                                                              selectedAutoProgram![
+                                                                      'subprogramas']
+                                                                  .isNotEmpty
+                                                          ? formatTime(
+                                                              remainingTime)
+                                                          : "N/A",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15.sp,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            )
+                                          // Si no hay subprogramas o isRunning es falso, no se muestra nada
+                                          else
+                                            Column(
+                                              children: [
+                                                // Mostrar duración total
+                                                Text(
+                                                  selectedAutoProgram != null
+                                                      ? "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min"
+                                                      : allAutomaticPrograms
+                                                              .isNotEmpty
+                                                          ? "${formatNumber(allAutomaticPrograms[0]['duracionTotal'] as double)} min"
+                                                          : "N/A",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 15.sp,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
                                         ],
                                       ),
                                   ],
@@ -3919,13 +4192,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             if (time < 30) {
                                                               // Máximo valor de time es 30
                                                               time++; // Aumentar el tiempo
-                                                              totalTime = time *
-                                                                  60; // Actualiza el tiempo total en segundos
-                                                              // Calcula el índice de la imagen con el nuevo tiempo
-                                                              _currentImageIndex =
-                                                                  31 - time;
-
-                                                              // Imprime el tiempo actualizado en consola
+                                                              _updateTime(time);
+                                                              // No se ejecuta _startTimer, solo se actualiza el tiempo y el índice
                                                               print(
                                                                   'Tiempo actualizado: $time minutos (${totalTime}s)');
                                                             }
@@ -3954,13 +4222,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             if (time > 1) {
                                                               // Mínimo valor de time es 1
                                                               time--; // Disminuir el tiempo
-                                                              totalTime = time *
-                                                                  60; // Actualiza el tiempo total en segundos
-                                                              // Calcula el índice de la imagen con el nuevo tiempo
-                                                              _currentImageIndex =
-                                                                  31 - time;
+                                                              _updateTime(time);
 
-                                                              // Imprime el tiempo actualizado en consola
+                                                              // No se ejecuta _startTimer, solo se actualiza el tiempo y el índice
                                                               print(
                                                                   'Tiempo actualizado: $time minutos (${totalTime}s)');
                                                             }
@@ -4669,7 +4933,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           SizedBox(width: screenWidth * 0.01),
                                           // Botón de control de sesión (Reproducir/Pausar)
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null
+                                            onTap: selectedAutoProgram == null || widget.selectedKey == null
                                                 ? null // Si selectedKey es null, el botón estará deshabilitado
                                                 : () {
                                                     setState(() {
@@ -5438,6 +5702,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               // Calcula el índice de la imagen con el nuevo tiempo
                                                               _currentImageIndex =
                                                                   31 - time;
+
+                                                              // No se ejecuta _startTimer, solo se actualiza el tiempo y el índice
+                                                              print(
+                                                                  'Tiempo actualizado: $time minutos (${totalTime}s)');
                                                             }
                                                           });
                                                         },
@@ -5469,6 +5737,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               // Calcula el índice de la imagen con el nuevo tiempo
                                                               _currentImageIndex =
                                                                   31 - time;
+
+                                                              // No se ejecuta _startTimer, solo se actualiza el tiempo y el índice
+                                                              print(
+                                                                  'Tiempo actualizado: $time minutos (${totalTime}s)');
                                                             }
                                                           });
                                                         },
@@ -6061,7 +6333,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                           // Botón de control de sesión (Reproducir/Pausar)
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null
+                                            onTap: selectedAutoProgram == null || widget.selectedKey == null
                                                 ? null // Si selectedKey es null, el botón estará deshabilitado
                                                 : () {
                                                     setState(() {
@@ -6654,6 +6926,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     return number % 1 == 0
         ? number.toInt().toString()
         : number.toStringAsFixed(2);
+  }
+
+  String formatTime(int seconds) {
+    int minutes = seconds ~/ 60;
+    int secs = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
   // Función para obtener la frecuencia y la rampa del programa seleccionado
@@ -7617,7 +7895,6 @@ class BleConnectionService {
     } else {
       debugPrint("⏲️ No había timers activos para el estado.");
     }
-
 
     if (_scanStream != null) {
       _scanStream?.cancel();
