@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 import '../../servicios/licencia_state.dart';
@@ -1522,6 +1523,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Timer? _phaseTimer;
   Timer? timerSub;
   String currentStatus = '';
+  bool isPauseStarted = false;
   bool isTimeless = false;
   bool _isExpanded1 = false;
   bool _isExpanded2 = false;
@@ -1583,7 +1585,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valuePause = 1.0;
   double contractionDuration = 0.0;
 
-  Map<int, double> subprogramElapsedTime = {};  // Almacena elapsedTimeSub para cada subprograma
+  Map<int, double> subprogramElapsedTime =
+      {}; // Almacena elapsedTimeSub para cada subprograma
   Map<int, int> subprogramRemainingTime = {};
   List<Map<String, dynamic>> selectedClients = [];
   List<Map<String, dynamic>> allIndividualPrograms = [];
@@ -1723,6 +1726,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         _clientsProvider = Provider.of<ClientsProvider>(context, listen: false);
       });
     });
+    loadCachedPrograms();
   }
 
   @override
@@ -1790,12 +1794,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   void _clearGlobals() {
-    setState(() {
+    if(mounted) {
+      setState(() {
       // Verifica si la sesión se ha iniciado antes de detenerla
       isElectroOn = false;
 
       // Restablecer variables globales
       selectedProgram = null;
+      selectedAutoProgram = null;
       selectedClient = null;
 
       isSessionStarted = false;
@@ -1829,6 +1835,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Restablecer el estado de la imagen y su índice
       _currentImageIndex = 31 - 25;
       currentSubprogramIndex = 0;
+      remainingTime = 0;
 
       // Restablecer la lista de músculos inactivos
       _isMusculoTrajeInactivo.fillRange(0, 10, false);
@@ -1838,8 +1845,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       _isMusculoTrajeBloqueado.fillRange(0, 10, false);
       _isMusculoPantalonBloqueado.fillRange(0, 7, false);
 
-      subprogramElapsedTime={};
-      subprogramRemainingTime={};
+      // Limpiar las variables de los temporizadores de los subprogramas
+      subprogramElapsedTime = {};
+      subprogramRemainingTime = {};
 
       // Restablecer los porcentajes
       porcentajesMusculoTraje.fillRange(0, 10, 0);
@@ -1861,10 +1869,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       progressPause = 0.0;
       startTime = DateTime.now();
       pausedTime = 0.0;
+
+      // Cancelar cualquier temporizador activo
       _phaseTimer?.cancel();
       timerSub?.cancel();
       _timer.cancel();
+
+      // Restablecer los temporizadores de subprograma (reiniciar todo)
+      remainingTime = 0;
+      elapsedTimeSub = 0.0;
+      currentSubprogramIndex = 0;
     });
+    }
     Navigator.of(context).pop();
   }
 
@@ -1947,6 +1963,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           allAutomaticPrograms =
               groupedPrograms; // Asigna los programas obtenidos a la lista
         });
+        _saveProgramsToCache(groupedPrograms);
       }
     } catch (e) {
       debugPrint('Error fetching programs: $e');
@@ -1975,6 +1992,42 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
 
     return groupedPrograms;
+  }
+
+  Future<void> _saveProgramsToCache(List<Map<String, dynamic>> programs) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Convertir la lista de programas a formato JSON y guardarla
+    String jsonPrograms = jsonEncode(programs);
+    await prefs.setString('cachedPrograms', jsonPrograms);
+  }
+
+  Future<List<Map<String, dynamic>>> _loadProgramsFromCache() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Obtener los datos guardados en caché
+    String? cachedData = prefs.getString('cachedPrograms');
+
+    if (cachedData != null) {
+      // Si hay datos en caché, convertirlos de JSON a lista de Map<String, dynamic>
+      List<dynamic> decodedData = jsonDecode(cachedData);
+      return List<Map<String, dynamic>>.from(decodedData);
+    }
+    return [];
+  }
+
+  void loadCachedPrograms() async {
+    List<Map<String, dynamic>> cachedPrograms = await _loadProgramsFromCache();
+    if (cachedPrograms.isNotEmpty) {
+      if(mounted) {
+        setState(() {
+        allAutomaticPrograms = cachedPrograms;
+      });
+      }
+    } else {
+      // Si no hay programas en caché, puedes optar por llamar a _fetchAutoPrograms nuevamente.
+      await _fetchAutoPrograms();
+    }
   }
 
   void updateContractionAndPauseValues() {
@@ -2070,17 +2123,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   void _pauseTimer(String macAddress) {
-    setState(() {
-      if (isElectroOn) {
-        widget.bleConnectionService._stopElectrostimulationSession(macAddress);
-      }
-      isRunning = false;
-      pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
-      _timer.cancel();
-      stopSubprogramTimer(); // Detiene el temporizador de subprograma
-      _phaseTimer?.cancel(); // Detiene el temporizador de fase
-    });
-
+    if (mounted) {
+      setState(() {
+        if (isElectroOn) {
+          widget.bleConnectionService
+              ._stopElectrostimulationSession(macAddress);
+        }
+        isRunning = false;
+        pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
+        _timer.cancel();
+        stopSubprogramTimer(); // Detiene el temporizador de subprograma
+        _phaseTimer?.cancel(); // Detiene el temporizador de fase
+      });
+    }
   }
 
   void _startContractionTimer(
@@ -2229,12 +2284,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Obtener la duración en minutos del subprograma actual y convertirla a segundos
       double durationInMinutes = programToUse['subprogramas'][currentSubprogramIndex]['duracion'] as double;
 
+      // Si el subprograma es el primero (índice 0), no restar nada
+      // Para los subprogramas posteriores, restar 1 segundo
+      int durationInSeconds;
+      if (currentSubprogramIndex > 0) {
+        durationInSeconds = (durationInMinutes * 60).toInt() - 1; // Restar 1 segundo solo a partir del segundo subprograma
+      } else {
+        durationInSeconds = (durationInMinutes * 60).toInt(); // No restar nada en el primer subprograma
+      }
+
       // Inicializar o recuperar los tiempos para el subprograma actual
       if (!subprogramElapsedTime.containsKey(currentSubprogramIndex)) {
         subprogramElapsedTime[currentSubprogramIndex] = 0.0;  // Si no tiene valor, inicializar
       }
       if (!subprogramRemainingTime.containsKey(currentSubprogramIndex)) {
-        subprogramRemainingTime[currentSubprogramIndex] = (durationInMinutes * 60).toInt();  // Duración en segundos
+        subprogramRemainingTime[currentSubprogramIndex] = durationInSeconds;  // Duración en segundos
       }
 
       // Actualizar remainingTime y elapsedTimeSub para el subprograma actual
@@ -2243,13 +2307,20 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       print("Iniciando subprograma $currentSubprogramIndex con duración: $remainingTime segundos");
 
+      if (isContractionPhase && selectedAutoProgram != null && !isPauseStarted) {
+        // Iniciar primero el temporizador de pausa solo si las tres condiciones son verdaderas
+        _startPauseTimer(valuePause, widget.macAddress!, porcentajesMusculoTraje, porcentajesMusculoPantalon);
+        isPauseStarted = true;  // Marcar que la pausa ha comenzado
+      }
+
+
       // Iniciar temporizador para este subprograma
       timerSub = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (remainingTime > 0) {
           if (mounted) {
             setState(() {
               remainingTime--;
-              elapsedTimeSub += 1.0; // Aumentar el tiempo transcurrido en segundos
+              elapsedTimeSub += 1.0;  // Aumentar el tiempo transcurrido en segundos
               subprogramRemainingTime[currentSubprogramIndex] = remainingTime;  // Actualizar remainingTime en el mapa
               subprogramElapsedTime[currentSubprogramIndex] = elapsedTimeSub;  // Actualizar elapsedTime en el mapa
             });
@@ -2261,7 +2332,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           // Pasar al siguiente subprograma
           currentSubprogramIndex++;
           updateContractionAndPauseValues();
-          startSubprogramTimer();
+          startSubprogramTimer();  // Iniciar el siguiente subprograma
         }
       });
     } else {
@@ -2287,14 +2358,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     subprogramElapsedTime[currentSubprogramIndex] = elapsedTimeSub;
     subprogramRemainingTime[currentSubprogramIndex] = remainingTime;
 
-    print("Temporizador detenido. Tiempo transcurrido: $elapsedTimeSub segundos.");
+    print(
+        "Temporizador detenido. Tiempo transcurrido: $elapsedTimeSub segundos.");
   }
-
 
   Future<void> executePeriodically(
       List<String> macAddresses, int endpoint, int mode) async {
     // El temporizador que ejecutará la función cada 5 segundos
-    Timer.periodic(Duration(seconds: 5), (timer) async {
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
       try {
         for (var macAddress in macAddresses) {
           // Llamada a la función getElectrostimulatorState con los parámetros deseados
@@ -2324,16 +2395,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           10, 0); // Inicializamos la lista de valoresCanales con ceros.
 
       // Asignar los valores de porcentajesMusculoTraje a los canales
-      valoresCanalesTraje[0] = porcentajesMusculoTraje[5] * 10;
-      valoresCanalesTraje[1] = porcentajesMusculoTraje[6] * 10;
-      valoresCanalesTraje[2] = porcentajesMusculoTraje[7] * 10;
-      valoresCanalesTraje[3] = porcentajesMusculoTraje[8] * 10;
-      valoresCanalesTraje[4] = porcentajesMusculoTraje[9] * 10;
-      valoresCanalesTraje[5] = porcentajesMusculoTraje[0] * 10;
-      valoresCanalesTraje[6] = porcentajesMusculoTraje[2] * 10;
-      valoresCanalesTraje[7] = porcentajesMusculoTraje[3] * 10;
-      valoresCanalesTraje[8] = porcentajesMusculoTraje[1] * 10;
-      valoresCanalesTraje[9] = porcentajesMusculoTraje[4] * 10;
+      valoresCanalesTraje[0] = porcentajesMusculoTraje[5];
+      valoresCanalesTraje[1] = porcentajesMusculoTraje[6];
+      valoresCanalesTraje[2] = porcentajesMusculoTraje[7];
+      valoresCanalesTraje[3] = porcentajesMusculoTraje[8];
+      valoresCanalesTraje[4] = porcentajesMusculoTraje[9];
+      valoresCanalesTraje[5] = porcentajesMusculoTraje[0];
+      valoresCanalesTraje[6] = porcentajesMusculoTraje[2];
+      valoresCanalesTraje[7] = porcentajesMusculoTraje[3];
+      valoresCanalesTraje[8] = porcentajesMusculoTraje[1];
+      valoresCanalesTraje[9] = porcentajesMusculoTraje[4];
 
       // Debug: Mostrar los porcentajes y los valores asignados a cada canal
       for (int i = 0; i < 10; i++) {
@@ -2347,11 +2418,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       double rampa = settings['rampa'] ?? 0;
       double pulso = settings['pulso'] ?? 0;
 
-      frecuencia *= 10;
       // Ajustar la rampa multiplicándola por 100ms
-      rampa *= 100;
+      rampa *= 10;
       // Ajustar la anchura de pulso multiplicándola por 5 microsegundos
-      pulso *= 5;
+      pulso /= 5;
 
       debugPrint(
           "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso µs");
@@ -2419,14 +2489,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 // Asignar los valores de porcentajesMusculoPantalon a los canales
       valoresCanalesPantalon[0] = 0; // Forzar valor 0 en el índice 0
       valoresCanalesPantalon[1] = 0; // Forzar valor 0 en el índice 1
-      valoresCanalesPantalon[2] = porcentajesMusculoPantalon[4] * 10;
-      valoresCanalesPantalon[3] = porcentajesMusculoPantalon[5] * 10;
-      valoresCanalesPantalon[4] = porcentajesMusculoPantalon[6] * 10;
+      valoresCanalesPantalon[2] = porcentajesMusculoPantalon[4];
+      valoresCanalesPantalon[3] = porcentajesMusculoPantalon[5];
+      valoresCanalesPantalon[4] = porcentajesMusculoPantalon[6];
       valoresCanalesPantalon[5] = 0; // Forzar valor 0 en el índice 5
-      valoresCanalesPantalon[6] = porcentajesMusculoPantalon[1] * 10;
-      valoresCanalesPantalon[7] = porcentajesMusculoPantalon[2] * 10;
-      valoresCanalesPantalon[8] = porcentajesMusculoPantalon[0] * 10;
-      valoresCanalesPantalon[9] = porcentajesMusculoPantalon[3] * 10;
+      valoresCanalesPantalon[6] = porcentajesMusculoPantalon[1];
+      valoresCanalesPantalon[7] = porcentajesMusculoPantalon[2];
+      valoresCanalesPantalon[8] = porcentajesMusculoPantalon[0];
+      valoresCanalesPantalon[9] = porcentajesMusculoPantalon[3];
 
 // Debug: Mostrar los valores asignados
       for (int i = 0; i < valoresCanalesPantalon.length; i++) {
@@ -2441,8 +2511,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       double pulso = settings['pulso'] ?? 20; // Valor por defecto
 
       // Ajustar los valores según las conversiones necesarias
-      rampa *= 100;
-      pulso *= 5;
+      rampa *= 10;
+      pulso /= 5;
 
       debugPrint(
           "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso µs");
@@ -2578,8 +2648,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                     OutlinedButton(
                       onPressed: () async {
                         _clearGlobals();
-                        await widget.bleConnectionService
-                            ._stopElectrostimulationSession(widget.macAddress!);
+                        if (isElectroOn) {
+                          await widget.bleConnectionService
+                              ._stopElectrostimulationSession(
+                                  widget.macAddress!);
+                        }
                       },
                       style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.red),
@@ -3147,18 +3220,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   TextSpan(
                                                     children: [
                                                       TextSpan(
-                                                        text: '${selectedAutoProgram!['nombre_programa_automatico']?.toUpperCase() ?? tr(context, 'Programa automático desconocido').toUpperCase()} ',
+                                                        text:
+                                                            '${selectedAutoProgram!['nombre_programa_automatico']?.toUpperCase() ?? tr(context, 'Programa automático desconocido').toUpperCase()} ',
                                                         style: TextStyle(
-                                                          color: const Color(0xFF2be4f3),
+                                                          color: const Color(
+                                                              0xFF2be4f3),
                                                           fontSize: 15.sp,
-                                                          fontWeight:FontWeight.bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                         ),
                                                       ),
-                                            
                                                     ],
                                                   ),
                                                 ),
-
                                                 GestureDetector(
                                                   onTap: widget.selectedKey ==
                                                               null ||
@@ -3355,20 +3429,29 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       TextSpan(
                                                         children: [
                                                           TextSpan(
-                                                            text: ' ${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['orden']  ?? tr(context, 'Subprograma desconocido')}${'. '}',
+                                                            text:
+                                                                ' ${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['orden'] ?? tr(context, 'Subprograma desconocido')}${'. '}',
                                                             style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 15.sp, // Tamaño más pequeño para el nombre del subprograma
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 15
+                                                                  .sp, // Tamaño más pequeño para el nombre del subprograma
                                                             ),
                                                           ),
                                                           TextSpan(
-                                                            text: '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
+                                                            text:
+                                                                '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
                                                             style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 15.sp, // Tamaño más pequeño para el nombre del subprograma
-                                                              decoration: TextDecoration.underline,
-                                                              decorationColor: Colors.white,
-                                                              ),
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 15.sp,
+                                                              // Tamaño más pequeño para el nombre del subprograma
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .underline,
+                                                              decorationColor:
+                                                                  Colors.white,
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
@@ -3412,8 +3495,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               remainingTime)
                                                           : "N/A",
                                                       style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 15.sp,
+                                                          color: const Color(0xFF2be4f3),
+                                                        fontSize: 18.sp,
+                                                        fontWeight: FontWeight.bold
                                                       ),
                                                     ),
                                                   ],
@@ -4933,7 +5017,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           SizedBox(width: screenWidth * 0.01),
                                           // Botón de control de sesión (Reproducir/Pausar)
                                           GestureDetector(
-                                            onTap: selectedAutoProgram == null || widget.selectedKey == null
+                                            onTap: selectedAutoProgram ==
+                                                        null ||
+                                                    widget.selectedKey == null
                                                 ? null // Si selectedKey es null, el botón estará deshabilitado
                                                 : () {
                                                     setState(() {
@@ -6333,7 +6419,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                           // Botón de control de sesión (Reproducir/Pausar)
                                           GestureDetector(
-                                            onTap: selectedAutoProgram == null || widget.selectedKey == null
+                                            onTap: selectedAutoProgram ==
+                                                        null ||
+                                                    widget.selectedKey == null
                                                 ? null // Si selectedKey es null, el botón estará deshabilitado
                                                 : () {
                                                     setState(() {
@@ -6986,6 +7074,38 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             ? allRecoveryPrograms[0]['pulso'] as double
             : 0;
       }
+    } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
+        allAutomaticPrograms.isNotEmpty) {
+      if (selectedAutoProgram != null) {
+        // Aquí puedes acceder a los valores de cada subprograma
+        var subprogram = selectedAutoProgram!['subprogramas'][currentSubprogramIndex];
+
+        frecuencia = subprogram['frecuencia'] != null
+            ? subprogram['frecuencia'] as double
+            : 0;
+        rampa = subprogram['rampa'] != null
+            ? subprogram['rampa'] as double
+            : 0;
+        pulso = subprogram['pulso'] != null
+            ? subprogram['pulso'] as double
+            : 0;
+      } else {
+        var subprogram = allAutomaticPrograms.isNotEmpty
+            ? allAutomaticPrograms[0]['subprogramas'][0]
+            : null;
+
+        if (subprogram != null) {
+          frecuencia = subprogram['frecuencia'] != null
+              ? subprogram['frecuencia'] as double
+              : 0;
+          rampa = subprogram['rampa'] != null
+              ? subprogram['rampa'] as double
+              : 0;
+          pulso = subprogram['pulso'] != null
+              ? subprogram['pulso'] as double
+              : 0;
+        }
+      }
     }
 
     return {
@@ -7354,23 +7474,23 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Widget buildControlRow({
     required double value, // El valor que se va a mostrar y modificar
     required String imagePathIncrement, // Ruta de la imagen para el botón "Más"
-    required String
-        imagePathDecrement, // Ruta de la imagen para el botón "Menos"
-    required String
-        imagePathDisplay, // Ruta de la imagen para mostrar (como la imagen de CONTRACCION)
+    required String imagePathDecrement, // Ruta de la imagen para el botón "Menos"
+    required String imagePathDisplay, // Ruta de la imagen para mostrar (como la imagen de CONTRACCION)
     required Function onIncrement, // Lógica de incremento
     required Function onDecrement, // Lógica de decremento
-    required String
-        suffix, // Sufijo para el valor (por ejemplo: "S" para contracción)
+    required String suffix, // Sufijo para el valor (por ejemplo: "S" para contracción)
     required double screenWidth, // El ancho de la pantalla
     required double screenHeight, // El alto de la pantalla
   }) {
+    // Condición para bloquear los botones si selectedProgram no es nulo
+    bool isButtonEnabled = selectedProgram == null;  // Asegúrate de que selectedProgram esté accesible en el contexto
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Botón de "Más"
         GestureDetector(
-          onTap: () => onIncrement(),
+          onTap: isButtonEnabled ? () => onIncrement() : null, // Solo se ejecuta si el botón está habilitado
           child: SizedBox(
             width: 45.0,
             height: 45.0,
@@ -7394,11 +7514,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             color: Colors.white,
           ),
         ),
-
         SizedBox(width: screenWidth * 0.01),
         // Botón de "Menos"
         GestureDetector(
-          onTap: () => onDecrement(),
+          onTap: isButtonEnabled ? () => onDecrement() : null, // Solo se ejecuta si el botón está habilitado
           child: SizedBox(
             width: 45.0,
             height: 45.0,
@@ -7421,6 +7540,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       ],
     );
   }
+
 }
 
 class BleConnectionService {
@@ -7659,8 +7779,9 @@ class BleConnectionService {
       ).listen((event) async {
         switch (event.connectionState) {
           case DeviceConnectionState.connected:
-            if (kDebugMode)
+            if (kDebugMode) {
               print("🔗--->>> Dispositivo $macAddress conectado.");
+            }
             success = true;
 
             // Descubrir servicios
@@ -7798,8 +7919,9 @@ class BleConnectionService {
   }
 
   void _onDeviceDisconnected(String macAddress) {
-    if (kDebugMode)
+    if (kDebugMode) {
       print("️‍️‍⛓️‍💥--->>>Dispositivo $macAddress desconectado.");
+    }
     connectedDevices.remove(macAddress);
 
     // Cancelar el stream asociado a la MAC
@@ -8719,10 +8841,10 @@ $endpoints
     requestPacket[2] = limitador;
 
 // Multiplicamos la rampa por 100ms
-    requestPacket[3] = (rampa * 100).toInt(); // Rampa en x100ms
+    requestPacket[3] = (rampa).toInt(); // Rampa en x100ms
 
 // Multiplicamos la frecuencia por 10 (ya que la frecuencia está en x10Hz)
-    requestPacket[4] = (frecuencia * 10).toInt(); // Frecuencia en x10 Hz
+    requestPacket[4] = (frecuencia).toInt(); // Frecuencia en x10 Hz
 
     requestPacket[5] = deshabilitaElevador;
 
@@ -8739,11 +8861,11 @@ $endpoints
       requestPacket[8] = requestPacket[9] = requestPacket[10] =
           requestPacket[11] = requestPacket[12] = requestPacket[13] =
               requestPacket[14] = requestPacket[15] = requestPacket[16] =
-                  requestPacket[17] = anchuraPulsosPorCanal[0] * 5;
+                  requestPacket[17] = anchuraPulsosPorCanal[0];
     } else {
       // Si no es 0, usamos los valores proporcionados para cada canal multiplicados por 5µs
       for (int i = 0; i < 10; i++) {
-        requestPacket[8 + i] = anchuraPulsosPorCanal[i] * 5;
+        requestPacket[8 + i] = anchuraPulsosPorCanal[i];
       }
     }
 
