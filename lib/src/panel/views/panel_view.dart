@@ -56,6 +56,8 @@ class _PanelViewState extends State<PanelView> {
 
   ValueNotifier<List<String>> successfullyConnectedDevices = ValueNotifier([]);
   List<String> connectedDevices = [];
+  // Lista para almacenar las macAddresses seleccionadas
+  List<String> groupedMcis = [];
   Map<String, dynamic>? selectedClient;
   final Map<String, String> deviceConnectionStatus = {};
   Map<String, String> clientsNames = {};
@@ -107,7 +109,7 @@ class _PanelViewState extends State<PanelView> {
     // 2. Cargar los datos desde AppState
     await AppState.instance.loadState();
     List<String> macAddresses =
-    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
     debugPrint("🔍 Direcciones MAC obtenidas: $macAddresses");
 
@@ -139,9 +141,8 @@ class _PanelViewState extends State<PanelView> {
       deviceConnectionStatus[macAddress] = 'desconectado';
 
       // Escuchar el estado de conexión para cada dispositivo
-      bleConnectionService
-          .connectionStateStream(macAddress)
-          .listen((isConnected) {
+      bleConnectionService.connectionStateStream(macAddress).listen(
+          (isConnected) {
         if (isConnected) {
           // Agregar a conexiones exitosas si está conectado
           if (!successfullyConnectedDevices.value.contains(macAddress)) {
@@ -152,7 +153,8 @@ class _PanelViewState extends State<PanelView> {
           }
         } else {
           // Remover de conexiones exitosas si está desconectado
-          successfullyConnectedDevices.value = successfullyConnectedDevices.value
+          successfullyConnectedDevices.value = successfullyConnectedDevices
+              .value
               .where((device) => device != macAddress)
               .toList();
         }
@@ -161,7 +163,7 @@ class _PanelViewState extends State<PanelView> {
         if (mounted) {
           setState(() {
             deviceConnectionStatus[macAddress] =
-            isConnected ? 'conectado' : 'desconectado';
+                isConnected ? 'conectado' : 'desconectado';
           });
         }
       }, onError: (error) {
@@ -176,8 +178,6 @@ class _PanelViewState extends State<PanelView> {
 
     debugPrint("✅ Inicialización BLE completada.");
   }
-
-
 
   void updateDeviceSelection(String mac, String group) {
     setState(() {
@@ -237,14 +237,17 @@ class _PanelViewState extends State<PanelView> {
     int indexForGroup = group == "A"
         ? 0
         : group == "B"
-            ? 1
-            : -1;
+        ? 1
+        : -1;
 
     // Seleccionamos los dispositivos del grupo
     groupedDevices[group]?.forEach((deviceMac) {
       isSelected[deviceMac] = true;
       equipSelectionMap[deviceMac] =
           indexForGroup; // Actualiza el índice para el dispositivo
+
+      // Agregar a la lista groupedMcis
+      groupedMcis.add(deviceMac);
 
       // Agregar un print para ver cómo se actualiza equipSelectionMap
       print("🔄 equipSelectionMap actualizado: $deviceMac -> $indexForGroup");
@@ -263,7 +266,11 @@ class _PanelViewState extends State<PanelView> {
     // Asignamos el índice global del grupo
     selectedIndex = indexForGroup; // Establecemos el índice del grupo
     print("📊 Índice global del grupo seleccionado: $selectedIndex");
+
+    // Mostrar las macAddresses seleccionadas
+    print("📋 Lista de dispositivos seleccionados (groupedMcis): $groupedMcis");
   }
+
 
   void updateEquipSelection(String key, int selectedIndex) {
     setState(() {
@@ -2124,8 +2131,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       setState(() {
         isRunning = true;
         isSessionStarted = true;
-        isElectroOn = true;
-        // Si pausedTime tiene un valor previo, reanuda desde donde quedó
         startTime = DateTime.now();
 
         // Inicia o reanuda el temporizador principal
@@ -2197,7 +2202,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       setState(() {
         stopElectrostimulationProcess(widget.macAddress!);
         isRunning = false;
-        isElectroOn = false;
         isSessionStarted = false;
         pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
         _timer.cancel();
@@ -2210,10 +2214,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void _stopAllTimersAndReset(String macAddress) {
     if (mounted) {
-      setState(() {
-        // Llamar a _clearGlobals para reiniciar todas las variables
-        _clearGlobals();
-        stopElectrostimulationProcess(widget.macAddress!);
+      // Pausa el temporizador antes de reiniciar las variables globales
+      _pauseTimer(widget.macAddress!);
+
+      // Espera 2 segundos antes de reiniciar las variables globales
+      Future.delayed(const Duration(seconds: 4), () {
+        if (mounted) {
+          setState(() {
+            _clearGlobals(); // Reinicia las variables globales
+            debugPrint("🔄 Variables globales reiniciadas después de la pausa.");
+          });
+        }
       });
     }
   }
@@ -2227,7 +2238,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
 
     // Verificar y sincronizar con el estado BLE
-    if (!isElectroOn) {
+    if (isElectroOn==false) {
       if (selectedIndexEquip == 0) {
         // Si el índice seleccionado es 0, iniciar la sesión para traje
         startFullElectrostimulationTrajeProcess(
@@ -2301,43 +2312,38 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
-  void _startPauseTimer(
-    double pauseDuration,
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    List<int> porcentajesMusculoPantalon,
-  ) {
-    // Cancelar cualquier temporizador previo
+  Future<void> _startPauseTimer(
+      double pauseDuration,
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      List<int> porcentajesMusculoPantalon,
+      ) async {
+    // Detener cualquier temporizador previo
     _phaseTimer?.cancel();
 
-    // Detener la electroestimulación antes de iniciar la pausa
-    stopElectrostimulationProcess(widget.macAddress!).then((success) {
-      if (success) {
-        debugPrint("✅ Electroestimulación detenida antes de iniciar la pausa.");
-      } else {
-        debugPrint(
-            "⚠️ No se pudo detener la electroestimulación antes de iniciar la pausa.");
-      }
+    try {
+      // Intentar detener la electroestimulación antes de iniciar la pausa
+      bool success = await stopElectrostimulationProcess(widget.macAddress!);
 
-      // Iniciar la fase de pausa
-      _startPausePhase(
-        pauseDuration,
-        macAddress,
-        porcentajesMusculoTraje,
-        porcentajesMusculoPantalon,
-      );
-    }).catchError((e) {
+      if (success) {
+        debugPrint(
+            "✅ Electroestimulación detenida correctamente antes de la pausa.");
+        // Iniciar la fase de pausa, independientemente del resultado
+        _startPausePhase(
+          pauseDuration,
+          widget.macAddress!,
+          porcentajesMusculoTraje,
+          porcentajesMusculoPantalon,
+        );
+      } else {
+        debugPrint("⚠️ No había electroestimulación activa para detener.");
+      }
+    } catch (e) {
       debugPrint(
-          "❌ Error al detener la electroestimulación durante la pausa: $e");
-      // Continuar con la pausa incluso si detener la electroestimulación falla
-      _startPausePhase(
-        pauseDuration,
-        macAddress,
-        porcentajesMusculoTraje,
-        porcentajesMusculoPantalon,
-      );
-    });
+          "❌ Error al detener la electroestimulación antes de la pausa: $e");
+    }
   }
+
 
   void _startPausePhase(
     double pauseDuration,
@@ -2509,7 +2515,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Iniciar sesión de electroestimulación
       final isElectroOn =
           await bleConnectionService._startElectrostimulationSession(
-        macAddress,
+        widget.macAddress!,
         valoresCanalesTraje,
         frecuencia,
         rampa,
@@ -2523,7 +2529,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Controlar todos los canales del dispositivo
       final response = await bleConnectionService._controlAllChannels(
-        macAddress,
+        widget.macAddress!,
         1, // Endpoint
         0, // Modo
         valoresCanalesTraje,
@@ -2752,6 +2758,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       },
     );
   }
+
 
   void onProgramSelected(String program) {
     setState(() {
@@ -5094,8 +5101,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             porcentajesMusculoTraje,
                                                             porcentajesMusculoPantalon);
                                                       }
-                                                      isElectroOn =
-                                                          !isElectroOn;
+
                                                       debugPrint(
                                                           'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
                                                     });
@@ -7620,7 +7626,7 @@ class BleConnectionService {
     targetDeviceIds.addAll(macAddresses);
     debugPrint(
         "🔄 Lista de dispositivos objetivo actualizada: $targetDeviceIds");
-    for (String deviceId in targetDeviceIds ){
+    for (String deviceId in targetDeviceIds) {
       _connectToDeviceByMac(deviceId);
     }
   }
@@ -7715,7 +7721,6 @@ class BleConnectionService {
 
     return success;
   }
-
 
   void _onDeviceDisconnected(String macAddress) {
     if (kDebugMode) {
@@ -7982,13 +7987,14 @@ class BleConnectionService {
     requestPacket[0] = 0x02; // FUN_INFO
 
     try {
-      // Cancelar cualquier suscripción activa antes de iniciar una nueva
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar cualquier suscripción activa previa para este dispositivo
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
-      // Completar la operación cuando se reciba la respuesta
       final completer = Completer<Map<String, dynamic>>();
-      notificationSubscription = flutterReactiveBle
+
+      // Suscribirse a las notificaciones
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x03) {
@@ -8009,26 +8015,44 @@ class BleConnectionService {
           completer.complete(deviceInfo);
           debugPrint("📥 FUN_INFO_R recibido desde $macAddress: $deviceInfo");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Guardar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_INFO
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint("📤 FUN_INFO enviado a $macAddress.");
 
       // Esperar la respuesta con timeout
       final deviceInfo =
-          await completer.future.timeout(const Duration(seconds: 15));
-      notificationSubscription?.cancel();
+      await completer.future.timeout(const Duration(seconds: 15));
+
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return deviceInfo;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      rethrow;
     } catch (e) {
       debugPrint("❌ Error al obtener FUN_INFO de $macAddress: $e");
-      notificationSubscription?.cancel();
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
       rethrow;
     }
   }
+
 
   // Función para parsear información en formato texto
   String parseDeviceInfo(Map<String, dynamic> deviceInfo) {
@@ -8098,50 +8122,63 @@ $endpoints
     requestPacket[0] = 0x04; // FUN_GET_NAMEBT
 
     try {
-      // Cancelar cualquier suscripción activa previa
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar cualquier suscripción activa previa para este dispositivo
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
-      // Completer para manejar la respuesta
       final completer = Completer<String>();
 
-      // Suscribirse a las notificaciones para recibir FUN_GET_NAMEBT_R
-      notificationSubscription = flutterReactiveBle
+      // Suscribirse a las notificaciones
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x05) {
           // FUN_GET_NAMEBT_R recibido
           final nameBytes =
-              data.sublist(1).takeWhile((byte) => byte != 0).toList();
+          data.sublist(1).takeWhile((byte) => byte != 0).toList();
           final name =
-              String.fromCharCodes(nameBytes); // Convertir bytes a string
+          String.fromCharCodes(nameBytes); // Convertir bytes a string
           completer.complete(name);
           debugPrint("📥 FUN_GET_NAMEBT_R recibido desde $macAddress: $name");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Guardar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_GET_NAMEBT
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint("📤 FUN_GET_NAMEBT enviado a $macAddress.");
 
       // Esperar la respuesta con timeout
       final bluetoothName =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return bluetoothName;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      rethrow;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
-      notificationSubscription?.cancel();
-      debugPrint(
-          "❌ Error al obtener el nombre del Bluetooth de $macAddress: $e");
+      debugPrint("❌ Error al obtener el nombre del Bluetooth de $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
       rethrow;
     }
   }
+
 
   Future<Map<String, dynamic>> getBatteryParameters(String macAddress) async {
     final characteristicRx = QualifiedCharacteristic(
@@ -8161,15 +8198,14 @@ $endpoints
     requestPacket[0] = 0x08; // FUN_GET_PARAMBAT
 
     try {
-      // Cancelar cualquier suscripción activa previa
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar cualquier suscripción activa previa para este dispositivo
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
-      // Completer para manejar la respuesta
       final completer = Completer<Map<String, dynamic>>();
 
-      // Suscribirse a las notificaciones para recibir FUN_GET_PARAMBAT_R
-      notificationSubscription = flutterReactiveBle
+      // Suscribirse a las notificaciones
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x09 && !completer.isCompleted) {
@@ -8177,17 +8213,17 @@ $endpoints
           final batteryParameters = {
             'batteryStatusRaw': data[3],
             'powerType':
-                data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
+            data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
             'batteryModel': data[2] == 0 ? "Por defecto" : "Desconocido",
             'batteryStatus': data[3] == 0
                 ? "Muy baja"
                 : data[3] == 1
-                    ? "Baja"
-                    : data[3] == 2
-                        ? "Media"
-                        : data[3] == 3
-                            ? "Alta"
-                            : "Llena",
+                ? "Baja"
+                : data[3] == 2
+                ? "Media"
+                : data[3] == 3
+                ? "Alta"
+                : "Llena",
             'temperature': "Sin implementar",
             'compensation': (data[6] << 8) | data[7],
             'voltages': {
@@ -8208,30 +8244,45 @@ $endpoints
           debugPrint(
               "📥 FUN_GET_PARAMBAT_R recibido desde $macAddress: $batteryParameters");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Guardar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_GET_PARAMBAT
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint("📤 FUN_GET_PARAMBAT enviado a $macAddress.");
 
       // Esperar la respuesta con timeout
       final batteryParameters =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return batteryParameters;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      rethrow;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
-      notificationSubscription?.cancel();
       debugPrint(
           "❌ Error al obtener los parámetros de la batería de $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
       rethrow;
     }
   }
+
 
   String parseBatteryParameters(Map<String, dynamic> batteryParameters) {
     final powerType = batteryParameters['powerType'];
@@ -8278,14 +8329,14 @@ $endpoints
     requestPacket[0] = 0x0C; // FUN_GET_CONTADOR
 
     try {
-      // Cancelar cualquier suscripción activa previa
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar cualquier suscripción activa previa para este dispositivo
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
-      // Completer para manejar la respuesta
       final completer = Completer<Map<String, dynamic>>();
-      // Suscribirse a las notificaciones para recibir FUN_GET_CONTADOR_R
-      notificationSubscription = flutterReactiveBle
+
+      // Suscribirse a las notificaciones
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x0D) {
@@ -8293,18 +8344,18 @@ $endpoints
           final tariffStatus = data[1] == 0
               ? "Sin tarifa"
               : data[1] == 1
-                  ? "Con tarifa"
-                  : "Con tarifa agotada";
+              ? "Con tarifa"
+              : "Con tarifa agotada";
 
           final totalSeconds = (data[2] << 24) |
-              (data[3] << 16) |
-              (data[4] << 8) |
-              data[5]; // Contador total (32 bits)
+          (data[3] << 16) |
+          (data[4] << 8) |
+          data[5]; // Contador total (32 bits)
 
           final remainingSeconds = (data[6] << 24) |
-              (data[7] << 16) |
-              (data[8] << 8) |
-              data[9]; // Contador parcial (32 bits)
+          (data[7] << 16) |
+          (data[8] << 8) |
+          data[9]; // Contador parcial (32 bits)
 
           final counters = {
             'tariffStatus': tariffStatus,
@@ -8316,30 +8367,45 @@ $endpoints
           debugPrint(
               "📥 FUN_GET_CONTADOR_R recibido desde $macAddress: $counters");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Guardar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_GET_CONTADOR
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint("📤 FUN_GET_CONTADOR enviado a $macAddress.");
 
       // Esperar la respuesta con timeout
       final counters =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return counters;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      rethrow;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
-      notificationSubscription?.cancel();
       debugPrint(
           "❌ Error al obtener los contadores de tarifa de $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
       rethrow;
     }
   }
+
 
   String parseTariffCounters(Map<String, dynamic> counters) {
     final tariffStatus = counters['tariffStatus'];
@@ -8393,15 +8459,14 @@ $endpoints
     requestPacket[2] = mode;
 
     try {
-      // Cancelar cualquier suscripción activa previa
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar cualquier suscripción activa previa para este dispositivo
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
-      // Completer para manejar la respuesta
       final completer = Completer<Map<String, dynamic>>();
 
-      // Suscribirse a las notificaciones para recibir FUN_GET_ESTADO_EMS_R
-      notificationSubscription = flutterReactiveBle
+      // Suscribirse a las notificaciones
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x11) {
@@ -8411,27 +8476,42 @@ $endpoints
           debugPrint(
               "📥 FUN_GET_ESTADO_EMS_R recibido desde $macAddress: $parsedState");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Guardar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_GET_ESTADO_EMS
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint(
           "📤 FUN_GET_ESTADO_EMS enviado a $macAddress. Endpoint: $endpoint, Modo: $mode.");
 
       // Esperar la respuesta con timeout
-      final state = await completer.future.timeout(const Duration(seconds: 10));
+      final state =
+      await completer.future.timeout(const Duration(seconds: 10));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return state;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      rethrow;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
-      notificationSubscription?.cancel();
       debugPrint(
           "❌ Error al obtener el estado del electroestimulador de $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
       rethrow;
     }
   }
@@ -8778,15 +8858,14 @@ $endpoints
     requestPacket[4] = valor;
 
     try {
-      // Cancelar cualquier suscripción activa previa
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar cualquier suscripción activa previa para este dispositivo
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
-      // Completer para manejar la respuesta
       final completer = Completer<Map<String, dynamic>>();
 
-      // Suscribirse a las notificaciones para recibir FUN_CANAL_EMS_R
-      notificationSubscription = flutterReactiveBle
+      // Suscribirse a las notificaciones
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x17) {
@@ -8807,30 +8886,46 @@ $endpoints
           debugPrint(
               "📥 FUN_CANAL_EMS_R recibido desde $macAddress: $response");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Guardar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_CANAL_EMS
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint(
           "📤 FUN_CANAL_EMS enviado a $macAddress. Endpoint: $endpoint, Canal: $canal, Modo: $modo, Valor: $valor.");
 
       // Esperar la respuesta con timeout
       final response =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return response;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      rethrow;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
-      notificationSubscription?.cancel();
-      debugPrint("❌ Error al controlar el canal del electroestimulador: $e");
+      debugPrint(
+          "❌ Error en controlElectrostimulatorChannel para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
       rethrow;
     }
   }
+
 
   String parseChannelControlResponse(Map<String, dynamic> response) {
     final endpoint = response['endpoint'];
@@ -8914,7 +9009,6 @@ $endpoints
       throw ArgumentError(
           "La lista de valoresCanales debe tener exactamente 7 o 10 elementos.");
     }
-
     if (valoresCanales.any((valor) => valor < 0 || valor > 100)) {
       throw ArgumentError(
           "Todos los valores de los canales deben estar entre 0 y 100.");
@@ -8925,20 +9019,19 @@ $endpoints
     requestPacket[0] = 0x18; // FUN_ALL_CANAL_EMS
     requestPacket[1] = endpoint;
     requestPacket[2] = modo;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < valoresCanales.length; i++) {
       requestPacket[3 + i] = valoresCanales[i];
     }
 
     try {
-      // Cancelar cualquier suscripción activa previa
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar cualquier suscripción previa para este dispositivo
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
-      // Completer para manejar la respuesta
       final completer = Completer<Map<String, dynamic>>();
 
-      // Suscribirse a las notificaciones para recibir FUN_ALL_CANAL_EMS_R
-      notificationSubscription = flutterReactiveBle
+      // Suscribirse a las notificaciones
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x19) {
@@ -8959,31 +9052,46 @@ $endpoints
           debugPrint(
               "📥 FUN_ALL_CANAL_EMS_R recibido desde $macAddress: $response");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Guardar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_ALL_CANAL_EMS
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint(
           "📤 FUN_ALL_CANAL_EMS enviado a $macAddress. Endpoint: $endpoint, Modo: $modo, Valores: $valoresCanales.");
 
       // Esperar la respuesta con timeout
       final response =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return response;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      rethrow;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
-      notificationSubscription?.cancel();
       debugPrint(
-          "❌ Error al controlar todos los canales del electroestimulador: $e");
+          "❌ Error en controlAllElectrostimulatorChannels para $macAddress: $e");
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
       rethrow;
     }
   }
+
 
   String parseAllChannelsResponse(Map<String, dynamic> response) {
     final endpoint = response['endpoint'];

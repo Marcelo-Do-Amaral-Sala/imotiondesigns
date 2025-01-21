@@ -197,6 +197,7 @@ class _AppState extends State<App> with WidgetsBindingObserver{
 
 
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             textTheme: GoogleFonts.oswaldTextTheme(),
           ),
