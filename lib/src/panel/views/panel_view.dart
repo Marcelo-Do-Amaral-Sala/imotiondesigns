@@ -54,7 +54,8 @@ class _PanelViewState extends State<PanelView> {
   Map<String, dynamic> clientSelectionMap = {};
   Set<String> processedDevices = {};
 
-  List<String> successfullyConnectedDevices = [];
+  ValueNotifier<List<String>> successfullyConnectedDevices = ValueNotifier([]);
+  List<String> connectedDevices = [];
   Map<String, dynamic>? selectedClient;
   final Map<String, String> deviceConnectionStatus = {};
   Map<String, String> clientsNames = {};
@@ -98,64 +99,85 @@ class _PanelViewState extends State<PanelView> {
   }
 
   Future<void> initializeAndConnectBLE() async {
-    // 1. Inicializar el servicio BLE con una lista vacía
+    debugPrint("🛠️ Inicializando BLE y conexiones...");
+
     bleConnectionService = BleConnectionService();
     bleConnectionService.isWidgetActive = true;
 
     // 2. Cargar los datos desde AppState
     await AppState.instance.loadState();
     List<String> macAddresses =
-        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
     debugPrint("🔍 Direcciones MAC obtenidas: $macAddresses");
 
-    // Inicializa las claves de los dispositivos y grupos
+    // 3. Inicializar claves de dispositivos y grupos
+    mciKeys.clear();
     for (var mci in AppState.instance.mcis) {
       String macAddress = mci['mac'];
-      mciKeys[macAddress] = ValueKey(macAddress); // Generar y asignar ValueKey
+      mciKeys[macAddress] = ValueKey(macAddress);
     }
 
-    // Manejo de grupos (si aplica)
     for (var grupo in mciSelectionStatus.values) {
       if (grupo != null) {
         List<String> macAddresses = grupo.split(',');
         String grupoKey = macAddresses.join('-');
-        mciKeys[grupoKey] = ValueKey(grupoKey); // Generar y asignar ValueKey
+        mciKeys[grupoKey] = ValueKey(grupoKey);
       }
     }
 
-    // Actualizar la lista de direcciones MAC en el servicio BLE
-    if (mounted) {
-      setState(() {
-        bleConnectionService.updateMacAddresses(macAddresses);
-      });
-    }
+    // 4. Actualizar las direcciones MAC en el servicio BLE
+    bleConnectionService.updateMacAddresses(macAddresses);
 
-    // Esperar un breve espacio de tiempo para procesar las conexiones actuales
-    await Future.delayed(const Duration(seconds: 2));
+    // 5. Limpiar las listas y estados locales
+    successfullyConnectedDevices.value.clear();
+    deviceConnectionStatus.clear();
 
-    successfullyConnectedDevices.clear(); // Limpiar lista al comenzar
-
+    // 6. Configurar estado inicial y escuchar el flujo de conexión
     for (final macAddress in macAddresses) {
-      bool succes =
-          await bleConnectionService._connectToDeviceByMac(macAddress);
+      // Inicializar estado de conexión como "desconectado"
+      deviceConnectionStatus[macAddress] = 'desconectado';
+
+      // Escuchar el estado de conexión para cada dispositivo
       bleConnectionService
           .connectionStateStream(macAddress)
-          .listen((isConnected) async {
+          .listen((isConnected) {
         if (isConnected) {
-          // Agregar el MAC address a la lista cuando se conecte con éxito
-          successfullyConnectedDevices.add(macAddress);
+          // Agregar a conexiones exitosas si está conectado
+          if (!successfullyConnectedDevices.value.contains(macAddress)) {
+            successfullyConnectedDevices.value = [
+              ...successfullyConnectedDevices.value,
+              macAddress,
+            ];
+          }
+        } else {
+          // Remover de conexiones exitosas si está desconectado
+          successfullyConnectedDevices.value = successfullyConnectedDevices.value
+              .where((device) => device != macAddress)
+              .toList();
         }
+
+        // Actualizar el estado de conexión en la UI
         if (mounted) {
           setState(() {
-            // Actualizar el estado de conexión en la UI
             deviceConnectionStatus[macAddress] =
-                isConnected ? 'conectado' : 'desconectado';
+            isConnected ? 'conectado' : 'desconectado';
+          });
+        }
+      }, onError: (error) {
+        debugPrint("❌ Error en la conexión de $macAddress: $error");
+        if (mounted) {
+          setState(() {
+            deviceConnectionStatus[macAddress] = 'error';
           });
         }
       });
     }
+
+    debugPrint("✅ Inicialización BLE completada.");
   }
+
+
 
   void updateDeviceSelection(String mac, String group) {
     setState(() {
@@ -264,19 +286,22 @@ class _PanelViewState extends State<PanelView> {
 
   @override
   void dispose() {
+    // Llamar al dispose de la clase base
+    _subscription.cancel();
     if (kDebugMode) {
       print("📡 Suscripción cancelada.");
     }
-    bleConnectionService.isWidgetActive = false;
-    bleConnectionService.disposeBleResources();
+
+    // Liberar otros recursos después de desconectar dispositivos
+    successfullyConnectedDevices.value.clear();
     if (kDebugMode) {
-      print("💡 Recursos BLE liberados.");
+      print("Lista despues del dispose $successfullyConnectedDevices}");
     }
 
+    super.dispose();
     if (kDebugMode) {
       print("🚀 dispose() ejecutado correctamente.");
     }
-    super.dispose();
   }
 
   @override
@@ -387,6 +412,7 @@ class _PanelViewState extends State<PanelView> {
 
                                                 // Verificar si la macAddress ya está en la lista de dispositivos conectados exitosamente
                                                 if (!successfullyConnectedDevices
+                                                    .value
                                                     .contains(macAddress)) {
                                                   // Intentar conectar al dispositivo si no está en la lista
                                                   bool success =
@@ -402,7 +428,11 @@ class _PanelViewState extends State<PanelView> {
                                                     if (isConnected) {
                                                       // Agregar el MAC address a la lista cuando se conecte con éxito
                                                       successfullyConnectedDevices
-                                                          .add(macAddress);
+                                                          .value = [
+                                                        ...successfullyConnectedDevices
+                                                            .value,
+                                                        macAddress,
+                                                      ];
                                                     }
                                                     if (mounted) {
                                                       setState(() {
@@ -742,18 +772,17 @@ class _PanelViewState extends State<PanelView> {
 
                                   // Crear el widget para cada contenido con su estado independiente
                                   return ExpandedContentWidget(
-                                      selectedKey: selectedKey,
-                                      index: index,
-                                      macAddress: macAddress,
-                                      onSelectEquip: (index) =>
-                                          updateEquipSelection(
-                                              selectedKey!, index),
-                                      onClientSelected: (client) =>
-                                          onClientSelected(
-                                              selectedKey!, client),
-                                      isFullChanged: handleActiveChange,
-                                      bleConnectionService:
-                                          bleConnectionService);
+                                    selectedKey: selectedKey,
+                                    index: index,
+                                    macAddress: macAddress,
+                                    macAddresses: successfullyConnectedDevices,
+                                    onSelectEquip: (index) =>
+                                        updateEquipSelection(
+                                            selectedKey!, index),
+                                    onClientSelected: (client) =>
+                                        onClientSelected(selectedKey!, client),
+                                    isFullChanged: handleActiveChange,
+                                  );
                                 }).toList(),
                               ),
                             ),
@@ -1343,7 +1372,10 @@ class _PanelViewState extends State<PanelView> {
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        // Verifica si la sesión se ha iniciado antes de detenerla
+                        await bleConnectionService.disposeBle();
+                        if (kDebugMode) {
+                          print("💡 Recursos BLE liberados.");
+                        }
                         widget.onBack();
                         Navigator.of(context)
                             .pop(); // Cierra el diálogo de confirmación
@@ -1501,10 +1533,10 @@ class ExpandedContentWidget extends StatefulWidget {
   final String? selectedKey;
   final int? index;
   final String? macAddress;
+  final ValueNotifier<List<String>> macAddresses;
   final ValueChanged<int> onSelectEquip;
   final ValueChanged<Map<String, dynamic>?> onClientSelected;
   final ValueChanged<bool> isFullChanged;
-  final BleConnectionService bleConnectionService;
 
   const ExpandedContentWidget({
     super.key,
@@ -1514,7 +1546,7 @@ class ExpandedContentWidget extends StatefulWidget {
     required this.onSelectEquip,
     required this.onClientSelected,
     required this.isFullChanged,
-    required this.bleConnectionService,
+    required this.macAddresses,
   });
 
   @override
@@ -1523,6 +1555,7 @@ class ExpandedContentWidget extends StatefulWidget {
 
 class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     with SingleTickerProviderStateMixin {
+  late final BleConnectionService bleConnectionService;
   late ClientsProvider? _clientsProvider;
   late PanelView panelView = PanelView(
     key: panelViewKey,
@@ -1605,6 +1638,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valuePause = 1.0;
   double contractionDuration = 0.0;
 
+  Map<String, bool> procesosActivos = {};
   Map<int, double> subprogramElapsedTime =
       {}; // Almacena elapsedTimeSub para cada subprograma
   Map<int, int> subprogramRemainingTime = {};
@@ -1723,6 +1757,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   @override
   void initState() {
     super.initState();
+    bleConnectionService = BleConnectionService();
     currentStatus = 'Estado inicial para ${widget.macAddress}';
     _currentImageIndex = imagePaths.length - time;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {});
@@ -1747,6 +1782,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       });
     });
     loadCachedPrograms();
+    widget.macAddresses.addListener(() {
+      debugPrint(
+        "🛠️ Lista de dispositivos conectados recibida (actualizada): ${widget.macAddresses.value}",
+      );
+    });
   }
 
   @override
@@ -2083,7 +2123,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (mounted) {
       setState(() {
         isRunning = true;
-
+        isSessionStarted = true;
+        isElectroOn = true;
         // Si pausedTime tiene un valor previo, reanuda desde donde quedó
         startTime = DateTime.now();
 
@@ -2104,7 +2145,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
               // Detiene el temporizador al alcanzar el tiempo total
               if (elapsedTime >= totalTime) {
-                _stopAllTimersAndReset(macAddress);
+                _stopAllTimersAndReset(widget.macAddress!);
               }
             });
           }
@@ -2112,16 +2153,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
         // Asegura que startSubprogramTimer solo se ejecute si ambos son no nulos
         if (selectedProgram != null && selectedAutoProgram != null) {
-          startSubprogramTimer();
+          startSubprogramTimer(widget.macAddress!);
         }
 
         // Reanuda el temporizador de contracción o pausa
         if (isContractionPhase) {
-          _startContractionTimer(valueContraction, macAddress,
+          _startContractionTimer(valueContraction, widget.macAddress!,
               porcentajesMusculoTraje, porcentajesMusculoPantalon);
         } else {
-          _startPauseTimer(valuePause, macAddress, porcentajesMusculoTraje,
-              porcentajesMusculoPantalon);
+          _startPauseTimer(valuePause, widget.macAddress!,
+              porcentajesMusculoTraje, porcentajesMusculoPantalon);
         }
       });
     }
@@ -2154,15 +2195,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   void _pauseTimer(String macAddress) {
     if (mounted) {
       setState(() {
-        if (isElectroOn) {
-          widget.bleConnectionService
-              ._stopElectrostimulationSession(macAddress);
-        }
+        stopElectrostimulationProcess(widget.macAddress!);
         isRunning = false;
+        isElectroOn = false;
         isSessionStarted = false;
         pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
         _timer.cancel();
-        stopSubprogramTimer(); // Detiene el temporizador de subprograma
+        stopSubprogramTimer(
+            widget.macAddress!); // Detiene el temporizador de subprograma
         _phaseTimer?.cancel(); // Detiene el temporizador de fase
       });
     }
@@ -2173,7 +2213,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       setState(() {
         // Llamar a _clearGlobals para reiniciar todas las variables
         _clearGlobals();
-        widget.bleConnectionService._stopElectrostimulationSession(macAddress);
+        stopElectrostimulationProcess(widget.macAddress!);
       });
     }
   }
@@ -2191,7 +2231,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (selectedIndexEquip == 0) {
         // Si el índice seleccionado es 0, iniciar la sesión para traje
         startFullElectrostimulationTrajeProcess(
-                macAddress, porcentajesMusculoTraje, selectedProgram)
+                widget.macAddress!, porcentajesMusculoTraje, selectedProgram)
             .then((success) {
           if (success) {
             if (mounted) {
@@ -2201,7 +2241,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             }
 
             // Una vez confirmada la sesión, iniciar el temporizador de contracción
-            _startContractionPhase(contractionDuration, macAddress,
+            _startContractionPhase(contractionDuration, widget.macAddress!,
                 porcentajesMusculoTraje, porcentajesMusculoPantalon);
           } else {
             debugPrint(
@@ -2211,7 +2251,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       } else if (selectedIndexEquip == 1) {
         // Si el índice seleccionado es 1, iniciar la sesión para pantalón
         startFullElectrostimulationPantalonProcess(
-                macAddress, porcentajesMusculoPantalon, selectedProgram)
+                widget.macAddress!, porcentajesMusculoPantalon, selectedProgram)
             .then((success) {
           if (success) {
             if (mounted) {
@@ -2221,7 +2261,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             }
 
             // Una vez confirmada la sesión, iniciar el temporizador de contracción
-            _startContractionPhase(contractionDuration, macAddress,
+            _startContractionPhase(contractionDuration, widget.macAddress!,
                 porcentajesMusculoTraje, porcentajesMusculoPantalon);
           } else {
             debugPrint(
@@ -2233,7 +2273,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
     } else {
       // Si ya está activo, inicia directamente el temporizador
-      _startContractionPhase(contractionDuration, macAddress,
+      _startContractionPhase(contractionDuration, widget.macAddress!,
           porcentajesMusculoTraje, porcentajesMusculoPantalon);
     }
   }
@@ -2253,8 +2293,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           if (elapsedTimeContraction >= contractionDuration) {
             elapsedTimeContraction = 0.0;
             isContractionPhase = false;
-            _startPauseTimer(valuePause, macAddress, porcentajesMusculoTraje,
-                porcentajesMusculoPantalon);
+            _startPauseTimer(valuePause, widget.macAddress!,
+                porcentajesMusculoTraje, porcentajesMusculoPantalon);
           }
         });
       }
@@ -2267,29 +2307,36 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     List<int> porcentajesMusculoTraje,
     List<int> porcentajesMusculoPantalon,
   ) {
-    _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
+    // Cancelar cualquier temporizador previo
+    _phaseTimer?.cancel();
 
-    if (isElectroOn) {
-      widget.bleConnectionService
-          ._stopElectrostimulationSession(macAddress)
-          .then((_) {
-        if (mounted) {
-          setState(() {
-            isElectroOn = false; // Actualizar estado local
-          });
-        }
-
-        // Una vez confirmada la pausa, iniciar el temporizador de pausa
-        _startPausePhase(pauseDuration, macAddress, porcentajesMusculoTraje,
-            porcentajesMusculoPantalon);
-      }).catchError((e) {
+    // Detener la electroestimulación antes de iniciar la pausa
+    stopElectrostimulationProcess(widget.macAddress!).then((success) {
+      if (success) {
+        debugPrint("✅ Electroestimulación detenida antes de iniciar la pausa.");
+      } else {
         debugPrint(
-            "❌ Error al detener la electroestimulación durante la fase de pausa: $e");
-      });
-    } else {
-      _startPausePhase(pauseDuration, macAddress, porcentajesMusculoTraje,
-          porcentajesMusculoPantalon);
-    }
+            "⚠️ No se pudo detener la electroestimulación antes de iniciar la pausa.");
+      }
+
+      // Iniciar la fase de pausa
+      _startPausePhase(
+        pauseDuration,
+        macAddress,
+        porcentajesMusculoTraje,
+        porcentajesMusculoPantalon,
+      );
+    }).catchError((e) {
+      debugPrint(
+          "❌ Error al detener la electroestimulación durante la pausa: $e");
+      // Continuar con la pausa incluso si detener la electroestimulación falla
+      _startPausePhase(
+        pauseDuration,
+        macAddress,
+        porcentajesMusculoTraje,
+        porcentajesMusculoPantalon,
+      );
+    });
   }
 
   void _startPausePhase(
@@ -2307,7 +2354,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           if (elapsedTimePause >= pauseDuration) {
             elapsedTimePause = 0.0;
             isContractionPhase = true;
-            _startContractionTimer(valueContraction, macAddress,
+            _startContractionTimer(valueContraction, widget.macAddress!,
                 porcentajesMusculoTraje, porcentajesMusculoPantalon);
           }
         });
@@ -2315,7 +2362,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
-  void startSubprogramTimer() {
+  void startSubprogramTimer(String macAddress) {
     // Verificar si selectedAutoProgram es nulo y usar allAutoPrograms[0] si es el caso
     var programToUse = selectedAutoProgram ?? allAutomaticPrograms[0];
 
@@ -2389,7 +2436,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           // Pasar al siguiente subprograma
           currentSubprogramIndex++;
           updateContractionAndPauseValues();
-          startSubprogramTimer(); // Iniciar el siguiente subprograma
+          startSubprogramTimer(
+              widget.macAddress!); // Iniciar el siguiente subprograma
         }
       });
     } else {
@@ -2399,7 +2447,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
-  void stopSubprogramTimer() {
+  void stopSubprogramTimer(String macAddress) {
     timerSub?.cancel();
     if (mounted) {
       setState(() {
@@ -2426,13 +2474,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     try {
       if (porcentajesMusculoTraje.length != 10) {
         debugPrint(
-            "❌ La lista porcentajesMusculoTraje debe tener 10 elementos.");
+            "❌ La lista porcentajesMusculoTraje debe tener exactamente 10 elementos.");
         return false;
       }
 
+      // Configurar los valores de los canales del traje
       List<int> valoresCanalesTraje = List.filled(10, 0);
-
-      // Asignar los valores de porcentajesMusculoTraje a los canales
       valoresCanalesTraje[0] = porcentajesMusculoTraje[5];
       valoresCanalesTraje[1] = porcentajesMusculoTraje[6];
       valoresCanalesTraje[2] = porcentajesMusculoTraje[7];
@@ -2444,29 +2491,24 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       valoresCanalesTraje[8] = porcentajesMusculoTraje[1];
       valoresCanalesTraje[9] = porcentajesMusculoTraje[4];
 
-      // Debug: Mostrar los porcentajes y los valores asignados a cada canal
-      for (int i = 0; i < 10; i++) {
-        debugPrint(
-            "🔢 Canal ${i + 1}: ${valoresCanalesTraje[i]} (Porcentaje: ${porcentajesMusculoTraje[i]}%)");
-      }
+      debugPrint("📊 Valores de canales configurados: $valoresCanalesTraje");
 
-      // Paso 2: Obtener frecuencia, rampa y anchura de pulso
+      // Obtener configuraciones del programa seleccionado
       Map<String, double> settings = getProgramSettings(selectedProgram);
-      double frecuencia = settings['frecuencia'] ?? 0;
-      double rampa = settings['rampa'] ?? 0;
-      double pulso = settings['pulso'] ?? 0;
+      double frecuencia = settings['frecuencia'] ?? 50;
+      double rampa = settings['rampa'] ?? 30;
+      double pulso = settings['pulso'] ?? 20;
 
-      // Ajustar la rampa multiplicándola por 100ms
+      // Ajustes de conversión
       rampa *= 10;
-      // Ajustar la anchura de pulso multiplicándola por 5 microsegundos
       pulso /= 5;
 
       debugPrint(
-          "✅ Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Anchura de pulso: $pulso µs");
+          "⚙️ Configuración del programa: Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Pulso: $pulso µs");
 
-      // Paso 3: Iniciar la sesión de electroestimulación
-      bool isElectroOn =
-          await widget.bleConnectionService._startElectrostimulationSession(
+      // Iniciar sesión de electroestimulación
+      final isElectroOn =
+          await bleConnectionService._startElectrostimulationSession(
         macAddress,
         valoresCanalesTraje,
         frecuencia,
@@ -2474,37 +2516,29 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         pulso: pulso,
       );
 
-      if (isElectroOn) {
-        // Paso 4: Controlar todos los canales después de iniciar la sesión
-        int modo = 0; // 0: Absoluto
-        Map<String, dynamic> response = await widget.bleConnectionService
-            .controlAllElectrostimulatorChannels(
-          macAddress: macAddress,
-          endpoint: 1, // Asumiendo que el endpoint es 1
-          modo: modo,
-          valoresCanales: valoresCanalesTraje,
-        );
-
-        debugPrint(
-            "📡 Respuesta de controlAllElectrostimulatorChannels: $response");
-
-        if (response['resultado'] != "OK") {
-          debugPrint("❌ Error al configurar los canales.");
-          return false;
-        }
-        if (mounted) {
-          setState(() {
-            isElectroOn = true;
-          });
-        }
-        return true;
-      } else {
-        debugPrint(
-            "❌ Error al iniciar el proceso completo de electroestimulación.");
+      if (!isElectroOn) {
+        debugPrint("❌ Error al iniciar la electroestimulación en $macAddress.");
         return false;
       }
+
+      // Controlar todos los canales del dispositivo
+      final response = await bleConnectionService._controlAllChannels(
+        macAddress,
+        1, // Endpoint
+        0, // Modo
+        valoresCanalesTraje,
+      );
+
+      if (response['resultado'] != "OK") {
+        debugPrint("❌ Error al configurar los canales: $response");
+        return false;
+      }
+
+      debugPrint(
+          "✅ Proceso completo de electroestimulación iniciado correctamente en $macAddress.");
+      return true;
     } catch (e) {
-      debugPrint("❌ Error en el proceso completo: $e");
+      debugPrint("❌ Error en el proceso completo de electroestimulación: $e");
       return false;
     }
   }
@@ -2558,8 +2592,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Paso 3: Iniciar la sesión de electroestimulación
       bool isElectroOn =
-          await widget.bleConnectionService._startElectrostimulationSession(
-        macAddress,
+          await bleConnectionService._startElectrostimulationSession(
+        widget.macAddress!,
         valoresCanalesPantalon,
         frecuencia,
         rampa,
@@ -2568,13 +2602,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       if (isElectroOn) {
         // Paso 4: Controlar los canales
-        int modo = 0; // 0: Absoluto
-        Map<String, dynamic> response = await widget.bleConnectionService
-            .controlAllElectrostimulatorChannels(
-          macAddress: macAddress,
-          endpoint: 1,
-          modo: modo,
-          valoresCanales: valoresCanalesPantalon,
+        Map<String, dynamic> response =
+            await bleConnectionService._controlAllChannels(
+          widget.macAddress!,
+          1,
+          0,
+          valoresCanalesPantalon,
         );
 
         debugPrint(
@@ -2601,16 +2634,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
-  Future<void> stopElectrostimulationTrajeProcess(String macAddress) async {
+  Future<bool> stopElectrostimulationProcess(String macAddress) async {
     try {
       // Verificar si la electroestimulación está activa
       if (isElectroOn) {
         debugPrint(
-            "🛑 Deteniendo la electroestimulación en el dispositivo $macAddress...");
+            "🛑 Deteniendo la electroestimulación en el dispositivo ${widget.macAddress!}...");
 
         // Llamar al servicio para detener la sesión de electroestimulación
-        await widget.bleConnectionService
-            ._stopElectrostimulationSession(macAddress);
+        await bleConnectionService
+            ._stopElectrostimulationSession(widget.macAddress!);
+
         if (mounted) {
           // Actualizar el estado de la UI
           setState(() {
@@ -2620,13 +2654,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         }
 
         debugPrint(
-            "✅ Electroestimulación detenida correctamente en $macAddress.");
+            "✅ Electroestimulación detenida correctamente en ${widget.macAddress!}.");
+        return true; // Operación exitosa
       } else {
         debugPrint(
             "⚠️ No hay ninguna sesión de electroestimulación activa para detener.");
+        return false; // No había una sesión activa para detener
       }
     } catch (e) {
-      debugPrint("❌ Error al detener la electroestimulación: $e");
+      debugPrint(
+          "❌ Error al detener la electroestimulación en ${widget.macAddress!}: $e");
+      return false; // Error durante la operación
     }
   }
 
@@ -2689,8 +2727,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                     OutlinedButton(
                       onPressed: () async {
                         _clearGlobals();
-
-                        await widget.bleConnectionService
+                        await bleConnectionService
                             ._stopElectrostimulationSession(widget.macAddress!);
 
                         Navigator.of(context).pop();
@@ -2783,7 +2820,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             "📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
       }
     }
-
+    bleConnectionService.dispose();
     super.dispose();
   }
 
@@ -3628,8 +3665,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                   // Aquí llamamos a la función getPulseMeter al hacer tap
                                   try {
                                     // lamamos a la función que obtiene los datos del pulsómetro
-                                    final response = await widget
-                                        .bleConnectionService
+                                    final response = await bleConnectionService
                                         ._getSignalCable(widget.macAddress!, 1);
                                     // Mostrar los datos en consola o en la UI
                                     debugPrint(
@@ -5060,10 +5096,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       }
                                                       isElectroOn =
                                                           !isElectroOn;
-                                                      isSessionStarted =
-                                                          !isSessionStarted;
                                                       debugPrint(
-                                                          'isSessionStarted: $isSessionStarted');
+                                                          'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
                                                     });
                                                   },
                                             child: SizedBox(
@@ -6450,10 +6484,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             porcentajesMusculoTraje,
                                                             porcentajesMusculoPantalon);
                                                       }
-                                                      isElectroOn =
-                                                          !isElectroOn;
-                                                      isSessionStarted =
-                                                          !isSessionStarted;
                                                       debugPrint(
                                                           'isSessionStarted: $isSessionStarted');
                                                     });
@@ -7558,40 +7588,30 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 }
 
 class BleConnectionService {
-  // Variables de estado
-  bool _foundDeviceWaitingToConnect = false;
+  final flutterReactiveBle = FlutterReactiveBle();
+  StreamSubscription<List<int>>? notificationSubscription;
+  final Map<String, StreamSubscription<List<int>>> _subscriptions = {};
   final bool _connected = false;
-  Timer? _connectionCheckTimer; // Timer para el chequeo periódico de conexión
-  List<String> targetDeviceIds = []; // Lista para almacenar las direcciones MAC
-  final List<String> foundDevices = [];
-  List<String> disconnectedDevices = [];
   bool isWidgetActive = true;
-  StreamSubscription<List<int>>? subscription;
-
-  // Mapa para almacenar los StreamControllers de conexión por dispositivo
+  List<String> targetDeviceIds = []; // Lista para almacenar las direcciones MAC
+  final List<String> connectedDevices = []; // Lista de MACs conectadas
   final Map<String, StreamController<bool>> _deviceConnectionStateControllers =
       {};
-
-  // Variables relacionadas con Bluetooth
-  late DiscoveredDevice _ubiqueDevice;
-  final flutterReactiveBle = FlutterReactiveBle();
-  StreamSubscription<DiscoveredDevice>? _scanStream;
   final Map<String, StreamSubscription<ConnectionStateUpdate>>
       _connectionStreams = {};
-  final List<String> connectedDevices = []; // Lista de MACs conectadas
   final Uuid serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
   final Uuid rxCharacteristicUuid =
       Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
   final Uuid txCharacteristicUuid =
       Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
-  StreamSubscription<List<int>>? notificationSubscription;
-  Map<String, Timer> _keepAliveTimers = {};
-  Timer? _electrostimulationTimer;
 
-  final Map<String, Timer> deviceTimers = {};
+  final StreamController<Map<String, dynamic>> _deviceUpdatesController =
+      StreamController.broadcast();
 
+  /// Constructor con limpieza y reinicialización
   BleConnectionService() {
-    debugPrint("🚀 Servicio BLE inicializado con lista vacía.");
+    debugPrint("🚀 Servicio BLE inicializado");
+    flutterReactiveBle.initialize();
   }
 
   /// Actualizar la lista de dispositivos objetivo
@@ -7600,9 +7620,12 @@ class BleConnectionService {
     targetDeviceIds.addAll(macAddresses);
     debugPrint(
         "🔄 Lista de dispositivos objetivo actualizada: $targetDeviceIds");
+    for (String deviceId in targetDeviceIds ){
+      _connectToDeviceByMac(deviceId);
+    }
   }
 
-  // Este stream es lo que el widget escucha, pero ahora cada dispositivo tiene su propio stream
+  /// Stream de estado de conexión por dispositivo
   Stream<bool> connectionStateStream(String macAddress) {
     if (!_deviceConnectionStateControllers.containsKey(macAddress)) {
       _deviceConnectionStateControllers[macAddress] =
@@ -7611,28 +7634,19 @@ class BleConnectionService {
     return _deviceConnectionStateControllers[macAddress]!.stream;
   }
 
+  /// Actualizar el estado de conexión del dispositivo
   void _updateDeviceConnectionState(String macAddress, bool isConnected) {
     if (!_deviceConnectionStateControllers.containsKey(macAddress)) {
       _deviceConnectionStateControllers[macAddress] =
           StreamController<bool>.broadcast();
     }
-
     final controller = _deviceConnectionStateControllers[macAddress]!;
     if (!controller.isClosed) {
-      controller.add(isConnected); // Emitir el nuevo estado
-      if (kDebugMode) {
-        print(
-            "🔄 Estado de conexión actualizado para $macAddress: ${isConnected ? 'conectado' : 'desconectado'}");
-      }
-    } else {
-      if (kDebugMode) {
-        print("⚠️ StreamController para $macAddress ya está cerrado.");
-      }
+      controller.add(isConnected);
+      debugPrint(
+          "🔄 Estado de conexión actualizado para $macAddress: ${isConnected ? 'conectado' : 'desconectado'}");
     }
   }
-
-  final StreamController<Map<String, dynamic>> _deviceUpdatesController =
-      StreamController.broadcast();
 
 // Exponer el Stream para que otros lo escuchen
   Stream<Map<String, dynamic>> get deviceUpdates =>
@@ -7655,7 +7669,6 @@ class BleConnectionService {
     _emitDeviceUpdate(macAddress, 'batteryStatus', status);
   }
 
-// Modificación de la función _connectToDeviceByMac
   Future<bool> _connectToDeviceByMac(String deviceId) async {
     if (deviceId.isEmpty) {
       debugPrint("⚠️ Identificador del dispositivo vacío. Conexión cancelada.");
@@ -7672,39 +7685,37 @@ class BleConnectionService {
 
     try {
       _connectionStreams[deviceId] = flutterReactiveBle
-          .connectToDevice(
-        id: deviceId,
-      )
-          .listen((connectionState) async {
+          .connectToDevice(id: deviceId)
+          .listen((connectionState) {
         switch (connectionState.connectionState) {
           case DeviceConnectionState.connected:
             debugPrint("✅ Dispositivo $deviceId conectado.");
             success = true;
-            connectedDevices.add(deviceId);
+
+            if (success) connectedDevices.add(deviceId);
             _updateDeviceConnectionState(deviceId, true);
             break;
 
           case DeviceConnectionState.disconnected:
             debugPrint("⛓️ Dispositivo $deviceId desconectado.");
-            connectedDevices.remove(deviceId);
             _updateDeviceConnectionState(deviceId, false);
             _onDeviceDisconnected(deviceId);
             break;
 
           default:
-            debugPrint(
-                "⏳ Estado de conexión desconocido para el dispositivo $deviceId.");
+            debugPrint("⏳ Estado desconocido para $deviceId.");
             break;
         }
       }, onError: (error) {
-        debugPrint("❌ Error al conectar al dispositivo $deviceId: $error");
+        debugPrint("❌ Error al conectar a $deviceId: $error");
       });
     } catch (e) {
-      debugPrint("❌ Error inesperado al conectar al dispositivo $deviceId: $e");
+      debugPrint("❌ Error inesperado al conectar a $deviceId: $e");
     }
 
     return success;
   }
+
 
   void _onDeviceDisconnected(String macAddress) {
     if (kDebugMode) {
@@ -7723,7 +7734,7 @@ class BleConnectionService {
     }
   }
 
-  Future<void> disconnect(String macAddress) async {
+  void disconnect(String macAddress) async {
     if (_deviceConnectionStateControllers.containsKey(macAddress)) {
       if (kDebugMode) {
         print("Desconectando del dispositivo: $macAddress");
@@ -7752,20 +7763,6 @@ class BleConnectionService {
               "⚠️ El StreamController ya está cerrado para la MAC $macAddress.");
         }
       }
-
-      // Detener el chequeo periódico de la conexión (si existe)
-      if (_connectionCheckTimer?.isActive ?? false) {
-        _connectionCheckTimer?.cancel();
-        _connectionCheckTimer = null;
-        if (kDebugMode) {
-          print("⏲️ Timer de verificación de conexión cancelado.");
-        }
-      } else {
-        if (kDebugMode) {
-          print(
-              "⏲️ No había un timer activo para la verificación de conexión.");
-        }
-      }
     } else {
       if (kDebugMode) {
         print("No hay dispositivo conectado con la MAC $macAddress.");
@@ -7773,32 +7770,53 @@ class BleConnectionService {
     }
   }
 
-  void disposeBleResources() async {
-    isWidgetActive = false;
+  Future<void> disposeBle() async {
+    debugPrint("🧹 Limpiando recursos y desconectando dispositivos...");
 
-    // Desconectar todos los dispositivos si están conectados
     for (var macAddress in _deviceConnectionStateControllers.keys) {
-      await disconnect(macAddress); // Esperar a que la desconexión termine
+      disconnect(macAddress);
+      disconnect(macAddress); // Esperar a que la desconexión termine
       if (kDebugMode) {
         debugPrint("🛑 Desconectando dispositivo con MAC: $macAddress");
       }
     }
-
-    // Cerrar todos los StreamControllers de forma segura
-    for (var controller in _deviceConnectionStateControllers.values) {
+    _deviceConnectionStateControllers.forEach((macAddress, controller) {
       if (!controller.isClosed) {
         controller.close();
         if (kDebugMode) {
+          debugPrint(
+              "🗑️ Stream controller para el dispositivo $macAddress cerrado.");
+        }
+      } else {
+        if (kDebugMode) {
+          debugPrint(
+              "⚠️ El Stream controller ya estaba cerrado para el dispositivo $macAddress.");
           debugPrint("🗑️ Stream controller cerrado.");
         }
       }
+    });
+    if (!_deviceUpdatesController.isClosed) {
+      _deviceUpdatesController.close();
+      if (kDebugMode) {
+        debugPrint(
+            "🗑️ Stream controller de actualizaciones generales cerrado.");
+      }
+    } else {
+      if (kDebugMode) {
+        debugPrint(
+            "⚠️ El Stream controller de actualizaciones generales ya estaba cerrado.");
+      }
     }
+    flutterReactiveBle.deinitialize();
+  }
 
-    // Liberar recursos BLE globalmente
-    await flutterReactiveBle.deinitialize();
-    if (kDebugMode) {
-      debugPrint("Recursos BLE globalmente liberados.");
+  Future<void> dispose() async {
+    debugPrint("🔒 Liberando recursos de BleConnectionService");
+    // Cancelar y limpiar suscripciones
+    for (var subscription in _subscriptions.values) {
+      await subscription.cancel();
     }
+    _subscriptions.clear();
   }
 
   bool get isConnected => _connected;
@@ -8464,23 +8482,6 @@ $endpoints
     }
   }
 
-  Future<void> executePeriodically(
-      List<String> macAddresses, int endpoint, int mode) async {
-    // El temporizador que ejecutará la función cada 5 segundos
-    _electrostimulationTimer =
-        Timer.periodic(const Duration(seconds: 5), (timer) async {
-      try {
-        for (var macAddress in macAddresses) {
-          // Llamada a la función getElectrostimulatorState con los parámetros deseados
-          await getElectrostimulatorState(macAddress, endpoint, mode);
-        }
-      } catch (e) {
-        // Manejo de errores en caso de que algo falle
-        debugPrint("Error al ejecutar la función periódicamente: $e");
-      }
-    });
-  }
-
   Future<bool> _startElectrostimulationSession(
     String macAddress,
     List<int> valoresCanales,
@@ -8489,6 +8490,9 @@ $endpoints
     double pulso = 0, // Nuevo parámetro con valor por defecto
   }) async {
     try {
+      debugPrint(
+          "⚙️ Iniciando sesión de electroestimulación en $macAddress...");
+
       final runSuccess = await runElectrostimulationSession(
         macAddress: macAddress,
         endpoint: 1,
@@ -8498,9 +8502,7 @@ $endpoints
         deshabilitaElevador: 0,
         nivelCanales: valoresCanales,
         pulso: pulso.toInt(),
-        // Usar el valor de anchura de pulso
-        anchuraPulsosPorCanal:
-            List.generate(10, (index) => pulso.toInt()), // Usar un valor común
+        anchuraPulsosPorCanal: List.generate(10, (index) => pulso.toInt()),
       );
 
       if (runSuccess) {
@@ -8514,13 +8516,13 @@ $endpoints
       }
     } catch (e) {
       debugPrint(
-          "❌ Error al procesar la electroestimulación de $macAddress: $e");
+          "❌ Error al procesar la electroestimulación en $macAddress: $e");
       return false;
     }
   }
 
 // Función para detener la sesión de electroestimulación
-  Future<void> _stopElectrostimulationSession(String macAddress) async {
+  Future<bool> _stopElectrostimulationSession(String macAddress) async {
     try {
       final stopSuccess = await stopElectrostimulationSession(
         macAddress: macAddress,
@@ -8530,13 +8532,16 @@ $endpoints
       if (stopSuccess) {
         debugPrint(
             "✅ Sesión de electroestimulación detenida correctamente en $macAddress.");
+        return true;
       } else {
         debugPrint(
             "❌ Error al detener la sesión de electroestimulación en $macAddress.");
+        return false;
       }
     } catch (e) {
       debugPrint(
           "❌ Error al detener la electroestimulación de $macAddress: $e");
+      return false;
     }
   }
 
@@ -8557,55 +8562,37 @@ $endpoints
       deviceId: macAddress,
     );
 
-    // Validar parámetros
     if (endpoint < 1 || endpoint > 4) throw ArgumentError("Endpoint inválido.");
     if (anchuraPulsosPorCanal.length != 10) {
       throw ArgumentError(
           "Debe haber exactamente 10 valores de anchura de pulso.");
     }
 
-    // Crear el paquete
     final List<int> requestPacket = List.filled(20, 0);
-    requestPacket[0] = 0x12; // FUN_RUN_EMS
+    requestPacket[0] = 0x12;
     requestPacket[1] = endpoint;
     requestPacket[2] = limitador;
-
-// Multiplicamos la rampa por 100ms
-    requestPacket[3] = (rampa).toInt(); // Rampa en x100ms
-
-// Multiplicamos la frecuencia por 10 (ya que la frecuencia está en x10Hz)
-    requestPacket[4] = (frecuencia).toInt(); // Frecuencia en x10 Hz
-
+    requestPacket[3] = (rampa).toInt();
+    requestPacket[4] = (frecuencia).toInt();
     requestPacket[5] = deshabilitaElevador;
 
     for (int i = 0; i < nivelCanales.length; i++) {
-      // Si el nivel es 255, lo dejamos igual; si no, lo ajustamos.
-      requestPacket[6 + i] = (nivelCanales[i] == 255)
-          ? nivelCanales[i]
-          : nivelCanales[i].clamp(0, 100);
+      requestPacket[6 + i] = nivelCanales[i].clamp(0, 100);
     }
 
-// Ajustar la anchura de pulso común si es 0
-    if (requestPacket[7] == 0) {
-      // Multiplicamos por 5 microsegundos (µs) la anchura de pulso por canal
-      requestPacket[8] = requestPacket[9] = requestPacket[10] =
-          requestPacket[11] = requestPacket[12] = requestPacket[13] =
-              requestPacket[14] = requestPacket[15] = requestPacket[16] =
-                  requestPacket[17] = anchuraPulsosPorCanal[0];
-    } else {
-      // Si no es 0, usamos los valores proporcionados para cada canal multiplicados por 5µs
-      for (int i = 0; i < 10; i++) {
-        requestPacket[8 + i] = anchuraPulsosPorCanal[i];
-      }
+    for (int i = 0; i < 10; i++) {
+      requestPacket[8 + i] = anchuraPulsosPorCanal[i];
     }
 
     try {
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
-      // Completer para manejar la respuesta
+      // Cancelar suscripción previa si existe
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       final completer = Completer<bool>();
 
-      notificationSubscription = flutterReactiveBle
+      // Suscribirse a notificaciones para este dispositivo
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(
         QualifiedCharacteristic(
           serviceId: serviceUuid,
@@ -8616,30 +8603,46 @@ $endpoints
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x13) {
           final retorno = data[2];
-          final result = retorno == 1;
-          completer.complete(result);
+          completer.complete(retorno == 1);
           debugPrint(
-              "📥 FUN_RUN_EMS_R recibido desde $macAddress: ${result ? "OK" : "FAIL"}");
+              "📥 FUN_RUN_EMS_R recibido desde $macAddress: ${retorno == 1 ? "OK" : "FAIL"}");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) completer.completeError(error);
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
-      // Enviar el comando
+
+      // Almacenar la suscripción
+      _subscriptions[macAddress] = subscription;
+
+      // Enviar comando
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
-      debugPrint(
-          "📤 FUN_RUN_EMS enviado a $macAddress para endpoint $endpoint.");
 
+      debugPrint("📤 FUN_RUN_EMS enviado a $macAddress.");
+
+      // Esperar respuesta con timeout
       final result =
-          await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 20));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return result;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress: $e");
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      return false;
     } catch (e) {
-      debugPrint("❌ Error en runElectrostimulationSession: $e");
-      notificationSubscription?.cancel();
-      rethrow;
+      debugPrint(
+          "❌ Error en runElectrostimulationSession para $macAddress: $e");
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      return false;
     }
   }
 
@@ -8670,47 +8673,65 @@ $endpoints
     requestPacket[1] = endpoint;
 
     try {
-      // Cancelar cualquier suscripción activa previa
-      notificationSubscription?.cancel();
-      notificationSubscription = null;
+      // Cancelar suscripción previa si existe
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
 
       // Completer para manejar la respuesta
       final completer = Completer<bool>();
 
-      // Suscribirse a las notificaciones para recibir FUN_STOP_EMS_R
-      notificationSubscription = flutterReactiveBle
+      // Suscribirse a las notificaciones para este dispositivo
+      final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x15) {
           // FUN_STOP_EMS_R recibido
           final retorno = data[2];
           final result = retorno == 1;
-          completer.complete(result);
+          if (!completer.isCompleted) {
+            completer.complete(result);
+          }
           debugPrint(
               "📥 FUN_STOP_EMS_R recibido desde $macAddress: ${result ? "OK" : "FAIL"}");
         }
+      }, onError: (error) {
+        if (!completer.isCompleted) {
+          completer.completeError(error);
+        }
+        debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
+      // Almacenar la suscripción
+      _subscriptions[macAddress] = subscription;
 
       // Enviar la solicitud FUN_STOP_EMS
       await flutterReactiveBle.writeCharacteristicWithResponse(
         characteristicRx,
         value: requestPacket,
       );
+
       debugPrint(
           "📤 FUN_STOP_EMS enviado a $macAddress para endpoint $endpoint.");
 
-      // Esperar la respuesta con timeout
+      // Esperar respuesta con timeout
       final result =
           await completer.future.timeout(const Duration(seconds: 10));
 
-      // Cancelar la suscripción después de recibir la respuesta
-      notificationSubscription?.cancel();
+      // Cancelar y remover la suscripción después de recibir la respuesta
+      await _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+
       return result;
+    } on TimeoutException catch (e) {
+      debugPrint("❌ Timeout para $macAddress al detener sesión: $e");
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      return false;
     } catch (e) {
-      // Cancelar la suscripción en caso de error
-      notificationSubscription?.cancel();
-      debugPrint("❌ Error al detener sesión de electroestimulación: $e");
-      rethrow;
+      debugPrint("❌ Error al detener sesión en $macAddress: $e");
+      _subscriptions[macAddress]?.cancel();
+      _subscriptions.remove(macAddress);
+      return false;
     }
   }
 
@@ -8824,6 +8845,43 @@ $endpoints
 - Resultado: $resultado
 - Valor: $valor
 ''';
+  }
+
+  Future<Map<String, dynamic>> _controlAllChannels(
+    String macAddress,
+    int endpoint,
+    int modo,
+    List<int> valoresCanales,
+  ) async {
+    try {
+      // Invocar la función principal que controla todos los canales
+      final response = await controlAllElectrostimulatorChannels(
+        macAddress: macAddress,
+        endpoint: endpoint,
+        modo: modo,
+        valoresCanales: valoresCanales,
+      );
+
+      // Verificar el resultado y mostrar mensajes adecuados
+      if (response['resultado'] == "OK") {
+        debugPrint(
+            "✅ Control de canales ejecutado correctamente en $macAddress.");
+      } else {
+        debugPrint(
+            "❌ Error al controlar los canales en $macAddress: ${response['resultado']}.");
+      }
+
+      return response; // Retornar el mapa con los datos de la respuesta
+    } catch (e) {
+      debugPrint(
+          "❌ Error al procesar el control de canales en $macAddress: $e");
+      // Retornar un mapa de error en caso de excepción
+      return {
+        'endpoint': endpoint,
+        'resultado': "ERROR",
+        'valoresCanales': [],
+      };
+    }
   }
 
   Future<Map<String, dynamic>> controlAllElectrostimulatorChannels({
