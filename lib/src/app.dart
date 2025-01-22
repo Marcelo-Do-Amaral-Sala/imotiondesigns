@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imotion_designs/src/panel/views/panel_view.dart';
+import 'package:imotion_designs/src/panel/views/prueba.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
 import 'package:imotion_designs/src/servicios/json.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
@@ -13,33 +14,27 @@ import 'mainviews/change_pwd.dart';
 import 'mainviews/login.dart';
 import 'mainviews/main_menu.dart';
 
-
 class App extends StatefulWidget {
   final double screenWidth;
   final double screenHeight;
 
-
   App({Key? key, required this.screenWidth, required this.screenHeight})
       : super(key: key);
-
 
   @override
   _AppState createState() => _AppState();
 }
 
-
-class _AppState extends State<App> with WidgetsBindingObserver{
+class _AppState extends State<App> with WidgetsBindingObserver {
   String currentView = 'mainMenu';
   Key? panelViewKey = UniqueKey(); // Clave única solo para PanelView
   Map<String, dynamic>? selectedMciData;
-
 
   void selectMCI(Map<String, dynamic> mciData) {
     setState(() {
       selectedMciData = mciData;
     });
   }
-
 
   void navigateTo(String view) {
     setState(() {
@@ -50,7 +45,6 @@ class _AppState extends State<App> with WidgetsBindingObserver{
     });
   }
 
-
   Future<void> clearLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('user_id');
@@ -58,45 +52,39 @@ class _AppState extends State<App> with WidgetsBindingObserver{
     print('Datos de inicio de sesión eliminados de SharedPreferences');
   }
 
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);  // Escuchar el ciclo de vida de la app
+    WidgetsBinding.instance
+        .addObserver(this); // Escuchar el ciclo de vida de la app
   }
+
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);  // Remover el observer
+    WidgetsBinding.instance.removeObserver(this); // Remover el observer
     super.dispose();
   }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
       // Si la app se pasa a segundo plano o se está cerrando, eliminar los datos de SharedPreferences
       clearLoginData();
     }
   }
 
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     Widget viewToDisplay;
-
-
     // Usamos LayoutBuilder para obtener las restricciones de tamaño de la pantalla
     return LayoutBuilder(
       builder: (context, constraints) {
         // Obtiene el tamaño disponible de la pantalla
         double screenWidth = constraints.maxWidth;
         double screenHeight = constraints.maxHeight;
-
 
         // Aquí ajustamos la vista según el tamaño disponible
         switch (currentView) {
@@ -114,6 +102,9 @@ class _AppState extends State<App> with WidgetsBindingObserver{
             break;
           case 'json':
             viewToDisplay = UploadJsonView();
+            break;
+          case 'prueba':
+            viewToDisplay = MiWidget();
             break;
           case 'clients':
             viewToDisplay = ClientsView(
@@ -195,7 +186,6 @@ class _AppState extends State<App> with WidgetsBindingObserver{
             break;
         }
 
-
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
@@ -210,12 +200,3 @@ class _AppState extends State<App> with WidgetsBindingObserver{
     );
   }
 }
-
-
-
-
-
-
-
-
-

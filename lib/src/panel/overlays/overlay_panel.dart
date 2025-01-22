@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
+import 'package:http/http.dart' as http;
 
 class OverlayTipoPrograma extends StatefulWidget {
   final VoidCallback onClose;
@@ -164,29 +167,126 @@ class _OverlaySeleccionarProgramaIndividualState
     with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> allIndividualPrograms = [];
   String? individualSelectedProgram;
+  List<String> respuestaTroceada = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchIndividualPrograms();
+    initializeDataProgram();
+  }
+  Future<void> initializeDataProgram() async {
+    await obtenerDatos(); // Esperar a que se obtengan los datos
+    await _fetchIndividualPrograms(); // Esperar a que se asigne la información
+  }
+
+  // Función de encriptación
+  String encrip(String wcadena) {
+    String xkkk =
+        'ABCDE0FGHIJ1KLMNO2PQRST3UVWXY4Zabcd5efghi6jklmn7opqrs8tuvwx9yz(),-.:;@';
+    String xkk2 = '[]{}<>?¿!¡*#';
+    int wp = 0, wd = 0, we = 0, wr = 0;
+    String wa = '', wres = '';
+    int wl = xkkk.length;
+    var wcont = Random().nextInt(10);
+
+    if (wcadena.isNotEmpty) {
+      wres = xkkk.substring(wcont, wcont + 1);
+      for (int wx = 0; wx < wcadena.length; wx++) {
+        wa = wcadena.substring(wx, wx + 1);
+        wp = xkkk.indexOf(wa);
+        if (wp == -1) {
+          wd = wa.codeUnitAt(0);
+          we = wd ~/ wl;
+          wr = wd % wl;
+          wcont += wr;
+          if (wcont >= wl) {
+            wcont -= wl;
+          }
+          wres += xkk2.substring(we, we + 1) + xkkk.substring(wcont, wcont + 1);
+        } else {
+          wcont += wp;
+          if (wcont >= wl) {
+            wcont -= wl;
+          }
+          wres += xkkk.substring(wcont, wcont + 1);
+        }
+      }
+    }
+
+    print("Cadena encriptada: $wres"); // Imprime la cadena encriptada
+    return wres;
+  }
+
+  Future<List<String>> getTrainer(String modulo) async {
+    // Encripta el módulo
+    String datos = encrip("18<#>$modulo");
+    // Construye la URL
+    Uri url = Uri.parse("https://imotionems.es/lic2.php?a=$datos");
+
+    try {
+      // Realiza la solicitud GET
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        // Trocea la respuesta por "|"
+        return response.body.split('|');
+      } else {
+        throw Exception("Error en la solicitud: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Ocurrió un error: $e");
+    }
+  }
+
+  Future<void> obtenerDatos() async {
+    try {
+      List<String> datos = await getTrainer("imotion21");
+
+      // Filtrar los datos para excluir elementos vacíos
+      List<String> datosFiltrados =
+      datos.where((element) => element.isNotEmpty).toList();
+
+      // Imprimir los datos filtrados con su índice ajustado
+      for (int i = 0; i < datosFiltrados.length; i++) {
+        print("${i + 1}. ${datosFiltrados[i]}");
+      }
+
+      setState(() {
+        respuestaTroceada = datosFiltrados;
+      });
+    } catch (e) {
+      print("Error al obtener datos: $e");
+    }
   }
 
   Future<void> _fetchIndividualPrograms() async {
-    var db = await DatabaseHelper()
-        .database; // Obtener la instancia de la base de datos
+    var db = await DatabaseHelper().database;
     try {
-      // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
+      // Obtener los programas de la base de datos
       final individualProgramData = await DatabaseHelper()
           .obtenerProgramasPredeterminadosPorTipoIndividual(db);
 
+      if (respuestaTroceada.isEmpty) {
+        throw Exception("No se han cargado los datos de videos. Ejecuta 'obtenerDatos()' primero.");
+      }
+
+      // Asignar videos dinámicamente
+      for (int i = 0; i < individualProgramData.length; i++) {
+        var program = Map<String, dynamic>.from(individualProgramData[i]);
+        var video = (i < respuestaTroceada.length) ? respuestaTroceada[i] : null;
+        program['video'] = video;
+        individualProgramData[i] = program;
+      }
+
       setState(() {
-        allIndividualPrograms =
-            individualProgramData; // Asignamos los programas obtenidos a la lista
+        allIndividualPrograms = individualProgramData;
+        print("Programas con videos asignados en Overlay: $allIndividualPrograms");
       });
     } catch (e) {
       print('Error fetching programs: $e');
     }
   }
+
 
   // Función de estilo global para los textos
   TextStyle getGlobalTextStyle({
@@ -266,19 +366,15 @@ class _OverlaySeleccionarProgramaIndividualState
                   // Espacio entre los elementos
                   child: GestureDetector(
                     onTap: () {
-                      // Aquí solo seleccionamos el programa si no está seleccionado aún
                       setState(() {
                         individualSelectedProgram = program['nombre'];
                       });
-
-                      widget.onIndivProgramSelected(
-                          program); // Llama a la función para pasar el programa seleccionado
+                      print("Programa seleccionado en overlay: $program");
+                      widget.onIndivProgramSelected(program); // Pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
-                      // Mostrar el Dialog con más detalles
-                      _showProgramDetailsDialog(
-                          context, program, screenHeight, screenWidth);
+                      _showProgramDetailsDialog(context, program, screenHeight, screenWidth);
                     },
                     child: Column(
                       children: [
@@ -300,6 +396,7 @@ class _OverlaySeleccionarProgramaIndividualState
                       ],
                     ),
                   ),
+
                 );
               }).toList(),
             ),
@@ -1482,6 +1579,59 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
     );
   }
 }
+
+class OverlayResumenSesion extends StatefulWidget {
+  final VoidCallback onClose;
+  final Function(Map<String, dynamic>?) onClientSelected;
+
+  const OverlayResumenSesion(
+      {super.key, required this.onClose, required this.onClientSelected});
+
+  @override
+  _OverlayResumenSesionState createState() =>
+      _OverlayResumenSesionState();
+}
+
+class _OverlayResumenSesionState extends State<OverlayResumenSesion>
+    with SingleTickerProviderStateMixin {
+
+  String? selectedClient;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return MainOverlay(
+      title: Text(
+          tr(context, 'Resumen sesión').toUpperCase(),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 34.sp,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF2be4f3),
+        ),
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Column(
+          children: [
+          ],
+        ),
+      ),
+      onClose: widget.onClose,
+    );
+  }
+}
+
+
+
+
 
 class ClientsProvider with ChangeNotifier {
   List<Map<String, dynamic>> _selectedClients = [];
