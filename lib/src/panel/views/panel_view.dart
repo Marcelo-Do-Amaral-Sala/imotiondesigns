@@ -1934,18 +1934,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
 
     try {
-      // Dispose del controlador actual si existe.
-      await _videoController?.dispose();
+      // Cancela cualquier controlador existente antes de inicializar uno nuevo.
+      await _cancelVideoInitialization();
 
       _videoController = VideoPlayerController.networkUrl(
         Uri.parse(videoUrl),
         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
       );
 
-      // Agregar un listener para observar el estado del controlador.
-      _videoController!.addListener(() {
-        print("VideoController State: ${_videoController!.value}");
-      });
+      // Agregar el listener al controlador.
+      _videoController!.addListener(_videoControllerListener);
 
       // Inicializar el controlador.
       await _videoController!.initialize();
@@ -1958,9 +1956,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       print("Error al inicializar el video: $e");
       setState(() {
         _isLoading = false;
-        _videoController = null; // Si falla, el controlador es nulo.
+        _videoController = null;
         _showVideo = false;
       });
+    }
+  }
+
+  void _videoControllerListener() {
+    if (_videoController != null && mounted) {
+      print("VideoController State: ${_videoController!.value}");
+      setState(() {}); // Forzar la actualización del estado.
     }
   }
 
@@ -1976,6 +1981,29 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
 
     setState(() {});
+  }
+
+  Future<void> _cancelVideoInitialization() async {
+    try {
+      // Verifica si existe un controlador.
+      if (_videoController != null) {
+        // Elimina el listener antes de desechar el controlador.
+        _videoController!.removeListener(_videoControllerListener);
+        await _videoController!.dispose();
+        print("VideoController cancelado y liberado correctamente.");
+      }
+    } catch (e) {
+      print("Error al cancelar el VideoController: $e");
+    }
+
+    // Actualiza el estado para reflejar la cancelación.
+    if (mounted) {
+      setState(() {
+        _videoController = null;
+        _showVideo = false;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _preloadImages() async {
@@ -2116,11 +2144,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     widget.onClientSelected(client); // Pasa el cliente seleccionado
   }
 
-  void _clearGlobals() {
+  void _clearGlobals() async {
     if (mounted) {
+      await _cancelVideoInitialization();
       setState(() {
         // Verifica si la sesión se ha iniciado antes de detenerla
         isElectroOn = false;
+        _isLoading = false;
+        _showVideo = false;
 
         // Restablecer variables globales
         selectedProgram = null;
@@ -2132,9 +2163,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         isRunning = false;
         isContractionPhase = true;
         isPantalonSelected = false;
-
+        selectedIndexEquip = 0;
         // Restablecer los programas
         selectedProgram = null;
+        selectedAutoProgram = null;
+        selectedIndivProgram = null;
+        selectedRecoProgram = null;
         // Restablecer valores de escalado
         scaleFactorFull = 1.0;
         scaleFactorCliente = 1.0;
