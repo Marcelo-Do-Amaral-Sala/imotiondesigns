@@ -53,6 +53,7 @@ dependencies:
   permission_handler: ^11.3.1
   shared_preferences: ^2.3.3
   flutter_screenutil: ^5.9.3
+  audioplayers: ^6.1.0
 
 
 imotion_mci_com:
@@ -352,6 +353,7 @@ flutter:
     - .env
     - assets/traduccionesv25.json
     - assets/videos/tutorial.mp4
+    - assets/sounds/beep.mp3
 
   #   - images/a_dot_ham.jpeg
 

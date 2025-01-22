@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,6 +45,7 @@ class _PanelViewState extends State<PanelView> {
   bool isActive = false;
   bool isFullScreen = false;
   bool isRunning = false;
+  bool showBlackScreen = true;
   String? selectedKey;
   String? macAddress;
   String? grupoKey;
@@ -56,8 +58,10 @@ class _PanelViewState extends State<PanelView> {
 
   ValueNotifier<List<String>> successfullyConnectedDevices = ValueNotifier([]);
   List<String> connectedDevices = [];
-  // Lista para almacenar las macAddresses seleccionadas
-  List<String> groupedMcis = [];
+
+  // Listas específicas para grupos
+  ValueNotifier<List<String>> groupedAmcis = ValueNotifier([]);
+  ValueNotifier<List<String>> groupedBmcis = ValueNotifier([]);
   Map<String, dynamic>? selectedClient;
   final Map<String, String> deviceConnectionStatus = {};
   Map<String, String> clientsNames = {};
@@ -71,6 +75,11 @@ class _PanelViewState extends State<PanelView> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      setState(() {
+        showBlackScreen = false;
+      });
+    });
     initializeAndConnectBLE();
     _subscription = bleConnectionService.deviceUpdates.listen((update) {
       final macAddress = update['macAddress'];
@@ -233,12 +242,16 @@ class _PanelViewState extends State<PanelView> {
       print("✖️ El dispositivo $key ha sido deseleccionado.");
     });
 
+    // Limpiar las listas observables antes de actualizar
+    groupedAmcis.value = [];
+    groupedBmcis.value = [];
+
     // Asignar índices según el grupo
     int indexForGroup = group == "A"
         ? 0
         : group == "B"
-        ? 1
-        : -1;
+            ? 1
+            : -1;
 
     // Seleccionamos los dispositivos del grupo
     groupedDevices[group]?.forEach((deviceMac) {
@@ -246,8 +259,12 @@ class _PanelViewState extends State<PanelView> {
       equipSelectionMap[deviceMac] =
           indexForGroup; // Actualiza el índice para el dispositivo
 
-      // Agregar a la lista groupedMcis
-      groupedMcis.add(deviceMac);
+      // Agregar a la lista correspondiente según el grupo
+      if (group == "A") {
+        groupedAmcis.value = [...groupedAmcis.value, deviceMac];
+      } else if (group == "B") {
+        groupedBmcis.value = [...groupedBmcis.value, deviceMac];
+      }
 
       // Agregar un print para ver cómo se actualiza equipSelectionMap
       print("🔄 equipSelectionMap actualizado: $deviceMac -> $indexForGroup");
@@ -267,10 +284,12 @@ class _PanelViewState extends State<PanelView> {
     selectedIndex = indexForGroup; // Establecemos el índice del grupo
     print("📊 Índice global del grupo seleccionado: $selectedIndex");
 
-    // Mostrar las macAddresses seleccionadas
-    print("📋 Lista de dispositivos seleccionados (groupedMcis): $groupedMcis");
+    // Mostrar las listas separadas por grupo
+    print(
+        "📋 Lista de dispositivos seleccionados (groupedAmcis): ${groupedAmcis.value}");
+    print(
+        "📋 Lista de dispositivos seleccionados (groupedBmcis): ${groupedBmcis.value}");
   }
-
 
   void updateEquipSelection(String key, int selectedIndex) {
     setState(() {
@@ -347,7 +366,9 @@ class _PanelViewState extends State<PanelView> {
                             if (!isFullScreen) ...[
                               Expanded(
                                 child: Container(
-                                  padding: const EdgeInsets.all(10.0),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: screenHeight * 0.015,
+                                      horizontal: screenWidth * 0.015),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -394,6 +415,35 @@ class _PanelViewState extends State<PanelView> {
                                                             : index;
                                                     print(
                                                         "📊 Índice global del grupo seleccionado: $selectedIndex");
+
+                                                    // Verificar si la dirección MAC pertenece al grupo
+                                                    List<String>
+                                                        devicesInGroup =
+                                                        group == "A"
+                                                            ? groupedAmcis.value
+                                                            : group == "B"
+                                                                ? groupedBmcis
+                                                                    .value
+                                                                : [];
+
+                                                    // Procesar dispositivos en el grupo
+                                                    for (String deviceMac
+                                                        in devicesInGroup) {
+                                                      if (!processedDevices
+                                                          .contains(
+                                                              deviceMac)) {
+                                                        print(
+                                                            "🚀 Procesando dispositivo del grupo: $deviceMac");
+                                                        bleConnectionService
+                                                            .processConnectedDevices(
+                                                                deviceMac);
+                                                        processedDevices.add(
+                                                            deviceMac); // Marcar como procesado
+                                                      } else {
+                                                        print(
+                                                            "✅ El dispositivo $deviceMac ya fue procesado.");
+                                                      }
+                                                    }
                                                   }
 
                                                   // Mostrar índice del dispositivo seleccionado
@@ -401,7 +451,7 @@ class _PanelViewState extends State<PanelView> {
                                                       "📊 Índice del dispositivo seleccionado: $selectedIndex");
                                                 });
 
-                                                // Verificar si ya se ha procesado el dispositivo
+                                                // Verificar si ya se ha procesado el dispositivo individualmente
                                                 if (!processedDevices
                                                     .contains(macAddress)) {
                                                   await bleConnectionService
@@ -486,9 +536,9 @@ class _PanelViewState extends State<PanelView> {
                                               children: [
                                                 // Widget principal (contenedor y detalles)
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 10),
+                                                  padding: EdgeInsets.only(
+                                                      right:
+                                                          screenWidth * 0.01),
                                                   child: SizedBox(
                                                     width: screenWidth * 0.1,
                                                     height: screenHeight * 0.1,
@@ -503,10 +553,11 @@ class _PanelViewState extends State<PanelView> {
                                                                 macAddress),
                                                       ),
                                                       child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 5.0),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical:
+                                                                    screenHeight *
+                                                                        0.005),
                                                         decoration:
                                                             BoxDecoration(
                                                           color: Colors
@@ -605,10 +656,8 @@ class _PanelViewState extends State<PanelView> {
                                                                             5,
                                                                             (index) {
                                                                       return Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .symmetric(
-                                                                            horizontal:
-                                                                                1.0),
+                                                                        padding:
+                                                                            EdgeInsets.symmetric(horizontal: screenWidth * 0.001),
                                                                         child:
                                                                             Container(
                                                                           width:
@@ -711,9 +760,9 @@ class _PanelViewState extends State<PanelView> {
                                         },
                                         style: OutlinedButton.styleFrom(
                                           padding: const EdgeInsets.all(10.0),
-                                          side: const BorderSide(
-                                            width: 1.0,
-                                            color: Color(0xFF2be4f3),
+                                          side: BorderSide(
+                                            width: screenWidth * 0.001,
+                                            color: const Color(0xFF2be4f3),
                                           ),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
@@ -764,8 +813,8 @@ class _PanelViewState extends State<PanelView> {
                             ],
                             Text(
                               '$isFullScreen',
-                              style: const TextStyle(
-                                  fontSize: 1, color: Colors.transparent),
+                              style: TextStyle(
+                                  fontSize: 1.sp, color: Colors.transparent),
                             ),
                             Expanded(
                               flex: 9,
@@ -789,6 +838,8 @@ class _PanelViewState extends State<PanelView> {
                                     onClientSelected: (client) =>
                                         onClientSelected(selectedKey!, client),
                                     isFullChanged: handleActiveChange,
+                                    groupedA: groupedAmcis,
+                                    groupedB: groupedBmcis,
                                   );
                                 }).toList(),
                               ),
@@ -802,6 +853,16 @@ class _PanelViewState extends State<PanelView> {
               ],
             ),
           ),
+          if (showBlackScreen)
+            Container(
+              color: Colors.black,
+              child: Center(
+                child: Text(
+                  "Cargando...",
+                  style: TextStyle(color: Colors.white, fontSize: 24.sp),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -823,14 +884,15 @@ class _PanelViewState extends State<PanelView> {
               return Container(
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.height * 0.6,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+                padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.03,
+                    horizontal: MediaQuery.of(context).size.width * 0.03),
                 decoration: BoxDecoration(
                   color: const Color(0xFF494949),
                   borderRadius: BorderRadius.circular(7),
                   border: Border.all(
                     color: const Color(0xFF28E2F5),
-                    width: 1,
+                    width: MediaQuery.of(context).size.width * 0.001,
                   ),
                 ),
                 child: Center(
@@ -902,9 +964,12 @@ class _PanelViewState extends State<PanelView> {
                                                         macAddress]),
                                               ),
                                               child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5.0),
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.005),
                                                 decoration: BoxDecoration(
                                                   color: Colors.transparent,
                                                   borderRadius:
@@ -978,10 +1043,11 @@ class _PanelViewState extends State<PanelView> {
                                                               5,
                                                               (batteryIndex) {
                                                                 return Padding(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          1.0),
+                                                                  padding: EdgeInsets.symmetric(
+                                                                      horizontal: MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.001),
                                                                   child:
                                                                       Container(
                                                                     width: MediaQuery.of(context)
@@ -1048,17 +1114,19 @@ class _PanelViewState extends State<PanelView> {
                                       itemBuilder: (context, index) {
                                         var mci = AppState.instance.mcis[index];
                                         String macAddress = mci['mac'];
+
+                                        // Verificar si está seleccionado para el grupo A
+                                        bool isSelected =
+                                            temporarySelectionStatus[
+                                                    macAddress] ==
+                                                'B';
+
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
                                             clientSelectionMap[macAddress];
                                         String clientName =
                                             selectedClient?['name'] ?? '';
-                                        // Verificar si está seleccionado para el grupo B
-                                        bool isSelected =
-                                            temporarySelectionStatus[
-                                                    macAddress] ==
-                                                'B';
 
                                         return Padding(
                                           padding: EdgeInsets.only(
@@ -1083,9 +1151,12 @@ class _PanelViewState extends State<PanelView> {
                                                         macAddress]),
                                               ),
                                               child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5.0),
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.005),
                                                 decoration: BoxDecoration(
                                                   color: Colors.transparent,
                                                   borderRadius:
@@ -1159,10 +1230,11 @@ class _PanelViewState extends State<PanelView> {
                                                               5,
                                                               (batteryIndex) {
                                                                 return Padding(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          1.0),
+                                                                  padding: EdgeInsets.symmetric(
+                                                                      horizontal: MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.001),
                                                                   child:
                                                                       Container(
                                                                     width: MediaQuery.of(context)
@@ -1301,7 +1373,9 @@ class _PanelViewState extends State<PanelView> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.04,
         height: MediaQuery.of(context).size.height * 0.04,
-        margin: const EdgeInsets.all(5.0),
+        margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.01,
+            horizontal: MediaQuery.of(context).size.width * 0.01),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: temporarySelectionStatus[option] == group
@@ -1311,7 +1385,7 @@ class _PanelViewState extends State<PanelView> {
             color: temporarySelectionStatus[option] == group
                 ? const Color(0xFF2be4f3) // Borde azul si está seleccionado
                 : Colors.white, // Borde blanco si no está seleccionado
-            width: 1.0,
+            width: MediaQuery.of(context).size.width * 0.001,
           ),
         ),
       ),
@@ -1327,13 +1401,15 @@ class _PanelViewState extends State<PanelView> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
             height: MediaQuery.of(context).size.height * 0.3,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.02,
+                horizontal: MediaQuery.of(context).size.width * 0.01),
             decoration: BoxDecoration(
               color: const Color(0xFF494949),
               borderRadius: BorderRadius.circular(7),
               border: Border.all(
                 color: const Color(0xFF28E2F5),
-                width: 1,
+                width: MediaQuery.of(context).size.width * 0.001,
               ),
             ),
             child: Column(
@@ -1540,6 +1616,8 @@ class ExpandedContentWidget extends StatefulWidget {
   final String? selectedKey;
   final int? index;
   final String? macAddress;
+  final ValueNotifier<List<String>> groupedA;
+  final ValueNotifier<List<String>> groupedB;
   final ValueNotifier<List<String>> macAddresses;
   final ValueChanged<int> onSelectEquip;
   final ValueChanged<Map<String, dynamic>?> onClientSelected;
@@ -1554,6 +1632,8 @@ class ExpandedContentWidget extends StatefulWidget {
     required this.onClientSelected,
     required this.isFullChanged,
     required this.macAddresses,
+    required this.groupedA,
+    required this.groupedB,
   });
 
   @override
@@ -1562,6 +1642,7 @@ class ExpandedContentWidget extends StatefulWidget {
 
 class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     with SingleTickerProviderStateMixin {
+  final AudioPlayer _audioPlayer = AudioPlayer();
   late final BleConnectionService bleConnectionService;
   late ClientsProvider? _clientsProvider;
   late PanelView panelView = PanelView(
@@ -1789,9 +1870,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       });
     });
     loadCachedPrograms();
-    widget.macAddresses.addListener(() {
+    widget.groupedA.addListener(() {
       debugPrint(
-        "🛠️ Lista de dispositivos conectados recibida (actualizada): ${widget.macAddresses.value}",
+        "🛠️ Grupos actualizados A: ${widget.groupedA.value}",
+      );
+    });
+    widget.groupedB.addListener(() {
+      debugPrint(
+        "🛠️ Grupos actualizados B: ${widget.groupedB.value}",
       );
     });
   }
@@ -1813,6 +1899,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     setState(() {
       _isImagesLoaded = true;
     });
+  }
+
+  void playBeep() async {
+    // Asegúrate de que la ruta del archivo sea correcta
+    await _audioPlayer.play(AssetSource('sounds/beep.mp3'));
   }
 
   // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
@@ -2151,6 +2242,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
               // Detiene el temporizador al alcanzar el tiempo total
               if (elapsedTime >= totalTime) {
                 _stopAllTimersAndReset(widget.macAddress!);
+                playBeep();
               }
             });
           }
@@ -2222,7 +2314,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         if (mounted) {
           setState(() {
             _clearGlobals(); // Reinicia las variables globales
-            debugPrint("🔄 Variables globales reiniciadas después de la pausa.");
+            debugPrint(
+                "🔄 Variables globales reiniciadas después de la pausa.");
           });
         }
       });
@@ -2238,7 +2331,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
 
     // Verificar y sincronizar con el estado BLE
-    if (isElectroOn==false) {
+    if (isElectroOn == false) {
       if (selectedIndexEquip == 0) {
         // Si el índice seleccionado es 0, iniciar la sesión para traje
         startFullElectrostimulationTrajeProcess(
@@ -2313,11 +2406,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Future<void> _startPauseTimer(
-      double pauseDuration,
-      String macAddress,
-      List<int> porcentajesMusculoTraje,
-      List<int> porcentajesMusculoPantalon,
-      ) async {
+    double pauseDuration,
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    List<int> porcentajesMusculoPantalon,
+  ) async {
     // Detener cualquier temporizador previo
     _phaseTimer?.cancel();
 
@@ -2343,7 +2436,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           "❌ Error al detener la electroestimulación antes de la pausa: $e");
     }
   }
-
 
   void _startPausePhase(
     double pauseDuration,
@@ -2684,13 +2776,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             width: MediaQuery.of(context).size.width * 0.4,
             // Aquí defines el ancho del diálogo
             height: MediaQuery.of(context).size.height * 0.3,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.02,
+                horizontal: MediaQuery.of(context).size.width * 0.01),
             decoration: BoxDecoration(
               color: const Color(0xFF494949),
               borderRadius: BorderRadius.circular(7),
               border: Border.all(
                 color: const Color(0xFF28E2F5),
-                width: 1,
+                width: MediaQuery.of(context).size.width * 0.001,
               ),
             ),
             child: Column(
@@ -2758,7 +2852,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       },
     );
   }
-
 
   void onProgramSelected(String program) {
     setState(() {
@@ -2847,7 +2940,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 if (!isFullScreen) ...[
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.01,
+                          horizontal: screenWidth * 0.01),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -2881,7 +2976,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                             child: Container(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: screenHeight * 0.01,
+                                  horizontal: screenWidth * 0.01),
                               width: _isExpanded1 ? screenWidth * 0.25 : 0,
                               height: screenHeight * 0.2,
                               alignment: Alignment.center,
@@ -3025,9 +3122,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       ),
                                     ),
                                   ),
-
                                   SizedBox(width: screenWidth * 0.01),
-
                                   // Botón "Repetir"
                                   Expanded(
                                     child: GestureDetector(
@@ -3082,9 +3177,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               ),
                             ),
                           ),
-                          SizedBox(width: screenWidth * 0.02),
+                          SizedBox(width: screenWidth * 0.01),
                           Container(
-                            padding: const EdgeInsets.all(20.0),
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenHeight * 0.02,
+                                horizontal: screenWidth * 0.02),
                             height: screenHeight * 0.2,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
@@ -3105,10 +3202,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           });
                                         },
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.all(10.0),
-                                    side: const BorderSide(
-                                      width: 1.0,
-                                      color: Color(0xFF2be4f3),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: screenHeight * 0.01,
+                                        horizontal: screenWidth * 0.01),
+                                    side: BorderSide(
+                                      width: screenWidth * 0.001,
+                                      color: const Color(0xFF2be4f3),
                                     ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(7),
@@ -3603,8 +3702,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                   onPressed: () {},
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.all(10.0),
-                                    side: const BorderSide(
-                                        width: 1.0, color: Color(0xFF2be4f3)),
+                                    side:  BorderSide(
+                                        width: screenWidth*0.001, color: const Color(0xFF2be4f3)),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(7),
                                     ),
@@ -3711,7 +3810,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 Expanded(
                   flex: isFullScreen ? 1 : 3,
                   child: Padding(
-                    padding: EdgeInsets.only(top: isFullScreen ? 50.0 : 5.0),
+                    padding: EdgeInsets.only(top: isFullScreen ? screenHeight*0.05 : screenHeight*0.005),
                     child: Row(
                       children: [
                         Expanded(
@@ -4417,8 +4516,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       progress2:
                                                           progressContraction,
                                                       strokeHeight: isFullScreen
-                                                          ? 20
-                                                          : 15, // Aumentar altura si isFullScreen es verdadero
+                                                          ? screenHeight*0.025
+                                                          : screenHeight*0.02, // Aumentar altura si isFullScreen es verdadero
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -4464,8 +4563,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     painter: LinePainter2(
                                                       progress3: progressPause,
                                                       strokeHeight: isFullScreen
-                                                          ? 20
-                                                          : 15, // Aumentar altura si isFullScreen es verdadero
+                                                          ? screenHeight*0.025
+                                                          : screenHeight*0.02,
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -5919,8 +6018,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       progress2:
                                                           progressContraction,
                                                       strokeHeight: isFullScreen
-                                                          ? 20
-                                                          : 15, // Aumentar altura si isFullScreen es verdadero
+                                                          ? screenHeight*0.025
+                                                          : screenHeight*0.02, // Aumentar altura si isFullScreen es verdadero
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -5966,8 +6065,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     painter: LinePainter2(
                                                       progress3: progressPause,
                                                       strokeHeight: isFullScreen
-                                                          ? 20
-                                                          : 15, // Aumentar altura si isFullScreen es verdadero
+                                                          ? screenHeight*0.025
+                                                          : screenHeight*0.02,
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -6698,9 +6797,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 children: selectedClients
                                                     .map((client) {
                                                   return Padding(
-                                                    padding: const EdgeInsets
+                                                    padding:  EdgeInsets
                                                         .symmetric(
-                                                        horizontal: 8.0),
+                                                        horizontal: screenWidth*0.008),
                                                     child: Column(
                                                       crossAxisAlignment:
                                                           CrossAxisAlignment
@@ -6796,7 +6895,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             curve: Curves.easeInOut,
                                             child: Container(
                                               padding:
-                                                  const EdgeInsets.all(10.0),
+                                                   EdgeInsets.symmetric(vertical: screenHeight*0.015, horizontal: screenWidth*0.015),
                                               width: _isExpanded3
                                                   ? screenWidth * 0.2
                                                   : 0,
@@ -7170,7 +7269,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+          padding:  EdgeInsets.symmetric(horizontal:  MediaQuery.of(context).size.height*0.002),
           decoration: BoxDecoration(
             color: _isMusculoTrajeInactivo[index]
                 ? Colors.grey.withOpacity(0.5) // Gris si está inactivo
@@ -7201,7 +7300,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/mas.png',
-                size: isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ?  MediaQuery.of(context).size.height*0.065 : MediaQuery.of(context).size.height*0.055,
                 isDisabled: _isMusculoTrajeBloqueado[index] ||
                     _isMusculoTrajeInactivo[index],
               ),
@@ -7234,8 +7333,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       });
                     },
                     child: SizedBox(
-                      width: isFullScreen ? 80.0 : 65.0,
-                      height: isFullScreen ? 80.0 : 65.0,
+                      height: isFullScreen ?MediaQuery.of(context).size.height*0.09 : MediaQuery.of(context).size.height*0.08,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Stack(
@@ -7280,7 +7378,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 ],
               ),
               SizedBox(width: MediaQuery.of(context).size.width * 0.005),
-
               // Botón "Menos"
               CustomIconButton(
                 onTap: widget.selectedKey == null
@@ -7300,7 +7397,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/menos.png',
-                size: isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ? MediaQuery.of(context).size.height*0.065 : MediaQuery.of(context).size.height*0.055,
                 isDisabled: _isMusculoTrajeBloqueado[index] ||
                     _isMusculoTrajeInactivo[index],
               ),
@@ -7378,7 +7475,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/mas.png',
-                size: isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ? MediaQuery.of(context).size.height*0.065 : MediaQuery.of(context).size.height*0.055,
                 isDisabled: _isMusculoPantalonBloqueado[index] ||
                     _isMusculoPantalonInactivo[index],
               ),
@@ -7412,8 +7509,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       });
                     },
                     child: SizedBox(
-                      width: isFullScreen ? 80.0 : 60.0,
-                      height: isFullScreen ? 80.0 : 60.0,
+                      height: isFullScreen ?MediaQuery.of(context).size.height*0.09 : MediaQuery.of(context).size.height*0.08,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Stack(
@@ -7477,7 +7573,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         });
                       },
                 imagePath: 'assets/images/menos.png',
-                size: isFullScreen ? 55.0 : 45.0,
+                size: isFullScreen ? MediaQuery.of(context).size.height*0.065 : MediaQuery.of(context).size.height*0.055,
                 isDisabled: _isMusculoPantalonBloqueado[index] ||
                     _isMusculoPantalonInactivo[index],
               ),
@@ -7542,8 +7638,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           onTap: isButtonEnabled ? () => onIncrement() : null,
           // Solo se ejecuta si el botón está habilitado
           child: SizedBox(
-            width: 45.0,
-            height: 45.0,
+            height: MediaQuery.of(context).size.height*0.06,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.asset(
@@ -7570,8 +7665,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           onTap: isButtonEnabled ? () => onDecrement() : null,
           // Solo se ejecuta si el botón está habilitado
           child: SizedBox(
-            width: 45.0,
-            height: 45.0,
+            height: MediaQuery.of(context).size.height*0.06,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.asset(
@@ -7581,7 +7675,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             ),
           ),
         ),
-        SizedBox(width: screenWidth * 0.01),
+        SizedBox(width: screenWidth * 0.005),
         // Imagen que se muestra en el lado derecho (por ejemplo: "CONTRACCION.png")
         Image.asset(
           imagePathDisplay, // Imagen personalizada
@@ -8033,7 +8127,7 @@ class BleConnectionService {
 
       // Esperar la respuesta con timeout
       final deviceInfo =
-      await completer.future.timeout(const Duration(seconds: 15));
+          await completer.future.timeout(const Duration(seconds: 15));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -8052,7 +8146,6 @@ class BleConnectionService {
       rethrow;
     }
   }
-
 
   // Función para parsear información en formato texto
   String parseDeviceInfo(Map<String, dynamic> deviceInfo) {
@@ -8135,9 +8228,9 @@ $endpoints
         if (data.isNotEmpty && data[0] == 0x05) {
           // FUN_GET_NAMEBT_R recibido
           final nameBytes =
-          data.sublist(1).takeWhile((byte) => byte != 0).toList();
+              data.sublist(1).takeWhile((byte) => byte != 0).toList();
           final name =
-          String.fromCharCodes(nameBytes); // Convertir bytes a string
+              String.fromCharCodes(nameBytes); // Convertir bytes a string
           completer.complete(name);
           debugPrint("📥 FUN_GET_NAMEBT_R recibido desde $macAddress: $name");
         }
@@ -8159,7 +8252,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final bluetoothName =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -8172,13 +8265,13 @@ $endpoints
       _subscriptions.remove(macAddress);
       rethrow;
     } catch (e) {
-      debugPrint("❌ Error al obtener el nombre del Bluetooth de $macAddress: $e");
+      debugPrint(
+          "❌ Error al obtener el nombre del Bluetooth de $macAddress: $e");
       await _subscriptions[macAddress]?.cancel();
       _subscriptions.remove(macAddress);
       rethrow;
     }
   }
-
 
   Future<Map<String, dynamic>> getBatteryParameters(String macAddress) async {
     final characteristicRx = QualifiedCharacteristic(
@@ -8213,17 +8306,17 @@ $endpoints
           final batteryParameters = {
             'batteryStatusRaw': data[3],
             'powerType':
-            data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
+                data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
             'batteryModel': data[2] == 0 ? "Por defecto" : "Desconocido",
             'batteryStatus': data[3] == 0
                 ? "Muy baja"
                 : data[3] == 1
-                ? "Baja"
-                : data[3] == 2
-                ? "Media"
-                : data[3] == 3
-                ? "Alta"
-                : "Llena",
+                    ? "Baja"
+                    : data[3] == 2
+                        ? "Media"
+                        : data[3] == 3
+                            ? "Alta"
+                            : "Llena",
             'temperature': "Sin implementar",
             'compensation': (data[6] << 8) | data[7],
             'voltages': {
@@ -8262,7 +8355,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final batteryParameters =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -8282,7 +8375,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   String parseBatteryParameters(Map<String, dynamic> batteryParameters) {
     final powerType = batteryParameters['powerType'];
@@ -8344,18 +8436,18 @@ $endpoints
           final tariffStatus = data[1] == 0
               ? "Sin tarifa"
               : data[1] == 1
-              ? "Con tarifa"
-              : "Con tarifa agotada";
+                  ? "Con tarifa"
+                  : "Con tarifa agotada";
 
           final totalSeconds = (data[2] << 24) |
-          (data[3] << 16) |
-          (data[4] << 8) |
-          data[5]; // Contador total (32 bits)
+              (data[3] << 16) |
+              (data[4] << 8) |
+              data[5]; // Contador total (32 bits)
 
           final remainingSeconds = (data[6] << 24) |
-          (data[7] << 16) |
-          (data[8] << 8) |
-          data[9]; // Contador parcial (32 bits)
+              (data[7] << 16) |
+              (data[8] << 8) |
+              data[9]; // Contador parcial (32 bits)
 
           final counters = {
             'tariffStatus': tariffStatus,
@@ -8385,7 +8477,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final counters =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -8405,7 +8497,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   String parseTariffCounters(Map<String, dynamic> counters) {
     final tariffStatus = counters['tariffStatus'];
@@ -8494,8 +8585,7 @@ $endpoints
           "📤 FUN_GET_ESTADO_EMS enviado a $macAddress. Endpoint: $endpoint, Modo: $mode.");
 
       // Esperar la respuesta con timeout
-      final state =
-      await completer.future.timeout(const Duration(seconds: 10));
+      final state = await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -8905,7 +8995,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final response =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -8925,7 +9015,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   String parseChannelControlResponse(Map<String, dynamic> response) {
     final endpoint = response['endpoint'];
@@ -9071,7 +9160,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final response =
-      await completer.future.timeout(const Duration(seconds: 10));
+          await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -9091,7 +9180,6 @@ $endpoints
       rethrow;
     }
   }
-
 
   String parseAllChannelsResponse(Map<String, dynamic> response) {
     final endpoint = response['endpoint'];
