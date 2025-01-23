@@ -284,17 +284,6 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
             _isLicenciaValida = true;
           });
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                "LICENCIA ACTIVADA",
-                style: TextStyle(color: Colors.white, fontSize: 17),
-              ),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
-
           // Guardar el estado utilizando AppState
           AppState.instance.nLicencia = _nLicenciaController.text;
           AppState.instance.nombre = _nameController.text;
@@ -325,13 +314,13 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     } catch (e) {
       print('Excepción al validar la licencia: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
             "LICENCIA NO VÁLIDA",
-            style: TextStyle(color: Colors.white, fontSize: 17),
+            style: TextStyle(color: Colors.white, fontSize: 17.sp),
           ),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -424,7 +413,10 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       fit: BoxFit.fill,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.008,
+                                        vertical: screenHeight * 0.008,
+                                      ),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -684,9 +676,13 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                 OutlinedButton(
                                   onPressed: _validarLicencia,
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.all(10.0),
-                                    side: const BorderSide(
-                                        width: 1.0, color: Color(0xFF2be4f3)),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.01,
+                                      vertical: screenHeight * 0.01,
+                                    ),
+                                    side: BorderSide(
+                                        width: screenWidth * 0.001,
+                                        color: const Color(0xFF2be4f3)),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(7),
                                     ),
@@ -705,7 +701,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                 ),
                                 if (AppState.instance.isLicenciaValida)
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 20.0),
+                                    padding: EdgeInsets.only(
+                                        left: screenWidth * 0.01),
                                     child: Text(
                                       tr(context, 'Licencia validada')
                                           .toUpperCase(),
@@ -745,7 +742,10 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                             child: SizedBox(
                               width: double.infinity,
                               child: Padding(
-                                padding: const EdgeInsets.all(10.0),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.001,
+                                  vertical: screenHeight * 0.001,
+                                ),
                                 child: Column(
                                   children: [
                                     // Encabezado de la tabla
@@ -861,9 +861,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
 
   // Función para crear las celdas de la tabla
   Widget buildCell(String text) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.01,
+          vertical: screenHeight * 0.01,
+        ),
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -953,9 +958,12 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   }
 
   Widget buildCell(String text) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.01, vertical: screenHeight * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center,

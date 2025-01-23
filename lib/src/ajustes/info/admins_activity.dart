@@ -90,32 +90,30 @@ class _AdminsActivityState extends State<AdminsActivity> {
         child: Column(
           children: [
             // Contenedor para los campos de entrada (ID, NOMBRE, ESTADO)
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // Campo ID
-                  // Campo NOMBRE
-                  Flexible(
-                    child: _buildTextField(tr(context, 'Nombre').toUpperCase(),
-                        _nameController, false),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                // Campo ID
+                // Campo NOMBRE
+                Flexible(
+                  child: _buildTextField(tr(context, 'Nombre').toUpperCase(),
+                      _nameController, false),
+                ),
+                SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
+                // Campo ESTADO
+                Flexible(
+                  child: _buildDropdownField(
+                    tr(context, 'Estado').toUpperCase(),
+                    selectedOption,
+                    (value) {
+                      setState(() {
+                        selectedOption = value;
+                      });
+                    },
+                    false, // Deshabilitado
                   ),
-                  SizedBox(width: screenWidth * 0.02), // Espaciado entre campos
-                  // Campo ESTADO
-                  Flexible(
-                    child: _buildDropdownField(
-                      tr(context, 'Estado').toUpperCase(),
-                      selectedOption,
-                      (value) {
-                        setState(() {
-                          selectedOption = value;
-                        });
-                      },
-                      false, // Deshabilitado
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
             SizedBox(height: screenHeight * 0.05),
             // Contenedor para la tabla de actividades
@@ -128,7 +126,9 @@ class _AdminsActivityState extends State<AdminsActivity> {
                   borderRadius: BorderRadius.circular(7.0),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.02,
+                      vertical: screenHeight * 0.02),
                   child: ActivityTableWidget(activityData: allSesions),
                 ),
               ),
@@ -179,6 +179,7 @@ class _AdminsActivityState extends State<AdminsActivity> {
 
   Widget _buildDropdownField(
       String label, String? value, Function(String?) onChanged, bool enabled) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -225,11 +226,8 @@ class _AdminsActivityState extends State<AdminsActivity> {
               onChanged: enabled ? onChanged : null,
               // Permitir cambio si está habilitado
               dropdownColor: const Color(0xFF313030),
-              icon: const Icon(
-                Icons.arrow_drop_down,
-                color: Color(0xFF2be4f3),
-                size: 30,
-              ),
+              icon: Icon(Icons.arrow_drop_down,
+                  color: const Color(0xFF2be4f3), size: screenHeight * 0.05),
             ),
           ),
         ),

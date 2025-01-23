@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
@@ -33,17 +34,48 @@ class _ClientListViewState extends State<ClientListView> {
 
   Future<void> _fetchClients() async {
     final dbHelper = DatabaseHelper();
+
     try {
-      final clientData = await dbHelper.getClients();
+      // Obtener el userId desde SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('user_id');
+
+      if (userId == null) {
+        // Manejar el caso de usuario no autenticado
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error: Usuario no autenticado',
+              style: TextStyle(color: Colors.white, fontSize: 17.sp),
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      // Obtener clientes: si userId es 1, mostrar todos; si no, filtrar por userId
+      List<Map<String, dynamic>> clientData;
+      if (userId == 1) {
+        // Obtener todos los clientes sin filtrar
+        clientData = await dbHelper.getClients();
+      } else {
+        // Obtener clientes asociados al usuario
+        clientData = await dbHelper.getClientsByUserId(userId);
+      }
+
       setState(() {
         allClients = clientData; // Asigna a la lista original
         filteredClients = allClients; // Inicializa la lista filtrada
       });
-      _filterClients(); // Filtra para mostrar todos los clientes
+
+      _filterClients(); // Aplica cualquier filtrado adicional
     } catch (e) {
       print('Error fetching clients: $e');
     }
   }
+
 
   void _filterClients() {
     setState(() {
@@ -82,22 +114,14 @@ class _ClientListViewState extends State<ClientListView> {
     });
   }
 
-  // Método para llamar al deleteDatabaseFile
-  Future<void> _deleteDatabase() async {
-    final dbHelper = DatabaseHelper();
-    await dbHelper.deleteDatabaseFile(); // Elimina la base de datos
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Base de datos eliminada con éxito.'),
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+      padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
       child: Column(
         children: [
           Row(
@@ -138,7 +162,7 @@ class _ClientListViewState extends State<ClientListView> {
             ),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style:  TextStyle(color: Colors.white, fontSize: 12.sp),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(7),
@@ -147,7 +171,7 @@ class _ClientListViewState extends State<ClientListView> {
                 fillColor: const Color(0xFF313030),
                 isDense: true,
                 hintText: hint,
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                hintStyle:  TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),
           ),
@@ -157,6 +181,8 @@ class _ClientListViewState extends State<ClientListView> {
   }
 
   Widget _buildDropdown() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,8 +224,8 @@ class _ClientListViewState extends State<ClientListView> {
                 });
               },
               dropdownColor: const Color(0xFF313030),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF2be4f3), size: 30),
+              icon:  Icon(Icons.arrow_drop_down,
+                  color: const Color(0xFF2be4f3), size: screenHeight*0.05),
             ),
           ),
         ],
@@ -219,7 +245,8 @@ class _ClientListViewState extends State<ClientListView> {
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
           child: DataTableWidget(
             data: filteredClients,
             onRowTap: (clientData) {

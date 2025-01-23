@@ -91,30 +91,28 @@ class _ClientsActivityState extends State<ClientsActivity> {
         child: Column(
           children: [
             // Contenedor para los campos de entrada (ID, NOMBRE, ESTADO)
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: _buildTextField(tr(context, 'Nombre').toUpperCase(),
-                        _nameController, false),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: _buildTextField(tr(context, 'Nombre').toUpperCase(),
+                      _nameController, false),
+                ),
+                SizedBox(width: screenWidth * 0.05), // Espaciado entre campos
+                // Campo ESTADO
+                Flexible(
+                  child: _buildDropdownField(
+                    tr(context, 'Estado').toUpperCase(),
+                    selectedOption,
+                    (value) {
+                      setState(() {
+                        selectedOption = value;
+                      });
+                    },
+                    false, // Deshabilitado
                   ),
-                  SizedBox(width: screenWidth * 0.05), // Espaciado entre campos
-                  // Campo ESTADO
-                  Flexible(
-                    child: _buildDropdownField(
-                      tr(context, 'Estado').toUpperCase(),
-                      selectedOption,
-                      (value) {
-                        setState(() {
-                          selectedOption = value;
-                        });
-                      },
-                      false, // Deshabilitado
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
             SizedBox(height: screenHeight * 0.05),
             // Contenedor para la tabla de actividades
@@ -127,7 +125,8 @@ class _ClientsActivityState extends State<ClientsActivity> {
                   borderRadius: BorderRadius.circular(7.0),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
                   child: ActivityTableWidget(activityData: allSesions),
                 ),
               ),

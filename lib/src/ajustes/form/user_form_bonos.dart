@@ -145,44 +145,46 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
   }
 
   Widget _buildInputRow(double screenWidth) {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildTextField(tr(context, 'Nombre').toUpperCase(), _nameController,
-              enabled: false),
-          SizedBox(width: screenWidth * 0.02),
-          _buildDropdownField(
-              tr(context, 'Estado').toUpperCase(), selectedOption, (value) {
-            setState(() {
-              selectedOption = value;
-            });
-          }, enabled: false), // Deshabilitar dropdown
-          SizedBox(width: screenWidth * 0.02),
-          OutlinedButton(
-            onPressed: () {
-              _addBonos(context);
-            }, // Mantener vacío para que InkWell funcione
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.all(10.0),
-              side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(7),
-              ),
-              backgroundColor: Colors.transparent,
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildTextField(tr(context, 'Nombre').toUpperCase(), _nameController,
+            enabled: false),
+        SizedBox(width: screenWidth * 0.02),
+        _buildDropdownField(tr(context, 'Estado').toUpperCase(), selectedOption,
+            (value) {
+          setState(() {
+            selectedOption = value;
+          });
+        }, enabled: false), // Deshabilitar dropdown
+        SizedBox(width: screenWidth * 0.02),
+        OutlinedButton(
+          onPressed: () {
+            _addBonos(context);
+          }, // Mantener vacío para que InkWell funcione
+          style: OutlinedButton.styleFrom(
+            padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.01, vertical: screenHeight * 0.01),
+            side: BorderSide(
+                width: screenWidth * 0.001, color: const Color(0xFF2be4f3)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(7),
             ),
-            child: Text(
-              tr(context, 'Añadir bonos').toUpperCase(),
-              style: TextStyle(
-                color: const Color(0xFF2be4f3),
-                fontSize: 17.sp,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            backgroundColor: Colors.transparent,
           ),
-        ],
-      ),
+          child: Text(
+            tr(context, 'Añadir bonos').toUpperCase(),
+            style: TextStyle(
+              color: const Color(0xFF2be4f3),
+              fontSize: 17.sp,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
     );
   }
 
@@ -228,6 +230,8 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
 
   Widget _buildBonosContainer(
       double screenHeight, List<Map<String, String>> bonosData, bool showHour) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Container(
         height: screenHeight * 0.3,
@@ -236,7 +240,8 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.015, vertical: screenHeight * 0.015),
           child: BonosTableWidget(
             bonosData: bonosData,
             showHour: showHour,
@@ -261,6 +266,8 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
 
   Widget _buildTotalContainer(
       double screenHeight, String label, String total, Color totalColor) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Container(
         height: screenHeight * 0.1,
@@ -269,7 +276,8 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.015, vertical: screenHeight * 0.015),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -327,6 +335,8 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
   Widget _buildDropdownField(
       String label, String? value, Function(String?) onChanged,
       {bool enabled = true}) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,8 +369,8 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
                 ],
                 onChanged: enabled ? onChanged : null,
                 dropdownColor: const Color(0xFF313030),
-                icon: const Icon(Icons.arrow_drop_down,
-                    color: Color(0xFF2be4f3), size: 30),
+                icon: Icon(Icons.arrow_drop_down,
+                    color: const Color(0xFF2be4f3), size: screenHeight * 0.05),
               ),
             ),
           ),
@@ -398,7 +408,8 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: Color(0xFF2be4f3), width: 2),
+            side: BorderSide(
+                color: const Color(0xFF2be4f3), width: screenWidth * 0.001),
             borderRadius: BorderRadius.circular(7),
           ),
           child: SizedBox(
@@ -437,10 +448,10 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.close_sharp,
                             color: Colors.white,
-                            size: 50,
+                            size: screenHeight * 0.07,
                           ),
                         ),
                       ),
@@ -451,17 +462,19 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 5.0, vertical: 5.0),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.002,
+                        vertical: screenHeight * 0.002),
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(20.0),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.02,
+                              vertical: screenHeight * 0.02),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: const Color(0xFF313030),
                             borderRadius: BorderRadius.circular(7),
-                            border: Border.all(color: Colors.white, width: 1),
                           ),
                           child: TextField(
                             controller: _bonosController,
@@ -482,7 +495,7 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
                             ),
                           ),
                         ),
-                        SizedBox(height: screenHeight * 0.03),
+                        SizedBox(height: screenHeight * 0.05),
                         OutlinedButton(
                           onPressed: () async {
                             final cantidadBonos =
@@ -524,10 +537,12 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
                             );
                           },
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(10.0),
-                            side: const BorderSide(
-                              width: 1.0,
-                              color: Color(0xFF2be4f3),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.01,
+                                vertical: screenHeight * 0.01),
+                            side: BorderSide(
+                              width: screenWidth * 0.001,
+                              color: const Color(0xFF2be4f3),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(7),

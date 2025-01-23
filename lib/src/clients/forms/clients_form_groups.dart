@@ -143,8 +143,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
         });
       },
       child: Container(
-        width: 22.0,
-        height: 22.0,
+        width: MediaQuery.of(context).size.width * 0.03,
+        height: MediaQuery.of(context).size.height * 0.03,
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -155,7 +155,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
             color: selectedGroups[option] == true
                 ? const Color(0xFF2be4f3)
                 : Colors.white,
-            width: 1.0,
+            width: MediaQuery.of(context).size.width * 0.001,
           ),
         ),
       ),
@@ -188,104 +188,103 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Primer contenedor para el primer row de inputs
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(tr(context, 'Nombre').toUpperCase(),
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.bold)),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: const Color(0xFF313030),
-                                    borderRadius: BorderRadius.circular(7)),
-                                child: TextField(
-                                  controller: _nameController,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 14.sp),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(7)),
-                                    filled: true,
-                                    fillColor: const Color(0xFF313030),
-                                    isDense: true,
-                                    enabled: false,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                tr(context, 'Estado').toUpperCase(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(tr(context, 'Nombre').toUpperCase(),
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15.sp,
-                                    fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.bold)),
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7)),
+                              child: TextField(
+                                controller: _nameController,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14.sp),
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(7)),
+                                  filled: true,
+                                  fillColor: const Color(0xFF313030),
+                                  isDense: true,
+                                  enabled: false,
+                                ),
                               ),
-                              Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: const Color(0xFF313030),
-                                    borderRadius: BorderRadius.circular(7)),
-                                child: AbsorbPointer(
-                                  absorbing: true,
-                                  // Esto deshabilita la interacción con el DropdownButton
-                                  child: DropdownButton<String>(
-                                    hint: Text(
-                                      tr(context, 'Seleccione'),
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 14.sp),
-                                    ),
-                                    value: selectedOption,
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'Activo',
-                                        child: Text(
-                                          tr(context, 'Activo'),
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14.sp),
-                                        ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.05),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tr(context, 'Estado').toUpperCase(),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFF313030),
+                                  borderRadius: BorderRadius.circular(7)),
+                              child: AbsorbPointer(
+                                absorbing: true,
+                                // Esto deshabilita la interacción con el DropdownButton
+                                child: DropdownButton<String>(
+                                  hint: Text(
+                                    tr(context, 'Seleccione'),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 14.sp),
+                                  ),
+                                  value: selectedOption,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: 'Activo',
+                                      child: Text(
+                                        tr(context, 'Activo'),
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.sp),
                                       ),
-                                      DropdownMenuItem(
-                                        value: 'Inactivo',
-                                        child: Text(
-                                          tr(context, 'Inactivo'),
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14.sp),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: null,
-                                    // Asegura que no se pueda cambiar el valor
-                                    dropdownColor: const Color(0xFF313030),
-                                    icon: const Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Color(0xFF2be4f3),
-                                      size: 30,
                                     ),
+                                    DropdownMenuItem(
+                                      value: 'Inactivo',
+                                      child: Text(
+                                        tr(context, 'Inactivo'),
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14.sp),
+                                      ),
+                                    ),
+                                  ],
+                                  onChanged: null,
+                                  // Asegura que no se pueda cambiar el valor
+                                  dropdownColor: const Color(0xFF313030),
+                                  icon: Icon(
+                                    Icons.arrow_drop_down,
+                                    color: const Color(0xFF2be4f3),
+                                    size: MediaQuery.of(context).size.height *
+                                        0.05,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                   SizedBox(height: screenHeight * 0.05),
                   // Segundo contenedor para el segundo row de inputs

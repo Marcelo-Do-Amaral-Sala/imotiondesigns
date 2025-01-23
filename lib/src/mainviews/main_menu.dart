@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
 
 import '../../utils/translation_utils.dart';
 import '../bio/overlay_bio.dart';
@@ -19,7 +19,6 @@ import '../servicios/licencia_state.dart';
 import '../servicios/sync.dart';
 import '../servicios/translation_provider.dart'; // Importa el TranslationProvider
 
-
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToLogin;
   final Function() onNavigateToPanel;
@@ -30,7 +29,6 @@ class MainMenuView extends StatefulWidget {
   final double screenWidth;
   final double screenHeight;
 
-
   const MainMenuView({
     Key? key,
     required this.onNavigateToPanel,
@@ -39,14 +37,13 @@ class MainMenuView extends StatefulWidget {
     required this.onNavigateToAjustes,
     required this.onNavigateToTutoriales,
     required this.screenWidth,
-    required this.screenHeight, required this.onNavigateToLogin,
+    required this.screenHeight,
+    required this.onNavigateToLogin,
   }) : super(key: key);
-
 
   @override
   State<MainMenuView> createState() => _MainMenuViewState();
 }
-
 
 class _MainMenuViewState extends State<MainMenuView> {
   double scaleFactorBack = 1.0;
@@ -64,13 +61,13 @@ class _MainMenuViewState extends State<MainMenuView> {
   int? userId;
   String? userTipoPerfil;
 
-
   @override
   void initState() {
     super.initState();
     // Llamar a la función para verificar el userId y tipo de perfil al iniciar
     _checkUserProfile();
   }
+
   Future<void> clearLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('user_id');
@@ -78,16 +75,11 @@ class _MainMenuViewState extends State<MainMenuView> {
     print('Datos de inicio de sesión eliminados de SharedPreferences');
   }
 
-
-
-
-
-
   Future<void> _checkUserProfile() async {
     // Obtener el userId desde SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId = prefs.getInt('user_id'); // Guardamos el userId en la variable de clase
-
+    userId =
+        prefs.getInt('user_id'); // Guardamos el userId en la variable de clase
 
     if (userId != null) {
       // Obtener el tipo de perfil del usuario usando el userId
@@ -100,16 +92,10 @@ class _MainMenuViewState extends State<MainMenuView> {
       // Si no se encuentra el userId en SharedPreferences
       print('No se encontró el userId en SharedPreferences.');
 
-
       // Aquí puedes agregar un flujo para navegar al login si no hay usuario
       // widget.onNavigateToLogin();
     }
   }
-
-
-
-
-
 
   void toggleOverlay(int index) {
     setState(() {
@@ -117,7 +103,6 @@ class _MainMenuViewState extends State<MainMenuView> {
       overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
     });
   }
-
 
   Future<void> _logOut(BuildContext context) async {
     showDialog(
@@ -128,13 +113,15 @@ class _MainMenuViewState extends State<MainMenuView> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
             height: MediaQuery.of(context).size.height * 0.2,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.01,
+                horizontal: MediaQuery.of(context).size.width * 0.02),
             decoration: BoxDecoration(
               color: const Color(0xFF494949),
               borderRadius: BorderRadius.circular(7),
               border: Border.all(
                 color: const Color(0xFF28E2F5),
-                width: 1,
+                width: MediaQuery.of(context).size.width * 0.001,
               ),
             ),
             child: Column(
@@ -148,7 +135,7 @@ class _MainMenuViewState extends State<MainMenuView> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-               const Spacer(),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -202,7 +189,6 @@ class _MainMenuViewState extends State<MainMenuView> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -243,11 +229,11 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/panel.png',
                                 tr(context, 'Panel de control').toUpperCase(),
                                 scaleFactorPanel,
-                                    () {
+                                () {
                                   scaleFactorPanel = 1;
                                   widget.onNavigateToPanel();
                                 },
-                                    () => setState(() => scaleFactorPanel = 0.90),
+                                () => setState(() => scaleFactorPanel = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -255,11 +241,11 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/cliente.png',
                                 tr(context, 'Clientes').toUpperCase(),
                                 scaleFactorClient,
-                                    () {
+                                () {
                                   scaleFactorClient = 1;
                                   widget.onNavigateToClients();
                                 },
-                                    () => setState(() => scaleFactorClient = 0.90),
+                                () => setState(() => scaleFactorClient = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -267,13 +253,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/programas.png',
                                 tr(context, 'Programas').toUpperCase(),
                                 scaleFactorProgram,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorProgram = 1;
                                     widget.onNavigateToPrograms();
                                   });
                                 },
-                                    () => setState(() => scaleFactorProgram = 0.90),
+                                () => setState(() => scaleFactorProgram = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -281,13 +267,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/bio.png',
                                 tr(context, 'Bioimpedancia').toUpperCase(),
                                 scaleFactorBio,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorBio = 1;
                                     toggleOverlay(0);
                                   });
                                 },
-                                    () => setState(() => scaleFactorBio = 0.90),
+                                () => setState(() => scaleFactorBio = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -295,13 +281,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/tutoriales.png',
                                 tr(context, 'Tutoriales').toUpperCase(),
                                 scaleFactorTuto,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorTuto = 1;
                                     widget.onNavigateToTutoriales();
                                   });
                                 },
-                                    () => setState(() => scaleFactorTuto = 0.90),
+                                () => setState(() => scaleFactorTuto = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -309,14 +295,15 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 'assets/images/ajustes.png',
                                 tr(context, 'Ajustes').toUpperCase(),
                                 scaleFactorAjustes,
-                                    () {
+                                () {
                                   setState(() {
                                     scaleFactorAjustes = 1;
                                     widget.onNavigateToAjustes();
                                   });
                                 },
-                                    () => setState(() => scaleFactorAjustes = 0.90),
-                                isDisabled: userTipoPerfil == "Entrenador", // Deshabilitar si el perfil no es "Ambos" ni "Administrador"
+                                () => setState(() => scaleFactorAjustes = 0.90),
+                                isDisabled: userTipoPerfil ==
+                                    "Entrenador", // Deshabilitar si el perfil no es "Ambos" ni "Administrador"
                               ),
                             ],
                           ),
@@ -363,6 +350,33 @@ class _MainMenuViewState extends State<MainMenuView> {
                                 ),
                               ),
                             ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTapDown: (_) =>
+                                    setState(() => scaleFactorBack = 0.90),
+                                onTapUp: (_) =>
+                                    setState(() => scaleFactorBack = 1.0),
+                                onTap: () {
+                                  toggleOverlay(1);
+                                },
+                                child: AnimatedScale(
+                                  scale: scaleFactorBack,
+                                  duration: const Duration(milliseconds: 100),
+                                  child: SizedBox(
+                                    width: screenWidth * 0.1,
+                                    height: screenHeight * 0.1,
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        'assets/images/icono-vita.png',
+                                        fit: BoxFit.scaleDown,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -384,35 +398,40 @@ class _MainMenuViewState extends State<MainMenuView> {
     );
   }
 
-
   Widget _getOverlayWidget(int overlayIndex) {
     switch (overlayIndex) {
       case 0:
         return OverlayBioimpedancia(
           onClose: () => toggleOverlay(0),
         );
+      case 1:
+        return OverlayVita(
+          onClose: () => toggleOverlay(1),
+        );
       default:
         return Container();
     }
   }
 
-
   Widget buildButton(BuildContext context, String imagePath, String text,
-      double scale, VoidCallback onTapUp, VoidCallback onTapDown, {bool isDisabled = false}) {
+      double scale, VoidCallback onTapUp, VoidCallback onTapDown,
+      {bool isDisabled = false}) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
 
     return Align(
       alignment: Alignment.centerRight,
       child: GestureDetector(
-        onTapDown: isDisabled ? null : (_) => onTapDown(), // Deshabilitar acción si está deshabilitado
-        onTapUp: isDisabled ? null : (_) => onTapUp(), // Deshabilitar acción si está deshabilitado
+        onTapDown: isDisabled ? null : (_) => onTapDown(),
+        // Deshabilitar acción si está deshabilitado
+        onTapUp: isDisabled ? null : (_) => onTapUp(),
+        // Deshabilitar acción si está deshabilitado
         child: AnimatedScale(
           scale: scale,
           duration: const Duration(milliseconds: 100),
           child: Opacity(
-            opacity: isDisabled ? 0.5 : 1.0, // Aplica opacidad solo si está deshabilitado
+            opacity: isDisabled ? 0.5 : 1.0,
+            // Aplica opacidad solo si está deshabilitado
             child: SizedBox(
               width: screenWidth * 0.25,
               height: screenHeight * 0.12,
@@ -424,12 +443,13 @@ class _MainMenuViewState extends State<MainMenuView> {
                     fit: BoxFit.fill,
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding:  EdgeInsets.symmetric(horizontal: screenWidth * 0.005,
+                      vertical: screenHeight * 0.001),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          padding: const EdgeInsets.only(left: 20.0),
+                          padding:  EdgeInsets.only(left: screenWidth*0.01),
                           width: screenWidth * 0.05,
                           height: screenHeight * 0.1,
                           child: Image.asset(
@@ -460,5 +480,3 @@ class _MainMenuViewState extends State<MainMenuView> {
     );
   }
 }
-
-

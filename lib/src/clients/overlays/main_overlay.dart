@@ -29,12 +29,14 @@ class _MainOverlayState extends State<MainOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return isVisible
         ? Center( // Esto asegura que el overlay se coloque en el centro
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF494949),
-          border: Border.all(color: const Color(0xFF2be4f3), width: 2),
+          border: Border.all(color: const Color(0xFF2be4f3), width: screenWidth*0.002),
           borderRadius: BorderRadius.circular(7),
         ),
         // Ajusta el tamaño del contenedor con un width y height
@@ -73,10 +75,10 @@ class _MainOverlayState extends State<MainOverlay> {
               bottom: 0,
               child: IconButton(
                 onPressed: closeOverlay,
-                icon: const Icon(
+                icon:  Icon(
                   Icons.close_sharp,
                   color: Colors.white,
-                  size: 50,
+                  size: MediaQuery.of(context).size.height*0.06,
                 ),
               ),
             ),

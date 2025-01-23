@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
@@ -106,11 +107,30 @@ class _ClientsDataState extends State<ClientsData> {
             ),
           ),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       return; // Exit method if there are empty fields
     }
+
+    // Obtener el userId desde SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('user_id');
+
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tr(context, 'Error: Usuario no autenticado').toUpperCase(),
+            style: TextStyle(color: Colors.white, fontSize: 17.sp),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     // Convertir la primera letra del nombre a mayúscula
     String name = _nameController.text.trim();
     if (name.isNotEmpty) {
@@ -118,7 +138,8 @@ class _ClientsDataState extends State<ClientsData> {
     }
 
     final clientData = {
-      'name': name, // Nombre con la primera letra en mayúscula
+      'usuario_id': userId, // Asociar el cliente con el usuario
+      'name': name,
       'email': _emailController.text,
       'phone': int.tryParse(_phoneController.text),
       'height': int.tryParse(_heightController.text), // Convert to int
@@ -177,102 +198,125 @@ class _ClientsDataState extends State<ClientsData> {
   }
 
   Future<void> _deleteClients(BuildContext context, int clientId) async {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF494949),
-          // Color de fondo del diálogo
-          title: Text(
-            tr(context, 'Confirmar borrado').toUpperCase(),
-            style: TextStyle(
-                color: Color(0xFF2be4f3),
-                fontSize: 30.sp,
-                fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center, // Color del texto
-          ),
-          content: Text(
-            tr(context, '¿Estás seguro que quieres borrar este cliente?')
-                .toUpperCase(),
-            style: TextStyle(color: Colors.white, fontSize: 25.sp),
-            textAlign: TextAlign.center, // Color del texto
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Dialog(
+          child: Container(
+            width: screenWidth * 0.4,
+            height: screenHeight * 0.3,
+            padding: EdgeInsets.symmetric(
+                vertical: screenHeight * 0.01, horizontal: screenWidth * 0.01),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: screenWidth * 0.001,
+              ),
+            ),
+            child: Column(
               children: [
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side: const BorderSide(
-                      width: 1.0,
-                      color: Color(0xFF2be4f3),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    tr(context, 'Cancelar').toUpperCase(),
-                    style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: () async {
-                    DatabaseHelper dbHelper = DatabaseHelper();
-                    await dbHelper.deleteClient(clientId); // Borrar cliente
-
-                    // Mostrar Snackbar de éxito
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          tr(context, 'Cliente borrado correctamente')
-                              .toUpperCase(),
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 17.sp),
-                        ),
-                        backgroundColor: Colors.orange,
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                    // Cierra el diálogo después de confirmar el borrado
-                    Navigator.of(context).pop();
-                    widget.onClose();
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side: const BorderSide(
-                      width: 1.0,
+                Text(
+                  tr(context, 'Confirmar borrado').toUpperCase(),
+                  style: TextStyle(
                       color: Colors.red,
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: screenHeight * 0.02),
+                Text(
+                  tr(context, '¿Estás seguro que quieres borrar este cliente?')
+                      .toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Cerrar el diálogo
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.01,
+                            vertical: screenHeight * 0.01),
+                        side: BorderSide(
+                          width: screenWidth * 0.001,
+                          color: const Color(0xFF2be4f3),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        backgroundColor: Colors.transparent,
+                      ),
+                      child: Text(
+                        tr(context, 'Cancelar').toUpperCase(),
+                        style: TextStyle(
+                          color: const Color(0xFF2be4f3),
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
+                    OutlinedButton(
+                      onPressed: () async {
+                        DatabaseHelper dbHelper = DatabaseHelper();
+                        await dbHelper.deleteClient(clientId); // Borrar cliente
+
+                        // Mostrar Snackbar de éxito
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              tr(context, 'Cliente borrado correctamente')
+                                  .toUpperCase(),
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 17.sp),
+                            ),
+                            backgroundColor: Colors.orange,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+
+                        Navigator.of(context).pop(); // Cierra el diálogo
+                        widget.onClose(); // Lógica post-cierre
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.01,
+                            vertical: screenHeight * 0.01),
+                        side: BorderSide(
+                          width: screenWidth * 0.001,
+                          color: Colors.red,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                      child: Text(
+                        tr(context, '¡Sí, estoy seguro!').toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    backgroundColor: Colors.red,
-                  ),
-                  child: Text(
-                    tr(context, '¡Sí, estoy seguro!').toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -351,8 +395,9 @@ class _ClientsDataState extends State<ClientsData> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Color(0xFF2be4f3), size: 30),
+                                icon: Icon(Icons.arrow_drop_down,
+                                    color: const Color(0xFF2be4f3),
+                                    size: screenHeight * 0.05),
                               ),
                             ),
                           ],
@@ -394,8 +439,9 @@ class _ClientsDataState extends State<ClientsData> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Color(0xFF2be4f3), size: 30),
+                                icon: Icon(Icons.arrow_drop_down,
+                                    color: const Color(0xFF2be4f3),
+                                    size: screenHeight * 0.05),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
@@ -503,50 +549,53 @@ class _ClientsDataState extends State<ClientsData> {
             ),
             SizedBox(height: screenHeight * 0.01),
             // Fila para el ícono de "tick" alineado a la parte inferior
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              GestureDetector(
-                onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
-                onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-                onTap: () {
-                  _deleteClients(context, clientId!);
-                },
-                child: AnimatedScale(
-                  scale: scaleFactorRemove,
-                  duration: const Duration(milliseconds: 100),
-                  child: SizedBox(
-                    width: screenWidth * 0.08,
-                    height: screenHeight * 0.08,
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/papelera.png',
-                        fit: BoxFit.scaleDown,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
+                  onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
+                  onTap: () {
+                    _deleteClients(context, clientId!);
+                  },
+                  child: AnimatedScale(
+                    scale: scaleFactorRemove,
+                    duration: const Duration(milliseconds: 100),
+                    child: SizedBox(
+                      width: screenWidth * 0.08,
+                      height: screenHeight * 0.08,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/papelera.png',
+                          fit: BoxFit.scaleDown,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              GestureDetector(
-                onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                onTap: () {
-                  _updateData(); // Llama a la función pasando el ID
-                },
-                child: AnimatedScale(
-                  scale: scaleFactorTick,
-                  duration: const Duration(milliseconds: 100),
-                  child: SizedBox(
-                    width: screenWidth * 0.08,
-                    height: screenHeight * 0.08,
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/tick.png',
-                        fit: BoxFit.scaleDown,
+                GestureDetector(
+                  onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                  onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                  onTap: () {
+                    _updateData(); // Llama a la función pasando el ID
+                  },
+                  child: AnimatedScale(
+                    scale: scaleFactorTick,
+                    duration: const Duration(milliseconds: 100),
+                    child: SizedBox(
+                      width: screenWidth * 0.08,
+                      height: screenHeight * 0.08,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/tick.png',
+                          fit: BoxFit.scaleDown,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ]),
+              ],
+            ),
           ],
         ),
       ),

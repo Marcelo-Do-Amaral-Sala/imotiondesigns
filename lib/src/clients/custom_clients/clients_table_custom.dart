@@ -76,9 +76,12 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   }
 
   Widget buildCell(String text) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.01, vertical: screenHeight * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
@@ -164,9 +167,12 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   }
 
   Widget buildCell(String text) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.01, vertical: screenHeight * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada

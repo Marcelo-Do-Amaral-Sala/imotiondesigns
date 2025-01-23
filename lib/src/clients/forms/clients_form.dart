@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
@@ -95,6 +96,24 @@ class PersonalDataFormState extends State<PersonalDataForm> {
       return;
     }
 
+    // Obtener el userId desde SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('user_id');
+
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tr(context, 'Error: Usuario no autenticado').toUpperCase(),
+            style: const TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     // Convertir la primera letra del nombre a mayúscula
     String name = _nameController.text.trim();
     if (name.isNotEmpty) {
@@ -102,11 +121,12 @@ class PersonalDataFormState extends State<PersonalDataForm> {
     }
 
     final clientData = {
-      'name': name, // Nombre con la primera letra en mayúscula
+      'usuario_id': userId, // Asociar el cliente con el usuario
+      'name': name,
       'email': _emailController.text,
       'phone': _phoneController.text,
-      'height': _heightController.text,
-      'weight': _weightController.text,
+      'height': int.parse(_heightController.text),
+      'weight': int.parse(_weightController.text),
       'gender': selectedGender,
       'status': selectedOption,
       'birthdate': _birthDate,
@@ -129,9 +149,9 @@ class PersonalDataFormState extends State<PersonalDataForm> {
     );
 
     // Llama a la función onDataChanged para informar de los datos
-    widget.onDataChanged(
-        clientData); // Aquí notificamos que los datos fueron guardados
+    widget.onDataChanged(clientData); // Aquí notificamos que los datos fueron guardados
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -206,8 +226,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Color(0xFF2be4f3), size: 30),
+                                icon:  Icon(Icons.arrow_drop_down,
+                                    color: const Color(0xFF2be4f3), size: screenHeight*0.05),
                               ),
                             ),
                           ],
@@ -249,8 +269,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Color(0xFF2be4f3), size: 30),
+                                icon:  Icon(Icons.arrow_drop_down,
+                                    color: const Color(0xFF2be4f3), size: screenHeight*0.05),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),

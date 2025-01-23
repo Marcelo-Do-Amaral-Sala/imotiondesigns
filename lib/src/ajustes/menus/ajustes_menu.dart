@@ -138,7 +138,8 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                       fit: BoxFit.fill,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding:  EdgeInsets.symmetric(horizontal: screenWidth * 0.005,
+                                          vertical: screenHeight * 0.001),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -291,68 +292,6 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                 ),
                               ),
                             ),
-                            /*if (overlayIndex == 2)
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    AnimatedBuilder(
-                                      animation: _opacityAnimation,
-                                      builder: (context, child) {
-                                        return Opacity(
-                                          opacity: _opacityAnimation.value,
-                                          child: child,
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(7),
-                                        ),
-                                        child: const Text(
-                                          "¡Nuevo!",
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTapDown: (_) => setState(
-                                          () => scaleFactorVITA = 0.90),
-                                      onTapUp: (_) =>
-                                          setState(() => scaleFactorVITA = 1.0),
-                                      onTap: () {
-                                        setState(() {
-                                          isOverlayVisible = false;
-                                          toggleOverlay(3);
-                                        });
-                                      },
-                                      child: AnimatedScale(
-                                        scale: scaleFactorVITA,
-                                        duration:
-                                            const Duration(milliseconds: 100),
-                                        child: SizedBox(
-                                          width: screenWidth * 0.1,
-                                          height: screenHeight * 0.1,
-                                          child: ClipOval(
-                                            child: Image.asset(
-                                              'assets/images/mujer.png',
-                                              fit: BoxFit.scaleDown,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),*/
                           ],
                         ),
                       ),
@@ -408,6 +347,8 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
 
   Widget buildButton(BuildContext context, String text, double scale,
       VoidCallback onTapUp, VoidCallback onTapDown) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Align(
       alignment: Alignment.centerRight,
       child: GestureDetector(
@@ -427,15 +368,23 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                   fit: BoxFit.fill,
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: const Color(0xFF28E2F5),
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
+                  padding:  EdgeInsets.symmetric(horizontal: screenWidth * 0.005,
+                      vertical: screenHeight * 0.001),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: const Color(0xFF28E2F5),
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

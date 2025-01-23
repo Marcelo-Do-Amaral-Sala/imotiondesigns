@@ -18,6 +18,7 @@ class AdminsTableWidget extends StatefulWidget {
 
 class _AdminsTableWidgetState extends State<AdminsTableWidget> {
   @override
+  @override
   Widget build(BuildContext context) {
     // Ordenar la lista de datos por el id de menor a mayor
     List<Map<String, dynamic>> sortedData = List.from(widget.data);
@@ -28,6 +29,7 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
           b['id'] is int ? b['id'] : int.tryParse(b['id'].toString()) ?? 0;
       return idA.compareTo(idB); // Ordenar de menor a mayor
     });
+
     return Column(
       children: [
         buildHeaderRow(), // Encabezado fijo
@@ -37,7 +39,7 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
         Expanded(
           child: SingleChildScrollView(
             child: Column(
-              children: widget.data.map((row) {
+              children: sortedData.map((row) {
                 return Column(
                   children: [
                     DataRowWidget(
@@ -53,7 +55,9 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
                         widget.onRowTap(row); // Pasar el mapa completo
                       },
                     ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height *
+                            0.02), // Espaciado
                   ],
                 );
               }).toList(),
@@ -85,7 +89,9 @@ class _AdminsTableWidgetState extends State<AdminsTableWidget> {
   Widget buildCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.01,
+            horizontal: MediaQuery.of(context).size.width * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
@@ -173,7 +179,9 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   Widget buildCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.01,
+            horizontal: MediaQuery.of(context).size.width * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada

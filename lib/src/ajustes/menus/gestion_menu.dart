@@ -88,7 +88,8 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                                       fit: BoxFit.fill,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding:  EdgeInsets.symmetric(horizontal: screenWidth * 0.005,
+                                          vertical: screenHeight * 0.001),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -227,6 +228,8 @@ class _GestionMenuViewState extends State<GestionMenuView> {
 
   Widget buildButton(BuildContext context, String text, double scale,
       VoidCallback onTapUp, VoidCallback onTapDown) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Align(
       alignment: Alignment.centerRight,
       child: GestureDetector(
@@ -246,7 +249,8 @@ class _GestionMenuViewState extends State<GestionMenuView> {
                   fit: BoxFit.fill,
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding:  EdgeInsets.symmetric(horizontal: screenWidth * 0.005,
+                      vertical: screenHeight * 0.001),
                   child: Text(
                     text,
                     style: TextStyle(

@@ -142,7 +142,7 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
             color: selectedProgram == option
                 ? const Color(0xFF2be4f3)
                 : Colors.white,
-            width: 1.0,
+            width:  MediaQuery.of(context).size.width * 0.001,
           ),
         ),
       ),

@@ -1,12 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../../utils/translation_utils.dart';
 import '../db/db_helper.dart';
@@ -16,7 +13,6 @@ import '../db/db_helper_traducciones_pc.dart';
 import '../db/db_helper_traducciones_web.dart';
 import '../db/db_helper_web.dart';
 import '../servicios/sync.dart';
-import '../servicios/translation_provider.dart'; // Asegúrate de tener esta importación para manejar la base de datos.
 
 class LoginView extends StatefulWidget {
   final Function() onNavigateToMainMenu;
@@ -40,8 +36,6 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _user = TextEditingController();
   final TextEditingController _pwd = TextEditingController();
   String _errorMessage = ''; // Para almacenar el mensaje de error
-  Map<String, String> _translations = {};
-  final SyncService _syncService = SyncService();
   final DatabaseHelperTraducciones _dbHelperTraducciones =
       DatabaseHelperTraducciones();
 
@@ -202,13 +196,13 @@ class _LoginViewState extends State<LoginView> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
             height: MediaQuery.of(context).size.height * 0.2,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height *0.01, horizontal: MediaQuery.of(context).size.height *0.02),
             decoration: BoxDecoration(
               color: const Color(0xFF494949),
               borderRadius: BorderRadius.circular(7),
               border: Border.all(
                 color: const Color(0xFF28E2F5),
-                width: 1,
+                width:  MediaQuery.of(context).size.height *0.001,
               ),
             ),
             child: Column(
@@ -323,7 +317,8 @@ class _LoginViewState extends State<LoginView> {
                                       fit: BoxFit.fill,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding:  EdgeInsets.symmetric( horizontal: screenWidth * 0.005,
+                                        vertical: screenHeight * 0.002,),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -401,8 +396,8 @@ class _LoginViewState extends State<LoginView> {
                                                 });
                                               },
                                               child: Container(
-                                                padding: const EdgeInsets.only(
-                                                    right: 10.0),
+                                                padding:  EdgeInsets.only(
+                                                    right: screenWidth*0.01),
                                                 width: screenWidth * 0.01,
                                                 // Ajustar tamaño si es necesario
                                                 height: screenHeight * 0.01,
@@ -423,16 +418,14 @@ class _LoginViewState extends State<LoginView> {
                               ),
                               // Mensaje de error
                               if (_errorMessage.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(
+                                  Text(
                                     _errorMessage,
                                     style: TextStyle(
                                       color: Colors.red,
                                       fontSize: 16.sp,
                                     ),
                                   ),
-                                ),
+
                               // Botón de inicio de sesión
                               OutlinedButton(
                                 onPressed: () async {
@@ -448,8 +441,8 @@ class _LoginViewState extends State<LoginView> {
                                 },
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.all(10.0),
-                                  side: const BorderSide(
-                                      width: 1.0, color: Color(0xFF2be4f3)),
+                                  side:  BorderSide(
+                                      width: screenWidth*0.001, color: const Color(0xFF2be4f3)),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(7),
                                   ),

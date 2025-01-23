@@ -118,7 +118,7 @@ class _OverlayInfoState extends State<OverlayInfo>
   Widget _buildTab(String text, int index) {
     return Tab(
       child: SizedBox(
-        width: 200,
+        width: MediaQuery.of(context).size.width * 0.2,
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -310,13 +310,15 @@ class _OverlayCrearState extends State<OverlayCrear>
             width: MediaQuery.of(context).size.width * 0.4,
             // Aquí defines el ancho del diálogo
             height: MediaQuery.of(context).size.height * 0.3,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.height * 0.01,
+                vertical: MediaQuery.of(context).size.width * 0.01),
             decoration: BoxDecoration(
               color: const Color(0xFF494949),
               borderRadius: BorderRadius.circular(7),
               border: Border.all(
                 color: const Color(0xFF28E2F5),
-                width: 1,
+                width: MediaQuery.of(context).size.width * 0.001,
               ),
             ),
             child: Column(
@@ -343,9 +345,9 @@ class _OverlayCrearState extends State<OverlayCrear>
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.all(10.0),
-                    side: const BorderSide(
-                      width: 1.0,
-                      color: Color(0xFF2be4f3),
+                    side: BorderSide(
+                      width: MediaQuery.of(context).size.width * 0.001,
+                      color: const Color(0xFF2be4f3),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
@@ -416,7 +418,7 @@ class _OverlayCrearState extends State<OverlayCrear>
   Widget _buildTab(String text, int index) {
     return Tab(
       child: SizedBox(
-        width: 200,
+        width: MediaQuery.of(context).size.width * 0.2,
         child: Text(
           text,
           textAlign: TextAlign.center,

@@ -19,7 +19,7 @@ class AdminsListView extends StatefulWidget {
 class _AdminsListViewState extends State<AdminsListView> {
   final TextEditingController _adminNameController = TextEditingController();
   String selectedAdminOption = 'Todos'; // Valor predeterminado
-  String selectedTipo = 'Ambos'; // Valor predeterminado
+  String selectedTipo = 'Todos'; // Valor predeterminado
 
   List<Map<String, dynamic>> allAdmins = []; // Lista original de clientes
   List<Map<String, dynamic>> filteredAdmins = []; // Lista filtrada
@@ -68,7 +68,7 @@ class _AdminsListViewState extends State<AdminsListView> {
       List<Map<String, dynamic>> admins;
 
       // Si el filtro de tipo no es 'Ambos', consulta la base de datos
-      if (selectedTipo != 'Ambos') {
+      if (selectedTipo != 'Todos') {
         admins = await dbHelper.getUsuariosPorTipoPerfil(selectedTipo);
       } else {
         // Usa todos los administradores si no se filtra por tipo
@@ -106,6 +106,7 @@ class _AdminsListViewState extends State<AdminsListView> {
       _adminNameController.text = adminData['name'] ?? '';
       selectedAdminOption =
           adminData['status'] ?? 'Todos'; // Cambiar a 'Todos' si es nulo
+      selectedTipo = adminData['tipo'] ?? 'Todos';
     });
   }
 
@@ -115,7 +116,8 @@ class _AdminsListViewState extends State<AdminsListView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+      padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
       child: Column(
         children: [
           Row(
@@ -155,7 +157,7 @@ class _AdminsListViewState extends State<AdminsListView> {
             ),
             child: TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(color: Colors.white, fontSize: 12.sp),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(7),
@@ -174,6 +176,9 @@ class _AdminsListViewState extends State<AdminsListView> {
   }
 
   Widget _buildDropdown1() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,8 +220,8 @@ class _AdminsListViewState extends State<AdminsListView> {
                 });
               },
               dropdownColor: const Color(0xFF313030),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF2be4f3), size: 30),
+              icon: Icon(Icons.arrow_drop_down,
+                  color: const Color(0xFF2be4f3), size: screenHeight * 0.05),
             ),
           ),
         ],
@@ -225,6 +230,9 @@ class _AdminsListViewState extends State<AdminsListView> {
   }
 
   Widget _buildDropdown2() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,6 +251,11 @@ class _AdminsListViewState extends State<AdminsListView> {
             child: DropdownButton<String>(
               value: selectedTipo,
               items: [
+                DropdownMenuItem(
+                    value: 'Todos',
+                    child: Text(tr(context, 'Todos'),
+                        style:
+                            TextStyle(color: Colors.white, fontSize: 14.sp))),
                 DropdownMenuItem(
                     value: 'Ambos',
                     child: Text(tr(context, 'Ambos'),
@@ -266,8 +279,8 @@ class _AdminsListViewState extends State<AdminsListView> {
                 });
               },
               dropdownColor: const Color(0xFF313030),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF2be4f3), size: 30),
+              icon: Icon(Icons.arrow_drop_down,
+                  color: const Color(0xFF2be4f3), size: screenHeight * 0.05),
             ),
           ),
         ],
@@ -287,7 +300,8 @@ class _AdminsListViewState extends State<AdminsListView> {
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
           child: AdminsTableWidget(
             data: filteredAdmins,
             onRowTap: (adminData) {

@@ -13,6 +13,7 @@ import 'clients/clients_main_view.dart';
 import 'mainviews/change_pwd.dart';
 import 'mainviews/login.dart';
 import 'mainviews/main_menu.dart';
+import 'mainviews/splash_view.dart';
 
 class App extends StatefulWidget {
   final double screenWidth;
@@ -26,7 +27,7 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> with WidgetsBindingObserver {
-  String currentView = 'mainMenu';
+  String currentView = 'splash';
   Key? panelViewKey = UniqueKey(); // Clave única solo para PanelView
   Map<String, dynamic>? selectedMciData;
 
@@ -45,36 +46,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> clearLoginData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('user_id');
-    await prefs.remove('user_tipo_perfil');
-    print('Datos de inicio de sesión eliminados de SharedPreferences');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance
-        .addObserver(this); // Escuchar el ciclo de vida de la app
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this); // Remover el observer
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
-      // Si la app se pasa a segundo plano o se está cerrando, eliminar los datos de SharedPreferences
-      clearLoginData();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +141,15 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           case 'changePwd':
             viewToDisplay = ChangePwdView(
               onNavigateToMainMenu: () => navigateTo('mainMenu'),
+              screenWidth: screenWidth,
+              // Pasa el tamaño disponible
+              screenHeight: screenHeight,
+            );
+            break;
+          case 'splash':
+            viewToDisplay = SplashView(
+              onNavigateToMainMenu: () => navigateTo('mainMenu'),
+              onNavigateToLogin: () => navigateTo('login'),
               screenWidth: screenWidth,
               // Pasa el tamaño disponible
               screenHeight: screenHeight,
