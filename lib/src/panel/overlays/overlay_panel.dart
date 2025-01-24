@@ -143,7 +143,7 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
             color: selectedProgram == option
                 ? const Color(0xFF2be4f3)
                 : Colors.white,
-            width:  MediaQuery.of(context).size.width * 0.001,
+            width: MediaQuery.of(context).size.width * 0.001,
           ),
         ),
       ),
@@ -175,6 +175,7 @@ class _OverlaySeleccionarProgramaIndividualState
     super.initState();
     initializeDataProgram();
   }
+
   Future<void> initializeDataProgram() async {
     await obtenerDatos(); // Esperar a que se obtengan los datos
     await _fetchIndividualPrograms(); // Esperar a que se asigne la información
@@ -245,7 +246,7 @@ class _OverlaySeleccionarProgramaIndividualState
 
       // Filtrar los datos para excluir elementos vacíos
       List<String> datosFiltrados =
-      datos.where((element) => element.isNotEmpty).toList();
+          datos.where((element) => element.isNotEmpty).toList();
 
       // Imprimir los datos filtrados con su índice ajustado
       for (int i = 0; i < datosFiltrados.length; i++) {
@@ -268,26 +269,28 @@ class _OverlaySeleccionarProgramaIndividualState
           .obtenerProgramasPredeterminadosPorTipoIndividual(db);
 
       if (respuestaTroceada.isEmpty) {
-        throw Exception("No se han cargado los datos de videos. Ejecuta 'obtenerDatos()' primero.");
+        throw Exception(
+            "No se han cargado los datos de videos. Ejecuta 'obtenerDatos()' primero.");
       }
 
       // Asignar videos dinámicamente
       for (int i = 0; i < individualProgramData.length; i++) {
         var program = Map<String, dynamic>.from(individualProgramData[i]);
-        var video = (i < respuestaTroceada.length) ? respuestaTroceada[i] : null;
+        var video =
+            (i < respuestaTroceada.length) ? respuestaTroceada[i] : null;
         program['video'] = video;
         individualProgramData[i] = program;
       }
 
       setState(() {
         allIndividualPrograms = individualProgramData;
-        print("Programas con videos asignados en Overlay: $allIndividualPrograms");
+        print(
+            "Programas con videos asignados en Overlay: $allIndividualPrograms");
       });
     } catch (e) {
       print('Error fetching programs: $e');
     }
   }
-
 
   // Función de estilo global para los textos
   TextStyle getGlobalTextStyle({
@@ -371,11 +374,13 @@ class _OverlaySeleccionarProgramaIndividualState
                         individualSelectedProgram = program['nombre'];
                       });
                       print("Programa seleccionado en overlay: $program");
-                      widget.onIndivProgramSelected(program); // Pasar el programa seleccionado
+                      widget.onIndivProgramSelected(
+                          program); // Pasar el programa seleccionado
                       widget.onClose(); // Cerrar el overlay
                     },
                     onLongPress: () {
-                      _showProgramDetailsDialog(context, program, screenHeight, screenWidth);
+                      _showProgramDetailsDialog(
+                          context, program, screenHeight, screenWidth);
                     },
                     child: Column(
                       children: [
@@ -397,7 +402,6 @@ class _OverlaySeleccionarProgramaIndividualState
                       ],
                     ),
                   ),
-
                 );
               }).toList(),
             ),
@@ -1538,7 +1542,9 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                         children: [
                           GestureDetector(
                             onTap: () {
-                              Provider.of<ClientsProvider>(context, listen: false).addClient(client);
+                              Provider.of<ClientsProvider>(context,
+                                      listen: false)
+                                  .addClient(client);
 
                               // Llama a la función para pasar el cliente seleccionado
                               widget.onClientSelected(client);
@@ -1619,13 +1625,11 @@ class OverlayResumenSesion extends StatefulWidget {
       {super.key, required this.onClose, required this.onClientSelected});
 
   @override
-  _OverlayResumenSesionState createState() =>
-      _OverlayResumenSesionState();
+  _OverlayResumenSesionState createState() => _OverlayResumenSesionState();
 }
 
 class _OverlayResumenSesionState extends State<OverlayResumenSesion>
     with SingleTickerProviderStateMixin {
-
   String? selectedClient;
 
   @override
@@ -1640,7 +1644,7 @@ class _OverlayResumenSesionState extends State<OverlayResumenSesion>
 
     return MainOverlay(
       title: Text(
-          tr(context, 'Resumen sesión').toUpperCase(),
+        tr(context, 'Resumen sesión').toUpperCase(),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -1651,7 +1655,129 @@ class _OverlayResumenSesionState extends State<OverlayResumenSesion>
       content: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
         child: Column(
+          children: [],
+        ),
+      ),
+      onClose: widget.onClose,
+    );
+  }
+}
+
+class OverlayCiclos extends StatefulWidget {
+  final VoidCallback onClose;
+  final Function(String) onCycleSelected;
+
+  const OverlayCiclos({
+    super.key,
+    required this.onClose,
+    required this.onCycleSelected,
+  });
+
+  @override
+  _OverlayCiclosState createState() => _OverlayCiclosState();
+}
+
+class _OverlayCiclosState extends State<OverlayCiclos> {
+  String? selectedCycle;
+  final List<String> cycleNames = ["0", "A", "B", "C", "D"];
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return MainOverlay(
+      title: Text(
+        tr(context, "Ciclos").toUpperCase(),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 34.sp,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF2be4f3),
+        ),
+      ),
+      content: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.03,
+          vertical: screenHeight * 0.02,
+        ),
+        child: Column(
           children: [
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  childAspectRatio: 0.7,
+                  crossAxisCount: 3,
+                  crossAxisSpacing: screenWidth * 0.02,
+                  mainAxisSpacing: screenHeight * 0.02,
+                ),
+                itemCount: cycleNames.length,
+                itemBuilder: (context, index) {
+                  String cycleName = "Ciclo ${cycleNames[index]}";
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCycle = cycleName;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: selectedCycle == cycleName
+                            ? const Color(0xFF2be4f3)
+                            : const Color.fromARGB(255, 46, 46, 46),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: screenWidth * 0.001,
+                        ),
+                      ),
+                      child: CycleTextWidget(cycleNames[index]),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.0001,
+                    vertical: screenHeight * 0.0001,
+                  ),
+                  child: OutlinedButton(
+                    onPressed: () {
+                      if (selectedCycle != null) {
+                        widget.onCycleSelected(selectedCycle!);
+                      }
+                      widget.onClose();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.01,
+                        vertical: screenHeight * 0.01,
+                      ),
+                      side: BorderSide(
+                        width: screenWidth * 0.001,
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: const Color(0xFF2be4f3),
+                    ),
+                    child: Text(
+                      tr(context, "Seleccionar").toUpperCase(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )),
           ],
         ),
       ),
@@ -1660,26 +1786,86 @@ class _OverlayResumenSesionState extends State<OverlayResumenSesion>
   }
 }
 
+class CycleTextWidget extends StatelessWidget {
+  final String cycleName;
 
+  CycleTextWidget(this.cycleName);
 
+  @override
+  Widget build(BuildContext context) {
+    Map<String, List<String>> cycleInfo = {
+      "0": ["Todos los músculos"],
+      "A": [
+        "Glúteos\nIsquiotibiales",
+        "Trapecios\nDorsales\nLumbares",
+        "Bíceps"
+      ],
+      "B": [
+        "Glúteos\nIsquiotibiales\nCuádriceps",
+        "Trapecios\nDorsales\nLumbares",
+        "Pectorales\nAbdominales\nBíceps",
+      ],
+      "C": [
+        "Glúteos\nIsquiotibiales\nCuádriceps",
+        "Trapecios\nDorsales\nLumbares\nPectorales\nAbdominales\nBíceps",
+      ],
+      "D": ["Recuperación activa"]
+    };
 
+    List<String> items = cycleInfo[cycleName] ?? ["Información no disponible"];
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: items
+          .asMap()
+          .entries
+          .map((entry) => Column(
+                children: [
+                  if (entry.key !=
+                      0) // Divider entre elementos, excepto antes del primero
+                    Divider(
+                      color: Colors.white,
+                      thickness: 1,
+                    ),
+                  Text(
+                    entry.value,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ))
+          .toList(),
+    );
+  }
+}
 
 class ClientsProvider with ChangeNotifier {
   List<Map<String, dynamic>> _selectedClients = [];
+
+  // Obtiene la lista de clientes seleccionados
   List<Map<String, dynamic>> get selectedClients => _selectedClients;
+
+  // Agrega un cliente si no está ya en la lista
   void addClient(Map<String, dynamic> client) {
     if (!_selectedClients.any((c) => c['id'] == client['id'])) {
       _selectedClients.add(client);
       notifyListeners(); // Notifica a los widgets que están escuchando
     }
   }
+
+  // Elimina un cliente por su ID
   void removeClient(Map<String, dynamic> client) {
     _selectedClients.removeWhere((c) => c['id'] == client['id']);
     notifyListeners(); // Notifica después de eliminar
   }
+
+  // Limpia todos los clientes seleccionados sin notificar
   void clearSelectedClientsSilently() {
-    selectedClients.clear(); // Limpia los datos sin notificar
+    _selectedClients.clear(); // Limpia los datos sin notificar
   }
 }
-
 

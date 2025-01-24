@@ -1134,13 +1134,16 @@ class _OverlayVitaState extends State<OverlayVita>
   }
 
   void toggleOverlay(int index) {
-    setState(() {
+    if(mounted) {
+      setState(() {
       isOverlayVisible = !isOverlayVisible;
       overlayIndex = isOverlayVisible ? index : -1;
       if (!isOverlayVisible) {
         updateClientData(); // Actualizar datos al cerrar el overlay
+        // Cambiamos el estado para reflejar que el cliente está seleccionado
       }
     });
+    }
   }
 
   List<Map<String, dynamic>> getQuestions() {
@@ -1202,9 +1205,10 @@ class _OverlayVitaState extends State<OverlayVita>
 
   void updateClientData() {
     if (selectedBioClient != null && selectedBioClient!.isNotEmpty) {
-      print("Cliente seleccionado en vita: $selectedBioClient");
+      print("Cliente seleccionado: $selectedBioClient");
+
       setState(() {
-        // Actualizamos los datos del cliente
+        // Actualizar datos del cliente
         _clientName = selectedBioClient?['name'] ?? '';
         String birthdate = selectedBioClient?['birthdate'] ?? '';
 
@@ -1219,17 +1223,18 @@ class _OverlayVitaState extends State<OverlayVita>
         _clientHeight = selectedBioClient?['height'];
         _clientWeight = selectedBioClient?['weight'];
 
-        // Actualizamos las preguntas dinámicamente
-        questions = getQuestions();
+        // Reiniciar preguntas y chat
+        resetQuestions();
 
-        // Iniciamos el proceso del chat agregando la primera pregunta
-        chatMessages.add({
-          "text": questions[0]["question"], // Mostramos la primera pregunta
-          "isBot": true,
-        });
+        // Asegurar que la primera pregunta se muestre
+        if (questions.isNotEmpty) {
+          chatMessages.add({
+            "text": questions[0]["question"], // Primera pregunta
+            "isBot": true,
+          });
+        }
 
-        // Cambiamos el estado para reflejar que el cliente está seleccionado
-        isClientSelected = true;
+        isClientSelected = true; // Cambiar el estado del cliente
       });
     } else {
       print("No se seleccionó un cliente");
@@ -1238,6 +1243,19 @@ class _OverlayVitaState extends State<OverlayVita>
       });
     }
   }
+
+
+  void resetQuestions() {
+    setState(() {
+      // Limpia las preguntas y respuestas anteriores
+      questions = getQuestions();
+      answers.clear();
+      chatMessages.clear();
+      currentQuestion = 0;
+      hideOptions = false; // Hacer visibles las opciones nuevamente
+    });
+  }
+
 
   int calculateAge(String birthdate) {
     try {

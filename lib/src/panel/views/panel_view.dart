@@ -300,9 +300,24 @@ class _PanelViewState extends State<PanelView> {
     print("🔄 Equip seleccionado: $selectedIndex para clave $key");
   }
 
-  void onClientSelected(String key, Map<String, dynamic>? client) {
+  void onClientSelected(String key, Map<String, dynamic>? client, String? macAddress) {
     setState(() {
-      clientSelectionMap[key] = client;
+      if (client != null) {
+        // Elimina duplicidades: Verifica si el cliente ya está asociado
+        clientSelectionMap.removeWhere((k, v) => v != null && v['id'] == client['id']);
+        print("Cliente eliminado de asociaciones previas: ${client['name']}");
+
+        // Asigna el cliente al dispositivo actual
+        clientSelectionMap[key] = client;
+        print("Cliente asignado a $macAddress: ${client['name']}");
+      } else {
+        // Desasigna el cliente si es null
+        print("Cliente desasignado de $macAddress");
+        clientSelectionMap.remove(key);
+      }
+
+      // Imprime el estado actual del mapa
+      print("Estado actual de clientSelectionMap: ${clientSelectionMap.map((k, v) => MapEntry(k, v?['name'] ?? 'No asignado'))}");
     });
   }
 
@@ -510,31 +525,33 @@ class _PanelViewState extends State<PanelView> {
                                                 }
                                               }
                                             },
-                                            onLongPress: () {
-                                              // Imprime el cliente deseleccionado
-                                              print(
-                                                  'Cliente deseleccionado: $clientName');
+                                              onLongPress: () {
+                                                // Verifica si hay un cliente asociado a esta dirección MAC
+                                                if (selectedClient != null) {
+                                                  print('Cliente deseleccionado: ${selectedClient!['name']}');
 
-                                              setState(() {
-                                                // Elimina el cliente de la selección local
-                                                clientSelectionMap
-                                                    .remove(macAddress);
+                                                  setState(() {
+                                                    // Elimina el cliente de la selección local
+                                                    clientSelectionMap.remove(macAddress);
 
-                                                // Limpia el nombre del cliente
-                                                clientName = '';
+                                                    // Limpia específicamente el cliente en el Provider
+                                                    if (_clientsProvider != null) {
+                                                      _clientsProvider!.removeClient(selectedClient!); // Método del Provider para eliminar cliente
+                                                      if (kDebugMode) {
+                                                        print("📋 Cliente eliminado del Provider: ${selectedClient!['name']}");
+                                                      }
+                                                    }
 
-                                                // Limpia la lista de clientes seleccionados en el Provider
-                                                if (_clientsProvider != null) {
-                                                  _clientsProvider!
-                                                      .clearSelectedClientsSilently(); // Método personalizado para limpiar sin notificar
-                                                  if (kDebugMode) {
-                                                    print(
-                                                        "📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
-                                                  }
+                                                    // Limpia la selección local para esta dirección MAC
+                                                    selectedClient = null;
+                                                  });
+                                                } else {
+                                                  print("❌ No hay cliente asociado a esta dirección MAC para desasignar.");
                                                 }
-                                              });
-                                            },
-                                            child: Stack(
+                                              },
+
+
+                                              child: Stack(
                                               children: [
                                                 // Widget principal (contenedor y detalles)
                                                 Padding(
@@ -838,7 +855,7 @@ class _PanelViewState extends State<PanelView> {
                                         updateEquipSelection(
                                             selectedKey!, index),
                                     onClientSelected: (client) =>
-                                        onClientSelected(selectedKey!, client),
+                                        onClientSelected(selectedKey!, client, macAddress),
                                     isFullChanged: handleActiveChange,
                                     groupedA: groupedAmcis,
                                     groupedB: groupedBmcis,
@@ -1682,7 +1699,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool _isImagesLoaded = false;
   bool showTrainerInfo = false;
   bool _isLoading = true;
-  bool _showVideo = false;
   bool _hideControls = true;
   GlobalKey<_PanelViewState> panelViewKey = GlobalKey<_PanelViewState>();
   String modulo =
@@ -1691,6 +1707,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       30, ""); // Inicializamos la lista prvideos con 30 elementos vacíos.
   List<String> invideos = List.filled(30, "");
   String? selectedProgram;
+  String? selectedCycle;
+  Map<String, bool> _videoVisibilityMap = {};
   Map<String, dynamic>? selectedIndivProgram;
   Map<String, dynamic>? selectedRecoProgram;
   Map<String, dynamic>? selectedAutoProgram;
@@ -1901,8 +1919,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _preloadImages();
+  } // Verificar que BLE esté inicializado correctamente
+
+  @override
   void didUpdateWidget(covariant ExpandedContentWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     // Detectar cambios en selectedIndivProgram y actualizar el controlador si cambia la URL del video.
     if (selectedIndivProgram != null &&
         selectedIndivProgram!['video'] != selectedIndivProgram?['video']) {
@@ -1911,12 +1936,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _preloadImages();
-  } // Verificar que BLE esté inicializado correctamente
-
   Future<void> _initializeVideoController(
       String? videoUrl, String macAddress) async {
     if (videoUrl == null || videoUrl.isEmpty) {
@@ -1924,18 +1943,33 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       setState(() {
         _isLoading = false;
         _videoController = null;
+        _videoVisibilityMap[widget.macAddress!] = false;
       });
       return;
     }
 
     print("Intentando reproducir: $videoUrl");
+
+    // Verificar si el video actual está visible y ocultarlo.
+    final isCurrentlyVisible = _videoVisibilityMap[widget.macAddress!] ?? false;
+    if (isCurrentlyVisible) {
+      setState(() {
+        _videoVisibilityMap[widget.macAddress!] = false;
+      });
+      print("Video ocultado para ${widget.macAddress!}");
+    }
+
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Cancela cualquier controlador existente antes de inicializar uno nuevo.
-      await _cancelVideoInitialization();
+      // Cancelar cualquier controlador activo y ocultar videos previos.
+      await _cancelVideoInitialization(widget.macAddress!);
+
+      // Actualizar el mapa para reflejar la nueva visibilidad.
+      _videoVisibilityMap.clear();
+      _videoVisibilityMap[widget.macAddress!] = true;
 
       _videoController = VideoPlayerController.networkUrl(
         Uri.parse(videoUrl),
@@ -1947,47 +1981,29 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Inicializar el controlador.
       await _videoController!.initialize();
-
+      await _videoController!.play();
       setState(() {
         _isLoading = false;
-        _showVideo = true;
       });
     } catch (e) {
       print("Error al inicializar el video: $e");
       setState(() {
         _isLoading = false;
         _videoController = null;
-        _showVideo = false;
+        _videoVisibilityMap[macAddress] = false;
       });
     }
   }
 
   void _videoControllerListener() {
     if (_videoController != null && mounted) {
-      print("VideoController State: ${_videoController!.value}");
       setState(() {}); // Forzar la actualización del estado.
     }
   }
 
-  void _togglePlayPause(String macAddress) {
-    if (_videoController == null || !_videoController!.value.isInitialized) {
-      return;
-    }
-
-    if (_videoController!.value.isPlaying) {
-      _videoController!.pause();
-    } else {
-      _videoController!.play();
-    }
-
-    setState(() {});
-  }
-
-  Future<void> _cancelVideoInitialization() async {
+  Future<void> _cancelVideoInitialization(String macAddres) async {
     try {
-      // Verifica si existe un controlador.
       if (_videoController != null) {
-        // Elimina el listener antes de desechar el controlador.
         _videoController!.removeListener(_videoControllerListener);
         await _videoController!.dispose();
         print("VideoController cancelado y liberado correctamente.");
@@ -1996,12 +2012,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       print("Error al cancelar el VideoController: $e");
     }
 
-    // Actualiza el estado para reflejar la cancelación.
     if (mounted) {
       setState(() {
         _videoController = null;
-        _showVideo = false;
         _isLoading = false;
+        _videoVisibilityMap.clear(); // Limpiar el mapa de visibilidad.
       });
     }
   }
@@ -2124,34 +2139,37 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void onClientSelected(Map<String, dynamic>? client) {
     setState(() {
-      selectedClient = client; // Actualiza el cliente individual seleccionado
-      if (client != null &&
-          !selectedClients.any((c) => c['id'] == client['id'])) {
-        selectedClients.add(
-            client); // Agrega a la lista de clientes seleccionados si no está en la lista
+      if (client != null) {
+        // Verifica y elimina el cliente de asociaciones previas
+        selectedClients.removeWhere((c) => c['id'] == client['id']);
+        print("Cliente eliminado de cualquier asociación previa: ${client['name']}");
+
+        // Agrega el cliente al widget actual
+        selectedClients.add(client);
+        selectedClient = client;
+
+        print(
+            "Cliente asignado a ${widget.macAddress!}: ${client['name']}, Lista actualizada de clientes seleccionados: ${selectedClients.map((c) => c['name']).toList()}");
+      } else {
+        // Si el cliente es null, elimina la asociación actual
+        print("Cliente desasignado de ${widget.macAddress!}: ${selectedClient?['name']}");
+        selectedClients.remove(selectedClient);
+        selectedClient = null;
       }
     });
 
-    // Imprime el nombre del cliente seleccionado
-    if (selectedClient != null) {
-      print("Cliente seleccionado: ${selectedClient!['name']}");
-    }
-
-    // Imprime la lista de clientes seleccionados
-    print(
-        "Lista de clientes seleccionados: ${selectedClients.map((c) => c['name']).toList()}");
-
-    widget.onClientSelected(client); // Pasa el cliente seleccionado
+    // Notifica al widget padre sobre el cliente seleccionado
+    widget.onClientSelected(client);
   }
+
 
   void _clearGlobals() async {
     if (mounted) {
-      await _cancelVideoInitialization();
+      await _cancelVideoInitialization(widget.macAddress!);
       setState(() {
         // Verifica si la sesión se ha iniciado antes de detenerla
         isElectroOn = false;
         _isLoading = false;
-        _showVideo = false;
 
         // Restablecer variables globales
         selectedProgram = null;
@@ -2427,7 +2445,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         isRunning = true;
         isSessionStarted = true;
         startTime = DateTime.now();
-        _togglePlayPause(widget.macAddress!);
         // Inicia o reanuda el temporizador principal
         _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
           if (mounted) {
@@ -2496,7 +2513,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (mounted) {
       setState(() {
         stopElectrostimulationProcess(widget.macAddress!);
-        _togglePlayPause(widget.macAddress!);
         isRunning = false;
         isSessionStarted = false;
         pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
@@ -3089,6 +3105,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("Programa seleccionado: $selectedAutoProgram");
   }
 
+  void onCycleSelected(String cycle) {
+    setState(() {
+      selectedCycle = cycle; // Aquí actualizas el valor seleccionado
+    });
+    print("Ciclo seleccionado: $selectedCycle");
+  }
+
   @override
   void dispose() {
     if (kDebugMode) {
@@ -3397,8 +3420,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 OutlinedButton(
-                                  onPressed: widget.selectedKey == null ||
-                                          isRunning
+                                  onPressed: widget.selectedKey == null
                                       ? null // Inhabilitar el botón si selectedKey es null
                                       : () {
                                           setState(() {
@@ -3436,11 +3458,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                 SizedBox(width: screenWidth * 0.01),
                                 Column(
                                   children: [
-                                    // Condicional: Si globalSelectedProgram es null, muestra una imagen y texto predeterminados
                                     if (selectedProgram == null)
                                       Column(
                                         children: [
-                                          // Texto predeterminado si no se ha seleccionado ningún programa
                                           Text(
                                             tr(context, 'Nombre programa')
                                                 .toUpperCase(),
@@ -3449,7 +3469,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               fontSize: 15.sp,
                                             ),
                                           ),
-                                          // Imagen predeterminada si no se ha seleccionado ningún programa
                                           Image.asset(
                                             'assets/images/programacreado.png',
                                             // Imagen predeterminada
@@ -3460,57 +3479,32 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             fit: BoxFit.contain,
                                           ),
                                         ],
-                                      ),
-
-                                    if (selectedProgram ==
-                                            tr(context, 'Individual')
-                                                .toUpperCase() &&
-                                        allIndividualPrograms.isNotEmpty)
+                                      )
+                                    else if (selectedProgram ==
+                                        tr(context, 'Individual').toUpperCase())
                                       Column(
                                         children: [
-                                          // Mostrar el nombre del programa seleccionado o el primer programa por defecto
                                           Text(
                                             selectedIndivProgram?['nombre']
-                                                    .toUpperCase() ??
-                                                (allIndividualPrograms
-                                                        .isNotEmpty
-                                                    ? (allIndividualPrograms[0]
-                                                                ['nombre']
-                                                            ?.toUpperCase() ??
-                                                        tr(context,
-                                                                'NOMBRE PROGRAMA')
-                                                            .toUpperCase())
-                                                    : tr(context,
-                                                            'No hay programas disponibles')
-                                                        .toUpperCase()),
+                                                    ?.toUpperCase() ??
+                                                tr(context, 'Nombre programa')
+                                                    .toUpperCase(),
                                             style: TextStyle(
                                               color: const Color(0xFF2be4f3),
                                               fontSize: 15.sp,
                                             ),
                                           ),
-
-                                          // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null ||
-                                                    isRunning
-                                                ? null // Deshabilitar el pulsado si selectedKey es null
+                                            onTap: widget.selectedKey == null
+                                                ? null // Deshabilitar el clic si `selectedKey` es null
                                                 : () {
                                                     setState(() {
                                                       toggleOverlay(2);
                                                     });
                                                   },
                                             child: Image.asset(
-                                              selectedIndivProgram != null
-                                                  ? selectedIndivProgram![
-                                                          'imagen'] ??
-                                                      'assets/images/cliente.png'
-                                                  : allIndividualPrograms
-                                                          .isNotEmpty
-                                                      ? allIndividualPrograms[0]
-                                                              ['imagen'] ??
-                                                          'assets/images/cliente.png'
-                                                      : 'assets/images/cliente.png',
-                                              // Imagen por defecto
+                                              selectedIndivProgram?['imagen'] ??
+                                                  'assets/images/programacreado.png',
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .height *
@@ -3521,53 +3515,30 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ],
                                       )
                                     else if (selectedProgram ==
-                                            tr(context, 'Recovery')
-                                                .toUpperCase() &&
-                                        allRecoveryPrograms.isNotEmpty)
+                                        tr(context, 'Recovery').toUpperCase())
                                       Column(
                                         children: [
-                                          // Mostrar el nombre del programa seleccionado o el primer programa por defecto
                                           Text(
                                             selectedRecoProgram?['nombre']
                                                     ?.toUpperCase() ??
-                                                (allRecoveryPrograms.isNotEmpty
-                                                    ? (allRecoveryPrograms[0]
-                                                                ['nombre']
-                                                            ?.toUpperCase() ??
-                                                        tr(context,
-                                                                'NOMBRE PROGRAMA')
-                                                            .toUpperCase())
-                                                    : tr(context,
-                                                            'No hay programas disponibles')
-                                                        .toUpperCase()),
+                                                tr(context, 'Nombre programa')
+                                                    .toUpperCase(),
                                             style: TextStyle(
                                               color: const Color(0xFF2be4f3),
                                               fontSize: 15.sp,
                                             ),
                                           ),
-
-                                          // Imagen del programa seleccionado o la imagen del primer programa por defecto
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null ||
-                                                    isRunning
-                                                ? null // Deshabilitar el pulsado si selectedKey es null
+                                            onTap: widget.selectedKey == null
+                                                ? null
                                                 : () {
                                                     setState(() {
                                                       toggleOverlay(3);
                                                     });
                                                   },
                                             child: Image.asset(
-                                              selectedRecoProgram != null
-                                                  ? selectedRecoProgram![
-                                                          'imagen'] ??
-                                                      'assets/images/cliente.png'
-                                                  : allRecoveryPrograms
-                                                          .isNotEmpty
-                                                      ? allRecoveryPrograms[0]
-                                                              ['imagen'] ??
-                                                          'assets/images/cliente.png'
-                                                      : 'assets/images/cliente.png',
-                                              // Imagen por defecto
+                                              selectedRecoProgram?['imagen'] ??
+                                                  'assets/images/programacreado.png',
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .height *
@@ -3578,40 +3549,32 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ],
                                       )
                                     else if (selectedProgram ==
-                                            tr(context, 'Automáticos')
-                                                .toUpperCase() &&
-                                        allAutomaticPrograms.isNotEmpty)
+                                        tr(context, 'Automáticos')
+                                            .toUpperCase())
                                       Column(
                                         children: [
-                                          // Si isRunning es true, mostrar el primer subprograma
-                                          if (selectedAutoProgram != null &&
-                                              selectedAutoProgram![
-                                                      'subprogramas']
-                                                  .isNotEmpty)
+                                          if (isRunning &&
+                                              selectedAutoProgram != null)
                                             Column(
                                               children: [
-                                                Text.rich(
-                                                  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            '${selectedAutoProgram!['nombre_programa_automatico']?.toUpperCase() ?? tr(context, 'Programa automático desconocido').toUpperCase()} ',
-                                                        style: TextStyle(
-                                                          color: const Color(
-                                                              0xFF2be4f3),
-                                                          fontSize: 15.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ],
+                                                Text(
+                                                  selectedAutoProgram![
+                                                              'nombre_programa_automatico']
+                                                          ?.toUpperCase() ??
+                                                      tr(context,
+                                                              'Programa automático desconocido')
+                                                          .toUpperCase(),
+                                                  style: TextStyle(
+                                                    color:
+                                                        const Color(0xFF2be4f3),
+                                                    fontSize: 15.sp,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                                 GestureDetector(
                                                   onTap: widget.selectedKey ==
-                                                              null ||
-                                                          isRunning
-                                                      ? null // Deshabilitar el pulsado si selectedKey es null
+                                                          null
+                                                      ? null
                                                       : () {
                                                           setState(() {
                                                             toggleOverlay(4);
@@ -3634,7 +3597,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ),
                                               ],
                                             )
-                                          // Si isRunning es false, mostrar el programa automático
                                           else
                                             Column(
                                               children: [
@@ -3642,18 +3604,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   selectedAutoProgram?[
                                                               'nombre_programa_automatico']
                                                           ?.toUpperCase() ??
-                                                      (allAutomaticPrograms
-                                                              .isNotEmpty
-                                                          ? (allAutomaticPrograms[
-                                                                          0][
-                                                                      'nombre_programa_automatico']
-                                                                  ?.toUpperCase() ??
-                                                              tr(context,
-                                                                      'NOMBRE PROGRAMA')
-                                                                  .toUpperCase())
-                                                          : tr(context,
-                                                                  'No hay programas disponibles')
-                                                              .toUpperCase()),
+                                                      tr(context,
+                                                              'Nombre programa')
+                                                          .toUpperCase(),
                                                   style: TextStyle(
                                                     color:
                                                         const Color(0xFF2be4f3),
@@ -3662,26 +3615,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ),
                                                 GestureDetector(
                                                   onTap: widget.selectedKey ==
-                                                              null ||
-                                                          isRunning
-                                                      ? null // Deshabilitar el pulsado si selectedKey es null
+                                                          null
+                                                      ? null
                                                       : () {
                                                           setState(() {
                                                             toggleOverlay(4);
                                                           });
                                                         },
                                                   child: Image.asset(
-                                                    selectedAutoProgram != null
-                                                        ? selectedAutoProgram![
-                                                                'imagen'] ??
-                                                            'assets/images/cliente.png'
-                                                        : allAutomaticPrograms
-                                                                .isNotEmpty
-                                                            ? allAutomaticPrograms[
-                                                                        0][
-                                                                    'imagen'] ??
-                                                                'assets/images/cliente.png'
-                                                            : 'assets/images/cliente.png',
+                                                    selectedAutoProgram?[
+                                                            'imagen'] ??
+                                                        'assets/images/programacreado.png',
                                                     height:
                                                         MediaQuery.of(context)
                                                                 .size
@@ -3701,39 +3645,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     if (selectedProgram == null)
-                                      Column(
-                                        children: [
-                                          Text(
-                                            "",
-                                            style: TextStyle(
-                                              fontSize: 15.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            "",
-                                            style: TextStyle(
-                                              fontSize: 15.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      )
+                                      Container() // No se muestra nada
                                     else if (selectedProgram ==
-                                            tr(context, 'Individual')
-                                                .toUpperCase() &&
-                                        allIndividualPrograms.isNotEmpty)
+                                        tr(context, 'Individual').toUpperCase())
                                       Column(
                                         children: [
                                           Text(
                                             selectedIndivProgram != null
                                                 ? "${selectedIndivProgram!['frecuencia'] != null ? formatNumber(selectedIndivProgram!['frecuencia'] as double) : 'N/A'} Hz"
-                                                : allIndividualPrograms
-                                                        .isNotEmpty
-                                                    ? "${formatNumber(allIndividualPrograms[0]['frecuencia'] as double)} Hz"
-                                                    : " N/A",
+                                                : "N/A",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3742,10 +3662,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           Text(
                                             selectedIndivProgram != null
                                                 ? "${selectedIndivProgram!['pulso'] != null ? formatNumber(selectedIndivProgram!['pulso'] as double) : 'N/A'} ms"
-                                                : allIndividualPrograms
-                                                        .isNotEmpty
-                                                    ? "${formatNumber(allIndividualPrograms[0]['pulso'] as double)} ms"
-                                                    : "N/A",
+                                                : "N/A",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3754,17 +3671,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ],
                                       )
                                     else if (selectedProgram ==
-                                            tr(context, 'Recovery')
-                                                .toUpperCase() &&
-                                        allRecoveryPrograms.isNotEmpty)
+                                        tr(context, 'Recovery').toUpperCase())
                                       Column(
                                         children: [
                                           Text(
                                             selectedRecoProgram != null
                                                 ? "${selectedRecoProgram!['frecuencia'] != null ? formatNumber(selectedRecoProgram!['frecuencia'] as double) : 'N/A'} Hz"
-                                                : allRecoveryPrograms.isNotEmpty
-                                                    ? "${formatNumber(allRecoveryPrograms[0]['frecuencia'] as double)} Hz"
-                                                    : "N/A",
+                                                : "N/A",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3773,9 +3686,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           Text(
                                             selectedRecoProgram != null
                                                 ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : 'N/A'} ms"
-                                                : allRecoveryPrograms.isNotEmpty
-                                                    ? "${formatNumber(allRecoveryPrograms[0]['pulso'] as double)} ms"
-                                                    : "N/A",
+                                                : "N/A",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3784,119 +3695,73 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ],
                                       )
                                     else if (selectedProgram ==
-                                            tr(context, 'Automáticos')
-                                                .toUpperCase() &&
-                                        allAutomaticPrograms.isNotEmpty)
+                                        tr(context, 'Automáticos')
+                                            .toUpperCase())
                                       Column(
                                         children: [
-                                          // Si isRunning es true y hay subprogramas, mostrar la frecuencia y pulso del primer subprograma
                                           if (selectedAutoProgram != null &&
                                               selectedAutoProgram![
                                                       'subprogramas']
                                                   .isNotEmpty)
                                             Column(
                                               children: [
-                                                // Mostrar frecuencia y pulso del subprograma
-                                                Column(
-                                                  children: [
-                                                    Text.rich(
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
                                                       TextSpan(
-                                                        children: [
-                                                          TextSpan(
-                                                            text:
-                                                                ' ${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['orden'] ?? tr(context, 'Subprograma desconocido')}${'. '}',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 15
-                                                                  .sp, // Tamaño más pequeño para el nombre del subprograma
-                                                            ),
-                                                          ),
-                                                          TextSpan(
-                                                            text:
-                                                                '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 15.sp,
-                                                              // Tamaño más pequeño para el nombre del subprograma
-                                                              decoration:
-                                                                  TextDecoration
-                                                                      .underline,
-                                                              decorationColor:
-                                                                  Colors.white,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                        text:
+                                                            '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['orden'] ?? tr(context, 'Subprograma desconocido')}. ',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 15.sp,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    // Frecuencia
-                                                    Text(
-                                                      selectedAutoProgram !=
-                                                                  null &&
-                                                              selectedAutoProgram![
-                                                                      'subprogramas']
-                                                                  .isNotEmpty
-                                                          ? "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] as double) : 'N/A'} Hz"
-                                                          : "N/A",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 15.sp,
+                                                      TextSpan(
+                                                        text:
+                                                            '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 15.sp,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    // Pulso
-                                                    Text(
-                                                      selectedAutoProgram !=
-                                                                  null &&
-                                                              selectedAutoProgram![
-                                                                      'subprogramas']
-                                                                  .isNotEmpty
-                                                          ? "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] as double) : 'N/A'} ms"
-                                                          : "N/A",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 15.sp,
-                                                      ),
-                                                    ),
-                                                    // Tiempo restante dinámico
-                                                    Text(
-                                                      selectedAutoProgram !=
-                                                                  null &&
-                                                              selectedAutoProgram![
-                                                                      'subprogramas']
-                                                                  .isNotEmpty
-                                                          ? formatTime(
-                                                              remainingTime)
-                                                          : "N/A",
-                                                      style: TextStyle(
-                                                          color: const Color(
-                                                              0xFF2be4f3),
-                                                          fontSize: 18.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ],
-                                            )
-                                          // Si no hay subprogramas o isRunning es falso, no se muestra nada
-                                          else
-                                            Column(
-                                              children: [
-                                                // Mostrar duración total
                                                 Text(
-                                                  selectedAutoProgram != null
-                                                      ? "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min"
-                                                      : allAutomaticPrograms
-                                                              .isNotEmpty
-                                                          ? "${formatNumber(allAutomaticPrograms[0]['duracionTotal'] as double)} min"
-                                                          : "N/A",
+                                                  "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] as double) : 'N/A'} Hz",
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 15.sp,
                                                   ),
                                                 ),
+                                                Text(
+                                                  "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] as double) : 'N/A'} ms",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 15.sp,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  formatTime(remainingTime),
+                                                  style: TextStyle(
+                                                    color:
+                                                        const Color(0xFF2be4f3),
+                                                    fontSize: 18.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
                                               ],
+                                            )
+                                          else if (selectedAutoProgram != null)
+                                            Text(
+                                              "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15.sp,
+                                              ),
                                             ),
                                         ],
                                       ),
@@ -3905,19 +3770,29 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                 SizedBox(width: screenWidth * 0.01),
                                 if (selectedIndexEquip == 0)
                                   OutlinedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      if (mounted) {
+                                        setState(() {
+                                          toggleOverlay(6);
+                                        });
+                                      }
+                                    },
                                     style: OutlinedButton.styleFrom(
                                       padding: const EdgeInsets.all(10.0),
                                       side: BorderSide(
-                                          width: screenWidth * 0.001,
-                                          color: const Color(0xFF2be4f3)),
+                                        width: screenWidth * 0.001,
+                                        color: const Color(0xFF2be4f3),
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(7),
                                       ),
                                       backgroundColor: Colors.transparent,
                                     ),
                                     child: Text(
-                                      tr(context, 'Ciclos').toUpperCase(),
+                                      (selectedCycle == null
+                                              ? tr(context, 'Ciclos')
+                                              : selectedCycle!)
+                                          .toUpperCase(),
                                       style: TextStyle(
                                         color: const Color(0xFF2be4f3),
                                         fontSize: 15.sp,
@@ -3946,18 +3821,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           selectedIndivProgram?['video'];
                                       if (videoUrl != null &&
                                           videoUrl.isNotEmpty) {
-                                        if (_videoController != null &&
-                                            _videoController!
-                                                .value.isInitialized) {
-                                          // Si el controlador ya está inicializado, solo cambia el estado de visibilidad.
+                                        final isCurrentlyVisible =
+                                            _videoVisibilityMap[
+                                                    widget.macAddress] ??
+                                                false;
+
+                                        if (isCurrentlyVisible) {
+                                          // Si el video está visible, alternar visibilidad.
                                           setState(() {
-                                            _showVideo =
-                                                !_showVideo; // Cambiar entre mostrar u ocultar el video.
+                                            _videoVisibilityMap[
+                                                widget.macAddress!] = false;
                                           });
                                           print(
-                                              "VideoController ya inicializado. Cambiando visibilidad a: $_showVideo");
+                                              "Video ocultado para ${widget.macAddress}");
                                         } else {
-                                          // Si no está inicializado, inicialízalo.
+                                          // Inicializar el video para esta macAddress.
                                           _initializeVideoController(
                                               videoUrl, widget.macAddress!);
                                         }
@@ -3985,7 +3863,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ),
                                       ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                               SizedBox(width: screenWidth * 0.05),
@@ -4047,14 +3925,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                           flex: isFullScreen ? 1 : 6,
                           child: GestureDetector(
                             onTap: () {
-                              if (_showVideo) {
+                              if (_videoVisibilityMap[widget.macAddress] ??
+                                  false) {
                                 setState(() {
                                   _hideControls = !_hideControls;
                                 });
                               }
                             },
                             child: Stack(children: [
-                              if (_showVideo)
+                              if (_videoVisibilityMap[widget.macAddress] ??
+                                  false)
                                 Positioned.fill(
                                   child: _isLoading
                                       ? const Center(
@@ -7702,10 +7582,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             ),
             if (isOverlayVisible)
               Positioned(
-                top: overlayIndex == 1 ? screenHeight * 0.2 : 0,
-                bottom: overlayIndex == 1 ? screenHeight * 0.2 : 0,
-                left: overlayIndex == 1 ? screenWidth * 0.2 : 0,
-                right: overlayIndex == 1 ? screenWidth * 0.2 : 0,
+                top: overlayIndex == 6
+                    ? screenHeight * 0.1
+                    : (overlayIndex == 1 ? screenHeight * 0.2 : 0),
+                bottom: overlayIndex == 6
+                    ? screenHeight * 0.1
+                    : (overlayIndex == 1 ? screenHeight * 0.2 : 0),
+                left: overlayIndex == 6
+                    ? screenWidth * 0.2
+                    : (overlayIndex == 1 ? screenWidth * 0.2 : 0),
+                right: overlayIndex == 6
+                    ? screenWidth * 0.2
+                    : (overlayIndex == 1 ? screenWidth * 0.2 : 0),
                 child: Align(
                   alignment: Alignment.center,
                   child: _getOverlayWidget(
@@ -7714,7 +7602,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       onIndivProgramSelected,
                       onRecoProgramSelected,
                       onAutoProgramSelected,
-                      onClientSelected),
+                      onClientSelected,
+                      onCycleSelected),
                 ),
               ),
           ],
@@ -7728,6 +7617,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     Function(Map<String, dynamic>?) onRecoProgramSelected,
     Function(Map<String, dynamic>?) onAutoProgramSelected,
     Function(Map<String, dynamic>?) onClientSelected,
+    Function(String) onCycleSelected,
   ) {
     switch (overlayIndex) {
       case 0:
@@ -7756,10 +7646,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           onClose: () => toggleOverlay(4),
           onAutoProgramSelected: onAutoProgramSelected,
         );
-      case 5:
+ /*     case 5:
         return OverlayResumenSesion(
           onClose: () => toggleOverlay(5),
           onClientSelected: onClientSelected,
+        );*/
+      case 6:
+        return OverlayCiclos(
+          onClose: () => toggleOverlay(6),
+          onCycleSelected: onCycleSelected,
         );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada
@@ -8235,28 +8130,20 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Widget buildControlRow({
     required double value, // El valor que se va a mostrar y modificar
     required String imagePathIncrement, // Ruta de la imagen para el botón "Más"
-    required String
-        imagePathDecrement, // Ruta de la imagen para el botón "Menos"
-    required String
-        imagePathDisplay, // Ruta de la imagen para mostrar (como la imagen de CONTRACCION)
-    required Function onIncrement, // Lógica de incremento
-    required Function onDecrement, // Lógica de decremento
-    required String
-        suffix, // Sufijo para el valor (por ejemplo: "S" para contracción)
+    required String imagePathDecrement, // Ruta de la imagen para el botón "Menos"
+    required String imagePathDisplay, // Ruta de la imagen para mostrar (como la imagen de CONTRACCION)
+    required VoidCallback onIncrement, // Lógica de incremento
+    required VoidCallback onDecrement, // Lógica de decremento
+    required String suffix, // Sufijo para el valor (por ejemplo: "S" para contracción)
     required double screenWidth, // El ancho de la pantalla
     required double screenHeight, // El alto de la pantalla
   }) {
-    // Condición para bloquear los botones si selectedProgram no es nulo
-    bool isButtonEnabled = selectedProgram ==
-        null; // Asegúrate de que selectedProgram esté accesible en el contexto
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Botón de "Más"
         GestureDetector(
-          onTap: isButtonEnabled ? () => onIncrement() : null,
-          // Solo se ejecuta si el botón está habilitado
+          onTap: onIncrement, // Ejecuta la función al hacer clic
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.06,
             child: ClipRRect(
@@ -8271,8 +8158,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         SizedBox(width: screenWidth * 0.01),
         // Texto con el valor y el sufijo
         Text(
-          "${value.toStringAsFixed(0)}$suffix",
-          // Aquí formateamos el valor para que no tenga decimales
+          "${value.toStringAsFixed(0)}$suffix", // Valor formateado sin decimales
           style: TextStyle(
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
@@ -8282,8 +8168,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         SizedBox(width: screenWidth * 0.01),
         // Botón de "Menos"
         GestureDetector(
-          onTap: isButtonEnabled ? () => onDecrement() : null,
-          // Solo se ejecuta si el botón está habilitado
+          onTap: onDecrement, // Ejecuta la función al hacer clic
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.06,
             child: ClipRRect(
@@ -8305,6 +8190,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       ],
     );
   }
+
 }
 
 class BleConnectionService {
