@@ -30,7 +30,7 @@ class _SplashViewState extends State<SplashView> {
 
   Future<void> _startSplashSequence() async {
     // Garantiza que el splash sea visible al menos 3 segundos
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     _checkUserLoginStatus();
   }
 

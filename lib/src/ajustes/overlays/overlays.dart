@@ -5,11 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/form/user_form_bonos.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_activity.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/translation_utils.dart';
+import '../../bio/overlay_bio.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 import '../../db/db_helper_traducciones.dart';
@@ -1066,71 +1068,197 @@ class _OverlayVitaState extends State<OverlayVita>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   String _userName = '';
+  String _clientName = '';
+  String _clientAge = '';
+  int _clientHeight = 0;
+  int _clientWeight = 0;
   String _userProfileType = '';
+  String resumenRespuestas = "";
+  bool hideOptions = false;
+  bool isOverlayVisible = false; // Controla la visibilidad del overlay
+  bool isClientSelected = false; // Controla la visibilidad del overlay
+  int overlayIndex = -1; // -1 indica que no hay overlay visible
   int currentQuestion = 0;
   List<Map<String, dynamic>> chatMessages = [];
   Map<String, dynamic> answers = {};
+  double scaleFactorCliente = 1.0;
 
-  final List<Map<String, dynamic>> questions = [
-    {
-      "question":
-          "¡Hola! Vamos a crear tu informe y rutina i-motion personalizada de EMS. Primero, ¿cuál es tu objetivo principal?",
-      "options": [
-        "Tonificar",
-        "Perder grasa",
-        "Mejorar resistencia",
-        "Mejorar todo",
-        "Recuperación muscular"
-      ],
-      "key": "objetivo",
-      "type": "text" // Tipo de pregunta
-    },
-    {
-      "question": "¿Cuál es tu edad?",
-      "range": [18, 60], // Rango de opciones dinámicas
-      "key": "edad",
-      "type": "dropdown" // Indica que es un menú desplegable
-    },
-    {
-      "question": "¿Cuál es tu peso?",
-      "range": [30, 200], // Rango de opciones dinámicas
-      "key": "peso",
-      "type": "dropdown"
-    },
-    {
-      "question": "¿Cuál es tu altura?",
-      "range": [120, 210], // Rango de opciones dinámicas
-      "key": "altura",
-      "type": "dropdown"
-    },
-    {
-      "question":
-          "¿Tienes experiencia previa con electroestimulación o entrenamiento físico?",
-      "options": ["Sí", "No"],
-      "key": "experiencia",
-      "type": "text"
-    },
-    {
-      "question": "¿Cómo describirías tu nivel de condición física actual?",
-      "options": ["Principiante", "Intermedio", "Avanzado"],
-      "key": "nivel",
-      "type": "text"
-    },
-    {
-      "question":
-          "¿Cuántos días a la semana puedes dedicar a entrenar con i-motion?",
-      "options": ["1 día", "2 días", "3 días"],
-      "key": "dias",
-      "type": "text"
-    },
-  ];
+  List<Map<String, dynamic>> questions = [];
 
   @override
   void initState() {
     super.initState();
-    chatMessages
-        .add({"text": questions[currentQuestion]["question"], "isBot": true});
     _checkUserLoginStatus();
+  }
+  @override
+  void dispose() {
+    // Liberar recursos y reiniciar estados
+    _scrollController.dispose();
+    chatMessages.clear();
+    answers.clear();
+    questions.clear();
+    currentQuestion = 0;
+    isClientSelected = false;
+
+    super.dispose();
+  }
+
+
+  Future<void> _checkUserLoginStatus() async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Obtener el userId desde SharedPreferences
+    int? userId = prefs.getInt('user_id');
+
+    if (userId != null) {
+      // Obtener los detalles del usuario
+      Map<String, dynamic>? user = await dbHelper.getUserById(userId);
+      if (user != null) {
+        setState(() {
+          _userName = user['name']; // Guardar el nombre en la variable
+        });
+
+        // Obtener el tipo de perfil del usuario
+        String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId);
+        setState(() {
+          _userProfileType =
+              tipoPerfil ?? "Tipo no encontrado"; // Guardar el tipo de perfil
+        });
+      } else {
+        print('No se encontró el usuario con ID $userId');
+      }
+    } else {
+      print('No se encontró un user_id guardado en SharedPreferences');
+    }
+  }
+
+  void toggleOverlay(int index) {
+    setState(() {
+      isOverlayVisible = !isOverlayVisible;
+      overlayIndex = isOverlayVisible ? index : -1;
+      if (!isOverlayVisible) {
+        updateClientData(); // Actualizar datos al cerrar el overlay
+      }
+    });
+  }
+
+  List<Map<String, dynamic>> getQuestions() {
+    return [
+      {
+        "question": _clientName.isNotEmpty
+            ? "¡Hola $_clientName! Vamos a crear tu informe y rutina i-motion personalizada de EMS. Primero, ¿cuál es tu objetivo principal?"
+            : "¡Hola! Vamos a crear tu informe y rutina i-motion personalizada de EMS. Primero, ¿cuál es tu objetivo principal?",
+        "options": [
+          "Tonificar",
+          "Perder grasa",
+          "Mejorar resistencia",
+          "Mejorar todo",
+          "Recuperación muscular"
+        ],
+        "key": "Objetivo",
+        "type": "text" // Tipo de pregunta
+      },
+      {
+        "question": "¿Cuál es tu edad?",
+        "range": [18, 60], // Rango de opciones dinámicas
+        "key": "Edad",
+        "type": "dropdown" // Indica que es un menú desplegable
+      },
+      {
+        "question": "¿Cuál es tu peso?",
+        "range": [30, 200], // Cambiado a int
+        "key": "Peso",
+        "type": "dropdown"
+      },
+      {
+        "question": "¿Cuál es tu altura?",
+        "range": [120, 210], // Cambiado a int
+        "key": "Altura",
+        "type": "dropdown"
+      },
+      {
+        "question":
+            "¿Tienes experiencia previa con electroestimulación o entrenamiento físico?",
+        "options": ["Sí", "No"],
+        "key": "Experiencia",
+        "type": "text"
+      },
+      {
+        "question": "¿Cómo describirías tu nivel de condición física actual?",
+        "options": ["Principiante", "Intermedio", "Avanzado"],
+        "key": "Nivel",
+        "type": "text"
+      },
+      {
+        "question":
+            "¿Cuántos días a la semana puedes dedicar a entrenar con i-motion?",
+        "options": ["1 día", "2 días", "3 días"],
+        "key": "Días",
+        "type": "text"
+      },
+    ];
+  }
+
+  void updateClientData() {
+    if (selectedBioClient != null && selectedBioClient!.isNotEmpty) {
+      print("Cliente seleccionado en vita: $selectedBioClient");
+      setState(() {
+        // Actualizamos los datos del cliente
+        _clientName = selectedBioClient?['name'] ?? '';
+        String birthdate = selectedBioClient?['birthdate'] ?? '';
+
+        // Convertir fecha de nacimiento a edad
+        try {
+          _clientAge = calculateAge(birthdate).toString();
+        } catch (e) {
+          print('Error al calcular la edad: $e');
+          _clientAge = 'Fecha inválida';
+        }
+
+        _clientHeight = selectedBioClient?['height'];
+        _clientWeight = selectedBioClient?['weight'];
+
+        // Actualizamos las preguntas dinámicamente
+        questions = getQuestions();
+
+        // Iniciamos el proceso del chat agregando la primera pregunta
+        chatMessages.add({
+          "text": questions[0]["question"], // Mostramos la primera pregunta
+          "isBot": true,
+        });
+
+        // Cambiamos el estado para reflejar que el cliente está seleccionado
+        isClientSelected = true;
+      });
+    } else {
+      print("No se seleccionó un cliente");
+      setState(() {
+        isClientSelected = false;
+      });
+    }
+  }
+
+  int calculateAge(String birthdate) {
+    try {
+      // Formato de la fecha esperada: dd/mm/yyyy
+      final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+      final DateTime birthDate = dateFormat.parse(birthdate);
+
+      final DateTime today = DateTime.now();
+      int age = today.year - birthDate.year;
+
+      // Verifica si el cumpleaños aún no ha pasado este año
+      if (today.month < birthDate.month ||
+          (today.month == birthDate.month && today.day < birthDate.day)) {
+        age--;
+      }
+
+      return age;
+    } catch (e) {
+      throw const FormatException(
+          'Fecha inválida: asegúrate de usar el formato dd/mm/yyyy');
+    }
   }
 
   void _scrollToBottom() {
@@ -1163,50 +1291,81 @@ class _OverlayVitaState extends State<OverlayVita>
       });
       _scrollToBottom();
     } else {
+      // Generar el mensaje final del chat
       setState(() {
         chatMessages.add({
           "text": "¡Gracias! Tu rutina personalizada ha sido generada.",
-          "isBot": true
+          "isBot": true,
         });
+        hideOptions = true;
       });
       _scrollToBottom();
+
+      // Llamar a mostrarResumen para calcular y preparar el resumen
+      mostrarResumen();
     }
   }
 
-  Future<void> _checkUserLoginStatus() async {
-    DatabaseHelper dbHelper = DatabaseHelper();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  void mostrarResumen() {
+    // Construir el resumen de las respuestas del usuario
+    String resumen =
+        answers.entries.map((entry) => "${entry.value}").join("\n");
 
-    // Obtener el userId desde SharedPreferences
-    int? userId = prefs.getInt('user_id');
+    // Verificar si los datos de peso y altura existen
+    if (answers.containsKey('Peso') && answers.containsKey('Altura')) {
+      try {
+        // Asegurarse de que los valores sean convertidos a double
+        double peso = (answers['Peso'] as int).toDouble();
+        double altura = (answers['Altura'] as int).toDouble() /
+            100; // Convertir cm a metros
 
-    if (userId != null) {
-      // Obtener los detalles del usuario
-      Map<String, dynamic>? user = await dbHelper.getUserById(userId);
-      if (user != null) {
-        setState(() {
-          _userName = user['name']; // Guardar el nombre en la variable
-        });
+        // Calcular el IMC
+        double imc = peso / (altura * altura);
+        resumen += "\nIMC: ${imc.toStringAsFixed(2)}";
 
-        // Obtener el tipo de perfil del usuario
-        String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId);
-        setState(() {
-          _userProfileType =
-              tipoPerfil ?? "Tipo no encontrado"; // Guardar el tipo de perfil
-        });
-      } else {
-        print('No se encontró el usuario con ID $userId');
+        // Clasificación del IMC (opcional)
+        if (imc < 18.5) {
+          resumen += " (Bajo peso)";
+        } else if (imc >= 18.5 && imc < 24.9) {
+          resumen += " (Peso normal)";
+        } else if (imc >= 25 && imc < 29.9) {
+          resumen += " (Sobrepeso)";
+        } else {
+          resumen += " (Obesidad)";
+        }
+      } catch (e) {
+        resumen += "\nError al calcular el IMC: $e";
       }
     } else {
-      print('No se encontró un user_id guardado en SharedPreferences');
+      resumen += "\nIMC: No calculado (faltan datos de peso o altura)";
     }
+
+    // Actualizar la variable del resumen
+    setState(() {
+      resumenRespuestas = resumen;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     Widget buildAnswerSection() {
+      // Verificamos si un cliente ha sido seleccionado
+      if (questions.isEmpty || currentQuestion >= questions.length || selectedBioClient == null || selectedBioClient!.isEmpty) {
+        return Center(
+          child: Text(
+            tr(context, "Seleccione un cliente para empezar").toUpperCase(),
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2be4f3),
+            ),
+          ),
+        );
+      }
+
       if (questions[currentQuestion]["type"] == "dropdown") {
         // Código para el tipo dropdown
         final range = questions[currentQuestion]["range"] as List<int>;
@@ -1235,24 +1394,27 @@ class _OverlayVitaState extends State<OverlayVita>
             magnification: 1.4,
             onSelectedItemChanged: (index) {
               setState(() {
-                answers[key] = range[0] + index;
+                // Asegurarse de que el valor sea convertido a int
+                answers[key] = (range[0] + index).toInt();
               });
             },
             childDelegate: ListWheelChildBuilderDelegate(
               builder: (context, index) {
-                final value = range[0] + index;
+                // Convertir el valor a int
+                final value = (range[0] + index).toInt();
 
                 String unit = "";
-                if (key == "edad") {
+                if (key == "Edad") {
                   unit = "años";
-                } else if (key == "peso") {
+                } else if (key == "Peso") {
                   unit = "kg";
-                } else if (key == "altura") {
+                } else if (key == "Altura") {
                   unit = "cm";
                 }
 
                 return GestureDetector(
                   onTap: () {
+                    // Pasar el valor como int al método handleResponse
                     handleResponse(value);
                   },
                   child: Center(
@@ -1276,7 +1438,7 @@ class _OverlayVitaState extends State<OverlayVita>
           ),
         );
       } else if (questions[currentQuestion]["options"] != null) {
-// Dividir las opciones en filas con un máximo de 3 elementos por fila
+        // Dividir las opciones en filas con un máximo de 3 elementos por fila
         List<String> options = questions[currentQuestion]["options"];
         List<List<String>> rows = [];
         for (int i = 0; i < options.length; i += 3) {
@@ -1344,184 +1506,388 @@ class _OverlayVitaState extends State<OverlayVita>
       }
     }
 
-    return MainOverlay(
-      title: Text(
-        "ASISTENCIA VIRTUAL ",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 30.sp,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF2be4f3),
-        ),
-      ),
-      content: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.01, vertical: screenHeight * 0.01),
-        child: Row(
-          children: [
-            // Primer Expanded: Contenedor del chat con imagen de fondo
-            Expanded(
-              flex: 1, // Proporción del espacio asignado al chat
-              child: Stack(
+    return isOverlayVisible
+        ? _getOverlayWidget(overlayIndex)
+        : MainOverlay(
+            title: Text(
+              "ASISTENCIA VIRTUAL ",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 30.sp,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF2be4f3),
+              ),
+            ),
+            content: Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.01,
+                  vertical: screenHeight * 0.01),
+              child: Row(
                 children: [
-                  // Imagen de fondo
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 46, 46, 46),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(7),
-                        bottomLeft: Radius.circular(7),
-                      ),
-                    ),
-                  ),
-                  // Contenido del chat
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.05,
-                            vertical: screenHeight * 0.01),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.02,
-                              vertical: screenHeight * 0.01),
-                          height: screenHeight * 0.1,
+                  // Primer Expanded: Contenedor del chat con imagen de fondo
+                  Expanded(
+                    flex: 1, // Proporción del espacio asignado al chat
+                    child: Stack(
+                      children: [
+                        // Imagen de fondo
+                        Container(
                           decoration: const BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(12.0),
+                            color: Color.fromARGB(255, 46, 46, 46),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(7),
+                              bottomLeft: Radius.circular(7),
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                  height: screenHeight * 0.1,
-                                  'assets/images/cliente_ia.png',
-                                  fit: BoxFit.scaleDown),
-                              VerticalDivider(
-                                color: Colors.white,
-                                thickness: screenWidth * 0.001,
-                                width: screenWidth * 0.03,
-                              ),
-                              Column(
-                                children: [
-                                  Text(
-                                    _userName,
-                                    style: TextStyle(
-                                        fontSize: 17.sp, color: Colors.white),
-                                  ),
-                                  Text(
-                                    _userProfileType,
-                                    style: TextStyle(
-                                        fontSize: 15.sp, color: Colors.white),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: chatMessages.length,
-                          itemBuilder: (context, index) {
-                            final message = chatMessages[index];
-                            return Align(
-                              alignment: message["isBot"]
-                                  ? Alignment.centerLeft
-                                  : Alignment.centerRight,
+                        // Contenido del chat
+                        Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.05,
+                                  vertical: screenHeight * 0.01),
                               child: Container(
-                                constraints: BoxConstraints(
-                                  maxWidth: screenWidth *
-                                      0.25, // Limitar el ancho máximo del contenedor
-                                ),
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.01,
-                                  vertical: screenHeight * 0.03,
-                                ),
-                                padding: EdgeInsets.all(screenHeight * 0.01),
-                                decoration: BoxDecoration(
-                                  color: message["isBot"]
-                                      ? const Color(0xFF2be4f3)
-                                      : Colors.black.withOpacity(0.8),
-                                  borderRadius: BorderRadius.circular(6),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.02,
+                                    vertical: screenHeight * 0.01),
+                                height: screenHeight * 0.1,
+                                decoration: const BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(12.0),
+                                  ),
                                 ),
                                 child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: message["isBot"]
-                                      ? [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                right: screenWidth * 0.01),
-                                            child: Image.asset(
-                                              'assets/images/icono-vita.png',
-                                              height: screenHeight * 0.07,
-                                              fit: BoxFit.scaleDown,
+                                  children: [
+                                    Image.asset(
+                                        height: screenHeight * 0.1,
+                                        'assets/images/cliente_ia.png',
+                                        fit: BoxFit.scaleDown),
+                                    VerticalDivider(
+                                      color: Colors.white,
+                                      thickness: screenWidth * 0.001,
+                                      width: screenWidth * 0.03,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          _userName,
+                                          style: TextStyle(
+                                              fontSize: 17.sp,
+                                              color: Colors.white),
+                                        ),
+                                        Text(
+                                          _userProfileType,
+                                          style: TextStyle(
+                                              fontSize: 15.sp,
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          toggleOverlay(0);
+                                        });
+                                      },
+                                      child: AnimatedScale(
+                                        scale: scaleFactorCliente,
+                                        duration:
+                                            const Duration(milliseconds: 100),
+                                        child: Container(
+                                          height: screenWidth * 0.05,
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFF494949),
+                                            shape: BoxShape
+                                                .circle, // Forma circular
+                                          ),
+                                          child: Center(
+                                            child: SizedBox(
+                                              width: screenWidth * 0.05,
+                                              height: screenHeight * 0.05,
+                                              child: ClipOval(
+                                                child: Image.asset(
+                                                  'assets/images/cliente.png',
+                                                  fit: BoxFit.scaleDown,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                          Expanded(
-                                            child: Text(
-                                              message["text"],
-                                              style: TextStyle(fontSize: 16.sp),
-                                              textAlign: TextAlign.start,
-                                              softWrap: true,
-                                            ),
-                                          ),
-                                        ]
-                                      : [
-                                          Expanded(
-                                            child: Text(
-                                              message["text"],
-                                              style: TextStyle(
-                                                  fontSize: 16.sp,
-                                                  color: Colors.white),
-                                              textAlign: TextAlign.end,
-                                              softWrap: true,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                left: screenWidth * 0.01),
-                                            child: Image.asset(
-                                              'assets/images/cliente_ia.png',
-                                              height: screenHeight * 0.07,
-                                              fit: BoxFit.scaleDown,
-                                            ),
-                                          ),
-                                        ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+                                controller: _scrollController,
+                                itemCount: chatMessages.length,
+                                itemBuilder: (context, index) {
+                                  final message = chatMessages[index];
+                                  return Align(
+                                    alignment: message["isBot"]
+                                        ? Alignment.centerLeft
+                                        : Alignment.centerRight,
+                                    child: Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth: screenWidth *
+                                            0.25, // Limitar el ancho máximo del contenedor
+                                      ),
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.01,
+                                        vertical: screenHeight * 0.03,
+                                      ),
+                                      padding:
+                                          EdgeInsets.all(screenHeight * 0.01),
+                                      decoration: BoxDecoration(
+                                        color: message["isBot"]
+                                            ? const Color(0xFF2be4f3)
+                                            : Colors.black.withOpacity(0.8),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: message["isBot"]
+                                            ? [
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      right:
+                                                          screenWidth * 0.01),
+                                                  child: Image.asset(
+                                                    'assets/images/icono-vita.png',
+                                                    height: screenHeight * 0.07,
+                                                    fit: BoxFit.scaleDown,
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    message["text"],
+                                                    style: TextStyle(
+                                                        fontSize: 16.sp),
+                                                    textAlign: TextAlign.start,
+                                                    softWrap: true,
+                                                  ),
+                                                ),
+                                              ]
+                                            : [
+                                                Expanded(
+                                                  child: Text(
+                                                    message["text"],
+                                                    style: TextStyle(
+                                                        fontSize: 16.sp,
+                                                        color: Colors.white),
+                                                    textAlign: TextAlign.end,
+                                                    softWrap: true,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: screenWidth * 0.01),
+                                                  child: Image.asset(
+                                                    'assets/images/cliente_ia.png',
+                                                    height: screenHeight * 0.07,
+                                                    fit: BoxFit.scaleDown,
+                                                  ),
+                                                ),
+                                              ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            if (!hideOptions) buildAnswerSection(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Segundo Expanded: Contenedor vacío
+                  Expanded(
+                    flex:
+                        1, // Proporción del espacio asignado al contenedor vacío
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.03,
+                          vertical: screenHeight * 0.03),
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 46, 46, 46),
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(7),
+                          bottomRight: Radius.circular(7),
                         ),
                       ),
-                      buildAnswerSection(),
-                    ],
+                      child: Column(
+                        children: [
+                          // Centrar el título en el Expanded
+                          Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.001,
+                              ),
+                              child: Text(
+                                tr(context, "Tus resultados:").toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 25.sp,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: const Color(0xFF2be4f3),
+                                  color: const Color(0xFF2be4f3),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              // Distribuye horizontalmente
+                              children: [
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      tr(context, 'Nombre').toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      _clientName,
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      tr(context, 'Edad').toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      _clientAge,
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      tr(context, 'Altura').toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      '$_clientHeight cm',
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      tr(context, 'Peso').toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      '$_clientWeight kg',
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Expanded(
+                            child: SingleChildScrollView(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.01,
+                                  vertical: screenHeight * 0.01),
+                              child: Text(
+                                resumenRespuestas.isNotEmpty
+                                    ? resumenRespuestas
+                                    : "",
+                                style: TextStyle(
+                                    fontSize: 17.sp, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          OutlinedButton(
+                            onPressed: () {},
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.02,
+                                vertical: screenHeight * 0.02,
+                              ),
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.black,
+                              side: BorderSide(
+                                color: const Color(0xFF2be4f3),
+                                width: screenWidth * 0.001,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                            ),
+                            child: Text(
+                              tr(context, 'Descargar PDF').toUpperCase(),
+                              style: TextStyle(fontSize: 20.sp),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            // Segundo Expanded: Contenedor vacío
-            Expanded(
-              flex: 1, // Proporción del espacio asignado al contenedor vacío
-              child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 46, 46, 46),
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(7),
-                      bottomRight: Radius.circular(7),
-                    ),
-                  ),
-                  child: Column(
-                    children: [],
-                  )),
-            ),
-          ],
-        ),
-      ),
-      onClose: widget.onClose,
-    );
+            onClose: widget.onClose,
+          );
+  }
+
+  Widget _getOverlayWidget(int overlayIndex) {
+    switch (overlayIndex) {
+      case 0:
+        return OverlaySeleccionarClienteBio(
+          onClose: () => toggleOverlay(0),
+        );
+      default:
+        return Container();
+    }
   }
 }
 

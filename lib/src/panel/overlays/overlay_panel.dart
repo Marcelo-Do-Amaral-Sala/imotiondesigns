@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
@@ -1324,13 +1325,43 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
 
   Future<void> _fetchClients() async {
     final dbHelper = DatabaseHelper();
+
     try {
-      final clientData = await dbHelper.getClients();
+      // Obtener el userId desde SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('user_id');
+
+      if (userId == null) {
+        // Manejar el caso de usuario no autenticado
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error: Usuario no autenticado',
+              style: TextStyle(color: Colors.white, fontSize: 17.sp),
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      // Obtener clientes: si userId es 1, mostrar todos; si no, filtrar por userId
+      List<Map<String, dynamic>> clientData;
+      if (userId == 1) {
+        // Obtener todos los clientes sin filtrar
+        clientData = await dbHelper.getClients();
+      } else {
+        // Obtener clientes asociados al usuario
+        clientData = await dbHelper.getClientsByUserId(userId);
+      }
+
       setState(() {
         allClients = clientData; // Asigna a la lista original
         filteredClients = allClients; // Inicializa la lista filtrada
       });
-      _filterClients(); // Filtra para mostrar todos los clientes
+
+      _filterClients(); // Aplica cualquier filtrado adicional
     } catch (e) {
       print('Error fetching clients: $e');
     }
