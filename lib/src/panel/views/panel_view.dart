@@ -17,6 +17,8 @@ import 'package:video_player/video_player.dart';
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 import '../../servicios/licencia_state.dart';
+import '../../servicios/provider.dart';
+import '../../servicios/video_controller.dart';
 import '../custom/border_neon.dart';
 import '../custom/linear_custom.dart';
 import 'package:http/http.dart' as http;
@@ -300,11 +302,13 @@ class _PanelViewState extends State<PanelView> {
     print("🔄 Equip seleccionado: $selectedIndex para clave $key");
   }
 
-  void onClientSelected(String key, Map<String, dynamic>? client, String? macAddress) {
+  void onClientSelected(
+      String key, Map<String, dynamic>? client, String? macAddress) {
     setState(() {
       if (client != null) {
         // Elimina duplicidades: Verifica si el cliente ya está asociado
-        clientSelectionMap.removeWhere((k, v) => v != null && v['id'] == client['id']);
+        clientSelectionMap
+            .removeWhere((k, v) => v != null && v['id'] == client['id']);
         print("Cliente eliminado de asociaciones previas: ${client['name']}");
 
         // Asigna el cliente al dispositivo actual
@@ -317,7 +321,8 @@ class _PanelViewState extends State<PanelView> {
       }
 
       // Imprime el estado actual del mapa
-      print("Estado actual de clientSelectionMap: ${clientSelectionMap.map((k, v) => MapEntry(k, v?['name'] ?? 'No asignado'))}");
+      print(
+          "Estado actual de clientSelectionMap: ${clientSelectionMap.map((k, v) => MapEntry(k, v?['name'] ?? 'No asignado'))}");
     });
   }
 
@@ -525,33 +530,37 @@ class _PanelViewState extends State<PanelView> {
                                                 }
                                               }
                                             },
-                                              onLongPress: () {
-                                                // Verifica si hay un cliente asociado a esta dirección MAC
-                                                if (selectedClient != null) {
-                                                  print('Cliente deseleccionado: ${selectedClient!['name']}');
+                                            onLongPress: () {
+                                              // Verifica si hay un cliente asociado a esta dirección MAC
+                                              if (selectedClient != null) {
+                                                print(
+                                                    'Cliente deseleccionado: ${selectedClient!['name']}');
 
-                                                  setState(() {
-                                                    // Elimina el cliente de la selección local
-                                                    clientSelectionMap.remove(macAddress);
+                                                setState(() {
+                                                  // Elimina el cliente de la selección local
+                                                  clientSelectionMap
+                                                      .remove(macAddress);
 
-                                                    // Limpia específicamente el cliente en el Provider
-                                                    if (_clientsProvider != null) {
-                                                      _clientsProvider!.removeClient(selectedClient!); // Método del Provider para eliminar cliente
-                                                      if (kDebugMode) {
-                                                        print("📋 Cliente eliminado del Provider: ${selectedClient!['name']}");
-                                                      }
+                                                  // Limpia específicamente el cliente en el Provider
+                                                  if (_clientsProvider !=
+                                                      null) {
+                                                    _clientsProvider!.removeClient(
+                                                        selectedClient!); // Método del Provider para eliminar cliente
+                                                    if (kDebugMode) {
+                                                      print(
+                                                          "📋 Cliente eliminado del Provider: ${selectedClient!['name']}");
                                                     }
+                                                  }
 
-                                                    // Limpia la selección local para esta dirección MAC
-                                                    selectedClient = null;
-                                                  });
-                                                } else {
-                                                  print("❌ No hay cliente asociado a esta dirección MAC para desasignar.");
-                                                }
-                                              },
-
-
-                                              child: Stack(
+                                                  // Limpia la selección local para esta dirección MAC
+                                                  selectedClient = null;
+                                                });
+                                              } else {
+                                                print(
+                                                    "❌ No hay cliente asociado a esta dirección MAC para desasignar.");
+                                              }
+                                            },
+                                            child: Stack(
                                               children: [
                                                 // Widget principal (contenedor y detalles)
                                                 Padding(
@@ -855,7 +864,8 @@ class _PanelViewState extends State<PanelView> {
                                         updateEquipSelection(
                                             selectedKey!, index),
                                     onClientSelected: (client) =>
-                                        onClientSelected(selectedKey!, client, macAddress),
+                                        onClientSelected(
+                                            selectedKey!, client, macAddress),
                                     isFullChanged: handleActiveChange,
                                     groupedA: groupedAmcis,
                                     groupedB: groupedBmcis,
@@ -1699,6 +1709,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool _isImagesLoaded = false;
   bool showTrainerInfo = false;
   bool _isLoading = true;
+  bool _showVideo = true;
+  bool _isImageOne = true;
   bool _hideControls = true;
   GlobalKey<_PanelViewState> panelViewKey = GlobalKey<_PanelViewState>();
   String modulo =
@@ -1750,7 +1762,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valueRampa = 1.0;
   double valuePause = 1.0;
   double contractionDuration = 0.0;
-
   Map<String, bool> procesosActivos = {};
   Map<int, double> subprogramElapsedTime =
       {}; // Almacena elapsedTimeSub para cada subprograma
@@ -1905,17 +1916,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (selectedIndivProgram != null &&
         selectedIndivProgram!['video'] != null &&
         selectedIndivProgram!['video'].isNotEmpty) {
-      _initializeVideoController(
-          selectedIndivProgram!['video'], widget.macAddress!);
+      _initializeVideoController(selectedIndivProgram!['video']);
     }
   }
 
   Future<void> initializeDataProgram() async {
-    await obtenerDatos(); // Esperar a que se obtengan los datos
+    // Esperar a que se obtengan los datos
     _fetchClients();
+    await obtenerDatos();
     await _fetchIndividualPrograms(); // Esperar a que se asigne la información
-    _fetchRecoveryPrograms();
-    _fetchAutoPrograms();
+    await _fetchRecoveryPrograms();
+    await _fetchAutoPrograms();
   }
 
   @override
@@ -1931,94 +1942,64 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     // Detectar cambios en selectedIndivProgram y actualizar el controlador si cambia la URL del video.
     if (selectedIndivProgram != null &&
         selectedIndivProgram!['video'] != selectedIndivProgram?['video']) {
-      _initializeVideoController(
-          selectedIndivProgram!['video'], widget.macAddress!);
+      _initializeVideoController(selectedIndivProgram!['video']);
     }
   }
 
-  Future<void> _initializeVideoController(
-      String? videoUrl, String macAddress) async {
-    if (videoUrl == null || videoUrl.isEmpty) {
-      print("No se proporcionó una URL de video válida.");
+  Future<void> _initializeVideoController(String videoUrl) async {
+    try {
+      await GlobalVideoControllerManager.instance
+          .initializeVideo(videoUrl, widget.macAddress!);
+
       setState(() {
         _isLoading = false;
-        _videoController = null;
-        _videoVisibilityMap[widget.macAddress!] = false;
+        _showVideo = true;
       });
+
+      print("✅ Video inicializado con éxito: $videoUrl");
+    } catch (e) {
+      print("❌ Error al inicializar el video: $e");
+      setState(() {
+        _isLoading = false;
+        _showVideo = false;
+      });
+    }
+  }
+
+  Future<void> _cancelVideoController() async {
+    try {
+      await GlobalVideoControllerManager.instance
+          .cancelVideo(widget.macAddress!);
+      setState(() {
+        _showVideo = false;
+      });
+      print("✅ Video cancelado y recursos liberados.");
+    } catch (e) {
+      print("❌ Error al cancelar el video: $e");
+    }
+  }
+
+  void _togglePlayPause(String macAddress) {
+    final globalManager = GlobalVideoControllerManager.instance;
+    final videoController = globalManager.videoController;
+
+    if (videoController == null ||
+        !videoController.value.isInitialized ||
+        globalManager.activeMacAddress != macAddress) {
+      debugPrint(
+          "⚠️ No hay un video activo o el video no pertenece a este macAddress.");
       return;
     }
 
-    print("Intentando reproducir: $videoUrl");
-
-    // Verificar si el video actual está visible y ocultarlo.
-    final isCurrentlyVisible = _videoVisibilityMap[widget.macAddress!] ?? false;
-    if (isCurrentlyVisible) {
-      setState(() {
-        _videoVisibilityMap[widget.macAddress!] = false;
-      });
-      print("Video ocultado para ${widget.macAddress!}");
+    if (videoController.value.isPlaying) {
+      videoController.pause();
+      debugPrint("⏸️ Video pausado para macAddress: $macAddress");
+    } else {
+      videoController.play();
+      debugPrint("▶️ Video reproduciéndose para macAddress: $macAddress");
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // Cancelar cualquier controlador activo y ocultar videos previos.
-      await _cancelVideoInitialization(widget.macAddress!);
-
-      // Actualizar el mapa para reflejar la nueva visibilidad.
-      _videoVisibilityMap.clear();
-      _videoVisibilityMap[widget.macAddress!] = true;
-
-      _videoController = VideoPlayerController.networkUrl(
-        Uri.parse(videoUrl),
-        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-      );
-
-      // Agregar el listener al controlador.
-      _videoController!.addListener(_videoControllerListener);
-
-      // Inicializar el controlador.
-      await _videoController!.initialize();
-      await _videoController!.play();
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      print("Error al inicializar el video: $e");
-      setState(() {
-        _isLoading = false;
-        _videoController = null;
-        _videoVisibilityMap[macAddress] = false;
-      });
-    }
-  }
-
-  void _videoControllerListener() {
-    if (_videoController != null && mounted) {
-      setState(() {}); // Forzar la actualización del estado.
-    }
-  }
-
-  Future<void> _cancelVideoInitialization(String macAddres) async {
-    try {
-      if (_videoController != null) {
-        _videoController!.removeListener(_videoControllerListener);
-        await _videoController!.dispose();
-        print("VideoController cancelado y liberado correctamente.");
-      }
-    } catch (e) {
-      print("Error al cancelar el VideoController: $e");
-    }
-
-    if (mounted) {
-      setState(() {
-        _videoController = null;
-        _isLoading = false;
-        _videoVisibilityMap.clear(); // Limpiar el mapa de visibilidad.
-      });
-    }
+    setState(() {});
   }
 
   Future<void> _preloadImages() async {
@@ -2098,22 +2079,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
-  // Obtener datos y guardarlos localmente
-  Future<void> obtenerDatos() async {
-    try {
-      List<String> datos = await getTrainer("imotion21");
-
-      List<String> datosFiltrados =
-          datos.where((element) => element.isNotEmpty).toList();
-
-      setState(() {
-        respuestaTroceada = datosFiltrados;
-      });
-    } catch (e) {
-      print("Error al obtener datos: $e");
-    }
-  }
-
   // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
   void toggleFullScreen() {
     setState(() {
@@ -2142,7 +2107,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (client != null) {
         // Verifica y elimina el cliente de asociaciones previas
         selectedClients.removeWhere((c) => c['id'] == client['id']);
-        print("Cliente eliminado de cualquier asociación previa: ${client['name']}");
+        print(
+            "Cliente eliminado de cualquier asociación previa: ${client['name']}");
 
         // Agrega el cliente al widget actual
         selectedClients.add(client);
@@ -2152,7 +2118,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             "Cliente asignado a ${widget.macAddress!}: ${client['name']}, Lista actualizada de clientes seleccionados: ${selectedClients.map((c) => c['name']).toList()}");
       } else {
         // Si el cliente es null, elimina la asociación actual
-        print("Cliente desasignado de ${widget.macAddress!}: ${selectedClient?['name']}");
+        print(
+            "Cliente desasignado de ${widget.macAddress!}: ${selectedClient?['name']}");
         selectedClients.remove(selectedClient);
         selectedClient = null;
       }
@@ -2162,32 +2129,45 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     widget.onClientSelected(client);
   }
 
-
   void _clearGlobals() async {
     if (mounted) {
-      await _cancelVideoInitialization(widget.macAddress!);
       setState(() {
-        // Verifica si la sesión se ha iniciado antes de detenerla
+        // Detener la reproducción de video y liberar recursos
+        try {
+          if (GlobalVideoControllerManager.instance.videoController != null) {
+            GlobalVideoControllerManager.instance.cancelVideo(
+                GlobalVideoControllerManager.instance.activeMacAddress ?? "");
+          }
+        } catch (e) {
+          debugPrint("Error al liberar el VideoPlayerController: $e");
+        }
+
+        // Detener animaciones y temporizadores
+        _opacityController.dispose();
+        _phaseTimer?.cancel();
+        timerSub?.cancel();
+        _timer.cancel();
+
+        // Reiniciar todas las variables globales
         isElectroOn = false;
         _isLoading = false;
 
-        // Restablecer variables globales
+        // Restablecer valores de los programas y selección
         selectedProgram = null;
         selectedAutoProgram = null;
+        selectedIndivProgram = null;
+        selectedRecoProgram = null;
         selectedClient = null;
 
+        // Reiniciar estado de sesión
         isSessionStarted = false;
         _isImagesLoaded = false;
         isRunning = false;
         isContractionPhase = true;
         isPantalonSelected = false;
         selectedIndexEquip = 0;
-        // Restablecer los programas
-        selectedProgram = null;
-        selectedAutoProgram = null;
-        selectedIndivProgram = null;
-        selectedRecoProgram = null;
-        // Restablecer valores de escalado
+
+        // Restablecer valores de escala
         scaleFactorFull = 1.0;
         scaleFactorCliente = 1.0;
         scaleFactorRepeat = 1.0;
@@ -2197,42 +2177,36 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         scaleFactorMas = 1.0;
         scaleFactorMenos = 1.0;
 
-        // Restablecer los valores de rotación
+        // Restablecer ángulos de rotación
         rotationAngle1 = 0.0;
         rotationAngle2 = 0.0;
         rotationAngle3 = 0.0;
 
-        // Restablecer los índices y estados de expansión
+        // Reiniciar expansión
         _isExpanded1 = false;
         _isExpanded2 = false;
         _isExpanded3 = false;
 
-        // Restablecer el estado de la imagen y su índice
+        // Restablecer imágenes y temporizador
         _currentImageIndex = 31 - 25;
         currentSubprogramIndex = 0;
         remainingTime = 0;
 
-        // Restablecer la lista de músculos inactivos
+        // Restablecer los estados de músculos
         _isMusculoTrajeInactivo.fillRange(0, 10, false);
         _isMusculoPantalonInactivo.fillRange(0, 7, false);
-
-        // Restablecer los bloqueos de músculos
         _isMusculoTrajeBloqueado.fillRange(0, 10, false);
         _isMusculoPantalonBloqueado.fillRange(0, 7, false);
 
-        // Limpiar las variables de los temporizadores de los subprogramas
+        // Reiniciar tiempos de subprogramas
         subprogramElapsedTime = {};
         subprogramRemainingTime = {};
 
-        // Restablecer los porcentajes
+        // Restablecer porcentajes
         porcentajesMusculoTraje.fillRange(0, 10, 0);
         porcentajesMusculoPantalon.fillRange(0, 7, 0);
 
-        // Restablecer las variables relacionadas con el temporizador
-        valueContraction = 1.0;
-        valueRampa = 1.0;
-        valuePause = 1.0;
-
+        // Reiniciar temporizadores generales
         elapsedTime = 0.0;
         elapsedTimeSub = 0.0;
         time = 25;
@@ -2245,15 +2219,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         startTime = DateTime.now();
         pausedTime = 0.0;
 
-        // Cancelar cualquier temporizador activo
-        _phaseTimer?.cancel();
-        timerSub?.cancel();
-        _timer.cancel();
+        // Limpiar el mapa de procesos activos
+        procesosActivos.clear();
 
-        // Restablecer los temporizadores de subprograma (reiniciar todo)
-        remainingTime = 0;
-        elapsedTimeSub = 0.0;
-        currentSubprogramIndex = 0;
+        // Reiniciar visibilidad de videos y paneles
+        _videoVisibilityMap.clear();
+        _showVideo = false;
+        isFullScreen = false;
+        isOverlayVisible = false;
       });
     }
   }
@@ -2269,6 +2242,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
     } catch (e) {
       debugPrint('Error fetching clients: $e');
+    }
+  }
+
+  Future<void> obtenerDatos() async {
+    try {
+      List<String> datos = await getTrainer("imotion21");
+
+      List<String> datosFiltrados =
+          datos.where((element) => element.isNotEmpty).toList();
+
+      setState(() {
+        respuestaTroceada = datosFiltrados;
+      });
+    } catch (e) {
+      print("Error al obtener datos: $e");
     }
   }
 
@@ -2289,6 +2277,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             (i < respuestaTroceada.length) ? respuestaTroceada[i] : null;
         program['video'] = video;
 
+        // Añadir cronaxias y grupos al programa
+        program['cronaxias'] = await DatabaseHelper()
+            .obtenerCronaxiasPorPrograma(db, program['id_programa']);
+        program['grupos'] = await DatabaseHelper()
+            .obtenerGruposPorPrograma(db, program['id_programa']);
+
         individualProgramData[i] = program;
       }
 
@@ -2303,23 +2297,22 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Future<void> _fetchRecoveryPrograms() async {
-    var db = await DatabaseHelper()
-        .database; // Obtener la instancia de la base de datos
+    var db = await DatabaseHelper().database;
     try {
       final recoveryProgramData = await DatabaseHelper()
           .obtenerProgramasPredeterminadosPorTipoRecovery(db);
 
-      for (var recoveryProgram in recoveryProgramData) {
-        var cronaxias = await DatabaseHelper()
-            .obtenerCronaxiasPorPrograma(db, recoveryProgram['id_programa']);
-        var grupos = await DatabaseHelper()
-            .obtenerGruposPorPrograma(db, recoveryProgram['id_programa']);
+      for (var program in recoveryProgramData) {
+        // Añadir cronaxias y grupos al programa
+        program['cronaxias'] = await DatabaseHelper()
+            .obtenerCronaxiasPorPrograma(db, program['id_programa']);
+        program['grupos'] = await DatabaseHelper()
+            .obtenerGruposPorPrograma(db, program['id_programa']);
       }
 
       if (mounted) {
         setState(() {
-          allRecoveryPrograms =
-              recoveryProgramData; // Asignamos los programas obtenidos a la lista
+          allRecoveryPrograms = recoveryProgramData;
         });
       }
     } catch (e) {
@@ -2785,6 +2778,96 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         "Temporizador detenido. Tiempo transcurrido: $elapsedTimeSub segundos.");
   }
 
+  void resetSubprogramState() {
+    if (mounted) {
+      setState(() {
+        // Reiniciar el índice actual de subprograma
+        currentSubprogramIndex = 0;
+
+        // Reiniciar el temporizador del subprograma si está activo
+        timerSub?.cancel();
+        timerSub = null;
+
+        // Reiniciar tiempos transcurridos y restantes
+        elapsedTimeSub = 0.0;
+        remainingTime = 0;
+
+        // Vaciar los mapas de tiempo para subprogramas
+        subprogramElapsedTime.clear();
+        subprogramRemainingTime.clear();
+
+        print("Estado del subprograma reiniciado.");
+      });
+    }
+  }
+
+  Future<void> printElectrostimulationValues(
+    String macAddress,
+    List<int> porcentajesMusculoTraje,
+    String? selectedProgram,
+  ) async {
+    try {
+      if (porcentajesMusculoTraje.length != 10) {
+        debugPrint(
+            "❌ La lista porcentajesMusculoTraje debe tener exactamente 10 elementos.");
+        return;
+      }
+
+      // Configurar los valores de los canales del traje
+      List<int> valoresCanalesTraje = List.filled(10, 0);
+      valoresCanalesTraje[0] = porcentajesMusculoTraje[5];
+      valoresCanalesTraje[1] = porcentajesMusculoTraje[6];
+      valoresCanalesTraje[2] = porcentajesMusculoTraje[7];
+      valoresCanalesTraje[3] = porcentajesMusculoTraje[8];
+      valoresCanalesTraje[4] = porcentajesMusculoTraje[9];
+      valoresCanalesTraje[5] = porcentajesMusculoTraje[0];
+      valoresCanalesTraje[6] = porcentajesMusculoTraje[2];
+      valoresCanalesTraje[7] = porcentajesMusculoTraje[3];
+      valoresCanalesTraje[8] = porcentajesMusculoTraje[1];
+      valoresCanalesTraje[9] = porcentajesMusculoTraje[4];
+
+      debugPrint("📊 Valores de canales configurados: $valoresCanalesTraje");
+
+      // Obtener configuraciones del programa seleccionado
+      Map<String, dynamic> settings = getProgramSettings(selectedProgram);
+      double frecuencia = settings['frecuencia'] ?? 50;
+      double rampa = settings['rampa'] ?? 30;
+      double pulso = settings['pulso'] ?? 20;
+
+      // Validar y convertir la lista de cronaxias
+      List<Map<String, dynamic>> cronaxias = settings['cronaxias'] ?? [];
+
+      // Depurar la lista de cronaxias
+      if (cronaxias.isEmpty) {
+        debugPrint(
+            "⚠️ No se encontraron cronaxias para el programa seleccionado.");
+      } else {
+        debugPrint("✅ Se encontraron ${cronaxias.length} cronaxias:");
+      }
+
+      // Eliminar duplicados (usar 'nombre' como clave)
+      final uniqueCronaxias = {
+        for (var cronaxia in cronaxias) cronaxia['nombre']: cronaxia
+      }.values.toList();
+
+      for (var cronaxia in uniqueCronaxias) {
+        debugPrint(
+            "Cronaxia: ${cronaxia['nombre']}, Valor: ${cronaxia['valor']}");
+      }
+
+      // Ajustes de conversión
+      rampa *= 10;
+      pulso /= 5;
+
+      debugPrint(
+          "⚙️ Configuración del programa: Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Pulso: $pulso µs");
+
+      debugPrint("✅ Todos los valores se imprimieron correctamente.");
+    } catch (e) {
+      debugPrint("❌ Error al procesar los valores de electroestimulación: $e");
+    }
+  }
+
   Future<bool> startFullElectrostimulationTrajeProcess(
     String macAddress,
     List<int> porcentajesMusculoTraje,
@@ -2813,10 +2896,24 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       debugPrint("📊 Valores de canales configurados: $valoresCanalesTraje");
 
       // Obtener configuraciones del programa seleccionado
-      Map<String, double> settings = getProgramSettings(selectedProgram);
+      Map<String, dynamic> settings = getProgramSettings(selectedProgram);
       double frecuencia = settings['frecuencia'] ?? 50;
       double rampa = settings['rampa'] ?? 30;
       double pulso = settings['pulso'] ?? 20;
+
+      // Validar y convertir la lista de cronaxias
+      List<Map<String, dynamic>> cronaxias = [];
+      if (settings['cronaxias'] is List) {
+        cronaxias = (settings['cronaxias'] as List)
+            .where((e) => e is Map<String, dynamic>)
+            .cast<Map<String, dynamic>>()
+            .toList();
+      }
+
+      for (var cronaxia in cronaxias) {
+        debugPrint(
+            "Cronaxia: ${cronaxia['nombre']}, Valor: ${cronaxia['valor']}");
+      }
 
       // Ajustes de conversión
       rampa *= 10;
@@ -2897,11 +2994,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
 
       // Paso 2: Obtener configuración del programa seleccionado
-      Map<String, double> settings = getProgramSettings(selectedProgram);
+      Map<String, dynamic> settings = getProgramSettings(selectedProgram);
       double frecuencia = settings['frecuencia'] ?? 50; // Valor por defecto
       double rampa = settings['rampa'] ?? 30; // Valor por defecto
       double pulso = settings['pulso'] ?? 20; // Valor por defecto
-
+      List<Map<String, dynamic>> cronaxias = settings['cronaxias'] ?? [];
+      for (var cronaxia in cronaxias) {
+        debugPrint(
+            "Cronaxia: ${cronaxia['nombre']}, Valor: ${cronaxia['valor']}");
+      }
       // Ajustar los valores según las conversiones necesarias
       rampa *= 10;
       pulso /= 5;
@@ -3420,7 +3521,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 OutlinedButton(
-                                  onPressed: widget.selectedKey == null
+                                  onPressed: widget.selectedKey == null ||
+                                          isRunning
                                       ? null // Inhabilitar el botón si selectedKey es null
                                       : () {
                                           setState(() {
@@ -3495,7 +3597,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             ),
                                           ),
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null
+                                            onTap: widget.selectedKey == null ||
+                                                    isRunning
                                                 ? null // Deshabilitar el clic si `selectedKey` es null
                                                 : () {
                                                     setState(() {
@@ -3529,7 +3632,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             ),
                                           ),
                                           GestureDetector(
-                                            onTap: widget.selectedKey == null
+                                            onTap: widget.selectedKey == null ||
+                                                    isRunning
                                                 ? null
                                                 : () {
                                                     setState(() {
@@ -3573,7 +3677,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ),
                                                 GestureDetector(
                                                   onTap: widget.selectedKey ==
-                                                          null
+                                                              null ||
+                                                          isRunning
                                                       ? null
                                                       : () {
                                                           setState(() {
@@ -3615,7 +3720,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ),
                                                 GestureDetector(
                                                   onTap: widget.selectedKey ==
-                                                          null
+                                                              null ||
+                                                          isRunning
                                                       ? null
                                                       : () {
                                                           setState(() {
@@ -3652,8 +3758,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         children: [
                                           Text(
                                             selectedIndivProgram != null
-                                                ? "${selectedIndivProgram!['frecuencia'] != null ? formatNumber(selectedIndivProgram!['frecuencia'] as double) : 'N/A'} Hz"
-                                                : "N/A",
+                                                ? "${selectedIndivProgram!['frecuencia'] != null ? formatNumber(selectedIndivProgram!['frecuencia'] as double) : ''} Hz"
+                                                : "",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3661,8 +3767,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ),
                                           Text(
                                             selectedIndivProgram != null
-                                                ? "${selectedIndivProgram!['pulso'] != null ? formatNumber(selectedIndivProgram!['pulso'] as double) : 'N/A'} ms"
-                                                : "N/A",
+                                                ? "${selectedIndivProgram!['pulso'] != null ? formatNumber(selectedIndivProgram!['pulso'] as double) : ''} ms"
+                                                : "",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3676,8 +3782,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         children: [
                                           Text(
                                             selectedRecoProgram != null
-                                                ? "${selectedRecoProgram!['frecuencia'] != null ? formatNumber(selectedRecoProgram!['frecuencia'] as double) : 'N/A'} Hz"
-                                                : "N/A",
+                                                ? "${selectedRecoProgram!['frecuencia'] != null ? formatNumber(selectedRecoProgram!['frecuencia'] as double) : ''} Hz"
+                                                : "",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3685,8 +3791,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ),
                                           Text(
                                             selectedRecoProgram != null
-                                                ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : 'N/A'} ms"
-                                                : "N/A",
+                                                ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : ''} ms"
+                                                : "",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
@@ -3816,32 +3922,73 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         fontSize: 15.sp,
                                       )),
                                   GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
                                       final videoUrl =
                                           selectedIndivProgram?['video'];
                                       if (videoUrl != null &&
                                           videoUrl.isNotEmpty) {
-                                        final isCurrentlyVisible =
-                                            _videoVisibilityMap[
-                                                    widget.macAddress] ??
-                                                false;
+                                        final globalManager =
+                                            GlobalVideoControllerManager
+                                                .instance;
 
-                                        if (isCurrentlyVisible) {
-                                          // Si el video está visible, alternar visibilidad.
+                                        // Verificar si ya hay un video inicializado para este macAddress
+                                        if (globalManager.videoController !=
+                                                null &&
+                                            globalManager.videoController!.value
+                                                .isInitialized &&
+                                            globalManager.activeMacAddress ==
+                                                widget.macAddress) {
+                                          // Alternar visibilidad del video
                                           setState(() {
-                                            _videoVisibilityMap[
-                                                widget.macAddress!] = false;
+                                            _showVideo = !_showVideo;
                                           });
-                                          print(
-                                              "Video ocultado para ${widget.macAddress}");
+                                          debugPrint(
+                                              "Visibilidad del video alternada para macAddress: ${widget.macAddress!} -> $_showVideo");
                                         } else {
-                                          // Inicializar el video para esta macAddress.
-                                          _initializeVideoController(
-                                              videoUrl, widget.macAddress!);
+                                          // Inicializar el video si no está inicializado o no pertenece a este macAddress
+                                          setState(() {
+                                            _isLoading =
+                                                true; // Mostrar el indicador de carga
+                                          });
+
+                                          try {
+                                            await globalManager.initializeVideo(
+                                                videoUrl, widget.macAddress!);
+
+                                            setState(() {
+                                              _isLoading =
+                                                  false; // Ocultar el indicador de carga
+                                              _showVideo =
+                                                  true; // Mostrar el video tras la inicialización
+                                            });
+
+                                            debugPrint(
+                                                "Video inicializado y visible para macAddress: ${widget.macAddress!}");
+                                          } catch (e) {
+                                            setState(() {
+                                              _isLoading =
+                                                  false; // Ocultar el indicador si falla la inicialización
+                                            });
+                                            debugPrint(
+                                                "Error al inicializar el video: $e");
+                                          }
                                         }
                                       } else {
-                                        print(
+                                        debugPrint(
                                             "No se proporcionó una URL válida.");
+                                      }
+                                    },
+                                    onLongPress: () async {
+                                      try {
+                                        await _cancelVideoController();
+                                        setState(() {
+                                          _showVideo =
+                                              false; // Ocultar el video tras cancelar
+                                        });
+                                        debugPrint("Video cancelado y oculto.");
+                                      } catch (e) {
+                                        debugPrint(
+                                            "Error al cancelar el video: $e");
                                       }
                                     },
                                     child: AnimatedScale(
@@ -3868,23 +4015,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               ),
                               SizedBox(width: screenWidth * 0.05),
                               GestureDetector(
-                                onTapDown: (_) =>
-                                    setState(() => scaleFactorRayo = 0.90),
-                                onTapUp: (_) =>
-                                    setState(() => scaleFactorRayo = 1.0),
-                                onTap: () async {
-                                  // Aquí llamamos a la función getPulseMeter al hacer tap
-                                  try {
-                                    // lamamos a la función que obtiene los datos del pulsómetro
-                                    final response = await bleConnectionService
-                                        ._getSignalCable(widget.macAddress!, 1);
-                                    // Mostrar los datos en consola o en la UI
-                                    debugPrint(
-                                        "📊 Datos del pulsómetro: $response");
-                                  } catch (e) {
-                                    debugPrint(
-                                        "❌ Error al obtener datos del pulsómetro: $e");
-                                  }
+                                onTapDown: (_) => setState(() => scaleFactorRayo = 0.90),
+                                onTapUp: (_) => setState(() => scaleFactorRayo = 1.0),
+                                onTap: () {
+                                  setState(() {
+                                    _isImageOne = !_isImageOne; // Alterna entre las dos imágenes
+                                  });
                                 },
                                 child: AnimatedScale(
                                   scale: scaleFactorRayo,
@@ -3897,7 +4033,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       child: SizedBox(
                                         child: Image.asset(
                                           height: screenHeight * 0.1,
-                                          'assets/images/rayoaz.png',
+                                          _isImageOne
+                                              ? 'assets/images/rayoaz.png' // Primera imagen
+                                              : 'assets/images/rayoverd.png', // Segunda imagen
                                           fit: BoxFit.contain,
                                         ),
                                       ),
@@ -3925,45 +4063,65 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                           flex: isFullScreen ? 1 : 6,
                           child: GestureDetector(
                             onTap: () {
-                              if (_videoVisibilityMap[widget.macAddress] ??
-                                  false) {
+                              if (_showVideo) {
                                 setState(() {
                                   _hideControls = !_hideControls;
                                 });
                               }
                             },
                             child: Stack(children: [
-                              if (_videoVisibilityMap[widget.macAddress] ??
-                                  false)
+                              if (_showVideo &&
+                                  GlobalVideoControllerManager
+                                          .instance.activeMacAddress ==
+                                      widget.macAddress!)
                                 Positioned.fill(
                                   child: _isLoading
-                                      ? const Center(
-                                          child: CircularProgressIndicator())
-                                      : (_videoController != null &&
-                                              _videoController!
-                                                  .value.isInitialized)
+                                      ? Center(
+                                          child: Container(),
+                                        )
+                                      : (GlobalVideoControllerManager.instance
+                                                      .videoController !=
+                                                  null &&
+                                              GlobalVideoControllerManager
+                                                  .instance
+                                                  .videoController!
+                                                  .value
+                                                  .isInitialized)
                                           ? SizedBox(
                                               width: screenWidth,
                                               height: screenHeight,
                                               child: FittedBox(
                                                 fit: BoxFit.cover,
                                                 child: SizedBox(
-                                                  width: _videoController!
-                                                      .value.size.width,
-                                                  height: _videoController!
-                                                      .value.size.height,
+                                                  width:
+                                                      GlobalVideoControllerManager
+                                                          .instance
+                                                          .videoController!
+                                                          .value
+                                                          .size
+                                                          .width,
+                                                  height:
+                                                      GlobalVideoControllerManager
+                                                          .instance
+                                                          .videoController!
+                                                          .value
+                                                          .size
+                                                          .height,
                                                   child: VideoPlayer(
-                                                      _videoController!),
+                                                    GlobalVideoControllerManager
+                                                        .instance
+                                                        .videoController!,
+                                                  ),
                                                 ),
                                               ),
                                             )
                                           : const Center(
                                               child: Text(
-                                                "",
+                                                "No video available",
                                                 style: TextStyle(
-                                                    fontSize: 1,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
                                 ),
@@ -5510,7 +5668,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                                 porcentajesMusculoTraje,
                                                                 porcentajesMusculoPantalon);
                                                           }
-
+                                                          _togglePlayPause(
+                                                              widget
+                                                                  .macAddress!);
                                                           debugPrint(
                                                               'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
                                                         });
@@ -7049,15 +7209,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             _pauseTimer(widget
                                                                 .macAddress!);
                                                           } else {
-                                                            // Inicia o reanuda el temporizador si está pausado
                                                             _startTimer(
                                                                 widget
                                                                     .macAddress!,
                                                                 porcentajesMusculoTraje,
                                                                 porcentajesMusculoPantalon);
                                                           }
+                                                          _togglePlayPause(
+                                                              widget
+                                                                  .macAddress!);
                                                           debugPrint(
-                                                              'isSessionStarted: $isSessionStarted');
+                                                              'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
                                                         });
                                                       },
                                                 child: SizedBox(
@@ -7646,7 +7808,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           onClose: () => toggleOverlay(4),
           onAutoProgramSelected: onAutoProgramSelected,
         );
- /*     case 5:
+      /*     case 5:
         return OverlayResumenSesion(
           onClose: () => toggleOverlay(5),
           onClientSelected: onClientSelected,
@@ -7673,83 +7835,107 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
-  // Función para obtener la frecuencia y la rampa del programa seleccionado
-  Map<String, double> getProgramSettings(String? selectedProgram) {
+  Map<String, dynamic> getProgramSettings(String? selectedProgram) {
     double frecuencia = 0;
     double rampa = valueRampa;
-    double pulso = 0; // Nuevo parámetro
+    double pulso = 0;
+    List<Map<String, dynamic>> cronaxias = [];
 
     if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
         allIndividualPrograms.isNotEmpty) {
       if (selectedIndivProgram != null) {
-        frecuencia = selectedIndivProgram!['frecuencia'] != null
-            ? selectedIndivProgram!['frecuencia'] as double
-            : 0;
-        rampa = selectedIndivProgram!['rampa'] != null
-            ? selectedIndivProgram!['rampa'] as double
-            : 0;
-        pulso = selectedIndivProgram!['pulso'] != null
-            ? selectedIndivProgram!['pulso'] as double
-            : 0;
+        frecuencia = selectedIndivProgram!['frecuencia'] ?? 0;
+        rampa = selectedIndivProgram!['rampa'] ?? 0;
+        pulso = selectedIndivProgram!['pulso'] ?? 0;
+
+        if (selectedIndivProgram!['cronaxias'] is List) {
+          cronaxias = (selectedIndivProgram!['cronaxias'] as List)
+              .where((e) => e is Map<String, dynamic>)
+              .cast<Map<String, dynamic>>()
+              .toList();
+        }
       } else {
-        frecuencia = allIndividualPrograms.isNotEmpty
-            ? allIndividualPrograms[0]['frecuencia'] as double
-            : 0;
-        rampa = allIndividualPrograms.isNotEmpty
-            ? allIndividualPrograms[0]['rampa'] as double
-            : 0;
-        pulso = allIndividualPrograms.isNotEmpty
-            ? allIndividualPrograms[0]['pulso'] as double
-            : 0;
+        var program =
+            allIndividualPrograms.isNotEmpty ? allIndividualPrograms[0] : null;
+        if (program != null) {
+          frecuencia = program['frecuencia'] ?? 0;
+          rampa = program['rampa'] ?? 0;
+          pulso = program['pulso'] ?? 0;
+
+          if (program['cronaxias'] is List) {
+            cronaxias = (program['cronaxias'] as List)
+                .where((e) => e is Map<String, dynamic>)
+                .cast<Map<String, dynamic>>()
+                .toList();
+          }
+        }
       }
     } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
         allRecoveryPrograms.isNotEmpty) {
       if (selectedRecoProgram != null) {
-        frecuencia = selectedRecoProgram!['frecuencia'] != null
-            ? selectedRecoProgram!['frecuencia'] as double
-            : 0;
-        rampa = selectedRecoProgram!['rampa'] != null
-            ? selectedRecoProgram!['rampa'] as double
-            : 0;
-        pulso = selectedRecoProgram!['pulso'] != null
-            ? selectedRecoProgram!['pulso'] as double
-            : 0;
+        frecuencia = selectedRecoProgram!['frecuencia'] ?? 0;
+        rampa = selectedRecoProgram!['rampa'] ?? 0;
+        pulso = selectedRecoProgram!['pulso'] ?? 0;
+
+        if (selectedRecoProgram!['cronaxias'] is List) {
+          cronaxias = (selectedRecoProgram!['cronaxias'] as List)
+              .where((e) => e is Map<String, dynamic>)
+              .cast<Map<String, dynamic>>()
+              .toList();
+        }
       } else {
-        frecuencia = allRecoveryPrograms.isNotEmpty
-            ? allRecoveryPrograms[0]['frecuencia'] as double
-            : 0;
-        rampa = allRecoveryPrograms.isNotEmpty
-            ? allRecoveryPrograms[0]['rampa'] as double
-            : 0;
-        pulso = allRecoveryPrograms.isNotEmpty
-            ? allRecoveryPrograms[0]['pulso'] as double
-            : 0;
+        var program =
+            allRecoveryPrograms.isNotEmpty ? allRecoveryPrograms[0] : null;
+        if (program != null) {
+          frecuencia = program['frecuencia'] ?? 0;
+          rampa = program['rampa'] ?? 0;
+          pulso = program['pulso'] ?? 0;
+
+          if (program['cronaxias'] is List) {
+            cronaxias = (program['cronaxias'] as List)
+                .where((e) => e is Map<String, dynamic>)
+                .cast<Map<String, dynamic>>()
+                .toList();
+          }
+        }
       }
     } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
         allAutomaticPrograms.isNotEmpty) {
       if (selectedAutoProgram != null) {
-        // Aquí puedes acceder a los valores de cada subprograma
+        // Obtener el subprograma actual
         var subprogram =
             selectedAutoProgram!['subprogramas'][currentSubprogramIndex];
+        frecuencia = subprogram['frecuencia'] ?? 0;
+        rampa = subprogram['rampa'] ?? 0;
+        pulso = subprogram['pulso'] ?? 0;
 
-        frecuencia = subprogram['frecuencia'] != null
-            ? subprogram['frecuencia'] as double
-            : 0;
-        rampa = subprogram['rampa'] != null ? subprogram['rampa'] as double : 0;
-        pulso = subprogram['pulso'] != null ? subprogram['pulso'] as double : 0;
+        // Verificar si el subprograma tiene cronaxias
+        if (subprogram['cronaxias'] is List) {
+          cronaxias = (subprogram['cronaxias'] as List)
+              .where((e) => e is Map<String, dynamic>)
+              .cast<Map<String, dynamic>>()
+              .toList();
+        }
       } else {
-        var subprogram = allAutomaticPrograms.isNotEmpty
-            ? allAutomaticPrograms[0]['subprogramas'][0]
-            : null;
+        var program =
+            allAutomaticPrograms.isNotEmpty ? allAutomaticPrograms[0] : null;
+        if (program != null) {
+          var subprogram = program['subprogramas'].isNotEmpty
+              ? program['subprogramas'][0]
+              : null;
+          if (subprogram != null) {
+            frecuencia = subprogram['frecuencia'] ?? 0;
+            rampa = subprogram['rampa'] ?? 0;
+            pulso = subprogram['pulso'] ?? 0;
 
-        if (subprogram != null) {
-          frecuencia = subprogram['frecuencia'] != null
-              ? subprogram['frecuencia'] as double
-              : 0;
-          rampa =
-              subprogram['rampa'] != null ? subprogram['rampa'] as double : 0;
-          pulso =
-              subprogram['pulso'] != null ? subprogram['pulso'] as double : 0;
+            // Obtener cronaxias de este subprograma
+            if (subprogram['cronaxias'] is List) {
+              cronaxias = (subprogram['cronaxias'] as List)
+                  .where((e) => e is Map<String, dynamic>)
+                  .cast<Map<String, dynamic>>()
+                  .toList();
+            }
+          }
         }
       }
     }
@@ -7757,7 +7943,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     return {
       'frecuencia': frecuencia,
       'rampa': rampa,
-      'pulso': pulso, // Devuelve el nuevo valor
+      'pulso': pulso,
+      'cronaxias': cronaxias,
     };
   }
 
@@ -8130,11 +8317,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Widget buildControlRow({
     required double value, // El valor que se va a mostrar y modificar
     required String imagePathIncrement, // Ruta de la imagen para el botón "Más"
-    required String imagePathDecrement, // Ruta de la imagen para el botón "Menos"
-    required String imagePathDisplay, // Ruta de la imagen para mostrar (como la imagen de CONTRACCION)
+    required String
+        imagePathDecrement, // Ruta de la imagen para el botón "Menos"
+    required String
+        imagePathDisplay, // Ruta de la imagen para mostrar (como la imagen de CONTRACCION)
     required VoidCallback onIncrement, // Lógica de incremento
     required VoidCallback onDecrement, // Lógica de decremento
-    required String suffix, // Sufijo para el valor (por ejemplo: "S" para contracción)
+    required String
+        suffix, // Sufijo para el valor (por ejemplo: "S" para contracción)
     required double screenWidth, // El ancho de la pantalla
     required double screenHeight, // El alto de la pantalla
   }) {
@@ -8158,7 +8348,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         SizedBox(width: screenWidth * 0.01),
         // Texto con el valor y el sufijo
         Text(
-          "${value.toStringAsFixed(0)}$suffix", // Valor formateado sin decimales
+          "${value.toStringAsFixed(0)}$suffix",
+          // Valor formateado sin decimales
           style: TextStyle(
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
@@ -8180,17 +8371,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             ),
           ),
         ),
-        SizedBox(width: screenWidth * 0.005),
+        SizedBox(width: screenWidth * 0.001),
         // Imagen que se muestra en el lado derecho (por ejemplo: "CONTRACCION.png")
         Image.asset(
           imagePathDisplay, // Imagen personalizada
-          width: screenWidth * 0.05,
-          height: screenHeight * 0.05,
+          width: screenWidth * 0.04,
+          height: screenHeight * 0.04,
         ),
       ],
     );
   }
-
 }
 
 class BleConnectionService {

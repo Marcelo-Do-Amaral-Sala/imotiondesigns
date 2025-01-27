@@ -1579,7 +1579,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                   children: [
                                     Image.asset(
                                         height: screenHeight * 0.1,
-                                        'assets/images/cliente_ia.png',
+                                        'assets/images/i-icon.png',
                                         fit: BoxFit.scaleDown),
                                     VerticalDivider(
                                       color: Colors.white,
@@ -1622,11 +1622,10 @@ class _OverlayVitaState extends State<OverlayVita>
                                           ),
                                           child: Center(
                                             child: SizedBox(
-                                              width: screenWidth * 0.05,
                                               height: screenHeight * 0.05,
                                               child: ClipOval(
                                                 child: Image.asset(
-                                                  'assets/images/cliente.png',
+                                                  'assets/images/cliente_ia.png',
                                                   fit: BoxFit.scaleDown,
                                                 ),
                                               ),

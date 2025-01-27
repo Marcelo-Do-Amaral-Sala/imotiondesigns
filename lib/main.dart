@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/app.dart';
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:imotion_designs/src/servicios/licencia_state.dart';
+import 'package:imotion_designs/src/servicios/provider.dart';
 import 'package:imotion_designs/src/servicios/sync.dart';
 import 'package:imotion_designs/src/servicios/translation_provider.dart';
 import 'package:provider/provider.dart';

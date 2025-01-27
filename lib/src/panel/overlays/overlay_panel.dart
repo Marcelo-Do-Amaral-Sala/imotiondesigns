@@ -10,6 +10,8 @@ import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 import 'package:http/http.dart' as http;
 
+import '../../servicios/provider.dart';
+
 class OverlayTipoPrograma extends StatefulWidget {
   final VoidCallback onClose;
   final Function(String)
@@ -177,8 +179,7 @@ class _OverlaySeleccionarProgramaIndividualState
   }
 
   Future<void> initializeDataProgram() async {
-    await obtenerDatos(); // Esperar a que se obtengan los datos
-    await _fetchIndividualPrograms(); // Esperar a que se asigne la información
+    await fetchProgramsAndAssignVideos(); // Esperar a que se asigne la información
   }
 
   // Función de encriptación
@@ -261,34 +262,56 @@ class _OverlaySeleccionarProgramaIndividualState
     }
   }
 
-  Future<void> _fetchIndividualPrograms() async {
-    var db = await DatabaseHelper().database;
+  Future<void> fetchProgramsAndAssignVideos() async {
     try {
+      var db = await DatabaseHelper().database;
+
       // Obtener los programas de la base de datos
       final individualProgramData = await DatabaseHelper()
           .obtenerProgramasPredeterminadosPorTipoIndividual(db);
 
-      if (respuestaTroceada.isEmpty) {
-        throw Exception(
-            "No se han cargado los datos de videos. Ejecuta 'obtenerDatos()' primero.");
+      if (individualProgramData.isEmpty) {
+        throw Exception("No se encontraron programas en la base de datos.");
       }
 
-      // Asignar videos dinámicamente
-      for (int i = 0; i < individualProgramData.length; i++) {
-        var program = Map<String, dynamic>.from(individualProgramData[i]);
+      if (mounted) {
+        setState(() {
+        allIndividualPrograms = individualProgramData;
+      });
+      }
+
+      print("Programas obtenidos: $allIndividualPrograms");
+
+      // Obtener los datos de videos (respuestaTroceada)
+      List<String> datos = await getTrainer("imotion21");
+
+      // Filtrar los datos para excluir elementos vacíos
+      List<String> datosFiltrados =
+          datos.where((element) => element.isNotEmpty).toList();
+
+      if (mounted) {
+        setState(() {
+          respuestaTroceada = datosFiltrados;
+        });
+      }
+
+      print("Datos de videos filtrados: $respuestaTroceada");
+
+      // Asignar videos a los programas
+      for (int i = 0; i < allIndividualPrograms.length; i++) {
+        var program = Map<String, dynamic>.from(allIndividualPrograms[i]);
         var video =
             (i < respuestaTroceada.length) ? respuestaTroceada[i] : null;
         program['video'] = video;
-        individualProgramData[i] = program;
+        allIndividualPrograms[i] = program;
       }
-
-      setState(() {
-        allIndividualPrograms = individualProgramData;
-        print(
-            "Programas con videos asignados en Overlay: $allIndividualPrograms");
-      });
+      if (mounted) {
+        setState(() {
+          print("Programas con videos asignados: $allIndividualPrograms");
+        });
+      }
     } catch (e) {
-      print('Error fetching programs: $e');
+      print('Error en fetchProgramsAndAssignVideos: $e');
     }
   }
 
@@ -1842,30 +1865,3 @@ class CycleTextWidget extends StatelessWidget {
     );
   }
 }
-
-class ClientsProvider with ChangeNotifier {
-  List<Map<String, dynamic>> _selectedClients = [];
-
-  // Obtiene la lista de clientes seleccionados
-  List<Map<String, dynamic>> get selectedClients => _selectedClients;
-
-  // Agrega un cliente si no está ya en la lista
-  void addClient(Map<String, dynamic> client) {
-    if (!_selectedClients.any((c) => c['id'] == client['id'])) {
-      _selectedClients.add(client);
-      notifyListeners(); // Notifica a los widgets que están escuchando
-    }
-  }
-
-  // Elimina un cliente por su ID
-  void removeClient(Map<String, dynamic> client) {
-    _selectedClients.removeWhere((c) => c['id'] == client['id']);
-    notifyListeners(); // Notifica después de eliminar
-  }
-
-  // Limpia todos los clientes seleccionados sin notificar
-  void clearSelectedClientsSilently() {
-    _selectedClients.clear(); // Limpia los datos sin notificar
-  }
-}
-
