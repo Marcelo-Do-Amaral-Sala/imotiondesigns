@@ -77,7 +77,7 @@ class _PanelViewState extends State<PanelView> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 5000), () {
+    Future.delayed(const Duration(milliseconds: 2000), () {
       setState(() {
         showBlackScreen = false;
       });
@@ -885,13 +885,9 @@ class _PanelViewState extends State<PanelView> with SingleTickerProviderStateMix
             Container(
               color: Colors.black,
               child: Center(
-                child: Lottie.asset(
-                  'assets/animations/splash.json',
-                  controller: _controller,
-                  onLoaded: (composition) {
-                    _controller.duration = composition.duration;
-                    _controller.forward();
-                  },
+                child: Text(
+                  "Cargando panel...",
+                  style: TextStyle(color: Colors.white, fontSize: 24.sp),
                 ),
               ),
             ),
