@@ -2027,14 +2027,27 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                   Expanded(
                       child: Column(
                     children: [
-                      Text(
-                        'INFO',
-                        style: TextStyle(
-                          color: const Color(0xFF2be4f3),
-                          fontSize: 25.sp,
-                          fontWeight: FontWeight.bold,
+                      OutlinedButton(
+                        onPressed: () {},
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(10.0),
+                          side: BorderSide(
+                              width: screenWidth * 0.001,
+                              color: const Color(0xFF2be4f3)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          backgroundColor: Colors.transparent,
                         ),
-                        textAlign: TextAlign.left,
+                        child: Text(
+                          tr(context, 'Info').toUpperCase(),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       SizedBox(height: screenHeight * 0.01),
                       Container(
