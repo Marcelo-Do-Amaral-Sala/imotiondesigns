@@ -36,7 +36,8 @@ class PanelView extends StatefulWidget {
   State<PanelView> createState() => _PanelViewState();
 }
 
-class _PanelViewState extends State<PanelView> with SingleTickerProviderStateMixin{
+class _PanelViewState extends State<PanelView>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late BleConnectionService bleConnectionService;
   late StreamSubscription _subscription;
@@ -885,8 +886,11 @@ class _PanelViewState extends State<PanelView> with SingleTickerProviderStateMix
               color: Colors.black,
               child: Center(
                 child: Text(
-                  "Cargando panel...",
-                  style: TextStyle(color: Colors.white, fontSize: 24.sp),
+                  tr(context, "Cargando panel...").toUpperCase(),
+                  style: TextStyle(
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 40.sp,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
