@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:isolate';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
@@ -40,7 +37,8 @@ class PanelView extends StatefulWidget {
   State<PanelView> createState() => _PanelViewState();
 }
 
-class _PanelViewState extends State<PanelView> {
+class _PanelViewState extends State<PanelView> with SingleTickerProviderStateMixin{
+  late final AnimationController _controller;
   late BleConnectionService bleConnectionService;
   late StreamSubscription _subscription;
   late ClientsProvider? _clientsProvider;
@@ -79,7 +77,7 @@ class _PanelViewState extends State<PanelView> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 5000), () {
       setState(() {
         showBlackScreen = false;
       });
@@ -103,6 +101,7 @@ class _PanelViewState extends State<PanelView> {
         _clientsProvider = Provider.of<ClientsProvider>(context, listen: false);
       });
     });
+    _controller = AnimationController(vsync: this);
   }
 
   void initializeMcis(List<Map<String, dynamic>> mcisList) {
@@ -339,7 +338,7 @@ class _PanelViewState extends State<PanelView> {
     if (kDebugMode) {
       print("📡 Suscripción cancelada.");
     }
-
+    _controller.dispose();
     // Liberar otros recursos después de desconectar dispositivos
     successfullyConnectedDevices.value.clear();
     if (kDebugMode) {
@@ -886,9 +885,13 @@ class _PanelViewState extends State<PanelView> {
             Container(
               color: Colors.black,
               child: Center(
-                child: Text(
-                  "Cargando...",
-                  style: TextStyle(color: Colors.white, fontSize: 24.sp),
+                child: Lottie.asset(
+                  'assets/animations/splash.json',
+                  controller: _controller,
+                  onLoaded: (composition) {
+                    _controller.duration = composition.duration;
+                    _controller.forward();
+                  },
                 ),
               ),
             ),
@@ -1685,7 +1688,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     screenWidth: 0,
     screenHeight: 0,
   );
-  VideoPlayerController? _videoController;
+
   late AnimationController _opacityController;
   late Animation<double> _opacityAnimation;
   late Timer _timer;
@@ -2132,18 +2135,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   void _clearGlobals() async {
     if (mounted) {
       setState(() {
-        // Detener la reproducción de video y liberar recursos
-        try {
-          if (GlobalVideoControllerManager.instance.videoController != null) {
-            GlobalVideoControllerManager.instance.cancelVideo(
-                GlobalVideoControllerManager.instance.activeMacAddress ?? "");
-          }
-        } catch (e) {
-          debugPrint("Error al liberar el VideoPlayerController: $e");
-        }
-
-        // Detener animaciones y temporizadores
-        _opacityController.dispose();
+        _cancelVideoController();
         _phaseTimer?.cancel();
         timerSub?.cancel();
         _timer.cancel();
@@ -3602,6 +3594,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ? null // Deshabilitar el clic si `selectedKey` es null
                                                 : () {
                                                     setState(() {
+                                                      _cancelVideoController();
                                                       toggleOverlay(2);
                                                     });
                                                   },
@@ -3637,6 +3630,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 ? null
                                                 : () {
                                                     setState(() {
+                                                      _cancelVideoController();
                                                       toggleOverlay(3);
                                                     });
                                                   },
@@ -3682,6 +3676,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ? null
                                                       : () {
                                                           setState(() {
+                                                            _cancelVideoController();
+                                                            _showVideo = false;
                                                             toggleOverlay(4);
                                                           });
                                                         },
@@ -3937,7 +3933,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             globalManager.videoController!.value
                                                 .isInitialized &&
                                             globalManager.activeMacAddress ==
-                                                widget.macAddress) {
+                                                widget.macAddress!) {
                                           // Alternar visibilidad del video
                                           setState(() {
                                             _showVideo = !_showVideo;
@@ -3952,8 +3948,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           });
 
                                           try {
-                                            await globalManager.initializeVideo(
-                                                videoUrl, widget.macAddress!);
+                                            await _initializeVideoController(
+                                                videoUrl);
 
                                             setState(() {
                                               _isLoading =
@@ -4015,11 +4011,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               ),
                               SizedBox(width: screenWidth * 0.05),
                               GestureDetector(
-                                onTapDown: (_) => setState(() => scaleFactorRayo = 0.90),
-                                onTapUp: (_) => setState(() => scaleFactorRayo = 1.0),
+                                onTapDown: (_) =>
+                                    setState(() => scaleFactorRayo = 0.90),
+                                onTapUp: (_) =>
+                                    setState(() => scaleFactorRayo = 1.0),
                                 onTap: () {
                                   setState(() {
-                                    _isImageOne = !_isImageOne; // Alterna entre las dos imágenes
+                                    _isImageOne =
+                                        !_isImageOne; // Alterna entre las dos imágenes
                                   });
                                 },
                                 child: AnimatedScale(
@@ -4035,7 +4034,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           height: screenHeight * 0.1,
                                           _isImageOne
                                               ? 'assets/images/rayoaz.png' // Primera imagen
-                                              : 'assets/images/rayoverd.png', // Segunda imagen
+                                              : 'assets/images/rayoverd.png',
+                                          // Segunda imagen
                                           fit: BoxFit.contain,
                                         ),
                                       ),

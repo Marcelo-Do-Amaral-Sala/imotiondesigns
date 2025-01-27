@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imotion_designs/src/panel/views/panel_view.dart';
-import 'package:imotion_designs/src/panel/views/prueba.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
 import 'package:imotion_designs/src/servicios/json.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'ajustes/form/licencia_form.dart';
 import 'ajustes/menus/ajustes_menu.dart';
 import 'ajustes/menus/gestion_menu.dart';
@@ -73,9 +71,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             break;
           case 'json':
             viewToDisplay = UploadJsonView();
-            break;
-          case 'prueba':
-            viewToDisplay = MiWidget();
             break;
           case 'clients':
             viewToDisplay = ClientsView(
