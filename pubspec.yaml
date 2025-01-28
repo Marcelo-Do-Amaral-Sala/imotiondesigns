@@ -54,6 +54,8 @@ dependencies:
   shared_preferences: ^2.3.3
   flutter_screenutil: ^5.9.3
   audioplayers: ^6.1.0
+  pdf: ^3.11.2
+  open_file: ^3.5.10
 
 
 
@@ -361,6 +363,8 @@ flutter:
     - assets/traduccionesv25.json
     - assets/videos/tutorial.mp4
     - assets/sounds/beep.mp3
+    - assets/fonts/Oswald-Regular.ttf
+    - assets/fonts/Oswald-Bold.ttf
 
   #   - images/a_dot_ham.jpeg
 

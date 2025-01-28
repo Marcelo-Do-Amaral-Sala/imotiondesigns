@@ -1,23 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../utils/translation_utils.dart';
 import '../bio/overlay_bio.dart';
 import '../db/db_helper.dart';
-import '../db/db_helper_pc.dart';
-import '../db/db_helper_traducciones.dart';
-import '../db/db_helper_traducciones_pc.dart';
-import '../db/db_helper_traducciones_web.dart';
-import '../db/db_helper_web.dart';
-import '../servicios/licencia_state.dart';
-import '../servicios/sync.dart';
-import '../servicios/translation_provider.dart'; // Importa el TranslationProvider
 
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToLogin;
@@ -45,7 +33,8 @@ class MainMenuView extends StatefulWidget {
   State<MainMenuView> createState() => _MainMenuViewState();
 }
 
-class _MainMenuViewState extends State<MainMenuView> {
+class _MainMenuViewState extends State<MainMenuView>
+    with SingleTickerProviderStateMixin {
   double scaleFactorBack = 1.0;
   double scaleFactorPanel = 1.0;
   double scaleFactorClient = 1.0;
@@ -60,12 +49,50 @@ class _MainMenuViewState extends State<MainMenuView> {
   int overlayIndex = -1; // -1 indica que no hay overlay visible
   int? userId;
   String? userTipoPerfil;
+  late AnimationController _controller;
+  late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
     super.initState();
+
     // Llamar a la función para verificar el userId y tipo de perfil al iniciar
     _checkUserProfile();
+
+    // Crear el controlador de animación
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 700), // Duración de 0.5 segundos
+      vsync: this,
+    );
+
+    // Animación de opacidad para simular latencia
+    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.4)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    // Iniciar la animación de latido, pero solo hacerla una vez (sin repetir)
+    _controller.repeat(
+        reverse: true,
+        period: const Duration(
+            milliseconds: 700)); // Reproducir la animación una sola vez
+
+    // Después de 10 segundos, detener la animación y dejar la escala fija
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        // Verifica si el widget sigue montado
+        setState(() {
+          // Asegurarse de que la animación quede fija en el valor final
+          _controller.stop();
+          _opacityAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(
+              CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> clearLoginData() async {
@@ -353,28 +380,35 @@ class _MainMenuViewState extends State<MainMenuView> {
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: GestureDetector(
-                                onTapDown: (_) =>
-                                    setState(() => scaleFactorBack = 0.90),
-                                onTapUp: (_) =>
-                                    setState(() => scaleFactorBack = 1.0),
-                                onTap: () {
-                                  toggleOverlay(1);
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onTapDown: (_) =>
+                                        setState(() => scaleFactorBack = 0.90),
+                                    onTapUp: (_) =>
+                                        setState(() => scaleFactorBack = 1.0),
+                                    onTap: () {
+                                      toggleOverlay(1);
                                 },
                                 child: AnimatedScale(
                                   scale: scaleFactorBack,
                                   duration: const Duration(milliseconds: 100),
                                   child: SizedBox(
-                                    width: screenWidth * 0.1,
-                                    height: screenHeight * 0.1,
-                                    child: ClipOval(
-                                      child: Image.asset(
-                                        'assets/images/icono-vita.png',
-                                        fit: BoxFit.scaleDown,
+                                        width: widget.screenWidth * 0.1,
+                                        height: widget.screenHeight * 0.1,
+                                        child: FadeTransition(
+                                          opacity: _controller,
+                                          child: ClipOval(
+                                            child: Image.asset(
+                                              'assets/images/icono-vita.png',
+                                              fit: BoxFit.scaleDown,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ],

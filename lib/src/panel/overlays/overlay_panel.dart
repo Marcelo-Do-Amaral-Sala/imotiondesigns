@@ -1817,23 +1817,24 @@ class CycleTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map<String, List<String>> cycleInfo = {
-      "0": ["Todos los músculos"],
+      "0": [tr(context, "Todos los músculos")],
       "A": [
-        "Glúteos\nIsquiotibiales",
-        "Trapecios\nDorsales\nLumbares",
-        "Bíceps"
+        tr(context, "Glúteos\nIsquiotibiales"),
+        tr(context, "Trapecios\nDorsales\nLumbares"),
+        tr(context, "Bíceps"),
       ],
       "B": [
-        "Glúteos\nIsquiotibiales\nCuádriceps",
-        "Trapecios\nDorsales\nLumbares",
-        "Pectorales\nAbdominales\nBíceps",
+        tr(context, "Glúteos\nIsquiotibiales\nCuádriceps"),
+        tr(context, "Trapecios\nDorsales\nLumbares"),
+        tr(context, "Pectorales\nAbdominales\nBíceps"),
       ],
       "C": [
-        "Glúteos\nIsquiotibiales\nCuádriceps",
-        "Trapecios\nDorsales\nLumbares\nPectorales\nAbdominales\nBíceps",
+        tr(context, "Glúteos\nIsquiotibiales\nCuádriceps"),
+        tr(context, "Trapecios\nDorsales\nLumbares\nPectorales\nAbdominales\nBíceps"),
       ],
-      "D": ["Recuperación activa"]
+      "D": [tr(context, "Recuperación activa")],
     };
+
 
     List<String> items = cycleInfo[cycleName] ?? ["Información no disponible"];
 

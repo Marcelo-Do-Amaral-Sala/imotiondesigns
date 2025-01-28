@@ -1,6 +1,9 @@
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/form/user_form_bonos.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_activity.dart';
@@ -15,9 +18,11 @@ import '../../bio/overlay_bio.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 import '../../db/db_helper_traducciones.dart';
+import '../../servicios/generate_pdf.dart';
 import '../../servicios/licencia_state.dart';
 import '../../servicios/sync.dart';
 import '../../servicios/translation_provider.dart';
+import '../custom/imc_graph.dart';
 import '../form/user_form.dart';
 import '../info/admins_bonos.dart';
 import '../info/admins_data.dart';
@@ -181,6 +186,7 @@ class _OverlayBackupState extends State<OverlayBackup>
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return MainOverlay(
       title: Text(
         tr(context, 'Copia de seguridad').toUpperCase(),
@@ -193,123 +199,119 @@ class _OverlayBackupState extends State<OverlayBackup>
       ),
       content: Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.02, vertical: screenHeight * 0.07),
+            horizontal: screenWidth * 0.02, vertical: screenHeight * 0.04),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      showConfirmation = true;
-                      actionMessage = tr(context,
-                          '¿Seguro que quieres hacer la copia de seguridad?');
-                      subActionMessage =
-                          tr(context, 'Sobreescribirás tu copia anterior');
-                    });
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.01,
-                        vertical: screenHeight * 0.01),
-                    side: BorderSide(
-                        width: screenWidth * 0.001,
-                        color: const Color(0xFF2be4f3)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
+            // Título y botones de acción
+            Padding(
+              padding: EdgeInsets.only(bottom: screenHeight * 0.03),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        showConfirmation = true;
+                        actionMessage = tr(context,
+                            '¿Seguro que quieres hacer la copia de seguridad?');
+                        subActionMessage =
+                            tr(context, 'Sobreescribirás tu copia anterior');
+                      });
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.01,
+                          vertical: screenHeight * 0.01),
+                      side: BorderSide(
+                          width: screenWidth * 0.001,
+                          color: const Color(0xFF2be4f3)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7)),
+                      backgroundColor: Colors.transparent,
                     ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    tr(context, 'Hacer copia').toUpperCase(),
-                    style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
+                    child: Text(
+                      tr(context, 'Hacer copia').toUpperCase(),
+                      style: TextStyle(
+                          color: const Color(0xFF2be4f3),
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      showConfirmation = true;
-                      actionMessage = tr(context,
-                          '¿Seguro que quieres restaurar la copia de seguridad?');
-                      subActionMessage = tr(context,
-                          'La aplicación se reiniciará después de la descarga');
-                    });
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.01,
-                        vertical: screenHeight * 0.01),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        showConfirmation = true;
+                        actionMessage = tr(context,
+                            '¿Seguro que quieres restaurar la copia de seguridad?');
+                        subActionMessage = tr(context,
+                            'La aplicación se reiniciará después de la descarga');
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.01,
+                          vertical: screenHeight * 0.01),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7)),
+                      backgroundColor: const Color(0xFF2be4f3),
                     ),
-                    backgroundColor: const Color(0xFF2be4f3),
-                  ),
-                  child: Text(
-                    tr(context, 'Recuperar copia').toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
+                    child: Text(
+                      tr(context, 'Recuperar copia').toUpperCase(),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+
+            // Verificación de estado de progreso o confirmación
             if (isLoading) ...[
-              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+              SizedBox(height: screenHeight * 0.05),
               LinearProgressIndicator(
-                value: progress, // Aquí se usa el valor del progreso
+                value: progress,
                 backgroundColor: Colors.grey[300],
                 valueColor:
                     const AlwaysStoppedAnimation<Color>(Color(0xFF2be4f3)),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+              SizedBox(height: screenHeight * 0.02),
               Text(
                 statusMessage,
                 style: TextStyle(color: Colors.white, fontSize: 18.sp),
                 textAlign: TextAlign.center,
               ),
             ] else if (showConfirmationUpload) ...[
-              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+              SizedBox(height: screenHeight * 0.05),
               Text(
-                confirmationMessage, // Mostramos el mensaje dinámico
+                confirmationMessage,
                 style: TextStyle(
-                  fontSize: 30.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
+                    fontSize: 30.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green),
                 textAlign: TextAlign.center,
               ),
             ] else ...[
               if (showConfirmation) ...[
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                SizedBox(height: screenHeight * 0.02),
                 Text(
-                  actionMessage, // Mostramos el mismo mensaje dinámico
-                  style: TextStyle(
-                    fontSize: 25.sp,
-                    color: Colors.white,
-                  ),
+                  actionMessage,
+                  style: TextStyle(fontSize: 25.sp, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 Text(
-                  subActionMessage, // Mostramos el mismo mensaje dinámico
+                  subActionMessage,
                   style: TextStyle(
-                    fontSize: 25.sp,
-                    color: Colors.orange,
-                    decoration: TextDecoration.underline,
-                    decorationColor: Colors.orange,
-                  ),
+                      fontSize: 25.sp,
+                      color: Colors.orange,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.orange),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -323,8 +325,7 @@ class _OverlayBackupState extends State<OverlayBackup>
                               showConfirmationUpload = true;
                               actionMessage =
                                   "COPIA DE SEGURIDAD SUBIDA EXITOSAMENTE";
-                              subActionMessage =
-                                  ""; // Limpiar el mensaje adicional si es necesario
+                              subActionMessage = "";
                             });
                           } else {
                             await _downloadBackup(); // Descargar backup
@@ -345,17 +346,15 @@ class _OverlayBackupState extends State<OverlayBackup>
                         side: BorderSide(
                             width: screenWidth * 0.001, color: Colors.green),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
+                            borderRadius: BorderRadius.circular(7)),
                         backgroundColor: Colors.green,
                       ),
                       child: Text(
                         tr(context, 'Sí').toUpperCase(),
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -372,17 +371,15 @@ class _OverlayBackupState extends State<OverlayBackup>
                         side: BorderSide(
                             width: screenWidth * 0.001, color: Colors.red),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
+                            borderRadius: BorderRadius.circular(7)),
                         backgroundColor: Colors.red,
                       ),
                       child: Text(
                         tr(context, 'No').toUpperCase(),
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -469,6 +466,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return MainOverlay(
       title: Text(
         tr(context, 'Idioma').toUpperCase(),
@@ -484,48 +482,42 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
             horizontal: screenWidth * 0.03, vertical: screenHeight * 0.03),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Primera columna con parte de los ListTiles
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: _languageMap.keys.take(3).map((language) {
-                      return Column(
-                        children: [
-                          buildCustomCheckboxTile(language),
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height *
-                                  0.02), // Espacio entre filas
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
-                // Segunda columna con el resto de los ListTiles
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: _languageMap.keys.skip(3).map((language) {
-                      return Column(
-                        children: [
-                          buildCustomCheckboxTile(language),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.02),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
+            // Fila para las dos columnas
             Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                // Distribuye uniformemente
+                children: [
+                  // Primera columna con parte de los ListTiles
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      // Distribuye uniformemente
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: _languageMap.keys.take(3).map((language) {
+                        return buildCustomCheckboxTile(language);
+                      }).toList(),
+                    ),
+                  ),
+                  // Segunda columna con el resto de los ListTiles
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      // Distribuye uniformemente
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: _languageMap.keys.skip(3).map((language) {
+                        return buildCustomCheckboxTile(language);
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Botón de selección en la parte inferior
+            Padding(
+              padding: EdgeInsets.only(top: screenHeight * 0.03),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: OutlinedButton(
@@ -569,21 +561,28 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
   }
 
   Widget buildCustomCheckboxTile(String language) {
-    return ListTile(
-      leading: customCheckbox(language),
-      title: Text(
-        language,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 24.sp,
-          fontWeight: FontWeight.normal,
+    return Column(
+      children: [
+        ListTile(
+          leading: customCheckbox(language),
+          title: Text(
+            language,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 27.sp,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          onTap: () {
+            setState(() {
+              _selectedLanguage = _languageMap[language];
+            });
+          },
         ),
-      ),
-      onTap: () {
-        setState(() {
-          _selectedLanguage = _languageMap[language];
-        });
-      },
+        SizedBox(
+            height: MediaQuery.of(context).size.height *
+                0.02), // Espacio entre filas
+      ],
     );
   }
 
@@ -597,8 +596,8 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
         });
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.04,
-        height: MediaQuery.of(context).size.height * 0.04,
+        width: MediaQuery.of(context).size.width * 0.05,
+        height: MediaQuery.of(context).size.height * 0.05,
         margin: EdgeInsets.symmetric(
             horizontal: screenWidth * 0.005, vertical: screenHeight * 0.001),
         decoration: BoxDecoration(
@@ -641,6 +640,7 @@ class _OverlayServicioState extends State<OverlayServicio>
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return MainOverlay(
       title: Text(
         tr(context, 'Servicio técnico').toUpperCase(),
@@ -656,54 +656,73 @@ class _OverlayServicioState extends State<OverlayServicio>
             horizontal: screenWidth * 0.03, vertical: screenHeight * 0.03),
         child: Column(
           children: [
-            Text(
-              tr(context, 'Contacto').toUpperCase(),
-              style: TextStyle(
-                  color: const Color(0xFF28E2F5),
-                  fontSize: 25.sp,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-            Text(
-              tr(context,
-                  'Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional'),
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.normal),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.5,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 46, 46, 46),
-                borderRadius: BorderRadius.circular(7.0),
+            // Título "Contacto"
+            Padding(
+              padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+              child: Text(
+                tr(context, 'Contacto').toUpperCase(),
+                style: TextStyle(
+                    color: const Color(0xFF28E2F5),
+                    fontSize: 25.sp,
+                    fontWeight: FontWeight.bold),
               ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.03,
-                    vertical: screenHeight * 0.03),
-                child: Column(
-                  children: [
-                    Text(
-                      "E-MAIL: technical_service@i-motiongroup.com",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.normal),
-                      textAlign: TextAlign.center,
+            ),
+
+            // Descripción del servicio
+            Padding(
+              padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+              child: Text(
+                tr(context,
+                    'Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional'),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.normal),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+            // Contenedor con el contacto
+            Expanded(
+              child: Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: screenWidth * 0.8, // Ajuste de ancho
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 46, 46, 46),
+                    borderRadius: BorderRadius.circular(7.0),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.03,
+                        vertical: screenHeight * 0.03),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      // Alineación vertical
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      // Alineación horizontal
+                      children: [
+                        Text(
+                          "E-MAIL: technical_service@i-motiongroup.com",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.normal),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        // Espacio entre las líneas
+                        Text(
+                          "WHATSAPP: (+34) 618 112 271",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.normal),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                    Text(
-                      "WHATSAPP: (+34) 618 112 271",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.normal),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -1068,10 +1087,11 @@ class _OverlayVitaState extends State<OverlayVita>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   String _userName = '';
-  String _clientName = '';
-  String _clientAge = '';
-  int _clientHeight = 0;
-  int _clientWeight = 0;
+  String? _clientName = '';
+  String? _clientAge = '';
+  String? _clientGender = '';
+  int? _clientHeight;
+  int? _clientWeight;
   String _userProfileType = '';
   String resumenRespuestas = "";
   bool hideOptions = false;
@@ -1082,7 +1102,7 @@ class _OverlayVitaState extends State<OverlayVita>
   List<Map<String, dynamic>> chatMessages = [];
   Map<String, dynamic> answers = {};
   double scaleFactorCliente = 1.0;
-
+  final GlobalKey _repaintBoundaryKey = GlobalKey();
   List<Map<String, dynamic>> questions = [];
 
   @override
@@ -1090,6 +1110,7 @@ class _OverlayVitaState extends State<OverlayVita>
     super.initState();
     _checkUserLoginStatus();
   }
+
   @override
   void dispose() {
     // Liberar recursos y reiniciar estados
@@ -1102,7 +1123,6 @@ class _OverlayVitaState extends State<OverlayVita>
 
     super.dispose();
   }
-
 
   Future<void> _checkUserLoginStatus() async {
     DatabaseHelper dbHelper = DatabaseHelper();
@@ -1134,71 +1154,72 @@ class _OverlayVitaState extends State<OverlayVita>
   }
 
   void toggleOverlay(int index) {
-    if(mounted) {
+    if (mounted) {
       setState(() {
-      isOverlayVisible = !isOverlayVisible;
-      overlayIndex = isOverlayVisible ? index : -1;
-      if (!isOverlayVisible) {
-        updateClientData(); // Actualizar datos al cerrar el overlay
-        // Cambiamos el estado para reflejar que el cliente está seleccionado
-      }
-    });
+        isOverlayVisible = !isOverlayVisible;
+        overlayIndex = isOverlayVisible ? index : -1;
+        if (!isOverlayVisible) {
+          updateClientData(); // Actualizar datos al cerrar el overlay
+          // Cambiamos el estado para reflejar que el cliente está seleccionado
+        }
+      });
     }
   }
 
-  List<Map<String, dynamic>> getQuestions() {
+  List<Map<String, dynamic>> getQuestions(BuildContext context) {
     return [
       {
-        "question": _clientName.isNotEmpty
-            ? "¡Hola $_clientName! Vamos a crear tu informe y rutina i-motion personalizada de EMS. Primero, ¿cuál es tu objetivo principal?"
-            : "¡Hola! Vamos a crear tu informe y rutina i-motion personalizada de EMS. Primero, ¿cuál es tu objetivo principal?",
+        "question": _clientName!.isNotEmpty
+            ? tr(
+                context,
+                "¡Hola {name}! Vamos a crear tu informe y rutina i-motion personalizada de EMS. Primero, ¿cuál es tu objetivo principal?",
+                namedArgs: {"name": _clientName!},
+              )
+            : tr(
+                context,
+                "¡Hola! Vamos a crear tu informe y rutina i-motion personalizada de EMS. Primero, ¿cuál es tu objetivo principal?",
+              ),
         "options": [
-          "Tonificar",
-          "Perder grasa",
-          "Mejorar resistencia",
-          "Mejorar todo",
-          "Recuperación muscular"
+          tr(context, "Tonificar"),
+          tr(context, "Perder grasa"),
+          tr(context, "Mejorar resistencia"),
+          tr(context, "Mejorar todo"),
+          tr(context, "Recuperación muscular"),
         ],
-        "key": "Objetivo",
-        "type": "text" // Tipo de pregunta
+        "key": tr(context, "Objetivo"),
+        "type": tr(context, "text"), // Tipo de pregunta
       },
       {
-        "question": "¿Cuál es tu edad?",
-        "range": [18, 60], // Rango de opciones dinámicas
-        "key": "Edad",
-        "type": "dropdown" // Indica que es un menú desplegable
+        "question": tr(context,
+            "¿Tienes experiencia previa con electroestimulación o entrenamiento físico?"),
+        "options": [
+          tr(context, "Sí"),
+          tr(context, "No"),
+        ],
+        "key": tr(context, "Experiencia"),
+        "type": tr(context, "text"),
       },
       {
-        "question": "¿Cuál es tu peso?",
-        "range": [30, 200], // Cambiado a int
-        "key": "Peso",
-        "type": "dropdown"
+        "question": tr(
+            context, "¿Cómo describirías tu nivel de condición física actual?"),
+        "options": [
+          tr(context, "Principiante"),
+          tr(context, "Intermedio"),
+          tr(context, "Avanzado"),
+        ],
+        "key": tr(context, "Nivel"),
+        "type": tr(context, "text"),
       },
       {
-        "question": "¿Cuál es tu altura?",
-        "range": [120, 210], // Cambiado a int
-        "key": "Altura",
-        "type": "dropdown"
-      },
-      {
-        "question":
-            "¿Tienes experiencia previa con electroestimulación o entrenamiento físico?",
-        "options": ["Sí", "No"],
-        "key": "Experiencia",
-        "type": "text"
-      },
-      {
-        "question": "¿Cómo describirías tu nivel de condición física actual?",
-        "options": ["Principiante", "Intermedio", "Avanzado"],
-        "key": "Nivel",
-        "type": "text"
-      },
-      {
-        "question":
-            "¿Cuántos días a la semana puedes dedicar a entrenar con i-motion?",
-        "options": ["1 día", "2 días", "3 días"],
-        "key": "Días",
-        "type": "text"
+        "question": tr(context,
+            "¿Cuántos días a la semana puedes dedicar a entrenar con i-motion?"),
+        "options": [
+          tr(context, "1 día"),
+          tr(context, "2 días"),
+          tr(context, "3 días"),
+        ],
+        "key": tr(context, "Días"),
+        "type": tr(context, "text"),
       },
     ];
   }
@@ -1211,6 +1232,7 @@ class _OverlayVitaState extends State<OverlayVita>
         // Actualizar datos del cliente
         _clientName = selectedBioClient?['name'] ?? '';
         String birthdate = selectedBioClient?['birthdate'] ?? '';
+        _clientGender = selectedBioClient?['gender'] ?? '';
 
         // Convertir fecha de nacimiento a edad
         try {
@@ -1244,18 +1266,16 @@ class _OverlayVitaState extends State<OverlayVita>
     }
   }
 
-
   void resetQuestions() {
     setState(() {
       // Limpia las preguntas y respuestas anteriores
-      questions = getQuestions();
+      questions = getQuestions(context);
       answers.clear();
       chatMessages.clear();
       currentQuestion = 0;
       hideOptions = false; // Hacer visibles las opciones nuevamente
     });
   }
-
 
   int calculateAge(String birthdate) {
     try {
@@ -1280,13 +1300,15 @@ class _OverlayVitaState extends State<OverlayVita>
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   void handleResponse(dynamic response) {
@@ -1300,6 +1322,9 @@ class _OverlayVitaState extends State<OverlayVita>
           {"text": response.toString(), "isBot": false}); // Muestra respuesta
     });
 
+    // Desplazar después de agregar la respuesta del usuario
+    _scrollToBottom();
+
     if (currentQuestion < questions.length - 1) {
       setState(() {
         currentQuestion++;
@@ -1307,16 +1332,20 @@ class _OverlayVitaState extends State<OverlayVita>
           {"text": questions[currentQuestion]["question"], "isBot": true},
         );
       });
+
+      // Desplazar después de agregar la pregunta del bot
       _scrollToBottom();
     } else {
-      // Generar el mensaje final del chat
       setState(() {
         chatMessages.add({
-          "text": "¡Gracias! Tu rutina personalizada ha sido generada.",
+          "text":
+              tr(context, "¡Gracias! Tu rutina personalizada ha sido generada"),
           "isBot": true,
         });
         hideOptions = true;
       });
+
+      // Desplazar al final después del mensaje final
       _scrollToBottom();
 
       // Llamar a mostrarResumen para calcular y preparar el resumen
@@ -1324,138 +1353,172 @@ class _OverlayVitaState extends State<OverlayVita>
     }
   }
 
-  void mostrarResumen() {
-    // Construir el resumen de las respuestas del usuario
-    String resumen =
-        answers.entries.map((entry) => "${entry.value}").join("\n");
+  List<Map<String, String>> mostrarResumen() {
+    // Crear una lista de títulos para las respuestas en orden
+    List<String> titles = [
+      tr(context, 'Objetivo'),
+      tr(context, 'Experiencia en EMS'),
+      tr(context, 'Condición física actual'),
+      tr(context, 'Días de entrenamiento a la semana'),
+    ];
 
-    // Verificar si los datos de peso y altura existen
-    if (answers.containsKey('Peso') && answers.containsKey('Altura')) {
-      try {
-        // Asegurarse de que los valores sean convertidos a double
-        double peso = (answers['Peso'] as int).toDouble();
-        double altura = (answers['Altura'] as int).toDouble() /
-            100; // Convertir cm a metros
-
-        // Calcular el IMC
-        double imc = peso / (altura * altura);
-        resumen += "\nIMC: ${imc.toStringAsFixed(2)}";
-
-        // Clasificación del IMC (opcional)
-        if (imc < 18.5) {
-          resumen += " (Bajo peso)";
-        } else if (imc >= 18.5 && imc < 24.9) {
-          resumen += " (Peso normal)";
-        } else if (imc >= 25 && imc < 29.9) {
-          resumen += " (Sobrepeso)";
-        } else {
-          resumen += " (Obesidad)";
-        }
-      } catch (e) {
-        resumen += "\nError al calcular el IMC: $e";
-      }
-    } else {
-      resumen += "\nIMC: No calculado (faltan datos de peso o altura)";
+    // Verificar si no hay respuestas
+    if (answers.isEmpty) {
+      return []; // Retornar una lista vacía si no hay respuestas
     }
 
-    // Actualizar la variable del resumen
-    setState(() {
-      resumenRespuestas = resumen;
+    // Convertir las entradas del Map en una lista estructurada
+    List<Map<String, String>> resumen = [];
+
+    // Combinar títulos y respuestas
+    answers.entries.toList().asMap().forEach((index, entry) {
+      if (entry.value != null && entry.value.toString().isNotEmpty) {
+        String title =
+            titles.length > index ? titles[index] : "Respuesta $index";
+        resumen.add({"title": title, "value": entry.value.toString()});
+      }
     });
+
+    return resumen;
+  }
+
+  bool _allQuestionsAnswered() {
+    return questions.every((q) => answers.containsKey(q['key']));
+  }
+
+  Map<String, dynamic> calcularIMC({
+    required double peso,
+    required double altura,
+    required String genero,
+  }) {
+    if (peso > 0 && altura > 0 && genero.isNotEmpty) {
+      double imc = peso / pow(altura / 100, 2);
+      String classification = "";
+      Color color = Colors.black;
+
+      // Clasificación del IMC para hombres y mujeres
+      if (genero == 'Hombre') {
+        if (imc < 17) {
+          classification = tr(context, 'Desnutrición');
+          color = Colors.purple;
+        } else if (imc >= 17 && imc < 20) {
+          classification = tr(context, 'Bajo peso');
+          color = Colors.blue;
+        } else if (imc >= 20 && imc < 25) {
+          classification = tr(context, 'Normal');
+          color = Colors.green;
+        } else if (imc >= 25 && imc < 30) {
+          classification = tr(context, 'Sobrepeso');
+          color = Colors.yellow;
+        } else if (imc >= 30 && imc < 35) {
+          classification = tr(context, 'Obesidad');
+          color = Colors.orange;
+        } else if (imc >= 35 && imc < 40) {
+          classification = tr(context, 'Obesidad marcada');
+          color = Colors.red;
+        } else {
+          classification = tr(context, 'Obesidad mórbida');
+          color = Colors.red[900]!;
+        }
+      } else if (genero == tr(context, 'Mujer')) {
+        if (imc < 16) {
+          classification = tr(context, 'Desnutrición');
+          color = Colors.purple;
+        } else if (imc >= 16 && imc < 21) {
+          classification = tr(context, 'Bajo peso');
+          color = Colors.blue;
+        } else if (imc >= 21 && imc < 24) {
+          classification = tr(context, 'Normal');
+          color = Colors.green;
+        } else if (imc >= 24 && imc < 30) {
+          classification = tr(context, 'Sobrepeso');
+          color = Colors.yellow;
+        } else if (imc >= 30 && imc < 35) {
+          classification = tr(context, 'Obesidad');
+          color = Colors.orange;
+        } else if (imc >= 35 && imc < 40) {
+          classification = tr(context, 'Obesidad marcada');
+          color = Colors.red;
+        } else {
+          classification = tr(context, 'Obesidad mórbida');
+          color = Colors.red[900]!;
+        }
+      } else {
+        classification = "N/A";
+        color = Colors.grey;
+      }
+
+      return {
+        "imc": imc,
+        "classification": classification,
+        "color": color,
+      };
+    } else {
+      return {
+        "imc": 0.0,
+        "classification": "Datos incompletos",
+        "color": Colors.grey,
+      };
+    }
+  }
+
+  // Captura el gráfico y la leyenda como una imagen
+  Future<ui.Image> _captureWidget() async {
+    final boundary = _repaintBoundaryKey.currentContext!.findRenderObject()
+        as RenderRepaintBoundary;
+    final image = await boundary.toImage(pixelRatio: 3.0);
+    return image;
+  }
+
+  Future<Uint8List> _captureAsBytes() async {
+    final image = await _captureWidget();
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    final result = (_clientWeight != null &&
+            _clientHeight != null &&
+            _clientGender != null)
+        ? calcularIMC(
+            peso: _clientWeight!.toDouble(), // Peso en kg
+            altura: _clientHeight!.toDouble(), // Altura en cm
+            genero: _clientGender!, // Género
+          )
+        : {
+            "imc": 0.0,
+            "classification": tr(context, 'Datos incompletos'),
+            // Mensaje para datos incompletos
+            "color": Colors.grey,
+          };
 
     Widget buildAnswerSection() {
       // Verificamos si un cliente ha sido seleccionado
-      if (questions.isEmpty || currentQuestion >= questions.length || selectedBioClient == null || selectedBioClient!.isEmpty) {
+      if (questions.isEmpty ||
+          currentQuestion >= questions.length ||
+          selectedBioClient == null ||
+          selectedBioClient!.isEmpty) {
         return Center(
-          child: Text(
-            tr(context, "Seleccione un cliente para empezar").toUpperCase(),
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.01,
+              vertical: screenHeight * 0.02,
+            ),
+            child: Text(
+              tr(context, "Seleccione un cliente para empezar").toUpperCase(),
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
               color: const Color(0xFF2be4f3),
+            ),
             ),
           ),
         );
       }
-
-      if (questions[currentQuestion]["type"] == "dropdown") {
-        // Código para el tipo dropdown
-        final range = questions[currentQuestion]["range"] as List<int>;
-        String key = questions[currentQuestion]["key"];
-        int initialValue = answers[key] ?? range[0];
-        FixedExtentScrollController controller =
-            FixedExtentScrollController(initialItem: initialValue - range[0]);
-
-        return Container(
-          height: screenHeight * 0.15,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            border: Border(
-              top: BorderSide(
-                color: const Color(0xFF2be4f3),
-                width: screenWidth * 0.001,
-              ),
-            ),
-          ),
-          alignment: Alignment.center,
-          child: ListWheelScrollView.useDelegate(
-            controller: controller,
-            itemExtent: screenHeight * 0.06,
-            physics: const FixedExtentScrollPhysics(),
-            useMagnifier: true,
-            magnification: 1.4,
-            onSelectedItemChanged: (index) {
-              setState(() {
-                // Asegurarse de que el valor sea convertido a int
-                answers[key] = (range[0] + index).toInt();
-              });
-            },
-            childDelegate: ListWheelChildBuilderDelegate(
-              builder: (context, index) {
-                // Convertir el valor a int
-                final value = (range[0] + index).toInt();
-
-                String unit = "";
-                if (key == "Edad") {
-                  unit = "años";
-                } else if (key == "Peso") {
-                  unit = "kg";
-                } else if (key == "Altura") {
-                  unit = "cm";
-                }
-
-                return GestureDetector(
-                  onTap: () {
-                    // Pasar el valor como int al método handleResponse
-                    handleResponse(value);
-                  },
-                  child: Center(
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-                      child: Text(
-                        "$value $unit",
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-              childCount: range[1] - range[0] + 1,
-            ),
-          ),
-        );
-      } else if (questions[currentQuestion]["options"] != null) {
+      if (questions[currentQuestion]["options"] != null) {
         // Dividir las opciones en filas con un máximo de 3 elementos por fila
         List<String> options = questions[currentQuestion]["options"];
         List<List<String>> rows = [];
@@ -1528,7 +1591,7 @@ class _OverlayVitaState extends State<OverlayVita>
         ? _getOverlayWidget(overlayIndex)
         : MainOverlay(
             title: Text(
-              "ASISTENCIA VIRTUAL ",
+              tr(context, 'Asistente virtual').toUpperCase(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 30.sp,
@@ -1595,11 +1658,21 @@ class _OverlayVitaState extends State<OverlayVita>
                                               color: Colors.white),
                                         ),
                                         Text(
-                                          _userProfileType,
+                                          _userProfileType == 'Ambos'
+                                              ? tr(context, 'Ambos')
+                                              : _userProfileType == 'Entrenador'
+                                                  ? tr(context, 'Tr entrenador')
+                                                  : _userProfileType ==
+                                                          'Administrador'
+                                                      ? tr(context,
+                                                          'Tr administrador')
+                                                      : _userProfileType,
+                                          // Esto es por si el valor no coincide con ninguno de los anteriores
                                           style: TextStyle(
-                                              fontSize: 15.sp,
-                                              color: Colors.white),
-                                        ),
+                                            fontSize: 15.sp,
+                                            color: Colors.white,
+                                          ),
+                                        )
                                       ],
                                     ),
                                     const Spacer(),
@@ -1650,8 +1723,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                         : Alignment.centerRight,
                                     child: Container(
                                       constraints: BoxConstraints(
-                                        maxWidth: screenWidth *
-                                            0.25, // Limitar el ancho máximo del contenedor
+                                        maxWidth: screenWidth * 0.25,
                                       ),
                                       margin: EdgeInsets.symmetric(
                                         horizontal: screenWidth * 0.01,
@@ -1725,12 +1797,12 @@ class _OverlayVitaState extends State<OverlayVita>
                   ),
                   // Segundo Expanded: Contenedor vacío
                   Expanded(
-                    flex:
-                        1, // Proporción del espacio asignado al contenedor vacío
+                    flex: 1, // Proporción del espacio asignado
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.03,
-                          vertical: screenHeight * 0.03),
+                        horizontal: screenWidth * 0.03,
+                        vertical: screenHeight * 0.01,
+                      ),
                       decoration: const BoxDecoration(
                         color: Color.fromARGB(255, 46, 46, 46),
                         borderRadius: BorderRadius.only(
@@ -1740,149 +1812,322 @@ class _OverlayVitaState extends State<OverlayVita>
                       ),
                       child: Column(
                         children: [
-                          // Centrar el título en el Expanded
-                          Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.001,
-                              ),
-                              child: Text(
-                                tr(context, "Tus resultados:").toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 25.sp,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: const Color(0xFF2be4f3),
-                                  color: const Color(0xFF2be4f3),
+                          // Título
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.001),
+                                child: Text(
+                                  tr(context, "Tus resultados").toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 25.sp,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: const Color(0xFF2be4f3),
+                                    color: const Color(0xFF2be4f3),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
+
+                          // Información del cliente
                           Expanded(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              // Distribuye horizontalmente
                               children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      tr(context, 'Nombre').toUpperCase(),
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
+                                for (var item in [
+                                  {
+                                    'label':
+                                        tr(context, 'Nombre').toUpperCase(),
+                                    'value': _clientName
+                                  },
+                                  {
+                                    'label': tr(context, 'Género').toUpperCase(),
+                                    'value': (_clientGender == null || _clientGender!.isEmpty)
+                                        ? '' // Si _clientGender es nulo o está vacío, se asigna una cadena vacía
+                                        : (_clientGender == 'Hombre'
+                                        ? tr(context, 'Hombre') // Si es Hombre, se traduce como 'Hombre'
+                                        : tr(context, 'Mujer')), // Si es Mujer, se traduce como 'Mujer'
+                                  }
+                                  ,
+
+                                  {
+                                    'label': tr(context, 'Edad').toUpperCase(),
+                                    'value': _clientAge != null
+                                        ? _clientAge.toString()
+                                        : "",
+                                    // Si _clientAge es nulo, muestra un texto vacío
+                                  },
+                                  {
+                                    'label': tr(context, 'Altura (cm)')
+                                        .toUpperCase(),
+                                    'value': _clientHeight != null
+                                        ? '$_clientHeight cm'
+                                        : "",
+                                    // Si _clientHeight es nulo, muestra un texto vacío
+                                  },
+                                  {
+                                    'label':
+                                        tr(context, 'Peso (kg)').toUpperCase(),
+                                    'value': _clientWeight != null
+                                        ? '$_clientWeight kg'
+                                        : "",
+                                    // Si _clientWeight es nulo, muestra un texto vacío
+                                  },
+                                ])
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        tr(context, item['label']!)
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          fontSize: 18.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      _clientName,
-                                      style: TextStyle(
-                                        fontSize: 15.sp,
-                                        color: Colors.white,
+                                      Text(
+                                        item['value']!,
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      tr(context, 'Edad').toUpperCase(),
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      _clientAge,
-                                      style: TextStyle(
-                                        fontSize: 15.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      tr(context, 'Altura').toUpperCase(),
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      '$_clientHeight cm',
-                                      style: TextStyle(
-                                        fontSize: 15.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      tr(context, 'Peso').toUpperCase(),
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      '$_clientWeight kg',
-                                      style: TextStyle(
-                                        fontSize: 15.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
                               ],
                             ),
                           ),
 
+                          // Gráfico y leyenda
                           Expanded(
-                            child: SingleChildScrollView(
-                              padding: EdgeInsets.symmetric(
+                            flex: 3,
+                            child: RepaintBoundary(
+                              key: _repaintBoundaryKey,
+                              // Clave para capturar este widget
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.01,
-                                  vertical: screenHeight * 0.01),
-                              child: Text(
-                                resumenRespuestas.isNotEmpty
-                                    ? resumenRespuestas
-                                    : "",
-                                style: TextStyle(
-                                    fontSize: 17.sp, color: Colors.white),
+                                  vertical: screenHeight * 0.05,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[900],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: screenWidth * 0.02,
+                                            vertical: screenHeight * 0.02,
+                                          ),
+                                          width: screenWidth * 0.2,
+                                          height: screenHeight * 0.15,
+                                          child: CustomPaint(
+                                            painter: IMCGaugePainter(
+                                                imcValue: result['imc']),
+                                          ),
+                                        ),
+                                        SizedBox(height: screenHeight * 0.01),
+                                        Text(
+                                          'IMC: ${result['imc'].toStringAsFixed(1)}',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: _buildLegend(),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                          const Spacer(),
-                          OutlinedButton(
-                            onPressed: () {},
-                            style: OutlinedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.02,
-                                vertical: screenHeight * 0.02,
-                              ),
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.black,
-                              side: BorderSide(
-                                color: const Color(0xFF2be4f3),
-                                width: screenWidth * 0.001,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7),
+
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.001),
+                                child: Text(
+                                  tr(context,
+                                          "Según tus datos te recomendamos:")
+                                      .toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 22.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
-                            child: Text(
-                              tr(context, 'Descargar PDF').toUpperCase(),
-                              style: TextStyle(fontSize: 20.sp),
+                          ),
+
+                          // Botones
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                OutlinedButton(
+                                  onPressed: (selectedBioClient != null &&
+                                          _allQuestionsAnswered())
+                                      ? () async {
+                                          final resumen = mostrarResumen();
+                                          final result = calcularIMC(
+                                            peso: _clientWeight!.toDouble(),
+                                            altura: _clientHeight!.toDouble(),
+                                            genero: _clientGender!,
+                                          );
+                                          final imageBytes =
+                                              await _captureAsBytes();
+                                          final generator =
+                                              CustomPdfGenerator();
+                                          final sanitizedClientName =
+                                              _clientName!
+                                                  .replaceAll(
+                                                      RegExp(r'[^\w\s]'), '')
+                                                  .replaceAll(' ', '_');
+                                          final pdfFileName =
+                                              'informe_${sanitizedClientName.toLowerCase()}.pdf';
+
+                                          await generator.generateAndOpenPdf(
+                                            context,
+                                            pdfFileName,
+                                            _clientName!,
+                                            _clientGender!,
+                                            _clientAge!,
+                                            _clientHeight!,
+                                            _clientWeight!,
+                                            resumen,
+                                            imageBytes,
+                                            result,
+                                          );
+                                        }
+                                      : null,
+                                  // Botón desactivado si las condiciones no se cumplen
+                                  style: OutlinedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.02,
+                                      vertical: screenHeight * 0.02,
+                                    ),
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: const Color(0xFF2be4f3),
+                                    side: BorderSide(
+                                      color: const Color(0xFF2be4f3),
+                                      width: screenWidth * 0.001,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    tr(context, 'Ver PDF').toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 20.sp,
+                                      color: Colors
+                                          .white, // Mismo color para botón deshabilitado
+                                    ),
+                                  ),
+                                ),
+                                OutlinedButton(
+                                  onPressed: (selectedBioClient != null &&
+                                          _allQuestionsAnswered())
+                                      ? () async {
+                                          final resumen = mostrarResumen();
+                                          final imageBytes =
+                                              await _captureAsBytes();
+                                          final result = calcularIMC(
+                                            peso: _clientWeight!.toDouble(),
+                                            altura: _clientHeight!.toDouble(),
+                                            genero: _clientGender!,
+                                          );
+                                          final generator =
+                                              CustomPdfGenerator();
+                                          final sanitizedClientName =
+                                              _clientName!
+                                                  .replaceAll(
+                                                      RegExp(r'[^\w\s]'), '')
+                                                  .replaceAll(' ', '_');
+                                          final pdfFileName =
+                                              'informe_${sanitizedClientName.toLowerCase()}.pdf';
+
+                                          final file = await generator
+                                              .generateAndSavePdf(
+                                            context,
+                                            pdfFileName,
+                                            // Nombre dinámico con un número agregado si es necesario
+                                            _clientName!,
+                                            _clientGender!,
+                                            _clientAge!,
+                                            _clientHeight!,
+                                            _clientWeight!,
+                                            resumen,
+                                            imageBytes,
+                                            result,
+                                          );
+
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                tr(context,
+                                                        'PDF guardado en DESCARGAS')
+                                                    .toUpperCase(),
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 17.sp),
+                                              ),
+                                              backgroundColor: Colors.green,
+                                              duration:
+                                                  const Duration(seconds: 2),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  // Botón desactivado si las condiciones no se cumplen
+                                  style: OutlinedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.02,
+                                      vertical: screenHeight * 0.02,
+                                    ),
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.black,
+                                    side: BorderSide(
+                                      color: const Color(0xFF2be4f3),
+                                      width: screenWidth * 0.001,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    tr(context, 'Descargar PDF').toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 20.sp,
+                                      color: Colors
+                                          .white, // Mismo color para botón deshabilitado
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -1894,6 +2139,53 @@ class _OverlayVitaState extends State<OverlayVita>
             ),
             onClose: widget.onClose,
           );
+  }
+
+// Generar la leyenda
+  List<Widget> _buildLegend() {
+    final colors = [
+      Colors.purple, // Desnutrición
+      Colors.blue, // Bajo peso
+      Colors.green, // Normal
+      Colors.yellow, // Sobrepeso
+      Colors.orange, // Obesidad
+      Colors.red, // Obesidad marcada
+      Colors.red[900]!, // Obesidad mórbida
+    ];
+
+    final labels = [
+      tr(context, 'Desnutrición'),
+      tr(context, 'Bajo peso'),
+      tr(context, 'Normal'),
+      tr(context, 'Sobrepeso'),
+      tr(context, 'Obesidad'),
+      tr(context, 'Obesidad marcada'),
+      tr(context, 'Obesidad mórbida'),
+    ];
+
+    return List.generate(colors.length, (index) {
+      return Row(
+        children: [
+          // Círculo de color
+          Container(
+            width: MediaQuery.of(context).size.width * 0.02,
+            height: MediaQuery.of(context).size.height * 0.02,
+            decoration: BoxDecoration(
+              color: colors[index],
+              shape: BoxShape.circle,
+            ),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.01,
+          ),
+
+          Text(
+            labels[index],
+            style: TextStyle(fontSize: 14.sp, color: Colors.white),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _getOverlayWidget(int overlayIndex) {

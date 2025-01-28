@@ -1711,9 +1711,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool _isImagesLoaded = false;
   bool showTrainerInfo = false;
   bool _isLoading = true;
-  bool _showVideo = true;
+  bool _showVideo = false;
   bool _isImageOne = true;
-  bool _hideControls = true;
+  bool _hideControls = false;
   GlobalKey<_PanelViewState> panelViewKey = GlobalKey<_PanelViewState>();
   String modulo =
       "imotion21"; // Cambia "moduloEjemplo" por el valor real del módulo.
@@ -2209,12 +2209,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         progressPause = 0.0;
         startTime = DateTime.now();
         pausedTime = 0.0;
+        valueRampa = 1.0;
+        valuePause = 1.0;
+        valueContraction = 1.0;
 
-        // Limpiar el mapa de procesos activos
-        procesosActivos.clear();
-
-        // Reiniciar visibilidad de videos y paneles
-        _videoVisibilityMap.clear();
+        _hideControls = false;
         _showVideo = false;
         isFullScreen = false;
         isOverlayVisible = false;
@@ -2793,10 +2792,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Future<void> printElectrostimulationValues(
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    String? selectedProgram,
-  ) async {
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      String? selectedProgram,
+      ) async {
     try {
       if (porcentajesMusculoTraje.length != 10) {
         debugPrint(
@@ -2827,6 +2826,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Validar y convertir la lista de cronaxias
       List<Map<String, dynamic>> cronaxias = settings['cronaxias'] ?? [];
+      List<Map<String, dynamic>> grupos = settings['grupos'] ?? [];
 
       // Depurar la lista de cronaxias
       if (cronaxias.isEmpty) {
@@ -2836,7 +2836,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         debugPrint("✅ Se encontraron ${cronaxias.length} cronaxias:");
       }
 
-      // Eliminar duplicados (usar 'nombre' como clave)
+      // Eliminar duplicados (usar 'nombre' como clave) en cronaxias
       final uniqueCronaxias = {
         for (var cronaxia in cronaxias) cronaxia['nombre']: cronaxia
       }.values.toList();
@@ -2844,6 +2844,22 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       for (var cronaxia in uniqueCronaxias) {
         debugPrint(
             "Cronaxia: ${cronaxia['nombre']}, Valor: ${cronaxia['valor']}");
+      }
+
+      // Depurar la lista de grupos
+      if (grupos.isEmpty) {
+        debugPrint("⚠️ No se encontraron grupos para el programa seleccionado.");
+      } else {
+        debugPrint("✅ Se encontraron ${grupos.length} grupos:");
+      }
+
+      // Eliminar duplicados (usar 'nombre' como clave) en grupos
+      final uniqueGrupos = {
+        for (var grupo in grupos) grupo['nombre']: grupo
+      }.values.toList();
+
+      for (var grupo in uniqueGrupos) {
+        debugPrint("Grupo: ${grupo['nombre']}, Configuración: ${grupo['config']}");
       }
 
       // Ajustes de conversión
@@ -4016,6 +4032,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     setState(() => scaleFactorRayo = 1.0),
                                 onTap: () {
                                   setState(() {
+                                    printElectrostimulationValues(widget.macAddress!, porcentajesMusculoTraje, selectedProgram);
                                     _isImageOne =
                                         !_isImageOne; // Alterna entre las dos imágenes
                                   });
@@ -4062,7 +4079,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                           flex: isFullScreen ? 1 : 6,
                           child: GestureDetector(
                             onTap: () {
-                              if (_showVideo) {
+                              if (_showVideo == true) {
                                 setState(() {
                                   _hideControls = !_hideControls;
                                 });
@@ -4124,7 +4141,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               ),
                                             ),
                                 ),
-                              if (_hideControls)
+                              if (_hideControls == false)
                                 Row(
                                   children: [
                                     if (selectedIndexEquip == 0) ...[
@@ -7838,6 +7855,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     double frecuencia = 0;
     double rampa = valueRampa;
     double pulso = 0;
+    List<Map<String, dynamic>> grupos = [];
     List<Map<String, dynamic>> cronaxias = [];
 
     if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
@@ -7852,10 +7870,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
               .where((e) => e is Map<String, dynamic>)
               .cast<Map<String, dynamic>>()
               .toList();
+        } else if (selectedIndivProgram!['grupos'] is List) {
+          grupos = (selectedIndivProgram!['grupos'] as List)
+              .where((e) => e is Map<String, dynamic>)
+              .cast<Map<String, dynamic>>()
+              .toList();
         }
       } else {
         var program =
-            allIndividualPrograms.isNotEmpty ? allIndividualPrograms[0] : null;
+        allIndividualPrograms.isNotEmpty ? allIndividualPrograms[0] : null;
         if (program != null) {
           frecuencia = program['frecuencia'] ?? 0;
           rampa = program['rampa'] ?? 0;
@@ -7863,6 +7886,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
           if (program['cronaxias'] is List) {
             cronaxias = (program['cronaxias'] as List)
+                .where((e) => e is Map<String, dynamic>)
+                .cast<Map<String, dynamic>>()
+                .toList();
+          } else if (program['grupos'] is List) {
+            grupos = (program['grupos'] as List)
                 .where((e) => e is Map<String, dynamic>)
                 .cast<Map<String, dynamic>>()
                 .toList();
@@ -7881,10 +7909,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
               .where((e) => e is Map<String, dynamic>)
               .cast<Map<String, dynamic>>()
               .toList();
+        } else if (selectedRecoProgram!['grupos'] is List) {
+          grupos = (selectedRecoProgram!['grupos'] as List)
+              .where((e) => e is Map<String, dynamic>)
+              .cast<Map<String, dynamic>>()
+              .toList();
         }
       } else {
         var program =
-            allRecoveryPrograms.isNotEmpty ? allRecoveryPrograms[0] : null;
+        allRecoveryPrograms.isNotEmpty ? allRecoveryPrograms[0] : null;
         if (program != null) {
           frecuencia = program['frecuencia'] ?? 0;
           rampa = program['rampa'] ?? 0;
@@ -7892,6 +7925,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
           if (program['cronaxias'] is List) {
             cronaxias = (program['cronaxias'] as List)
+                .where((e) => e is Map<String, dynamic>)
+                .cast<Map<String, dynamic>>()
+                .toList();
+          } else if (program['grupos'] is List) {
+            grupos = (program['grupos'] as List)
                 .where((e) => e is Map<String, dynamic>)
                 .cast<Map<String, dynamic>>()
                 .toList();
@@ -7903,7 +7941,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (selectedAutoProgram != null) {
         // Obtener el subprograma actual
         var subprogram =
-            selectedAutoProgram!['subprogramas'][currentSubprogramIndex];
+        selectedAutoProgram!['subprogramas'][currentSubprogramIndex];
         frecuencia = subprogram['frecuencia'] ?? 0;
         rampa = subprogram['rampa'] ?? 0;
         pulso = subprogram['pulso'] ?? 0;
@@ -7914,10 +7952,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
               .where((e) => e is Map<String, dynamic>)
               .cast<Map<String, dynamic>>()
               .toList();
+        } else if (subprogram['grupos'] is List) {
+          grupos = (subprogram['grupos'] as List)
+              .where((e) => e is Map<String, dynamic>)
+              .cast<Map<String, dynamic>>()
+              .toList();
         }
       } else {
         var program =
-            allAutomaticPrograms.isNotEmpty ? allAutomaticPrograms[0] : null;
+        allAutomaticPrograms.isNotEmpty ? allAutomaticPrograms[0] : null;
         if (program != null) {
           var subprogram = program['subprogramas'].isNotEmpty
               ? program['subprogramas'][0]
@@ -7933,19 +7976,27 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                   .where((e) => e is Map<String, dynamic>)
                   .cast<Map<String, dynamic>>()
                   .toList();
+            } else // Obtener cronaxias de este subprograma
+            if (subprogram['grupos'] is List) {
+              grupos = (subprogram['grupos'] as List)
+                  .where((e) => e is Map<String, dynamic>)
+                  .cast<Map<String, dynamic>>()
+                  .toList();
             }
           }
         }
       }
     }
-
     return {
       'frecuencia': frecuencia,
       'rampa': rampa,
       'pulso': pulso,
+      'grupos': grupos,
       'cronaxias': cronaxias,
     };
   }
+
+
 
   Widget _buildMuscleRow({
     required int index,
