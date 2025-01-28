@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../overlays/overlays_tuto.dart';
@@ -150,7 +149,7 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                                 () {
                                   setState(() {
                                     scaleFactorSoft = 1;
-                                    //toggleOverlay(1);
+                                    toggleOverlay(1);
                                   });
                                 },
                                 () {
@@ -166,7 +165,7 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                                 () {
                                   setState(() {
                                     scaleFactorIncid = 1;
-                                    //toggleOverlay(1);
+                                    toggleOverlay(2);
                                   });
                                 },
                                 () {
@@ -249,8 +248,12 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
           onClose: () => toggleOverlay(0),
         );
       case 1:
-        return OverlayCrearNuevo(
+        return OverlaySw(
           onClose: () => toggleOverlay(1),
+        );
+      case 2:
+        return OverlayIncidencias(
+          onClose: () => toggleOverlay(2),
         );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada

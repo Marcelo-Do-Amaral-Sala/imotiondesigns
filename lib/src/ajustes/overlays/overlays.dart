@@ -45,7 +45,7 @@ class _OverlayBackupState extends State<OverlayBackup>
   bool isLoading = false;
   double progress = 0.0; // Agregar variable de progreso
   String statusMessage = 'Listo para hacer la copia de seguridad';
-  final DatabaseHelper _dbHelper = DatabaseHelper();
+
 
   // Variable para definir la acción (subir o bajar)
   String actionMessage = '';
@@ -788,8 +788,6 @@ class _OverlayAdminsState extends State<OverlayAdmins>
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return MainOverlay(
       title: Text(
         tr(context, 'Administradores').toUpperCase(),
@@ -913,7 +911,6 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
 
     return MainOverlay(
       title: Text(
@@ -2624,9 +2621,6 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
   // Ajustes de estilos para simplificar
   TextStyle get _labelStyle => TextStyle(
       color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.bold);
-
-  TextStyle get _inputTextStyle =>
-      TextStyle(color: Colors.white, fontSize: 14.sp);
 
   TextStyle get _dropdownHintStyle =>
       TextStyle(color: Colors.white, fontSize: 14.sp);

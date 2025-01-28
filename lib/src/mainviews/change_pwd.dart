@@ -1,5 +1,4 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -453,11 +452,6 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
   TextStyle get _inputTextStyle =>
       TextStyle(color: Colors.white, fontSize: 14.sp);
 
-  TextStyle get _dropdownHintStyle =>
-      TextStyle(color: Colors.white, fontSize: 14.sp);
-
-  TextStyle get _dropdownItemStyle =>
-      TextStyle(color: Colors.white, fontSize: 15.sp);
 
   InputDecoration _inputDecorationStyle(
       {String hintText = '', bool enabled = true, Widget? suffixIcon}) {

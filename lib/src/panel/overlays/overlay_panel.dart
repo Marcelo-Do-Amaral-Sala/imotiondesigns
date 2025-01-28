@@ -1688,8 +1688,6 @@ class _OverlayResumenSesionState extends State<OverlayResumenSesion>
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
 
     return MainOverlay(
       title: Text(

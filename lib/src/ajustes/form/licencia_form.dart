@@ -986,11 +986,6 @@ TextStyle get _labelStyle => TextStyle(
 TextStyle get _inputTextStyle =>
     TextStyle(color: Colors.white, fontSize: 14.sp);
 
-TextStyle get _dropdownHintStyle =>
-    TextStyle(color: Colors.white, fontSize: 14.sp);
-
-TextStyle get _dropdownItemStyle =>
-    TextStyle(color: Colors.white, fontSize: 15.sp);
 
 InputDecoration _inputDecorationStyle(
     {String hintText = '', bool enabled = true}) {

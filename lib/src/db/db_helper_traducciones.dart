@@ -1,9 +1,6 @@
 import 'dart:convert'; // Para manejar JSON
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:http/http.dart' as http;
 
 class DatabaseHelperTraducciones {
   static final DatabaseHelperTraducciones _instance = DatabaseHelperTraducciones._internal();

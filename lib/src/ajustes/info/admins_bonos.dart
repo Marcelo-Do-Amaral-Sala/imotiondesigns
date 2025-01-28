@@ -316,7 +316,6 @@ class _AdminsBonosState extends State<AdminsBonos> {
   Widget _buildDropdownField(
       String label, String? value, Function(String?) onChanged,
       {bool enabled = true}) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Column(

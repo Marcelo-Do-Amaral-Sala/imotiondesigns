@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/custom/admins_table_widget.dart';
-import 'package:imotion_designs/src/clients/custom_clients/clients_table_custom.dart';
-
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
@@ -183,7 +181,6 @@ class _AdminsListViewState extends State<AdminsListView> {
   }
 
   Widget _buildDropdown1() {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Expanded(
@@ -237,7 +234,6 @@ class _AdminsListViewState extends State<AdminsListView> {
   }
 
   Widget _buildDropdown2() {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Expanded(

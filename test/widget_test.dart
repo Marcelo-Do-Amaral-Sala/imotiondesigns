@@ -7,8 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:imotion_designs/main.dart';
 import 'package:imotion_designs/src/app.dart';
 
 void main() {

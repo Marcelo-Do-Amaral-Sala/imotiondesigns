@@ -1,10 +1,6 @@
 import 'dart:convert'; // Para manejar JSON
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:http/http.dart' as http;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class DatabaseHelperTraduccionesPc {
@@ -44,10 +40,17 @@ class DatabaseHelperTraduccionesPc {
         ));
   }
 
-  // Inicializar la base de datos al inicio de la app
+  /// Crea la tabla `TRADUCCIONES`
   Future<void> initializeDatabase() async {
-    await database; // Esto asegura que la base de datos esté inicializada
+    // Verifica si la base de datos ya está inicializada
+    if (_database == null || !_database!.isOpen) {
+      _database = await _initDatabase();  // Inicializa la base de datos si no está abierta
+    }
+    if (_database == null || !_database!.isOpen) {
+      throw Exception('La base de datos no pudo abrirse');
+    }
   }
+
 
   /// Crea la tabla `TRADUCCIONES`
   Future<void> _onCreate(Database db, int version) async {
@@ -60,8 +63,7 @@ class DatabaseHelperTraduccionesPc {
   }
 
   /// Inserta o actualiza las traducciones para un idioma
-  Future<void> insertOrUpdateTranslations(
-      String idioma, Map<String, dynamic> traducciones) async {
+  Future<void> insertOrUpdateTranslations(String idioma, Map<String, dynamic> traducciones) async {
     final db = await database;
     await db.insert(
       'TRADUCCIONES',
@@ -74,8 +76,7 @@ class DatabaseHelperTraduccionesPc {
   }
 
   /// Inserta o actualiza traducciones para varios idiomas
-  Future<void> insertOrUpdateMultipleTranslations(
-      Map<String, dynamic> allTranslations) async {
+  Future<void> insertOrUpdateMultipleTranslations(Map<String, dynamic> allTranslations) async {
     final db = await database;
 
     Batch batch = db.batch();
@@ -93,8 +94,7 @@ class DatabaseHelperTraduccionesPc {
     await batch.commit(noResult: true);
   }
 
-  Future<void> updateSQLiteDatabase(
-      List<Map<String, dynamic>> firebaseData) async {
+  Future<void> updateSQLiteDatabase(List<Map<String, dynamic>> firebaseData) async {
     final db = await database;
 
     // Inicia una transacción para actualizar la base de datos de forma eficiente
@@ -105,8 +105,7 @@ class DatabaseHelperTraduccionesPc {
         'TRADUCCIONES',
         {
           'idioma': data['idioma'],
-          'traducciones': jsonEncode(data['traducciones']),
-          // Convierte las traducciones a JSON
+          'traducciones': jsonEncode(data['traducciones']), // Convierte las traducciones a JSON
         },
         conflictAlgorithm: ConflictAlgorithm.replace, // Reemplaza si ya existe
       );
@@ -122,8 +121,7 @@ class DatabaseHelperTraduccionesPc {
     while (true) {
       final translations = await db.query('TRADUCCIONES');
       yield translations;
-      await Future.delayed(Duration(
-          seconds: 1)); // Espera un segundo antes de volver a obtener datos
+      await Future.delayed(Duration(seconds: 1)); // Espera un segundo antes de volver a obtener datos
     }
   }
 
@@ -144,14 +142,14 @@ class DatabaseHelperTraduccionesPc {
         // Retorna el mapa de claves y valores como Map<String, String>.
         return Map<String, String>.from(decoded);
       } else {
-        throw Exception(
-            'No se encontraron traducciones para el idioma: $idioma');
+        throw Exception('No se encontraron traducciones para el idioma: $idioma');
       }
     } catch (e) {
       // Aquí puedes loguear el error o manejarlo como prefieras.
       throw Exception('Error al obtener las traducciones: $e');
     }
   }
+
 
   Future<List<Map<String, dynamic>>> getAllTranslations() async {
     final db = await database;
@@ -163,13 +161,16 @@ class DatabaseHelperTraduccionesPc {
     }
   }
 
+
+
   /// Obtiene todos los idiomas almacenados
   Future<List<String>> getAllLanguages() async {
     final db = await database;
 
     final List<Map<String, dynamic>> result =
-        await db.query('TRADUCCIONES', columns: ['idioma']);
+    await db.query('TRADUCCIONES', columns: ['idioma']);
 
     return result.map((row) => row['idioma'] as String).toList();
   }
+
 }

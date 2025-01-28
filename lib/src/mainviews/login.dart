@@ -12,7 +12,6 @@ import '../db/db_helper_traducciones.dart';
 import '../db/db_helper_traducciones_pc.dart';
 import '../db/db_helper_traducciones_web.dart';
 import '../db/db_helper_web.dart';
-import '../servicios/sync.dart';
 
 class LoginView extends StatefulWidget {
   final Function() onNavigateToMainMenu;
@@ -36,8 +35,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _user = TextEditingController();
   final TextEditingController _pwd = TextEditingController();
   String _errorMessage = ''; // Para almacenar el mensaje de error
-  final DatabaseHelperTraducciones _dbHelperTraducciones =
-      DatabaseHelperTraducciones();
+
 
   List<Map<String, dynamic>> allAdmins = []; // Lista original de clientes
   List<Map<String, dynamic>> filteredAdmins = []; // Lista filtrada

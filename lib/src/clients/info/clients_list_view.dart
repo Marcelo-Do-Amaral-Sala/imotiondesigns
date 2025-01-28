@@ -196,7 +196,6 @@ class _ClientListViewState extends State<ClientListView> {
   }
 
   Widget _buildDropdown() {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Expanded(
       child: Column(

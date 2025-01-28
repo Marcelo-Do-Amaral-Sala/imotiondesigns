@@ -35,7 +35,6 @@ class _MainOverlayState extends State<MainOverlay> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
     return isVisible
         ? Center( // Esto asegura que el overlay se coloque en el centro
       child: Container(

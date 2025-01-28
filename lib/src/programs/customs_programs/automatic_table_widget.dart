@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:path/path.dart';
-
 import '../../../utils/translation_utils.dart';
 
 class SubprogramTableWidget extends StatelessWidget {

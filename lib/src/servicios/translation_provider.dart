@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../db/db_helper_traducciones.dart';
-import 'licencia_state.dart'; // Asegúrate de importar AppStateIdioma
 
 class TranslationProvider with ChangeNotifier {
   Map<String, String> _translations = {};

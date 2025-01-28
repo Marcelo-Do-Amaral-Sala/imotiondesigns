@@ -1722,7 +1722,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   List<String> invideos = List.filled(30, "");
   String? selectedProgram;
   String? selectedCycle;
-  Map<String, bool> _videoVisibilityMap = {};
   Map<String, dynamic>? selectedIndivProgram;
   Map<String, dynamic>? selectedRecoProgram;
   Map<String, dynamic>? selectedAutoProgram;
@@ -4936,8 +4935,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valueContraction ??
-                                                                0.0),
+                                                            valueContraction),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
                                                         style: TextStyle(
                                                           fontSize: isFullScreen
@@ -4989,7 +4987,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valuePause ?? 0.0),
+                                                            valuePause),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
                                                         style: TextStyle(
                                                           fontSize: isFullScreen
@@ -6609,8 +6607,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valueContraction ??
-                                                                0.0),
+                                                            valueContraction),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
                                                         style: TextStyle(
                                                           fontSize: isFullScreen
@@ -6662,7 +6659,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valuePause ?? 0.0),
+                                                            valuePause),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
                                                         style: TextStyle(
                                                           fontSize: isFullScreen
@@ -7465,8 +7462,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         Text(
                                                           client['name']
                                                                   .toString()
-                                                                  .toUpperCase() ??
-                                                              'Sin nombre',
+                                                                  .toUpperCase(),
                                                           style: TextStyle(
                                                             fontSize: 15.sp,
                                                             color: const Color(

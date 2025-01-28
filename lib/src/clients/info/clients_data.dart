@@ -187,7 +187,7 @@ class _ClientsDataState extends State<ClientsData> {
       setState(() {
         _nameController.text = updatedClientData['name'] ?? '';
         _emailController.text = updatedClientData['email'] ?? '';
-        _phoneController.text = updatedClientData['phone'].toString() ?? '';
+        _phoneController.text = updatedClientData['phone'].toString();
         _heightController.text = updatedClientData['height']?.toString() ?? '';
         _weightController.text = updatedClientData['weight']?.toString() ?? '';
         selectedGender = updatedClientData['gender'];
