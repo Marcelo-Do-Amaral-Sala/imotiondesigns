@@ -36,40 +36,10 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
   bool isOverlayVisible = false;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
 
-  late AnimationController _controller;
-  late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
     super.initState();
-    // Crear el controlador de animación
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 500), // Duración de 0.5 segundos
-      vsync: this,
-    );
-
-    // Animación de opacidad para simular latencia
-    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
-    // Iniciar la animación de latido, pero solo hacerla una vez (sin repetir)
-    _controller.repeat(
-        reverse: true,
-        period: const Duration(
-            milliseconds: 500)); // Reproducir la animación una sola vez
-
-    // Después de 10 segundos, detener la animación y dejar la escala fija
-    Future.delayed(const Duration(seconds: 6), () {
-      if (mounted) {
-        // Verifica si el widget sigue montado
-        setState(() {
-          // Asegurarse de que la animación quede fija en el valor final
-          _controller.stop();
-          _opacityAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(
-              CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-        });
-      }
-    });
   }
 
   void toggleOverlay(int index) {
@@ -84,7 +54,6 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 

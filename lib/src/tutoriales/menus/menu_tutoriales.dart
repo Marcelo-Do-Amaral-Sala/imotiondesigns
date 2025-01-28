@@ -33,6 +33,12 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
   void toggleOverlay(int index) {
     setState(() {
       isOverlayVisible = !isOverlayVisible;

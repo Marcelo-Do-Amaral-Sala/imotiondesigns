@@ -49,10 +49,20 @@ class _ClientsGroupsState extends State<ClientsGroups> {
 
   @override
   void dispose() {
+    // Liberar los controladores de texto
     _indexController.dispose();
     _nameController.dispose();
+
+    // Limpiar mapas, si contienen datos pesados o referencias que podrían mantenerse
+    selectedGroups.clear();
+    hintColors.clear();
+    groupIds.clear();
+    imagePaths.clear();
+
+    // Llamar al método base para liberar otros recursos
     super.dispose();
   }
+
 
 // Obtener los IDs de los grupos seleccionados
   List<int> getSelectedGroupIds() {

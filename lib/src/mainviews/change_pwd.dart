@@ -43,6 +43,12 @@ class _ChangePwdViewState extends State<ChangePwdView> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -151,6 +157,14 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
     super.initState();
     _checkUserProfile();
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _pwd.dispose();
+    _pwd2.dispose();
+  }
+
 
   Future<void> _checkUserProfile() async {
     // Obtener el userId desde SharedPreferences

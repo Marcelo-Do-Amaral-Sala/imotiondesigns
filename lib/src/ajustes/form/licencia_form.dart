@@ -80,6 +80,11 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void toggleOverlay(int index) {
     setState(() {
       isOverlayVisible = !isOverlayVisible;

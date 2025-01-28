@@ -38,6 +38,18 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
     }
   }
 
+  @override
+  void dispose() {
+    // Liberar los controladores de texto
+    _indexController.dispose();
+    _nameController.dispose();
+
+
+    // Llamar al método base para liberar otros recursos
+    super.dispose();
+  }
+
+
   Future<void> _loadMostRecentClient() async {
     final dbHelper = DatabaseHelper();
     final client = await dbHelper.getMostRecentClient();
@@ -55,13 +67,6 @@ class _ClientsFormBonosState extends State<ClientsFormBonos> {
         _loadAvailableBonos(lastClientId!);
       }
     }
-  }
-
-  @override
-  void dispose() {
-    _indexController.dispose();
-    _nameController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadAvailableBonos(int clienteId) async {

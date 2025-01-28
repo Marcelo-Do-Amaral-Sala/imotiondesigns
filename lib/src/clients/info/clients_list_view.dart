@@ -32,6 +32,21 @@ class _ClientListViewState extends State<ClientListView> {
     _clientIndexController.addListener(_filterClients);
   }
 
+  @override
+  void dispose() {
+    // Removemos los listeners de los controladores
+    _clientNameController.removeListener(_filterClients);
+    _clientIndexController.removeListener(_filterClients);
+
+    // Liberamos los controladores de texto
+    _clientIndexController.dispose();
+    _clientNameController.dispose();
+
+    // Llamamos al método de la superclase para limpiar recursos adicionales
+    super.dispose();
+  }
+
+
   Future<void> _fetchClients() async {
     final dbHelper = DatabaseHelper();
 

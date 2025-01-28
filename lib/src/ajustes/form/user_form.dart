@@ -38,10 +38,8 @@ class UserDataFormState extends State<UserDataForm> {
   void dispose() {
     // Mantén los controladores abiertos para preservar su estado
     _nameController.dispose();
-    // _emailController.dispose();
-    // _phoneController.dispose();
-    // _heightController.dispose();
-    // _weightController.dispose();
+     _emailController.dispose();
+     _phoneController.dispose();
     super.dispose();
   }
 

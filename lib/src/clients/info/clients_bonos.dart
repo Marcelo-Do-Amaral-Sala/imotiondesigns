@@ -40,6 +40,17 @@ class _ClientsBonosState extends State<ClientsBonos> {
     }
   }
 
+  @override
+  void dispose() {
+    // Liberar los controladores de texto
+    _indexController.dispose();
+    _nameController.dispose();
+
+    // Llamar al método base para liberar otros recursos
+    super.dispose();
+  }
+
+
   Future<void> _loadAvailableBonos(int clienteId) async {
     final dbHelper = DatabaseHelper();
     final bonos = await dbHelper.getAvailableBonosByClientId(clienteId);
@@ -84,13 +95,6 @@ class _ClientsBonosState extends State<ClientsBonos> {
     });
 
     _loadAvailableBonos(clienteId);
-  }
-
-  @override
-  void dispose() {
-    _indexController.dispose();
-    _nameController.dispose();
-    super.dispose();
   }
 
   @override

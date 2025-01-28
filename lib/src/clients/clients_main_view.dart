@@ -34,6 +34,11 @@ class _ClientsViewState extends State<ClientsView> {
     super.initState();
     _initializeDatabase();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   Future<void> _initializeDatabase() async {
     try {

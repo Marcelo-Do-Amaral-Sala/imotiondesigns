@@ -31,6 +31,11 @@ class _VideoTutorialesListViewState extends State<VideoTutorialesListView> {
     super.initState();
     _fetchTuto();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   Future<void> _fetchTuto() async {
     var db = await DatabaseHelper().database;

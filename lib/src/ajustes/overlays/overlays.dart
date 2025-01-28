@@ -57,6 +57,12 @@ class _OverlayBackupState extends State<OverlayBackup>
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
   // Función para subir la copia de seguridad
   Future<void> _uploadBackup() async {
     try {
@@ -429,6 +435,12 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
     _loadTranslations();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
   void _loadTranslations() async {
     // Sincronizar datos de Firebase a SQLite
     await _syncService.syncFirebaseToSQLite();
@@ -635,6 +647,12 @@ class _OverlayServicioState extends State<OverlayServicio>
   void initState() {
     super.initState();
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -2226,6 +2244,11 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
     super.initState();
     selectedEstado = widget.estado;
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {

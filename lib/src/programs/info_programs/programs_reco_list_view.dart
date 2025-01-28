@@ -17,6 +17,10 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
     super.initState();
     _fetchRecoveryPrograms(); // Cargar los programas al iniciar el estado
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   Future<void> _fetchRecoveryPrograms() async {
     var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos

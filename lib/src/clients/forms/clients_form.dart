@@ -36,10 +36,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   void dispose() {
     // Mantén los controladores abiertos para preservar su estado
     _nameController.dispose();
-    // _emailController.dispose();
-    // _phoneController.dispose();
-    // _heightController.dispose();
-    // _weightController.dispose();
+     _emailController.dispose();
+     _phoneController.dispose();
+     _heightController.dispose();
+     _weightController.dispose();
     super.dispose();
   }
 

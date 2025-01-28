@@ -37,6 +37,14 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
     }
   }
 
+  @override
+  void dispose() {
+    _indexController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
+
+
   Future<void> _loadMostRecentUser() async {
     final dbHelper = DatabaseHelper();
     final user = await dbHelper.getMostRecentUser();
@@ -56,12 +64,6 @@ class _UsersFormBonosState extends State<UsersFormBonos> {
     }
   }
 
-  @override
-  void dispose() {
-    _indexController.dispose();
-    _nameController.dispose();
-    super.dispose();
-  }
 
   Future<void> _loadAvailableBonos(int userId) async {
     final dbHelper = DatabaseHelper();

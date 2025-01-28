@@ -28,6 +28,11 @@ class _ProgramsMenuViewState extends State<ProgramsMenuView> {
   void initState() {
     super.initState();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   void toggleOverlay(int index) {
     setState(() {

@@ -364,6 +364,15 @@ class _OverlaySeleccionarClienteBioState
     _clientNameController.addListener(_filterClients);
   }
 
+  @override
+  void dispose() {
+    // Liberar los controladores de texto
+    _clientNameController.dispose();
+    _clientNameController.removeListener(_filterClients);
+    super.dispose();
+  }
+
+
   Future<void> _fetchClients() async {
     final dbHelper = DatabaseHelper();
 

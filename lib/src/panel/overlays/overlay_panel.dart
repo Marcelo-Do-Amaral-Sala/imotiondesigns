@@ -62,6 +62,9 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
                     buildCustomCheckboxTile(
                       tr(context, "Automáticos").toUpperCase(),
                     ),
+                    buildCustomCheckboxTile(
+                      tr(context, "Libre").toUpperCase(),
+                    ),
                   ],
                 ),
               ),
@@ -176,6 +179,10 @@ class _OverlaySeleccionarProgramaIndividualState
   void initState() {
     super.initState();
     initializeDataProgram();
+  }
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> initializeDataProgram() async {
@@ -599,6 +606,11 @@ class _OverlaySeleccionarProgramaRecoveryState
     _fetchRecoveryPrograms();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _fetchRecoveryPrograms() async {
     var db = await DatabaseHelper()
         .database; // Obtener la instancia de la base de datos
@@ -922,6 +934,10 @@ class _OverlaySeleccionarProgramaAutomaticState
   void initState() {
     super.initState();
     _fetchAutoPrograms();
+  }
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> _fetchAutoPrograms() async {
@@ -1349,6 +1365,11 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
     _fetchClients();
     _clientNameController.addListener(_filterClients);
   }
+  @override
+  void dispose() {
+    super.dispose();
+    _clientNameController.dispose();
+  }
 
   Future<void> _fetchClients() async {
     final dbHelper = DatabaseHelper();
@@ -1659,6 +1680,11 @@ class _OverlayResumenSesionState extends State<OverlayResumenSesion>
   void initState() {
     super.initState();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1703,6 +1729,12 @@ class OverlayCiclos extends StatefulWidget {
 class _OverlayCiclosState extends State<OverlayCiclos> {
   String? selectedCycle;
   final List<String> cycleNames = ["0", "A", "B", "C", "D"];
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {

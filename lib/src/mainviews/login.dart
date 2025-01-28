@@ -59,6 +59,14 @@ class _LoginViewState extends State<LoginView> {
     _checkUserProfile();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _user.dispose();
+    _pwd.dispose();
+  }
+
+
   Future<void> _initializeDatabase() async {
     try {
       if (kIsWeb) {

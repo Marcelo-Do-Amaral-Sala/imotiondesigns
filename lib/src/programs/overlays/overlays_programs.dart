@@ -36,6 +36,11 @@ class _OverlayIndividualesState extends State<OverlayIndividuales>
   void initState() {
     super.initState();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +84,16 @@ class _OverlayAutoState extends State<OverlayAuto> {
       isInfoVisible = true; // Muestra la vista detallada del programa
     });
   }
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -260,6 +275,10 @@ class _OverlayRecoveryState extends State<OverlayRecovery>
   @override
   void initState() {
     super.initState();
+  }
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

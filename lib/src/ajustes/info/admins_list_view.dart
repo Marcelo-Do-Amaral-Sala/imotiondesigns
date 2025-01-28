@@ -31,6 +31,13 @@ class _AdminsListViewState extends State<AdminsListView> {
     _adminNameController.addListener(_filterAdmins);
   }
 
+  @override
+  void dispose() {
+    _adminNameController.removeListener(_filterAdmins);
+    super.dispose();
+  }
+
+
   Future<void> _fetchAdmins() async {
     final dbHelper = DatabaseHelper();
     try {

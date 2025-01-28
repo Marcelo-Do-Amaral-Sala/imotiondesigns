@@ -43,6 +43,17 @@ class _ClientsBioState extends State<ClientsBio> {
     selectedOption = widget.clientDataBio['status'];
   }
 
+  @override
+  void dispose() {
+    // Liberar los controladores de texto
+    _indexController.dispose();
+    _nameController.dispose();
+
+    // Llamar al método base para liberar otros recursos
+    super.dispose();
+  }
+
+
   void _showSession(Map<String, String> clientData) {
     setState(() {
       _subTabData = clientData;

@@ -295,7 +295,8 @@
     "Recuperación activa": "Recuperación activa",
     "Ficha de cliente": "Ficha de cliente",
     "Cliente": "Cliente",
-    "Edad": "Edad"
+    "Edad": "Edad",
+    "Libre" : "Libre"
   },
   "en": {
     "Panel de control": "Dashboard",
@@ -594,7 +595,8 @@
     "Recuperación activa": "Active recovery",
     "Ficha de cliente": "Client Sheet",
     "Cliente": "Client",
-    "Edad": "Age"
+    "Edad": "Age",
+    "Libre" : "Free"
   },
   "fr": {
     "Panel de control": "Panneau de contrôle",
@@ -893,7 +895,8 @@
     "Recuperación activa": "Récupération active",
     "Ficha de cliente": "Fiche client",
     "Cliente": "Client",
-    "Edad": "Âge"
+    "Edad": "Âge",
+    "Libre" : "Libre"
   },
   "it": {
     "Panel de control": "Pannello di controllo",
@@ -1192,7 +1195,8 @@
     "Recuperación activa": "Recupero attivo",
     "Ficha de cliente": "Scheda cliente",
     "Cliente": "Cliente",
-    "Edad": "Età"
+    "Edad": "Età",
+    "Libre" : "Libero"
   },
   "pt": {
     "Panel de control": "Painel de controle",
@@ -1491,7 +1495,8 @@
     "Recuperación activa": "Recuperação ativa",
     "Ficha de cliente": "Ficha de cliente",
     "Cliente": "Cliente",
-    "Edad": "Idade"
+    "Edad": "Idade",
+    "Libro" : "Livre"
   },
   "dt": {
     "Panel de control": "Dashboard",
@@ -1790,6 +1795,7 @@
     "Recuperación activa": "Aktive Erholung",
     "Ficha de cliente": "Kundenblatt",
     "Cliente": "Kunde",
-    "Edad": "Alter"
+    "Edad": "Alter",
+    "Libre" : "Frei"
   }
 }

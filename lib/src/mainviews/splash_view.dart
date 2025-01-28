@@ -27,6 +27,11 @@ class _SplashViewState extends State<SplashView> {
     super.initState();
     _startSplashSequence();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   Future<void> _startSplashSequence() async {
     // Garantiza que el splash sea visible al menos 3 segundos

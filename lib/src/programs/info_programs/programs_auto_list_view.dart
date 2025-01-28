@@ -19,6 +19,11 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
     super.initState();
     _fetchPrograms(); // Cargar los programas automáticos al iniciar el estado
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   Future<void> _fetchPrograms() async {
     var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos

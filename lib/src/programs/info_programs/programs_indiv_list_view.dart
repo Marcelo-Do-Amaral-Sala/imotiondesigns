@@ -20,6 +20,12 @@ class _ProgramsIndividualesListViewState
     _fetchIndividualPrograms(); // Llamamos a la función para obtener los programas al iniciar
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
   Future<void> _fetchIndividualPrograms() async {
     var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
     try {

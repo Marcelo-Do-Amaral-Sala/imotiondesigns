@@ -42,6 +42,22 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     loadMuscleGroups();
     _loadMostRecentClient(); // Llamar al método para cargar los grupos musculares
   }
+  @override
+  void dispose() {
+    // Liberar los controladores de texto
+    _indexController.dispose();
+    _nameController.dispose();
+
+    // Limpiar mapas, si contienen datos pesados o referencias que podrían mantenerse
+    selectedGroups.clear();
+    hintColors.clear();
+    groupIds.clear();
+    imagePaths.clear();
+
+    // Llamar al método base para liberar otros recursos
+    super.dispose();
+  }
+
 
   // Método para obtener los grupos musculares desde la base de datos
   Future<void> loadMuscleGroups() async {
@@ -121,13 +137,6 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
         ),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _indexController.dispose();
-    _nameController.dispose();
-    super.dispose();
   }
 
   /// Crear el checkbox redondo personalizado
