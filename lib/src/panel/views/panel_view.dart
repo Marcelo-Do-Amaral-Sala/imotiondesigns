@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 import '../../servicios/licencia_state.dart';
@@ -17,7 +20,6 @@ import '../../servicios/provider.dart';
 import '../../servicios/video_controller.dart';
 import '../custom/border_neon.dart';
 import '../custom/linear_custom.dart';
-import 'package:http/http.dart' as http;
 
 class PanelView extends StatefulWidget {
   final VoidCallback onBack;
@@ -1880,7 +1882,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   Color selectedColor = const Color(0xFF2be4f3);
   Color unselectedColor = const Color(0xFF494949);
-
+  ValueNotifier<String> imagePauseNotifier = ValueNotifier<String>('assets/images/PAUSA.png');
 
   @override
   void initState() {
@@ -3257,6 +3259,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             "📋 Lista de clientes seleccionados borrada desde el Provider (sin notificación).");
       }
     }
+    imagePauseNotifier.dispose();
     bleConnectionService.dispose();
     super.dispose();
   }
@@ -7524,7 +7527,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   vertical:
                                                       screenHeight * 0.015,
                                                   horizontal:
-                                                      screenWidth * 0.015),
+                                                      screenWidth * 0.001),
                                               width: _isExpanded3
                                                   ? screenWidth * 0.2
                                                   : 0,
@@ -7605,8 +7608,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     // Sufijo para mostrar en el texto
                                                     screenWidth: screenWidth,
                                                     // Ancho de pantalla
-                                                    screenHeight:
-                                                        screenHeight, // Altura de pantalla
+                                                    screenHeight: screenHeight,
+                                                    isPausa: true,
+                                                    imageNotifier: imagePauseNotifier,
                                                   ),
                                                   SizedBox(
                                                       height:
@@ -8360,22 +8364,24 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Widget buildControlRow({
-    required double value, // El valor que se va a mostrar y modificar
-    required String imagePathIncrement, // Ruta de la imagen para el botón "Más"
-    required String
-    imagePathDecrement, // Ruta de la imagen para el botón "Menos"
-    required String imagePathDisplay, // Ruta de la imagen para mostrar
-    required VoidCallback onIncrement, // Lógica de incremento
-    required VoidCallback onDecrement, // Lógica de decremento
-    required String suffix, // Sufijo para el valor
-    required double screenWidth, // Ancho de la pantalla
-    required double screenHeight, // Alto de la pantalla
-    bool isRampa = false, // Indica si es el valor Rampa
+    required double value,
+    required String imagePathIncrement,
+    required String imagePathDecrement,
+    required String imagePathDisplay,
+    required VoidCallback onIncrement,
+    required VoidCallback onDecrement,
+    required String suffix,
+    required double screenWidth,
+    required double screenHeight,
+    bool isRampa = false,
+    bool isPausa = false,
+    ValueNotifier<String>? imageNotifier, // Agregar esto
   }) {
+    imageNotifier ??= ValueNotifier<String>(imagePathDisplay); // Usa el pasado o crea uno nuevo
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Botón de "Más"
         GestureDetector(
           onTap: onIncrement,
           child: SizedBox(
@@ -8390,19 +8396,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           ),
         ),
         SizedBox(width: screenWidth * 0.005),
-        // Texto con el valor y el sufijo
         Text(
-          isRampa
-              ? "${value.toStringAsFixed(1)}$suffix" // Formato con un decimal si es Rampa
-              : "${value.toStringAsFixed(0)}$suffix", // Formato entero
-          style: TextStyle(
-            fontSize: 15.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          isRampa ? "${value.toStringAsFixed(1)}$suffix" : "${value.toStringAsFixed(0)}$suffix",
+          style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(width: screenWidth * 0.005),
-        // Botón de "Menos"
         GestureDetector(
           onTap: onDecrement,
           child: SizedBox(
@@ -8417,12 +8415,30 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           ),
         ),
         SizedBox(width: screenWidth * 0.001),
-        // Imagen que se muestra en el lado derecho
-        Image.asset(
-          imagePathDisplay,
-          width: screenWidth * 0.04,
-          height: screenHeight * 0.04,
-        ),
+        if (isPausa)
+          GestureDetector(
+            onTap: () {
+              imageNotifier!.value = imageNotifier.value == imagePathDisplay
+                  ? 'assets/images/pausaactiva.png' // Imagen alterna
+                  : imagePathDisplay;
+            },
+            child: ValueListenableBuilder<String>(
+              valueListenable: imageNotifier,
+              builder: (context, imagePath, child) {
+                return Image.asset(
+                  imagePath,
+                  width: screenWidth * 0.05,
+                  height: screenHeight * 0.05,
+                );
+              },
+            ),
+          )
+        else
+          Image.asset(
+            imagePathDisplay,
+            width: screenWidth * 0.05,
+            height: screenHeight * 0.05,
+          ),
       ],
     );
   }

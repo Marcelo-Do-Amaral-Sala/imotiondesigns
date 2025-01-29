@@ -361,6 +361,7 @@ flutter:
     - assets/images/cliente_ia.png
     - assets/images/i-icon.png
     - assets/images/logopdf.png
+    - assets/images/pausaactiva.png
     - assets/icon/icono_app.png
     - .env
     - assets/traduccionesv25.json
