@@ -216,6 +216,77 @@ class _MainMenuViewState extends State<MainMenuView>
     );
   }
 
+  Future<void> _showMessage(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4, // Ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.4, // Alto del diálogo
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.01,
+                vertical: MediaQuery.of(context).size.height * 0.01),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: MediaQuery.of(context).size.width * 0.001,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribuye uniformemente
+              crossAxisAlignment: CrossAxisAlignment.center, // Centra horizontalmente
+              children: [
+                Text(
+                  tr(context, 'Función en desarrollo').toUpperCase(),
+                  style: TextStyle(
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  tr(context, 'Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo'),
+                  style: TextStyle(color: Colors.white, fontSize: 20.sp),
+                  textAlign: TextAlign.center,
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Cerrar el diálogo
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side: BorderSide(
+                      width: MediaQuery.of(context).size.width * 0.001,
+                      color: const Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    tr(context, '¡Entendido!').toUpperCase(),
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -311,7 +382,7 @@ class _MainMenuViewState extends State<MainMenuView>
                                 () {
                                   setState(() {
                                     scaleFactorTuto = 1;
-                                    widget.onNavigateToTutoriales();
+                                    _showMessage(context);
                                   });
                                 },
                                 () => setState(() => scaleFactorTuto = 0.90),

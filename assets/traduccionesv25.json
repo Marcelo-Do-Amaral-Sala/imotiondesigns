@@ -296,7 +296,12 @@
     "Ficha de cliente": "Ficha de cliente",
     "Cliente": "Cliente",
     "Edad": "Edad",
-    "Libre" : "Libre"
+    "Libre" : "Libre",
+    "Función en desarrollo" : "Función en desarrollo",
+    "Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo" : "Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo",
+    "Información personal" : "Información personal",
+    "Información adicional" : "Información adicional",
+    "Recomendaciones" : "Recomendaciones"
   },
   "en": {
     "Panel de control": "Dashboard",
@@ -596,7 +601,12 @@
     "Ficha de cliente": "Client Sheet",
     "Cliente": "Client",
     "Edad": "Age",
-    "Libre" : "Free"
+    "Libre" : "Free",
+    "Función en desarrollo": "Feature in development",
+    "Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo": "We are working to offer you this feature very soon.\nThank you for your patience and support",
+    "Información personal": "Personal information",
+    "Información adicional": "Additional information",
+    "Recomendaciones": "Recommendations"
   },
   "fr": {
     "Panel de control": "Panneau de contrôle",
@@ -896,7 +906,12 @@
     "Ficha de cliente": "Fiche client",
     "Cliente": "Client",
     "Edad": "Âge",
-    "Libre" : "Libre"
+    "Libre" : "Libre",
+    "Función en desarrollo": "Fonction en développement",
+    "Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo": "Nous travaillons pour vous offrir cette fonctionnalité très bientôt.\nMerci pour votre patience et votre soutien",
+    "Información personal": "Informations personnelles",
+    "Información adicional": "Informations supplémentaires",
+    "Recomendaciones": "Recommandations"
   },
   "it": {
     "Panel de control": "Pannello di controllo",
@@ -1196,7 +1211,12 @@
     "Ficha de cliente": "Scheda cliente",
     "Cliente": "Cliente",
     "Edad": "Età",
-    "Libre" : "Libero"
+    "Libre" : "Libero",
+    "Función en desarrollo": "Funzione in sviluppo",
+    "Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo": "Stiamo lavorando per offrirti questa funzionalità molto presto.\nGrazie per la tua pazienza e il tuo supporto",
+    "Información personal": "Informazioni personali",
+    "Información adicional": "Informazioni aggiuntive",
+    "Recomendaciones": "Raccomandazioni"
   },
   "pt": {
     "Panel de control": "Painel de controle",
@@ -1496,7 +1516,12 @@
     "Ficha de cliente": "Ficha de cliente",
     "Cliente": "Cliente",
     "Edad": "Idade",
-    "Libro" : "Livre"
+    "Libro" : "Livre",
+    "Función en desarrollo": "Função em desenvolvimento",
+    "Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo": "Estamos trabalhando para lhe oferecer esta funcionalidade em breve.\nObrigado pela sua paciência e apoio",
+    "Información personal": "Informações pessoais",
+    "Información adicional": "Informações adicionais",
+    "Recomendaciones": "Recomendações"
   },
   "dt": {
     "Panel de control": "Dashboard",
@@ -1796,6 +1821,11 @@
     "Ficha de cliente": "Kundenblatt",
     "Cliente": "Kunde",
     "Edad": "Alter",
-    "Libre" : "Frei"
+    "Libre" : "Frei",
+    "Función en desarrollo": "Funktion in Entwicklung",
+    "Estamos trabajando para ofrecerte esta funcionalidad muy pronto.\nGracias por tu paciencia y apoyo": "Wir arbeiten daran, Ihnen diese Funktion bald zur Verfügung zu stellen.\nVielen Dank für Ihre Geduld und Unterstützung",
+    "Información personal": "Persönliche Informationen",
+    "Información adicional": "Zusätzliche Informationen",
+    "Recomendaciones": "Empfehlungen"
   }
 }

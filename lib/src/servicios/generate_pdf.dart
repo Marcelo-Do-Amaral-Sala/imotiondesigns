@@ -43,7 +43,7 @@ class CustomPdfGenerator {
     String infoClienteText = tr(context, 'Información personal');
     String infoAddClienteText = tr(context, 'Información adicional');
     String recoClienteText = tr(context, 'Recomendaciones');
-    String clienteText = tr(context, 'Cliente');
+    String clienteText = tr(context, 'Nombre');
     String clienteEdad = tr(context, 'Edad');
     String clienteAltura = tr(context, 'Altura (cm)');
     String clientePeso = tr(context, 'Peso (kg)');
@@ -340,9 +340,9 @@ class CustomPdfGenerator {
 
     // Cargar fuentes
     final oswaldRegularFont =
-        pw.Font.ttf(await rootBundle.load('assets/fonts/Oswald-Regular.ttf'));
+    pw.Font.ttf(await rootBundle.load('assets/fonts/Oswald-Regular.ttf'));
     final oswaldBoldFont =
-        pw.Font.ttf(await rootBundle.load('assets/fonts/Oswald-Bold.ttf'));
+    pw.Font.ttf(await rootBundle.load('assets/fonts/Oswald-Bold.ttf'));
 
     // Cargar imágenes
     final logo = pw.MemoryImage(
@@ -503,7 +503,7 @@ class CustomPdfGenerator {
                       decoration: pw.BoxDecoration(
                         color: PdfColor.fromHex('#020659'),
                         borderRadius:
-                            pw.BorderRadius.circular(16), // Radio de 16
+                        pw.BorderRadius.circular(16), // Radio de 16
                       ),
                       width: 300,
                       height: 300,
@@ -600,6 +600,7 @@ class CustomPdfGenerator {
         },
       ),
     );
+
 
     // Guardar el PDF en una ubicación temporal
     final directory = await getTemporaryDirectory();
