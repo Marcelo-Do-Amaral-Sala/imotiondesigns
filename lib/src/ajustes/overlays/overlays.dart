@@ -1930,7 +1930,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                   vertical: screenHeight * 0.05,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[900],
+                                  color: Colors.transparent,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
@@ -2159,7 +2159,6 @@ class _OverlayVitaState extends State<OverlayVita>
 // Generar la leyenda
   List<Widget> _buildLegend() {
     final colors = [
-      Colors.purple, // Desnutrición
       Colors.blue, // Bajo peso
       Colors.green, // Normal
       Colors.yellow, // Sobrepeso
@@ -2169,7 +2168,6 @@ class _OverlayVitaState extends State<OverlayVita>
     ];
 
     final labels = [
-      tr(context, 'Desnutrición'),
       tr(context, 'Bajo peso'),
       tr(context, 'Normal'),
       tr(context, 'Sobrepeso'),

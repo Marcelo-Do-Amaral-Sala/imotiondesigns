@@ -35,14 +35,14 @@ class CustomPdfGenerator {
 
     // Cargar imágenes
     final logo = pw.MemoryImage(
-      (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List(),
-    );
-    final background = pw.MemoryImage(
-      (await rootBundle.load('assets/images/fondo.jpg')).buffer.asUint8List(),
+      (await rootBundle.load('assets/images/logopdf.png')).buffer.asUint8List(),
     );
 
     // Traducir los textos antes de generar el PDF
     String fichaClienteText = tr(context, 'Ficha de cliente');
+    String infoClienteText = tr(context, 'Información personal');
+    String infoAddClienteText = tr(context, 'Información adicional');
+    String recoClienteText = tr(context, 'Recomendaciones');
     String clienteText = tr(context, 'Cliente');
     String clienteEdad = tr(context, 'Edad');
     String clienteAltura = tr(context, 'Altura (cm)');
@@ -53,203 +53,238 @@ class CustomPdfGenerator {
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.zero,
         build: (pw.Context context) {
-          return pw.Stack(
-            children: [
-              pw.FullPage(
-                ignoreMargins: true,
-                child: pw.Image(background, fit: pw.BoxFit.cover),
-              ),
-              pw.Padding(
-                padding: pw.EdgeInsets.all(32),
-                child: pw.Column(
+          return pw.Padding(
+            padding: pw.EdgeInsets.all(32),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // Encabezado
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      fichaClienteText.toUpperCase(),
+                      style: pw.TextStyle(
+                        font: oswaldRegularFont,
+                        fontSize: 28.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                    ),
+                    pw.Image(logo, height: 70),
+                  ],
+                ),
+                pw.Divider(color: PdfColor.fromHex('#020659')),
+                pw.SizedBox(height: 20),
+                // Sección Información Personal (Ocupando todo el ancho)
+                pw.Container(
+                  width: double.infinity, // Hace que ocupe todo el ancho
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('#E0E0E0'),
+                    borderRadius: pw.BorderRadius.circular(16),
+                  ),
+                  padding: pw.EdgeInsets.all(5),
+                  child: pw.Text(infoClienteText,
+                      style: pw.TextStyle(
+                        font: oswaldBoldFont,
+                        fontSize: 18.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                      textAlign: pw.TextAlign.center),
+                ),
+                pw.SizedBox(height: 10),
+
+                // Cliente info + Imagen
+                pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Image(logo, height: 100),
-                        pw.Text(
-                          fichaClienteText.toUpperCase(),
-                          style: pw.TextStyle(
-                            font: oswaldBoldFont,
-                            decoration: pw.TextDecoration.underline,
-                            decorationColor: PdfColor.fromInt(0xFF2be4f3),
-                            fontSize: 30.sp,
-                            color: PdfColor.fromInt(0xFF2be4f3),
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Row(
-                      children: [
-                        pw.Column(
-                          mainAxisAlignment: pw.MainAxisAlignment.start,
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clienteText + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientName',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            pw.SizedBox(height: 5),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clienteEdad + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientAge',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            pw.SizedBox(height: 5),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clienteAltura + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientHeight cm',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            pw.SizedBox(height: 5),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clientePeso + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientWeight kg',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        pw.Spacer(),
-                        pw.Column(
-                          children: [
-                            pw.Container(
-                              width: 300,
-                              height: 300,
-                              child: pw.Image(image, fit: pw.BoxFit.contain),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Table(
-                      border: pw.TableBorder.all(
-                        color: PdfColors.black,
-                        width: 0.5,
-                      ),
-                      columnWidths: {
-                        0: pw.FlexColumnWidth(1),
-                        1: pw.FlexColumnWidth(1),
-                      },
-                      children: [
-                        ...resumen.map((entry) {
-                          return pw.TableRow(
+                    pw.Expanded(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Row(
                             children: [
-                              pw.Container(
-                                alignment: pw.Alignment.center,
-                                color: PdfColor.fromInt(0xFF2be4f3),
-                                padding: pw.EdgeInsets.all(4),
-                                child: pw.Text(
-                                  entry["title"]!,
-                                  textAlign: pw.TextAlign.center,
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
+                              pw.Text(
+                                clienteText + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
                                 ),
                               ),
-                              pw.Container(
-                                alignment: pw.Alignment.center,
-                                padding: pw.EdgeInsets.all(4),
-                                child: pw.Text(
-                                  entry["value"]!,
-                                  textAlign: pw.TextAlign.center,
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 14.sp,
-                                    color: PdfColors.white,
-                                  ),
+                              pw.Text(
+                                '$clientName',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
                                 ),
                               ),
                             ],
-                          );
-                        }).toList(),
-                      ],
+                          ),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                            children: [
+                              pw.Text(
+                                clienteEdad + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                              pw.Text(
+                                '$clientAge',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                            children: [
+                              pw.Text(
+                                clienteAltura + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                              pw.Text(
+                                '$clientHeight cm',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                            children: [
+                              pw.Text(
+                                clientePeso + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                              pw.Text(
+                                '$clientWeight kg',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    pw.Spacer(),
-                    pw.Align(
-                      alignment: pw.Alignment.centerRight,
-                      child: pw.Text(
-                        '${context.pageNumber} / ${context.pagesCount}',
-                        style: pw.TextStyle(
-                          font: oswaldRegularFont,
-                          fontSize: 10.sp,
-                          color: PdfColors.grey,
-                        ),
+                    pw.SizedBox(width: 10),
+                    pw.Container(
+                      decoration: pw.BoxDecoration(
+                        color: PdfColor.fromHex('#020659'),
+                        borderRadius:
+                        pw.BorderRadius.circular(16), // Radio de 16
+                      ),
+                      width: 300,
+                      height: 300,
+                      child: pw.ClipRRect(
+                        horizontalRadius: 16,
+                        verticalRadius: 16,
+                        child: pw.Image(image, fit: pw.BoxFit.contain),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+                pw.SizedBox(height: 20),
+                // Sección Información Adicional (Ocupando todo el ancho)
+                pw.Container(
+                  width: double.infinity, // Hace que ocupe todo el ancho
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('#E0E0E0'),
+                    borderRadius: pw.BorderRadius.circular(16),
+                  ),
+                  padding: pw.EdgeInsets.all(5),
+                  child: pw.Text(infoAddClienteText,
+                      style: pw.TextStyle(
+                        font: oswaldBoldFont,
+                        fontSize: 18.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                      textAlign: pw.TextAlign.center),
+                ),
+                pw.SizedBox(height: 10),
+                // Lista de resumen
+                ...resumen.map((entry) {
+                  return pw.Padding(
+                    padding: pw.EdgeInsets.symmetric(vertical: 5),
+                    child: pw.RichText(
+                      text: pw.TextSpan(
+                        children: [
+                          pw.TextSpan(
+                            text: '${entry["title"]!}: ',
+                            style: pw.TextStyle(
+                              font: oswaldBoldFont,
+                              fontSize: 16.sp,
+                              color: PdfColor.fromHex('#020659'),
+                            ),
+                          ),
+                          pw.TextSpan(
+                            text: entry["value"]!,
+                            style: pw.TextStyle(
+                              font: oswaldRegularFont,
+                              fontSize: 14.sp,
+                              color: PdfColor.fromHex('#020659'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+                pw.SizedBox(height: 20),
+
+                // Sección Recomendaciones (Ocupando todo el ancho)
+                pw.Container(
+                  width: double.infinity, // Hace que ocupe todo el ancho
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('#E0E0E0'),
+                    borderRadius: pw.BorderRadius.circular(16),
+                  ),
+                  padding: pw.EdgeInsets.all(5),
+                  child: pw.Text(recoClienteText,
+                      style: pw.TextStyle(
+                        font: oswaldBoldFont,
+                        fontSize: 18.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                      textAlign: pw.TextAlign.center),
+                ),
+                pw.SizedBox(height: 10),
+                // Footer
+                pw.Spacer(),
+                pw.Align(
+                  alignment: pw.Alignment.center,
+                  child: pw.Text(
+                    'www.i-motiongroup.com',
+                    style: pw.TextStyle(
+                      font: oswaldRegularFont,
+                      fontSize: 12.sp,
+                      color: PdfColor.fromHex('#020659'),
+                    ),
+                  ),
+                ),
+                pw.Divider(color: PdfColor.fromHex('#020659')),
+              ],
+            ),
           );
         },
       ),
@@ -302,6 +337,7 @@ class CustomPdfGenerator {
   ) async {
     final pdf = pw.Document();
     final image = pw.MemoryImage(imageBytes);
+
     // Cargar fuentes
     final oswaldRegularFont =
         pw.Font.ttf(await rootBundle.load('assets/fonts/Oswald-Regular.ttf'));
@@ -310,15 +346,15 @@ class CustomPdfGenerator {
 
     // Cargar imágenes
     final logo = pw.MemoryImage(
-      (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List(),
-    );
-    final background = pw.MemoryImage(
-      (await rootBundle.load('assets/images/fondo.jpg')).buffer.asUint8List(),
+      (await rootBundle.load('assets/images/logopdf.png')).buffer.asUint8List(),
     );
 
     // Traducir los textos antes de generar el PDF
     String fichaClienteText = tr(context, 'Ficha de cliente');
-    String clienteText = tr(context, 'Cliente');
+    String infoClienteText = tr(context, 'Información personal');
+    String infoAddClienteText = tr(context, 'Información adicional');
+    String recoClienteText = tr(context, 'Recomendaciones');
+    String clienteText = tr(context, 'Nombre');
     String clienteEdad = tr(context, 'Edad');
     String clienteAltura = tr(context, 'Altura (cm)');
     String clientePeso = tr(context, 'Peso (kg)');
@@ -328,207 +364,243 @@ class CustomPdfGenerator {
         pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.zero,
         build: (pw.Context context) {
-          return pw.Stack(
-            children: [
-              pw.FullPage(
-                ignoreMargins: true,
-                child: pw.Image(background, fit: pw.BoxFit.cover),
-              ),
-              pw.Padding(
-                padding: pw.EdgeInsets.all(32),
-                child: pw.Column(
+          return pw.Padding(
+            padding: pw.EdgeInsets.all(32),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // Encabezado
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      fichaClienteText.toUpperCase(),
+                      style: pw.TextStyle(
+                        font: oswaldRegularFont,
+                        fontSize: 28.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                    ),
+                    pw.Image(logo, height: 70),
+                  ],
+                ),
+                pw.Divider(color: PdfColor.fromHex('#020659')),
+                pw.SizedBox(height: 20),
+                // Sección Información Personal (Ocupando todo el ancho)
+                pw.Container(
+                  width: double.infinity, // Hace que ocupe todo el ancho
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('#E0E0E0'),
+                    borderRadius: pw.BorderRadius.circular(16),
+                  ),
+                  padding: pw.EdgeInsets.all(5),
+                  child: pw.Text(infoClienteText,
+                      style: pw.TextStyle(
+                        font: oswaldBoldFont,
+                        fontSize: 18.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                      textAlign: pw.TextAlign.center),
+                ),
+                pw.SizedBox(height: 10),
+
+                // Cliente info + Imagen
+                pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Image(logo, height: 100),
-                        pw.Text(
-                          fichaClienteText.toUpperCase(),
-                          style: pw.TextStyle(
-                            font: oswaldBoldFont,
-                            decoration: pw.TextDecoration.underline,
-                            decorationColor: PdfColor.fromInt(0xFF2be4f3),
-                            fontSize: 30.sp,
-                            color: PdfColor.fromInt(0xFF2be4f3),
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Row(
-                      children: [
-                        pw.Column(
-                          mainAxisAlignment: pw.MainAxisAlignment.start,
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clienteText + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientName',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            pw.SizedBox(height: 5),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clienteEdad + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientAge',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            pw.SizedBox(height: 5),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clienteAltura + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientHeight cm',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            pw.SizedBox(height: 5),
-                            pw.Row(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  clientePeso + " :",
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 18.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                                pw.Text(
-                                  '$clientWeight kg',
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        pw.Spacer(),
-                        pw.Column(
-                          children: [
-                            pw.Container(
-                              width: 300,
-                              height: 300,
-                              child: pw.Image(image, fit: pw.BoxFit.contain),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Table(
-                      border: pw.TableBorder.all(
-                        color: PdfColors.black,
-                        width: 0.5,
-                      ),
-                      columnWidths: {
-                        0: pw.FlexColumnWidth(1),
-                        1: pw.FlexColumnWidth(1),
-                      },
-                      children: [
-                        ...resumen.map((entry) {
-                          return pw.TableRow(
+                    pw.Expanded(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Row(
                             children: [
-                              pw.Container(
-                                alignment: pw.Alignment.center,
-                                color: PdfColor.fromInt(0xFF2be4f3),
-                                padding: pw.EdgeInsets.all(4),
-                                child: pw.Text(
-                                  entry["title"]!,
-                                  textAlign: pw.TextAlign.center,
-                                  style: pw.TextStyle(
-                                    font: oswaldBoldFont,
-                                    fontSize: 16.sp,
-                                    color: PdfColors.white,
-                                  ),
+                              pw.Text(
+                                clienteText + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
                                 ),
                               ),
-                              pw.Container(
-                                alignment: pw.Alignment.center,
-                                padding: pw.EdgeInsets.all(4),
-                                child: pw.Text(
-                                  entry["value"]!,
-                                  textAlign: pw.TextAlign.center,
-                                  style: pw.TextStyle(
-                                    font: oswaldRegularFont,
-                                    fontSize: 14.sp,
-                                    color: PdfColors.white,
-                                  ),
+                              pw.Text(
+                                '$clientName',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
                                 ),
                               ),
                             ],
-                          );
-                        }).toList(),
-                      ],
+                          ),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                            children: [
+                              pw.Text(
+                                clienteEdad + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                              pw.Text(
+                                '$clientAge',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                            children: [
+                              pw.Text(
+                                clienteAltura + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                              pw.Text(
+                                '$clientHeight cm',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                            children: [
+                              pw.Text(
+                                clientePeso + " : ",
+                                style: pw.TextStyle(
+                                  font: oswaldBoldFont,
+                                  fontSize: 16.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                              pw.Text(
+                                '$clientWeight kg',
+                                style: pw.TextStyle(
+                                  font: oswaldRegularFont,
+                                  fontSize: 14.sp,
+                                  color: PdfColor.fromHex('#020659'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    pw.Spacer(),
-                    pw.Align(
-                      alignment: pw.Alignment.centerRight,
-                      child: pw.Text(
-                        '${context.pageNumber} / ${context.pagesCount}',
-                        style: pw.TextStyle(
-                          font: oswaldRegularFont,
-                          fontSize: 10.sp,
-                          color: PdfColors.grey,
-                        ),
+                    pw.SizedBox(width: 10),
+                    pw.Container(
+                      decoration: pw.BoxDecoration(
+                        color: PdfColor.fromHex('#020659'),
+                        borderRadius:
+                            pw.BorderRadius.circular(16), // Radio de 16
+                      ),
+                      width: 300,
+                      height: 300,
+                      child: pw.ClipRRect(
+                        horizontalRadius: 16,
+                        verticalRadius: 16,
+                        child: pw.Image(image, fit: pw.BoxFit.contain),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+                pw.SizedBox(height: 20),
+                // Sección Información Adicional (Ocupando todo el ancho)
+                pw.Container(
+                  width: double.infinity, // Hace que ocupe todo el ancho
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('#E0E0E0'),
+                    borderRadius: pw.BorderRadius.circular(16),
+                  ),
+                  padding: pw.EdgeInsets.all(5),
+                  child: pw.Text(infoAddClienteText,
+                      style: pw.TextStyle(
+                        font: oswaldBoldFont,
+                        fontSize: 18.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                      textAlign: pw.TextAlign.center),
+                ),
+                pw.SizedBox(height: 10),
+                // Lista de resumen
+                ...resumen.map((entry) {
+                  return pw.Padding(
+                    padding: pw.EdgeInsets.symmetric(vertical: 5),
+                    child: pw.RichText(
+                      text: pw.TextSpan(
+                        children: [
+                          pw.TextSpan(
+                            text: '${entry["title"]!}: ',
+                            style: pw.TextStyle(
+                              font: oswaldBoldFont,
+                              fontSize: 16.sp,
+                              color: PdfColor.fromHex('#020659'),
+                            ),
+                          ),
+                          pw.TextSpan(
+                            text: entry["value"]!,
+                            style: pw.TextStyle(
+                              font: oswaldRegularFont,
+                              fontSize: 14.sp,
+                              color: PdfColor.fromHex('#020659'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+                pw.SizedBox(height: 20),
+
+                // Sección Recomendaciones (Ocupando todo el ancho)
+                pw.Container(
+                  width: double.infinity, // Hace que ocupe todo el ancho
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('#E0E0E0'),
+                    borderRadius: pw.BorderRadius.circular(16),
+                  ),
+                  padding: pw.EdgeInsets.all(5),
+                  child: pw.Text(recoClienteText,
+                      style: pw.TextStyle(
+                        font: oswaldBoldFont,
+                        fontSize: 18.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                      textAlign: pw.TextAlign.center),
+                ),
+                pw.SizedBox(height: 10),
+                // Footer
+                pw.Spacer(),
+                pw.Align(
+                  alignment: pw.Alignment.center,
+                  child: pw.Text(
+                    'www.i-motiongroup.com',
+                    style: pw.TextStyle(
+                      font: oswaldRegularFont,
+                      fontSize: 12.sp,
+                      color: PdfColor.fromHex('#020659'),
+                    ),
+                  ),
+                ),
+                pw.Divider(color: PdfColor.fromHex('#020659')),
+              ],
+            ),
           );
         },
       ),
     );
+
     // Guardar el PDF en una ubicación temporal
     final directory = await getTemporaryDirectory();
     final file = File('${directory.path}/$fileName');

@@ -358,6 +358,7 @@ flutter:
     - assets/images/icono-vita.png
     - assets/images/cliente_ia.png
     - assets/images/i-icon.png
+    - assets/images/logopdf.png
     - assets/icon/icono_app.png
     - .env
     - assets/traduccionesv25.json
