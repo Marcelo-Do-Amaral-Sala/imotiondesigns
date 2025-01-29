@@ -309,6 +309,8 @@ class CustomPdfGenerator {
       directory = Directory('/storage/emulated/0/Download');
     } else if (Platform.isIOS) {
       directory = await getApplicationDocumentsDirectory();
+    }else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      directory = Directory('${Directory.systemTemp.path}/Downloads');
     }
 
     if (!directory!.existsSync()) {
