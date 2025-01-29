@@ -558,16 +558,16 @@ class AdminsDataState extends State<AdminsData> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(tr(context, 'Nombre').toUpperCase(),
+                            Text(tr(context, 'Usuario').toUpperCase(),
                                 style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: TextField(
-                                controller: _nameController,
+                                controller: _userController,
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir nombre'),
+                                  hintText: tr(context, 'Introducir usuario'),
                                 ),
                               ),
                             ),

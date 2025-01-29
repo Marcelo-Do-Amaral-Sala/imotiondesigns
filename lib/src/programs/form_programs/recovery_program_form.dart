@@ -50,6 +50,8 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
 
   Map<String, TextEditingController> controllersJacket = {};
   Map<String, TextEditingController> controllersShape = {};
+  bool programaGuardado = false;
+
 
   @override
   void initState() {
@@ -159,7 +161,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     }
   }
 
-// Función para guardar el programa predeterminado desde el formulario
+  // Función para guardar el programa predeterminado desde el formulario
   Future<void> guardarProgramaPredeterminado() async {
     if (_nameController.text.isEmpty || selectedEquipOption == null) {
       // Verificación de '@' en el correo
@@ -203,14 +205,16 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
 
     // Insertar el programa en la base de datos
     int programaId =
-        await DatabaseHelper().insertarProgramaPredeterminado(programa);
+    await DatabaseHelper().insertarProgramaPredeterminado(programa);
 
     // Insertar las cronaxias y grupos musculares por defecto
     await DatabaseHelper()
         .insertarCronaxiasPorDefecto(programaId, equipamiento);
     await DatabaseHelper()
         .insertarGruposMuscularesPorDefecto(programaId, equipamiento);
-
+    setState(() {
+      programaGuardado = true; // 🔹 Ahora el usuario puede cambiar de pestañas
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -222,6 +226,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
       ),
     );
   }
+
 
   Future<void> actualizarCronaxias(
       int programaId, String tipoEquipamiento) async {
@@ -243,7 +248,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
         // Verifica que el valor no sea nulo antes de actualizar
         double valor = controller.text.isNotEmpty
             ? double.tryParse(controller.text) ??
-                0.0 // Usar valor por defecto si es nulo o vacío
+            0.0 // Usar valor por defecto si es nulo o vacío
             : 0.0;
 
         // Imprimir el valor antes de actualizarlo
@@ -252,16 +257,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
         // Llamar a la función de actualización desde el DatabaseHelper
         await DatabaseHelper().updateCronaxia(programaId, grupo['id'], valor);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              tr(context, "Cronaxias añadidas correctamente").toUpperCase(),
-              style: TextStyle(color: Colors.white, fontSize: 17.sp),
-            ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
       }
     } else if (tipoEquipamiento == 'BIO-SHAPE') {
       for (var grupo in gruposBioShape) {
@@ -290,16 +285,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
       }
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          "Cronaxias añadidas correctamente",
-          style: TextStyle(color: Colors.white, fontSize: 17),
-        ),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
 
   // Función para manejar la actualización de los grupos musculares
@@ -353,7 +338,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          tr(context, "Grupos activos añadidos correctamente").toUpperCase(),
+          tr(context, "Grupos añadidos correctamente").toUpperCase(),
           style: TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
         backgroundColor: Colors.green,
@@ -366,18 +351,18 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
   Widget customCheckbox(String option, String groupType) {
     // Según el tipo de grupo, actualizamos el mapa adecuado
     Map<String, bool> selectedGroups =
-        groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+    groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
     Map<String, Color> hintColors =
-        groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
+    groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
 
     return GestureDetector(
       onTap: () {
         setState(() {
           // Asegurarse de que selectedGroups[option] no sea null, lo inicializas como false si es nulo
           selectedGroups[option] =
-              !(selectedGroups[option] ?? false); // Si es null, toma false
+          !(selectedGroups[option] ?? false); // Si es null, toma false
           hintColors[option] =
-              selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
+          selectedGroups[option]! ? const Color(0xFF2be4f3) : Colors.white;
         });
       },
       child: Container(
@@ -404,9 +389,9 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
   void handleTextFieldTap(String option, String groupType) {
     // Según el tipo de grupo, actualizamos el mapa adecuado
     Map<String, bool> selectedGroups =
-        groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
+    groupType == 'BIO-JACKET' ? selectedJacketGroups : selectedShapeGroups;
     Map<String, Color> hintColors =
-        groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
+    groupType == 'BIO-JACKET' ? hintJacketColors : hintShapeColors;
 
     setState(() {
       // Cambiar el estado de selección
@@ -417,6 +402,78 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
           ? const Color(0xFF2be4f3) // Color cuando está seleccionado
           : Colors.white; // Color cuando no está seleccionado
     });
+  }
+
+  Future<void> _showAlert(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            // Aquí defines el ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.3,
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.height * 0.01,
+                vertical: MediaQuery.of(context).size.width * 0.01),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: MediaQuery.of(context).size.width * 0.001,
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  tr(context, '¡Alerta!').toUpperCase(),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                Text(
+                  tr(context, 'Debes completar el formulario para continuar')
+                      .toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side: BorderSide(
+                      width: MediaQuery.of(context).size.width * 0.001,
+                      color: const Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    tr(context, '¡Entendido!').toUpperCase(),
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -451,18 +508,23 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     );
   }
 
-  // Función modularizada para construir el TabBar
   Widget _buildTabBar() {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.5,
-      height: MediaQuery.of(context).size.height *
-          0.05, // Ajusta la altura si es necesario
+      height: MediaQuery.of(context).size.height * 0.05,
       child: TabBar(
         controller: _tabController,
         isScrollable: false,
         physics: const NeverScrollableScrollPhysics(),
         onTap: (index) {
-          setState(() {});
+          if (index != 0 && !programaGuardado) {
+            _showAlert(context); // Mostrar alerta
+            _tabController.index = 0; // 🔹 FORZAR PERMANECER EN CONFIGURACIÓN
+          } else {
+            setState(() {
+              _tabController.index = index;
+            });
+          }
         },
         tabs: [
           _buildTab(tr(context, 'Configuración').toUpperCase(), 0),
@@ -484,23 +546,31 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     );
   }
 
-  // Función modularizada para construir cada pestaña
+
+
   Widget _buildTab(String text, int index) {
-    return Tab(
-      child: SizedBox(
-        width: 150, // Ajusta el tamaño del ancho si lo necesitas
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            decoration: _tabController.index == index
-                ? TextDecoration.underline
-                : TextDecoration.none,
+    bool isDisabled = !programaGuardado && index != 0; // Bloquear si no está guardado y no es Configuración
+
+    return IgnorePointer(
+      ignoring: isDisabled, // 🔹 Bloquea la interacción si el programa no está guardado
+      child: Tab(
+        child: SizedBox(
+          width: 150,
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              decoration: _tabController.index == index
+                  ? TextDecoration.underline
+                  : TextDecoration.none,
+            ),
           ),
         ),
       ),
     );
   }
+
+
 
   Widget _buildConfigurationTab(double screenWidth, double screenHeight) {
     return Padding(
@@ -598,8 +668,8 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                               child: TextField(
                                 controller: _frequencyController,
                                 keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
+                                const TextInputType.numberWithOptions(
+                                    decimal: true),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.allow(
                                       RegExp(r'^\d*\.?\d*$')),
@@ -607,7 +677,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
                                   hintText:
-                                      tr(context, 'Introducir frecuencia'),
+                                  tr(context, 'Introducir frecuencia'),
                                 ),
                               ),
                             ),
@@ -620,8 +690,8 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                               child: TextField(
                                 controller: _pulseController,
                                 keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
+                                const TextInputType.numberWithOptions(
+                                    decimal: true),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.allow(
                                       RegExp(r'^\d*\.?\d*$')),
@@ -652,7 +722,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "${tr(context, 'Rampa').toUpperCase()} (sx10)",
@@ -692,7 +762,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "${tr(context, 'Contracción').toUpperCase()} (s.)",
@@ -733,7 +803,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "${tr(context, 'Pausa').toUpperCase()} (s.)",
@@ -753,7 +823,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                           style: _inputTextStyle,
                                           decoration: _inputDecorationStyle(
                                             hintText:
-                                                tr(context, 'Introducir pausa'),
+                                            tr(context, 'Introducir pausa'),
                                           ),
                                         ),
                                       ),
@@ -897,262 +967,262 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                   // Campos específicos para BIO-JACKET
                   Expanded(
                       child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Primera columna de TextFields
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los primeros grupos musculares
-                              for (int i = 0; i < 3; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Primera columna de TextFields
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los primeros grupos musculares
+                                  for (int i = 0; i < 3; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los siguientes grupos musculares
-                              for (int i = 3; i < 6; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los siguientes grupos musculares
+                                  for (int i = 3; i < 6; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los últimos grupos musculares
-                              for (int i = 6; i < 9; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los últimos grupos musculares
+                                  for (int i = 6; i < 9; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              for (int i = 9;
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  for (int i = 9;
                                   i < 10;
                                   i++) // Aquí ajustamos el rango de grupos
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
+                      )),
                 ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
                   // Campos específicos para BIO-SHAPE
                   Expanded(
                       child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Primera columna de TextFields
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los primeros grupos musculares
-                              for (int i = 0; i < 3; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Primera columna de TextFields
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los primeros grupos musculares
+                                  for (int i = 0; i < 3; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los siguientes grupos musculares
-                              for (int i = 3; i < 6; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los siguientes grupos musculares
+                                  for (int i = 3; i < 6; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los últimos grupos musculares
-                              for (int i = 6; i < 7; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los últimos grupos musculares
+                                  for (int i = 6; i < 7; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
+                      )),
                 ],
               ],
             ),
@@ -1171,9 +1241,8 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                       // Crear una instancia de DatabaseHelper
                       DatabaseHelper dbHelper = DatabaseHelper();
 
-                      // Llamar al método de instancia para obtener el programa más reciente
                       Map<String, dynamic>? programa =
-                          await dbHelper.getMostRecentPrograma();
+                      await dbHelper.getMostRecentPrograma();
 
                       if (programa != null) {
                         int programaId = programa['id_programa'];
@@ -1327,15 +1396,15 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                               groupName, 'BIO-JACKET'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: TextStyle(
@@ -1346,17 +1415,17 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 15.sp,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),
@@ -1392,15 +1461,15 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                               ),
                               ...selectedJacketGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Trapecios',
-                                        'Dorsales',
-                                        'Lumbares',
-                                        'Glúteos',
-                                        'Isquiotibiales',
-                                        'Gemelos'
-                                      ].contains(entry.key) &&
-                                      entry.value)
+                              [
+                                'Trapecios',
+                                'Dorsales',
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquiotibiales',
+                                'Gemelos'
+                              ].contains(entry.key) &&
+                                  entry.value)
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageJacketPaths[groupName];
@@ -1439,13 +1508,13 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                               ),
                               ...selectedJacketGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Pectorales',
-                                        'Abdomen',
-                                        'Cuádriceps',
-                                        'Bíceps',
-                                      ].contains(entry.key) &&
-                                      entry.value)
+                              [
+                                'Pectorales',
+                                'Abdomen',
+                                'Cuádriceps',
+                                'Bíceps',
+                              ].contains(entry.key) &&
+                                  entry.value)
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageJacketPaths[groupName];
@@ -1489,15 +1558,15 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                               groupName, 'BIO-JACKET'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: TextStyle(
@@ -1508,17 +1577,17 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 15.sp,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),
@@ -1569,15 +1638,15 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                               'MUSCULOS PARTE SUPERIOR'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: TextStyle(
@@ -1588,17 +1657,17 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 15.sp,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),
@@ -1635,14 +1704,14 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                               // Mostrar imágenes para los grupos seleccionados
                               ...selectedShapeGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Lumbares',
-                                        'Glúteos',
-                                        'Isquiotibiales',
-                                        'Gemelos',
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Solo mostrar los seleccionados
+                              [
+                                'Lumbares',
+                                'Glúteos',
+                                'Isquiotibiales',
+                                'Gemelos',
+                              ].contains(entry.key) &&
+                                  entry
+                                      .value) // Solo mostrar los seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageShapePaths[groupName];
@@ -1681,13 +1750,13 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                               // Mostrar imágenes para los grupos seleccionados
                               ...selectedShapeGroups.entries
                                   .where((entry) =>
-                                      [
-                                        'Abdomen',
-                                        'Cuádriceps',
-                                        'Bíceps',
-                                      ].contains(entry.key) &&
-                                      entry
-                                          .value) // Solo mostrar los seleccionados
+                              [
+                                'Abdomen',
+                                'Cuádriceps',
+                                'Bíceps',
+                              ].contains(entry.key) &&
+                                  entry
+                                      .value) // Solo mostrar los seleccionados
                                   .map((entry) {
                                 String groupName = entry.key;
                                 String? imagePath = imageShapePaths[groupName];
@@ -1732,15 +1801,15 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                               'MUSCULOS PARTE INFERIOR'),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Container(
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   color:
-                                                      const Color(0xFF313030),
+                                                  const Color(0xFF313030),
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: TextField(
                                                   style: TextStyle(
@@ -1751,17 +1820,17 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                     hintText: groupName,
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
-                                                          groupName],
+                                                      groupName],
                                                       fontSize: 15.sp,
                                                     ),
                                                     border: OutlineInputBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              7),
+                                                      BorderRadius.circular(
+                                                          7),
                                                     ),
                                                     filled: true,
                                                     fillColor:
-                                                        const Color(0xFF313030),
+                                                    const Color(0xFF313030),
                                                     isDense: true,
                                                     enabled: false,
                                                   ),

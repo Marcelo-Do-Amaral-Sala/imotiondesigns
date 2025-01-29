@@ -1688,6 +1688,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     screenHeight: 0,
   );
 
+  PageController _pageController = PageController();
   late AnimationController _opacityController;
   late Animation<double> _opacityAnimation;
   late Timer _timer;
@@ -1879,6 +1880,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   Color selectedColor = const Color(0xFF2be4f3);
   Color unselectedColor = const Color(0xFF494949);
+
 
   @override
   void initState() {
@@ -3933,74 +3935,51 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       )),
                                   GestureDetector(
                                     onTap: () async {
-                                      final videoUrl =
-                                          selectedIndivProgram?['video'];
-                                      if (videoUrl != null &&
-                                          videoUrl.isNotEmpty) {
-                                        final globalManager =
-                                            GlobalVideoControllerManager
-                                                .instance;
+                                      final videoUrl = selectedIndivProgram?['video'];
+                                      if (videoUrl != null && videoUrl.isNotEmpty) {
+                                        final globalManager = GlobalVideoControllerManager.instance;
 
                                         // Verificar si ya hay un video inicializado para este macAddress
-                                        if (globalManager.videoController !=
-                                                null &&
-                                            globalManager.videoController!.value
-                                                .isInitialized &&
-                                            globalManager.activeMacAddress ==
-                                                widget.macAddress!) {
-                                          // Alternar visibilidad del video
-                                          setState(() {
-                                            _showVideo = !_showVideo;
-                                          });
-                                          debugPrint(
-                                              "Visibilidad del video alternada para macAddress: ${widget.macAddress!} -> $_showVideo");
+                                        if (globalManager.videoController != null &&
+                                            globalManager.videoController!.value.isInitialized &&
+                                            globalManager.activeMacAddress == widget.macAddress!) {
+                                          // En lugar de alternar la visibilidad, cancela el video
+                                          try {
+                                            await _cancelVideoController();
+                                            setState(() {
+                                              _showVideo = false; // Ocultar el video tras cancelar
+                                            });
+                                            debugPrint("Video cancelado y oculto para macAddress: ${widget.macAddress!}");
+                                          } catch (e) {
+                                            debugPrint("Error al cancelar el video: $e");
+                                          }
                                         } else {
                                           // Inicializar el video si no está inicializado o no pertenece a este macAddress
                                           setState(() {
-                                            _isLoading =
-                                                true; // Mostrar el indicador de carga
+                                            _isLoading = true; // Mostrar el indicador de carga
                                           });
 
                                           try {
-                                            await _initializeVideoController(
-                                                videoUrl);
+                                            await _initializeVideoController(videoUrl);
 
                                             setState(() {
-                                              _isLoading =
-                                                  false; // Ocultar el indicador de carga
-                                              _showVideo =
-                                                  true; // Mostrar el video tras la inicialización
+                                              _isLoading = false; // Ocultar el indicador de carga
+                                              _showVideo = true; // Mostrar el video tras la inicialización
                                             });
 
-                                            debugPrint(
-                                                "Video inicializado y visible para macAddress: ${widget.macAddress!}");
+                                            debugPrint("Video inicializado y visible para macAddress: ${widget.macAddress!}");
                                           } catch (e) {
                                             setState(() {
-                                              _isLoading =
-                                                  false; // Ocultar el indicador si falla la inicialización
+                                              _isLoading = false; // Ocultar el indicador si falla la inicialización
                                             });
-                                            debugPrint(
-                                                "Error al inicializar el video: $e");
+                                            debugPrint("Error al inicializar el video: $e");
                                           }
                                         }
                                       } else {
-                                        debugPrint(
-                                            "No se proporcionó una URL válida.");
+                                        debugPrint("No se proporcionó una URL válida.");
                                       }
                                     },
-                                    onLongPress: () async {
-                                      try {
-                                        await _cancelVideoController();
-                                        setState(() {
-                                          _showVideo =
-                                              false; // Ocultar el video tras cancelar
-                                        });
-                                        debugPrint("Video cancelado y oculto.");
-                                      } catch (e) {
-                                        debugPrint(
-                                            "Error al cancelar el video: $e");
-                                      }
-                                    },
+
                                     child: AnimatedScale(
                                       scale: 1.0,
                                       duration:
@@ -7425,82 +7404,76 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ),
                                           SizedBox(width: screenWidth * 0.01),
                                           AnimatedSize(
-                                            duration: const Duration(
-                                                milliseconds: 300),
+                                            duration: const Duration(milliseconds: 300),
                                             curve: Curves.easeInOut,
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              width: _isExpanded2
-                                                  ? screenWidth * 0.2
-                                                  : 0,
-                                              height: screenHeight * 0.2,
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                color: Colors.black
-                                                    .withOpacity(0.5),
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: selectedClients
-                                                    .map((client) {
-                                                  return Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal:
-                                                                screenWidth *
-                                                                    0.008),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          client['name']
-                                                                  .toString()
-                                                                  .toUpperCase(),
-                                                          style: TextStyle(
-                                                            fontSize: 15.sp,
-                                                            color: const Color(
-                                                                0xFF2be4f3),
-                                                          ),
+                                            child: Consumer<ClientsProvider>(
+                                              builder: (context, clientsProvider, child) {
+                                                List<Map<String, dynamic>> selectedClients = clientsProvider.selectedClients;
+
+                                                // Dividir dinámicamente los clientes en dos páginas
+                                                List<Map<String, dynamic>> clientsPage1 =
+                                                selectedClients.length >= 4 ? selectedClients.sublist(0, 4) : selectedClients;
+
+                                                List<Map<String, dynamic>> clientsPage2 =
+                                                selectedClients.length > 4 ? selectedClients.sublist(4) : [];
+
+                                                return Container(
+                                                  padding: const EdgeInsets.all(10.0),
+                                                  width: _isExpanded2 ? screenWidth * 0.2 : 0,
+                                                  height: screenHeight * 0.2,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black.withOpacity(0.5),
+                                                    borderRadius: BorderRadius.circular(20.0),
+                                                  ),
+                                                  child: _isExpanded2
+                                                      ? PageView(
+                                                    controller: _pageController,
+                                                    children: [
+                                                      // Página 1: 2 columnas con 2 filas cada una
+                                                      GridView.builder(
+                                                        padding: EdgeInsets.symmetric(
+                                                          vertical: screenHeight * 0.015,
+                                                          horizontal: screenWidth * 0.001,
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            Image.asset(
-                                                              width:
-                                                                  screenWidth *
-                                                                      0.05,
-                                                              'assets/images/EKCAL.png',
-                                                              fit: BoxFit
-                                                                  .scaleDown,
-                                                            ),
-                                                            SizedBox(
-                                                                width:
-                                                                    screenWidth *
-                                                                        0.01),
-                                                            Text(
-                                                              client['counter1']
-                                                                      ?.toString() ??
-                                                                  '0',
-                                                              // Asegúrate de que el contador esté disponible
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      15.sp,
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                          ],
+                                                        physics: NeverScrollableScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                          crossAxisCount: 2,
+                                                          mainAxisSpacing: screenWidth * 0.001,
+                                                          crossAxisSpacing: screenHeight * 0.001,
+                                                          childAspectRatio: 1.8,
                                                         ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                }).toList(),
-                                              ),
+                                                        itemCount: clientsPage1.length,
+                                                        itemBuilder: (context, index) {
+                                                          return _buildClientCard(clientsPage1[index], screenWidth);
+                                                        },
+                                                      ),
+
+                                                      // Página 2: 2 columnas (una con 2 filas, otra con 1 fila)
+                                                      GridView.builder(
+                                                        padding: EdgeInsets.symmetric(
+                                                          vertical: screenHeight * 0.015,
+                                                          horizontal: screenWidth * 0.001,
+                                                        ),
+                                                        physics: NeverScrollableScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                          crossAxisCount: 2,
+                                                          mainAxisSpacing: screenWidth * 0.001,
+                                                          crossAxisSpacing: screenHeight * 0.001,
+                                                          childAspectRatio: 1.8,
+                                                        ),
+                                                        itemCount: clientsPage2.length,
+                                                        itemBuilder: (context, index) {
+                                                          return _buildClientCard(clientsPage2[index], screenWidth);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  )
+                                                      : SizedBox.shrink(),
+                                                );
+                                              },
                                             ),
                                           ),
                                         ],
@@ -7640,37 +7613,33 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           screenHeight * 0.02),
                                                   buildControlRow(
                                                     value: valueRampa,
-                                                    // Valor de pausa
                                                     imagePathIncrement:
-                                                        'assets/images/mas.png',
-                                                    // Imagen del botón de "Más"
+                                                    'assets/images/mas.png',
                                                     imagePathDecrement:
-                                                        'assets/images/menos.png',
-                                                    // Imagen del botón de "Menos"
+                                                    'assets/images/menos.png',
                                                     imagePathDisplay:
-                                                        'assets/images/RAMPA.png',
-                                                    // Imagen que se muestra (Pausa)
+                                                    'assets/images/RAMPA.png',
                                                     onIncrement: () {
                                                       setState(() {
                                                         valueRampa +=
-                                                            1.0; // Lógica de incremento
+                                                        0.1; // Incremento en decimales
                                                       });
                                                     },
                                                     onDecrement: () {
                                                       setState(() {
                                                         if (valueRampa > 0) {
                                                           valueRampa -=
-                                                              1.0; // Lógica de decremento
+                                                          0.1; // Decremento en decimales
                                                         }
                                                       });
                                                     },
                                                     suffix: " .s",
-                                                    // Sufijo para mostrar en el texto
                                                     screenWidth: screenWidth,
-                                                    // Ancho de pantalla
-                                                    screenHeight:
-                                                        screenHeight, // Altura de pantalla
+                                                    screenHeight: screenHeight,
+                                                    isRampa:
+                                                    true, // Indica que es Rampa, se usarán decimales
                                                   ),
+
                                                 ],
                                               ),
                                             ),
@@ -7992,7 +7961,37 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     };
   }
 
-
+  Widget _buildClientCard(Map<String, dynamic> client, double screenWidth) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.008),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            client['name'].toString().toUpperCase(),
+            style: TextStyle(
+              fontSize: 15.sp,
+              color: const Color(0xFF2be4f3),
+            ),
+          ),
+          Row(
+            children: [
+              Image.asset(
+                width: screenWidth * 0.05,
+                'assets/images/EKCAL.png',
+                fit: BoxFit.scaleDown,
+              ),
+              SizedBox(width: screenWidth * 0.01),
+              Text(
+                client['counter1']?.toString() ?? '0',
+                style: TextStyle(fontSize: 15.sp, color: Colors.white),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildMuscleRow({
     required int index,
@@ -8364,69 +8363,70 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     required double value, // El valor que se va a mostrar y modificar
     required String imagePathIncrement, // Ruta de la imagen para el botón "Más"
     required String
-        imagePathDecrement, // Ruta de la imagen para el botón "Menos"
-    required String
-        imagePathDisplay, // Ruta de la imagen para mostrar (como la imagen de CONTRACCION)
+    imagePathDecrement, // Ruta de la imagen para el botón "Menos"
+    required String imagePathDisplay, // Ruta de la imagen para mostrar
     required VoidCallback onIncrement, // Lógica de incremento
     required VoidCallback onDecrement, // Lógica de decremento
-    required String
-        suffix, // Sufijo para el valor (por ejemplo: "S" para contracción)
-    required double screenWidth, // El ancho de la pantalla
-    required double screenHeight, // El alto de la pantalla
+    required String suffix, // Sufijo para el valor
+    required double screenWidth, // Ancho de la pantalla
+    required double screenHeight, // Alto de la pantalla
+    bool isRampa = false, // Indica si es el valor Rampa
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Botón de "Más"
         GestureDetector(
-          onTap: onIncrement, // Ejecuta la función al hacer clic
+          onTap: onIncrement,
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.06,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.asset(
-                imagePathIncrement, // Imagen para el botón "Más"
+                imagePathIncrement,
                 fit: BoxFit.cover,
               ),
             ),
           ),
         ),
-        SizedBox(width: screenWidth * 0.01),
+        SizedBox(width: screenWidth * 0.005),
         // Texto con el valor y el sufijo
         Text(
-          "${value.toStringAsFixed(0)}$suffix",
-          // Valor formateado sin decimales
+          isRampa
+              ? "${value.toStringAsFixed(1)}$suffix" // Formato con un decimal si es Rampa
+              : "${value.toStringAsFixed(0)}$suffix", // Formato entero
           style: TextStyle(
             fontSize: 15.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        SizedBox(width: screenWidth * 0.01),
+        SizedBox(width: screenWidth * 0.005),
         // Botón de "Menos"
         GestureDetector(
-          onTap: onDecrement, // Ejecuta la función al hacer clic
+          onTap: onDecrement,
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.06,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.asset(
-                imagePathDecrement, // Imagen para el botón "Menos"
+                imagePathDecrement,
                 fit: BoxFit.cover,
               ),
             ),
           ),
         ),
         SizedBox(width: screenWidth * 0.001),
-        // Imagen que se muestra en el lado derecho (por ejemplo: "CONTRACCION.png")
+        // Imagen que se muestra en el lado derecho
         Image.asset(
-          imagePathDisplay, // Imagen personalizada
+          imagePathDisplay,
           width: screenWidth * 0.04,
           height: screenHeight * 0.04,
         ),
       ],
     );
   }
+
 }
 
 class BleConnectionService {

@@ -50,6 +50,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
   Map<String, TextEditingController> controllersJacket = {};
   Map<String, TextEditingController> controllersShape = {};
+  bool programaGuardado = false;
+
 
   @override
   void initState() {
@@ -159,7 +161,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     }
   }
 
-// Función para guardar el programa predeterminado desde el formulario
+  // Función para guardar el programa predeterminado desde el formulario
   Future<void> guardarProgramaPredeterminado() async {
     if (_nameController.text.isEmpty || selectedEquipOption == null) {
       // Verificación de '@' en el correo
@@ -203,18 +205,20 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
     // Insertar el programa en la base de datos
     int programaId =
-        await DatabaseHelper().insertarProgramaPredeterminado(programa);
+    await DatabaseHelper().insertarProgramaPredeterminado(programa);
 
     // Insertar las cronaxias y grupos musculares por defecto
     await DatabaseHelper()
         .insertarCronaxiasPorDefecto(programaId, equipamiento);
     await DatabaseHelper()
         .insertarGruposMuscularesPorDefecto(programaId, equipamiento);
-
+    setState(() {
+      programaGuardado = true; // 🔹 Ahora el usuario puede cambiar de pestañas
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          tr(context, "Programa individual creado correctamente").toUpperCase(),
+          tr(context, "Programa recovery creado correctamente").toUpperCase(),
           style: TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
         backgroundColor: Colors.green,
@@ -222,6 +226,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       ),
     );
   }
+
 
   Future<void> actualizarCronaxias(
       int programaId, String tipoEquipamiento) async {
@@ -252,16 +257,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         // Llamar a la función de actualización desde el DatabaseHelper
         await DatabaseHelper().updateCronaxia(programaId, grupo['id'], valor);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              tr(context, "Cronaxias añadidas correctamente").toUpperCase(),
-              style: TextStyle(color: Colors.white, fontSize: 17.sp),
-            ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
       }
     } else if (tipoEquipamiento == 'BIO-SHAPE') {
       for (var grupo in gruposBioShape) {
@@ -290,16 +285,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       }
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          "Cronaxias añadidas correctamente",
-          style: TextStyle(color: Colors.white, fontSize: 17),
-        ),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
 
   // Función para manejar la actualización de los grupos musculares
@@ -419,6 +404,78 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     });
   }
 
+  Future<void> _showAlert(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            // Aquí defines el ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.3,
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.height * 0.01,
+                vertical: MediaQuery.of(context).size.width * 0.01),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: MediaQuery.of(context).size.width * 0.001,
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  tr(context, '¡Alerta!').toUpperCase(),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                Text(
+                  tr(context, 'Debes completar el formulario para continuar')
+                      .toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side: BorderSide(
+                      width: MediaQuery.of(context).size.width * 0.001,
+                      color: const Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    tr(context, '¡Entendido!').toUpperCase(),
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -451,18 +508,23 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     );
   }
 
-  // Función modularizada para construir el TabBar
   Widget _buildTabBar() {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.5,
-      height: MediaQuery.of(context).size.height *
-          0.05, // Ajusta la altura si es necesario
+      height: MediaQuery.of(context).size.height * 0.05,
       child: TabBar(
         controller: _tabController,
         isScrollable: false,
         physics: const NeverScrollableScrollPhysics(),
         onTap: (index) {
-          setState(() {});
+          if (index != 0 && !programaGuardado) {
+            _showAlert(context); // Mostrar alerta
+            _tabController.index = 0; // 🔹 FORZAR PERMANECER EN CONFIGURACIÓN
+          } else {
+            setState(() {
+              _tabController.index = index;
+            });
+          }
         },
         tabs: [
           _buildTab(tr(context, 'Configuración').toUpperCase(), 0),
@@ -484,23 +546,31 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     );
   }
 
-  // Función modularizada para construir cada pestaña
+
+
   Widget _buildTab(String text, int index) {
-    return Tab(
-      child: SizedBox(
-        width: 150, // Ajusta el tamaño del ancho si lo necesitas
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            decoration: _tabController.index == index
-                ? TextDecoration.underline
-                : TextDecoration.none,
+    bool isDisabled = !programaGuardado && index != 0; // Bloquear si no está guardado y no es Configuración
+
+    return IgnorePointer(
+      ignoring: isDisabled, // 🔹 Bloquea la interacción si el programa no está guardado
+      child: Tab(
+        child: SizedBox(
+          width: 150,
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              decoration: _tabController.index == index
+                  ? TextDecoration.underline
+                  : TextDecoration.none,
+            ),
           ),
         ),
       ),
     );
   }
+
+
 
   Widget _buildConfigurationTab(double screenWidth, double screenHeight) {
     return Padding(
@@ -1171,7 +1241,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       // Crear una instancia de DatabaseHelper
                       DatabaseHelper dbHelper = DatabaseHelper();
 
-                      // Llamar al método de instancia para obtener el programa más reciente
                       Map<String, dynamic>? programa =
                           await dbHelper.getMostRecentPrograma();
 
