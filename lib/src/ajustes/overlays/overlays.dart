@@ -1964,7 +1964,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                     ),
                                     Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                          MainAxisAlignment.start,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: _buildLegend(),
@@ -1974,7 +1974,6 @@ class _OverlayVitaState extends State<OverlayVita>
                               ),
                             ),
                           ),
-
                           Expanded(
                             child: Align(
                               alignment: Alignment.center,
