@@ -565,20 +565,18 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                         }
                       }
 
-                      // Verificar si hay grupos seleccionados antes de intentar la inserción
+                      // Permitir guardar solo si hay al menos un grupo seleccionado
                       if (selectedGroupIds.isNotEmpty) {
-                        int clienteId =
-                            selectedClient!['id']; // Obtener el ID del cliente
+                        int clienteId = selectedClient!['id']; // Obtener el ID del cliente
                         await insertClientGroups(clienteId, selectedGroupIds);
                         widget.onClose();
                       } else {
-                        // Si no hay grupos seleccionados, mostrar un mensaje informativo
+                        // Mostrar mensaje y evitar el guardado si no hay grupos seleccionados
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
-                              "No se han seleccionado grupos musculares",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 17),
+                              "Debes seleccionar al menos un grupo muscular",
+                              style: TextStyle(color: Colors.white, fontSize: 17),
                             ),
                             backgroundColor: Colors.orange,
                             duration: Duration(seconds: 2),
@@ -586,6 +584,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                         );
                       }
                     },
+
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),

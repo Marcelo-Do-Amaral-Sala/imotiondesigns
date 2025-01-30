@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:imotion_designs/src/panel/overlays/overlay_panel.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../utils/translation_utils.dart';
@@ -1776,6 +1777,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   List<Map<String, dynamic>> allAutomaticPrograms = [];
   List<Map<String, dynamic>> allClients = [];
   List<String> respuestaTroceada = [];
+
   final List<bool> _isMusculoTrajeInactivo = [
     false, //PECHO
     false, //BICEPS
@@ -1842,7 +1844,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     [0, 25, 45, 70], // Glúteo
     [0, 15, 30, 50], // Isquiotibial
   ];
+  // **Definir las asignaciones de IDs según el equipamiento seleccionado**
+  final Map<int, int> muscleIdToIndexTraje = {
+    1: 0,  2: 5,  3: 6,  4: 8,  5: 9,
+    6: 7,  7: 2,  8: 3,  9: 1,  10: 4
+  };
 
+  final Map<int, int> muscleIdToIndexPantalon = {
+    4: 5,  5: 6,  6: 4,  7: 1,  8: 2,
+    9: 0,  10: 3  // Solo 7 elementos
+  };
   final List<int> porcentajesMusculoTraje = List.filled(10, 0);
   final List<int> porcentajesMusculoPantalon = List.filled(7, 0);
 
@@ -2102,37 +2113,77 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   void selectEquip(int index) {
     setState(() {
       selectedIndexEquip = index; // Actualizar índice local
+      updateMuscleLists();
     });
     widget.onSelectEquip(index); // Notificar cambio a PanelView
     print("🔄 Cambiado al equipo $index para clave: ${widget.selectedKey}");
+
   }
 
-  void onClientSelected(Map<String, dynamic>? client) {
-    setState(() {
-      if (client != null) {
-        // Verifica y elimina el cliente de asociaciones previas
-        selectedClients.removeWhere((c) => c['id'] == client['id']);
-        print(
-            "Cliente eliminado de cualquier asociación previa: ${client['name']}");
-
-        // Agrega el cliente al widget actual
-        selectedClients.add(client);
-        selectedClient = client;
-
-        print(
-            "Cliente asignado a ${widget.macAddress!}: ${client['name']}, Lista actualizada de clientes seleccionados: ${selectedClients.map((c) => c['name']).toList()}");
-      } else {
-        // Si el cliente es null, elimina la asociación actual
-        print(
-            "Cliente desasignado de ${widget.macAddress!}: ${selectedClient?['name']}");
+  void onClientSelected(Map<String, dynamic>? client) async {
+    if (client == null) {
+      setState(() {
+        print("Cliente desasignado de ${widget.macAddress!}: ${selectedClient?['name']}");
         selectedClients.remove(selectedClient);
         selectedClient = null;
-      }
+      });
+
+      widget.onClientSelected(client);
+      return;
+    }
+
+    setState(() {
+      selectedClients.removeWhere((c) => c['id'] == client['id']);
+      selectedClients.add(client);
+      selectedClient = client;
     });
 
-    // Notifica al widget padre sobre el cliente seleccionado
+    updateMuscleLists(); // Actualiza la lista de músculos basada en el cliente y equipo seleccionado
+
     widget.onClientSelected(client);
   }
+
+
+  void updateMuscleLists() {
+    if (selectedClient == null) return;
+
+    final clientId = selectedClient!['id'];
+    if (clientId == null) return;
+
+    openDatabase('my_database.db').then((db) async {
+      final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery('''
+      SELECT g.id
+      FROM grupos_musculares g
+      INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
+      WHERE cg.cliente_id = ?
+    ''', [clientId]);
+
+      final Map<int, int> selectedMuscleIdToIndex = selectedIndexEquip == 0
+          ? muscleIdToIndexTraje
+          : muscleIdToIndexPantalon;
+
+      final Set<int> muscleIndexes = clientGroupsResult
+          .map((group) => selectedMuscleIdToIndex[group['id'] as int])
+          .where((index) => index != null)
+          .cast<int>()
+          .toSet();
+
+      setState(() {
+        if (selectedIndexEquip == 0) {
+          for (int i = 0; i < _isMusculoTrajeInactivo.length; i++) {
+            _isMusculoTrajeInactivo[i] = !muscleIndexes.contains(i);
+          }
+        } else if (selectedIndexEquip == 1) {
+          for (int i = 0; i < _isMusculoPantalonInactivo.length; i++) {
+            _isMusculoPantalonInactivo[i] = !muscleIndexes.contains(i);
+          }
+        }
+      });
+    });
+  }
+
+
+
 
   void _clearGlobals() async {
     if (mounted) {
@@ -3158,11 +3209,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                     ),
                     OutlinedButton(
                       onPressed: () async {
+                        Navigator.of(context).pop();
                         _clearGlobals();
                         await bleConnectionService
                             ._stopElectrostimulationSession(widget.macAddress!);
-
-                        Navigator.of(context).pop();
                       },
                       style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.red),
@@ -3392,6 +3442,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       child: GestureDetector(
                                         onTap: () {
                                           selectEquip(0);
+
                                         },
                                         child: Opacity(
                                           opacity: widget.selectedKey == null
