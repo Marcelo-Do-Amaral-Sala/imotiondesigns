@@ -3290,8 +3290,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        Navigator.of(context).pop();
                         playBeep();
+                        Navigator.of(context).pop();
                         _clearGlobals();
                         await bleConnectionService
                             ._stopElectrostimulationSession(widget.macAddress!);
