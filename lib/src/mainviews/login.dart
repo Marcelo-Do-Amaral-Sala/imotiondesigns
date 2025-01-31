@@ -50,8 +50,6 @@ class _LoginViewState extends State<LoginView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _initializeDatabase();
-    _initializeDatabaseTraducciones();
     _requestLocationPermissions();
     _fetchAdmins();
     _checkUserProfile();
@@ -65,51 +63,8 @@ class _LoginViewState extends State<LoginView> {
   }
 
 
-  Future<void> _initializeDatabase() async {
-    try {
-      if (kIsWeb) {
-        debugPrint("Inicializando base de datos para Web...");
-        databaseFactory = databaseFactoryFfi;
-        await DatabaseHelperWeb().initializeDatabase();
-      } else if (Platform.isAndroid || Platform.isIOS) {
-        debugPrint("Inicializando base de datos para Móviles...");
-        await DatabaseHelper().initializeDatabase();
-      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-        debugPrint("Inicializando base de datos para Desktop...");
-        databaseFactory = databaseFactoryFfi;
-        await DatabaseHelperPC().initializeDatabase();
-      } else {
-        throw UnsupportedError(
-            'Plataforma no soportada para la base de datos.');
-      }
-      debugPrint("Base de datos inicializada correctamente.");
-    } catch (e) {
-      debugPrint("Error al inicializar la base de datos: $e");
-    }
-  }
 
-  Future<void> _initializeDatabaseTraducciones() async {
-    try {
-      if (kIsWeb) {
-        debugPrint("Inicializando base de datos para Web...");
-        databaseFactory = databaseFactoryFfi;
-        await DatabaseHelperTraduccionesWeb().initializeDatabase();
-      } else if (Platform.isAndroid || Platform.isIOS) {
-        debugPrint("Inicializando base de datos para Móviles...");
-        await DatabaseHelperTraducciones().initializeDatabase();
-      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-        debugPrint("Inicializando base de datos para Desktop...");
-        databaseFactory = databaseFactoryFfi;
-        await DatabaseHelperTraduccionesPc().initializeDatabase();
-      } else {
-        throw UnsupportedError(
-            'Plataforma no soportada para la base de datos.');
-      }
-      debugPrint("Base de datos inicializada correctamente.");
-    } catch (e) {
-      debugPrint("Error al inicializar la base de datos: $e");
-    }
-  }
+
 
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {

@@ -17,17 +17,21 @@ class App extends StatefulWidget {
   final double screenWidth;
   final double screenHeight;
 
-  App({Key? key, required this.screenWidth, required this.screenHeight})
-      : super(key: key);
+  App({Key? key, required this.screenWidth, required this.screenHeight}) : super(key: key);
 
   @override
   _AppState createState() => _AppState();
 }
 
-class _AppState extends State<App> with WidgetsBindingObserver {
-  String currentView = 'splash';
-  Key? panelViewKey = UniqueKey(); // Clave única solo para PanelView
+class _AppState extends State<App> {
+  int _selectedIndex = 0; // 🔹 Controla la vista activa
   Map<String, dynamic>? selectedMciData;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
 
   void selectMCI(Map<String, dynamic> mciData) {
     setState(() {
@@ -35,143 +39,114 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     });
   }
 
-  void navigateTo(String view) {
+  void changePage(int index) {
     setState(() {
-      currentView = view;
-      if (view == 'panel') {
-        panelViewKey = UniqueKey(); // Generar una nueva clave si es PanelView
-      }
+      _selectedIndex = index;
     });
   }
 
+  /// 🔹 Función para abrir `PanelView` como pantalla independiente
+  void openPanelView() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PanelView(
+          onBack: () => Navigator.pop(context), // 🔹 Vuelve al menú principal
+          onReset: () => openPanelView(), // 🔹 Reinicia el panel desde cero
+          screenWidth: widget.screenWidth,
+          screenHeight: widget.screenHeight,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget viewToDisplay;
-    // Usamos LayoutBuilder para obtener las restricciones de tamaño de la pantalla
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Obtiene el tamaño disponible de la pantalla
-        double screenWidth = constraints.maxWidth;
-        double screenHeight = constraints.maxHeight;
-
-        // Aquí ajustamos la vista según el tamaño disponible
-        switch (currentView) {
-          case 'panel':
-            viewToDisplay = PanelView(
-              key: panelViewKey,
-              // Usar la clave única para PanelView
-              onBack: () => navigateTo('mainMenu'),
-              onReset: () => navigateTo('panel'),
-              // Manejo de reinicio solo para Panel
-              screenWidth: screenWidth,
-              // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'json':
-            viewToDisplay = UploadJsonView();
-            break;
-          case 'clients':
-            viewToDisplay = ClientsView(
-              onBack: () => navigateTo('mainMenu'),
-              screenWidth: screenWidth,
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'programs':
-            viewToDisplay = ProgramsMenuView(
-              onBack: () => navigateTo('mainMenu'),
-              screenWidth: screenWidth, // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'tutoriales':
-            viewToDisplay = TutorialesMenuView(
-              onBack: () => navigateTo('mainMenu'),
-              screenWidth: screenWidth, // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'ajustes':
-            viewToDisplay = AjustesMenuView(
-              onBack: () => navigateTo('mainMenu'),
-              onNavigatetoLicencia: () => navigateTo('licencia'),
-              onNavigatetoGestion: () => navigateTo('gestion'),
-              screenWidth: screenWidth,
-              // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'gestion':
-            viewToDisplay = GestionMenuView(
-              onBack: () => navigateTo('ajustes'),
-              screenWidth: screenWidth, // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'licencia':
-            viewToDisplay = LicenciaFormView(
-              onBack: () => navigateTo('ajustes'),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        textTheme: GoogleFonts.oswaldTextTheme(),
+      ),
+      home: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            // 🔹 0 - Splash Screen (se muestra primero)
+            SplashView(
+              onNavigateToMainMenu: () => changePage(1),
+              onNavigateToLogin: () => changePage(9),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 1 - Menú Principal
+            MainMenuView(
+              onNavigateToLogin: () => changePage(9),
+              onNavigateToPanel: openPanelView, // 🔹 Abre `PanelView` con `Navigator`
+              onNavigateToClients: () => changePage(2),
+              onNavigateToPrograms: () => changePage(3),
+              onNavigateToAjustes: () => changePage(4),
+              onNavigateToTutoriales: () => changePage(5),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 2 - Clientes
+            ClientsView(
+              onBack: () => changePage(1),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 3 - Programas
+            ProgramsMenuView(
+              onBack: () => changePage(1),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 4 - Ajustes
+            AjustesMenuView(
+              onBack: () => changePage(1),
+              onNavigatetoLicencia: () => changePage(6),
+              onNavigatetoGestion: () => changePage(7),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 5 - Tutoriales
+            TutorialesMenuView(
+              onBack: () => changePage(1),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 6 - Licencia
+            LicenciaFormView(
+              onBack: () => changePage(4),
               onMciTap: (mciData) {
                 selectMCI(mciData);
               },
-              screenWidth: screenWidth, // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'mainMenu':
-            viewToDisplay = MainMenuView(
-              onNavigateToLogin: () => navigateTo('login'),
-              onNavigateToPanel: () => navigateTo('panel'),
-              onNavigateToClients: () => navigateTo('clients'),
-              onNavigateToPrograms: () => navigateTo('programs'),
-              onNavigateToAjustes: () => navigateTo('ajustes'),
-              onNavigateToTutoriales: () => navigateTo('tutoriales'),
-              screenWidth: screenWidth,
-              // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'changePwd':
-            viewToDisplay = ChangePwdView(
-              onNavigateToMainMenu: () => navigateTo('mainMenu'),
-              screenWidth: screenWidth,
-              // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'splash':
-            viewToDisplay = SplashView(
-              onNavigateToMainMenu: () => navigateTo('mainMenu'),
-              onNavigateToLogin: () => navigateTo('login'),
-              screenWidth: screenWidth,
-              // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-          case 'login':
-          default:
-            viewToDisplay = LoginView(
-              onNavigateToMainMenu: () => navigateTo('mainMenu'),
-              onNavigateToChangePwd: () => navigateTo('changePwd'),
-              screenWidth: screenWidth, // Pasa el tamaño disponible
-              screenHeight: screenHeight,
-            );
-            break;
-        }
-
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            textTheme: GoogleFonts.oswaldTextTheme(),
-          ),
-          home: Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: viewToDisplay,
-          ),
-        );
-      },
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 7 - Gestión
+            GestionMenuView(
+              onBack: () => changePage(4),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 8 - Cambio de Contraseña
+            ChangePwdView(
+              onNavigateToMainMenu: () => changePage(1),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+            // 🔹 9 - Login
+            LoginView(
+              onNavigateToMainMenu: () => changePage(1),
+              onNavigateToChangePwd: () => changePage(8),
+              screenWidth: widget.screenWidth,
+              screenHeight: widget.screenHeight,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

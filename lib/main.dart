@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -9,6 +12,8 @@ import 'package:imotion_designs/src/servicios/provider.dart';
 import 'package:imotion_designs/src/servicios/sync.dart';
 import 'package:imotion_designs/src/servicios/translation_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'firebase_options.dart';
 
@@ -19,7 +24,11 @@ void main() async {
   );
   await dotenv.load(fileName: ".env");
   WakelockPlus.enable();
-
+  // 🔹 Configurar `sqflite_common_ffi` SOLO si está corriendo en escritorio
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   // Establece la orientación horizontal obligatoria
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);

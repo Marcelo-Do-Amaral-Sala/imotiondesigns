@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/translation_utils.dart';
 import '../bio/overlay_bio.dart';
 import '../db/db_helper.dart';
+import '../panel/views/panel_view.dart';
 
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToLogin;
@@ -327,11 +328,47 @@ class _MainMenuViewState extends State<MainMenuView>
                                 'assets/images/panel.png',
                                 tr(context, 'Panel de control').toUpperCase(),
                                 scaleFactorPanel,
-                                () {
-                                  scaleFactorPanel = 1;
-                                  widget.onNavigateToPanel();
+                                    () async {
+                                  setState(() => scaleFactorPanel = 1); // 🔹 Restaurar tamaño antes de navegar
+
+                                  // 🔹 Esperar 200ms antes de navegar para asegurarnos de que el botón recupere su tamaño
+                                  await Future.delayed(Duration(milliseconds: 200));
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PanelView(
+                                        onBack: () => Navigator.pop(context), // 🔹 Volver al menú principal
+                                        onReset: () => Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => PanelView(
+                                              onBack: () => Navigator.pop(context),
+                                              onReset: () => Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => PanelView(
+                                                    onBack: () => Navigator.pop(context),
+                                                    onReset: () {}, // 🔹 Evita bucle infinito en navegación
+                                                    screenWidth: MediaQuery.of(context).size.width,
+                                                    screenHeight: MediaQuery.of(context).size.height,
+                                                  ),
+                                                ),
+                                              ),
+                                              screenWidth: MediaQuery.of(context).size.width,
+                                              screenHeight: MediaQuery.of(context).size.height,
+                                            ),
+                                          ),
+                                        ),
+                                        screenWidth: MediaQuery.of(context).size.width,
+                                        screenHeight: MediaQuery.of(context).size.height,
+                                      ),
+                                    ),
+                                  ).then((_) {
+                                    setState(() => scaleFactorPanel = 1); // 🔹 Restaurar tamaño al volver
+                                  });
                                 },
-                                () => setState(() => scaleFactorPanel = 0.90),
+                                    () => setState(() => scaleFactorPanel = 0.90),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(

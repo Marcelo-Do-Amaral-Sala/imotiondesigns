@@ -81,11 +81,11 @@ class _PanelViewState extends State<PanelView>
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 2000), () {
+  /*  Future.delayed(const Duration(milliseconds: 2000), () {
       setState(() {
         showBlackScreen = false;
       });
-    });
+    });*/
     initializeAndConnectBLE();
     _subscription = bleConnectionService.deviceUpdates.listen((update) {
       final macAddress = update['macAddress'];
@@ -896,7 +896,7 @@ class _PanelViewState extends State<PanelView>
               ],
             ),
           ),
-          if (showBlackScreen)
+ /*         if (showBlackScreen)
             Container(
               color: Colors.black,
               child: Center(
@@ -908,7 +908,7 @@ class _PanelViewState extends State<PanelView>
                       fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
+            ),*/
         ],
       ),
     );

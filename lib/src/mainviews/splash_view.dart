@@ -1,5 +1,17 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../db/db_helper.dart';
+import '../db/db_helper_pc.dart';
+import '../db/db_helper_traducciones.dart';
+import '../db/db_helper_traducciones_pc.dart';
+import '../db/db_helper_traducciones_web.dart';
+import '../db/db_helper_web.dart';
 
 class SplashView extends StatefulWidget {
   final Function() onNavigateToMainMenu;
@@ -25,7 +37,56 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
+    _initializeDatabaseTraducciones();
+    _initializeDatabase();
     _startSplashSequence();
+  }
+
+  Future<void> _initializeDatabaseTraducciones() async {
+    try {
+      if (kIsWeb) {
+        debugPrint("Inicializando base de datos para Web...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperTraduccionesWeb().initializeDatabase();
+      } else if (Platform.isAndroid || Platform.isIOS) {
+        debugPrint("Inicializando base de datos para Móviles...");
+        await DatabaseHelperTraducciones().initializeDatabase();
+      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        debugPrint("Inicializando base de datos para Desktop...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperTraduccionesPc().initializeDatabase();
+      } else {
+        throw UnsupportedError(
+            'Plataforma no soportada para la base de datos.');
+      }
+      debugPrint("Base de datos inicializada correctamente.");
+    } catch (e) {
+      debugPrint("Error al inicializar la base de datos: $e");
+    }
+  }
+
+
+  Future<void> _initializeDatabase() async {
+    try {
+      if (kIsWeb) {
+        debugPrint("Inicializando base de datos para Web...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperWeb().initializeDatabase();
+      } else if (Platform.isAndroid || Platform.isIOS) {
+        debugPrint("Inicializando base de datos para Móviles...");
+        await DatabaseHelper().initializeDatabase();
+      } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        debugPrint("Inicializando base de datos para Desktop...");
+        databaseFactory = databaseFactoryFfi;
+        await DatabaseHelperPC().initializeDatabase();
+      } else {
+        throw UnsupportedError(
+            'Plataforma no soportada para la base de datos.');
+      }
+      debugPrint("Base de datos inicializada correctamente.");
+    } catch (e) {
+      debugPrint("Error al inicializar la base de datos: $e");
+    }
   }
 
   Future<void> _startSplashSequence() async {
