@@ -1447,7 +1447,7 @@ class _PanelViewState extends State<PanelView>
         return Dialog(
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.33,
             padding: EdgeInsets.symmetric(
                 vertical: MediaQuery.of(context).size.height * 0.02,
                 horizontal: MediaQuery.of(context).size.width * 0.01),
@@ -3353,6 +3353,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       selectedCycle = cycle; // Aquí actualizas el valor seleccionado
       if (selectedCycle == "${tr(context, 'Ciclo')} D") {
         selectedRecoProgram = allRecoveryPrograms[3]; // 🔥 Direct assignment
+      }
+      if (selectedCycle == '') {
+        selectedCycle = null; // 🔥 Direct assignment
       }
       updateContractionAndPauseValues();
     });
@@ -7987,6 +7990,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         return OverlayCiclos(
           onClose: () => toggleOverlay(6),
           onCycleSelected: onCycleSelected,
+          selectedCycle: selectedCycle ?? '',
         );
       default:
         return Container(); // Si no coincide con ninguno de los índices, no muestra nada

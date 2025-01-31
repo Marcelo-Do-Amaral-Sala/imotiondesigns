@@ -2,14 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
-import 'package:http/http.dart' as http;
-
 import '../../servicios/provider.dart';
 
 class OverlayTipoPrograma extends StatefulWidget {
@@ -1713,11 +1712,13 @@ class _OverlayResumenSesionState extends State<OverlayResumenSesion>
 class OverlayCiclos extends StatefulWidget {
   final VoidCallback onClose;
   final Function(String) onCycleSelected;
+  final String selectedCycle;
 
   const OverlayCiclos({
     super.key,
     required this.onClose,
     required this.onCycleSelected,
+    required this.selectedCycle,
   });
 
   @override
@@ -1725,14 +1726,14 @@ class OverlayCiclos extends StatefulWidget {
 }
 
 class _OverlayCiclosState extends State<OverlayCiclos> {
-  String? selectedCycle;
+  String selectedCycle = '';
   final List<String> cycleNames = ["0", "A", "B", "C", "D"];
 
   @override
-  void dispose() {
-    super.dispose();
+  void initState() {
+    super.initState();
+    selectedCycle = widget.selectedCycle; // 🔹 Cargar ciclo guardado
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -1768,19 +1769,24 @@ class _OverlayCiclosState extends State<OverlayCiclos> {
                 itemBuilder: (context, index) {
                   String cycleName = "${tr(context, 'Ciclo')} ${cycleNames[index]}";
 
-
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedCycle = cycleName;
+                        // 🔥 Si el usuario vuelve a presionar, se deselecciona
+                        selectedCycle =
+                            (selectedCycle == cycleName) ? '' : cycleName;
                       });
+                      widget.onCycleSelected(
+                          selectedCycle); // 🔹 Pasar ciclo al padre (puede ser vacío)
+                      widget.onClose();
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       decoration: BoxDecoration(
                         color: selectedCycle == cycleName
-                            ? const Color(0xFF2be4f3)
+                            ? const Color(0xFF2be4f3) // Seleccionado
                             : const Color.fromARGB(255, 46, 46, 46),
+                        // No seleccionado
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: Colors.white,
@@ -1793,45 +1799,6 @@ class _OverlayCiclosState extends State<OverlayCiclos> {
                 },
               ),
             ),
-            Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.0001,
-                    vertical: screenHeight * 0.0001,
-                  ),
-                  child: OutlinedButton(
-                    onPressed: () {
-                      if (selectedCycle != null) {
-                        widget.onCycleSelected(selectedCycle!);
-                      }
-                      widget.onClose();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.01,
-                        vertical: screenHeight * 0.01,
-                      ),
-                      side: BorderSide(
-                        width: screenWidth * 0.001,
-                        color: const Color(0xFF2be4f3),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7),
-                      ),
-                      backgroundColor: const Color(0xFF2be4f3),
-                    ),
-                    child: Text(
-                      tr(context, "Seleccionar").toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )),
           ],
         ),
       ),
