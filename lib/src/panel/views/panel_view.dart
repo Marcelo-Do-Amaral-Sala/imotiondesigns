@@ -1906,6 +1906,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     31: 'assets/images/1.png',
   };
 
+  // Lista de imágenes alternantes
+  List<String> rayo = [
+    'assets/images/rayoaz.png',
+    'assets/images/rayoverd.png',
+  ];
+  List<String> controlImages = [
+    'assets/images/play.png',
+    'assets/images/pause.png',
+  ];
+
   Color selectedColor = const Color(0xFF2be4f3);
   Color unselectedColor = const Color(0xFF494949);
   ValueNotifier<String> imagePauseNotifier = ValueNotifier<String>('assets/images/PAUSA.png');
@@ -2042,10 +2052,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Future<void> _preloadImages() async {
-    // Itera sobre las claves del mapa (1 a 31)
+    // Itera sobre las claves del mapa y precarga las imágenes principales
     for (int key in imagePaths.keys) {
       String path = imagePaths[key]!; // Obtiene la ruta de la imagen
       await precacheImage(AssetImage(path), context); // Pre-carga la imagen
+    }
+
+    for (String imgPath in rayo) {
+      await precacheImage(AssetImage(imgPath), context);
+    }
+    for (String imgPath in controlImages) {
+      await precacheImage(AssetImage(imgPath), context);
     }
 
     // Cambia el estado una vez que todas las imágenes estén precargadas
@@ -3274,6 +3291,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                     OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
+                        playBeep();
                         _clearGlobals();
                         await bleConnectionService
                             ._stopElectrostimulationSession(widget.macAddress!);
@@ -3333,6 +3351,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   void onCycleSelected(String cycle) {
     setState(() {
       selectedCycle = cycle; // Aquí actualizas el valor seleccionado
+      if (selectedCycle == "${tr(context, 'Ciclo')} D") {
+        selectedRecoProgram = allRecoveryPrograms[3]; // 🔥 Direct assignment
+      }
+      updateContractionAndPauseValues();
     });
     print("Ciclo seleccionado: $selectedCycle");
   }
@@ -3786,41 +3808,35 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       )
                                     else if (selectedProgram ==
                                         tr(context, 'Recovery').toUpperCase())
-                                      Column(
-                                        children: [
-                                          Text(
-                                            selectedRecoProgram?['nombre']
-                                                    ?.toUpperCase() ??
-                                                tr(context, 'Nombre programa')
-                                                    .toUpperCase(),
-                                            style: TextStyle(
-                                              color: const Color(0xFF2be4f3),
-                                              fontSize: 15.sp,
+                                        Column(
+                                          children: [
+                                            Text(
+                                              (selectedRecoProgram?['nombre'])?.toUpperCase() ??
+                                                  tr(context, 'Nombre programa').toUpperCase(),
+                                              style: TextStyle(
+                                                color: const Color(0xFF2be4f3),
+                                                fontSize: 15.sp,
+                                              ),
                                             ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: widget.selectedKey == null ||
-                                                    isRunning
-                                                ? null
-                                                : () {
-                                                    setState(() {
-                                                      _cancelVideoController();
-                                                      toggleOverlay(3);
-                                                    });
-                                                  },
-                                            child: Image.asset(
-                                              selectedRecoProgram?['imagen'] ??
-                                                  'assets/images/programacreado.png',
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.1,
-                                              fit: BoxFit.contain,
+                                            GestureDetector(
+                                              onTap: (widget.selectedKey == null || isRunning || selectedCycle == "${tr(context, 'Ciclo')} D")
+                                                  ? null  // 🔥 Disabled when it's "Ciclo D"
+                                                  : () {
+                                                setState(() {
+                                                  _cancelVideoController();
+                                                  toggleOverlay(3);
+                                                });
+                                              },
+                                              child: Image.asset(
+                                                selectedRecoProgram?['imagen'] ?? 'assets/images/programacreado.png',
+                                                height: MediaQuery.of(context).size.height * 0.1,
+                                                fit: BoxFit.contain,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      )
-                                    else if (selectedProgram ==
+                                          ],
+                                        )
+
+                                      else if (selectedProgram ==
                                         tr(context, 'Automáticos')
                                             .toUpperCase())
                                       Column(
@@ -4172,7 +4188,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     setState(() => scaleFactorRayo = 1.0),
                                 onTap: () {
                                   setState(() {
-                                    printElectrostimulationValues(widget.macAddress!, porcentajesMusculoTraje, selectedProgram);
+                                    printElectrostimulationValues(
+                                        widget.macAddress!,
+                                        porcentajesMusculoTraje,
+                                        selectedProgram);
                                     _isImageOne =
                                         !_isImageOne; // Alterna entre las dos imágenes
                                   });
@@ -4188,10 +4207,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       child: SizedBox(
                                         child: Image.asset(
                                           height: screenHeight * 0.1,
-                                          _isImageOne
-                                              ? 'assets/images/rayoaz.png' // Primera imagen
-                                              : 'assets/images/rayoverd.png',
-                                          // Segunda imagen
+                                          _isImageOne ? rayo[0] : rayo[1],
+                                          // Alterna entre las imágenes precargadas
                                           fit: BoxFit.contain,
                                         ),
                                       ),
@@ -5835,7 +5852,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     child: Image.asset(
                                                       height:
                                                           screenHeight * 0.15,
-                                                      'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
+                                                      isRunning
+                                                          ? controlImages[1]
+                                                          : controlImages[0],
+                                                      // Alterna entre Play y Pause
                                                       fit: BoxFit.scaleDown,
                                                     ),
                                                   ),
@@ -7380,8 +7400,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   child: ClipOval(
                                                     child: Image.asset(
                                                       height:
-                                                          screenHeight * 0.15,
-                                                      'assets/images/${isRunning ? 'pause.png' : 'play.png'}',
+                                                      screenHeight * 0.15,
+                                                      isRunning
+                                                          ? controlImages[1]
+                                                          : controlImages[0],
+                                                      // Alterna entre Play y Pause
                                                       fit: BoxFit.scaleDown,
                                                     ),
                                                   ),
@@ -7389,7 +7412,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               ),
                                               SizedBox(
                                                   width: screenWidth * 0.01),
-
                                               // Botón "Más"
                                               CustomIconButton(
                                                 onTap: widget.selectedKey ==

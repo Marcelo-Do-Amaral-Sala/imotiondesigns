@@ -1766,7 +1766,8 @@ class _OverlayCiclosState extends State<OverlayCiclos> {
                 ),
                 itemCount: cycleNames.length,
                 itemBuilder: (context, index) {
-                  String cycleName = "Ciclo ${cycleNames[index]}";
+                  String cycleName = "${tr(context, 'Ciclo')} ${cycleNames[index]}";
+
 
                   return GestureDetector(
                     onTap: () {
