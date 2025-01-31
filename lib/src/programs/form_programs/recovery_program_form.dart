@@ -1236,10 +1236,9 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
               ],
             ),
           ),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           SizedBox(
             child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.001),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

@@ -972,274 +972,273 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   // Campos específicos para BIO-JACKET
                   Expanded(
                       child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.03,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Primera columna de TextFields
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los primeros grupos musculares
-                              for (int i = 0; i < 3; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.03,
                         ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los siguientes grupos musculares
-                              for (int i = 3; i < 6; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Primera columna de TextFields
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los primeros grupos musculares
+                                  for (int i = 0; i < 3; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los últimos grupos musculares
-                              for (int i = 6; i < 9; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los siguientes grupos musculares
+                                  for (int i = 3; i < 6; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              for (int i = 9;
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los últimos grupos musculares
+                                  for (int i = 6; i < 9; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
+                                            gruposBioJacket[i]['nombre']],
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  for (int i = 9;
                                   i < 10;
                                   i++) // Aquí ajustamos el rango de grupos
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersJacket[
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersJacket[
                                             gruposBioJacket[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
+                      )),
                 ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
                   // Campos específicos para BIO-SHAPE
                   Expanded(
                       child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.03,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Primera columna de TextFields
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los primeros grupos musculares
-                              for (int i = 0; i < 3; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
-                                            gruposBioShape[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.03,
                         ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los siguientes grupos musculares
-                              for (int i = 3; i < 6; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Primera columna de TextFields
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los primeros grupos musculares
+                                  for (int i = 0; i < 3; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.05),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Itera sobre los últimos grupos musculares
-                              for (int i = 6; i < 7; i++)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                      style: _labelStyle,
-                                    ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: controllersShape[
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los siguientes grupos musculares
+                                  for (int i = 3; i < 6; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
                                             gruposBioShape[i]['nombre']],
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(decimal: true),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'^\d*\.?\d*$')),
-                                        ],
-                                        style: _inputTextStyle,
-                                      ),
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
-                          ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.05),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Itera sobre los últimos grupos musculares
+                                  for (int i = 6; i < 7; i++)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                          style: _labelStyle,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          decoration: _inputDecoration(),
+                                          child: TextField(
+                                            controller: controllersShape[
+                                            gruposBioShape[i]['nombre']],
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(decimal: true),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'^\d*\.?\d*$')),
+                                            ],
+                                            style: _inputTextStyle,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
+                      )),
                 ],
               ],
             ),
           ),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           SizedBox(
             child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.001),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -1251,7 +1250,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       DatabaseHelper dbHelper = DatabaseHelper();
 
                       Map<String, dynamic>? programa =
-                          await dbHelper.getMostRecentPrograma();
+                      await dbHelper.getMostRecentPrograma();
 
                       if (programa != null) {
                         int programaId = programa['id_programa'];
@@ -1866,7 +1865,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           SizedBox(
             child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.001),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
