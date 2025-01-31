@@ -467,11 +467,12 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
     AppStateIdioma.instance.currentLanguage = language;
     AppStateIdioma.instance.saveLanguage(language);
 
-    final provider = Provider.of<TranslationProvider>(context, listen: false);
-    provider.changeLanguage(language); // Cambiar el idioma usando el provider
-
-    // Recargar las traducciones inmediatamente
-    _fetchLocalTranslations(language);
+    final provider = context.read<TranslationProvider>(); // 🔹 Obtener Provider correctamente
+    provider.changeLanguage(language).then((_) { // 🔹 Esperamos a que se actualicen las traducciones
+      if (mounted) {
+        setState(() {}); // 🔹 Forzamos la actualización de la UI inmediatamente
+      }
+    });
   }
 
   @override
@@ -535,9 +536,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                 child: OutlinedButton(
                   onPressed: () {
                     if (_selectedLanguage != null) {
-                      _changeAppLanguage(
-                          _selectedLanguage!); // Cambia el idioma seleccionado
-                      setState(() {});
+                      _changeAppLanguage(_selectedLanguage!); // 🔹 Cambia el idioma y actualiza la UI inmediatamente
                     }
                     widget.onClose();
                   },
@@ -563,6 +562,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                     textAlign: TextAlign.center,
                   ),
                 ),
+
               ),
             ),
           ],
@@ -588,6 +588,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
           onTap: () {
             setState(() {
               _selectedLanguage = _languageMap[language];
+              _changeAppLanguage(_selectedLanguage!);
             });
           },
         ),

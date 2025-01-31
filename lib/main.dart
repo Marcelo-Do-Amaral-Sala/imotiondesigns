@@ -28,27 +28,28 @@ void main() async {
 
   final SyncService syncService = SyncService();
 
-  // Sincronización inicial de Firebase a SQLite
+  // 🔹 Sincronización inicial de Firebase a SQLite antes de iniciar la app
   try {
     await syncService.syncFirebaseToSQLite();
   } catch (e) {
     print("Error durante la sincronización: $e");
   }
 
-  // Cargar el idioma guardado al inicio
+  // 🔹 Cargar el idioma guardado ANTES de ejecutar la app
   await AppStateIdioma.instance.loadLanguage();
+  final String savedLanguage = AppStateIdioma.instance.currentLanguage;
 
-  // Verificación: imprimir el idioma cargado
-  print(
-      'Idioma cargado en main.dart: ${AppStateIdioma.instance.currentLanguage}');
+  // 🔹 Esperamos a que TranslationProvider cargue el idioma antes de `runApp`
+  final TranslationProvider translationProvider = TranslationProvider();
+  await translationProvider.changeLanguage(savedLanguage);
+
+  print('Idioma cargado en main.dart: $savedLanguage');
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => TranslationProvider()
-            ..changeLanguage(AppStateIdioma
-                .instance.currentLanguage), // Cargar el idioma guardado
+          create: (_) => translationProvider, // 🔹 Ya tiene el idioma cargado
         ),
         ChangeNotifierProvider(
           create: (_) => ClientsProvider(),
@@ -56,15 +57,12 @@ void main() async {
       ],
       child: ScreenUtilInit(
         designSize: const Size(1200, 1920),
-        // Tamaño base de la tablet Galaxy A8
         builder: (context, child) {
           return LayoutBuilder(
             builder: (context, constraints) {
-              // Aquí obtienes las restricciones máximas de ancho y alto de la pantalla
               double screenWidth = constraints.maxWidth;
               double screenHeight = constraints.maxHeight;
 
-              // Ajusta el diseño de acuerdo al tamaño disponible
               return App(
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
@@ -76,3 +74,4 @@ void main() async {
     ),
   );
 }
+
