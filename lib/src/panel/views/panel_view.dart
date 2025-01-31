@@ -1781,6 +1781,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valueContraction = 1.0;
   double valueRampa = 1.0;
   double valuePause = 1.0;
+  double valueFrecuency = 50.0;
+  double valuePulse = 50.0;
   double contractionDuration = 0.0;
   Map<String, bool> procesosActivos = {};
   Map<int, double> subprogramElapsedTime =
@@ -3838,7 +3840,76 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             ),
                                           ],
                                         )
+                                      else if (selectedProgram ==
+                                            tr(context, 'Libre').toUpperCase())
+                                          Column(
+                                            children: [
+                                              buildControlRow2(
+                                                value: valueFrecuency,
+                                                // Valor de la contracción
+                                                imagePathIncrement:
+                                                'assets/images/mas.png',
+                                                // Imagen del botón de "Más"
+                                                imagePathDecrement:
+                                                'assets/images/menos.png',
+                                                // Imagen del botón de "Menos"
+                                                imagePathDisplay:
+                                                'assets/images/CONTRACCION.png',
+                                                // Imagen que se muestra (Contracción)
+                                                onIncrement: () {
+                                                  setState(() {
+                                                    valueFrecuency +=
+                                                    1.0; // Lógica de incremento
+                                                  });
+                                                },
+                                                onDecrement: () {
+                                                  setState(() {
+                                                    if (valueFrecuency >
+                                                        0) {
+                                                      valueFrecuency -=
+                                                      1.0; // Lógica de decremento
+                                                    }
+                                                  });
+                                                },
+                                                suffix: " Hz",
+                                                // Sufijo para mostrar en el texto
+                                                screenWidth: screenWidth,
+                                                // Ancho de pantalla
+                                                screenHeight:
+                                                screenHeight, // Altura de pantalla
+                                              ),
+                                              SizedBox(
+                                                  height:
+                                                  screenHeight * 0.02),
+                                              buildControlRow2(
+                                                value: valuePulse,
+                                                imagePathIncrement:
+                                                'assets/images/mas.png',
+                                                imagePathDecrement:
+                                                'assets/images/menos.png',
+                                                imagePathDisplay:
+                                                'assets/images/RAMPA.png',
+                                                onIncrement: () {
+                                                  setState(() {
+                                                    valuePulse +=
+                                                    1.0; // Incremento en decimales
+                                                  });
+                                                },
+                                                onDecrement: () {
+                                                  setState(() {
+                                                    if (valuePulse > 0) {
+                                                      valuePulse -=
+                                                      1.0; // Decremento en decimales
+                                                    }
+                                                  });
+                                                },
+                                                suffix: " ms",
+                                                screenWidth: screenWidth,
+                                                screenHeight: screenHeight,
+                                              ),
 
+                                            ],
+                                          )
                                       else if (selectedProgram ==
                                         tr(context, 'Automáticos')
                                             .toUpperCase())
@@ -8631,6 +8702,62 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       ],
     );
   }
+  Widget buildControlRow2({
+    required double value,
+    required String imagePathIncrement,
+    required String imagePathDecrement,
+    required String imagePathDisplay,
+    required VoidCallback onIncrement,
+    required VoidCallback onDecrement,
+    required String suffix,
+    required double screenWidth,
+    required double screenHeight,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: onIncrement,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.06,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                imagePathIncrement,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: screenWidth * 0.005),
+        Text(
+       "${value.toStringAsFixed(0)}$suffix",
+          style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        SizedBox(width: screenWidth * 0.005),
+        GestureDetector(
+          onTap: onDecrement,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.06,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                imagePathDecrement,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: screenWidth * 0.001),
+          Image.asset(
+            imagePathDisplay,
+            width: screenWidth * 0.05,
+            height: screenHeight * 0.05,
+          ),
+      ],
+    );
+  }
+
 
 }
 
