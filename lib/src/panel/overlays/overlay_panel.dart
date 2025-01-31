@@ -1862,7 +1862,7 @@ class CycleTextWidget extends StatelessWidget {
         tr(context, "Glúteos\nIsquiotibiales\nCuádriceps"),
         tr(context, "Trapecios\nDorsales\nLumbares\nPectorales\nAbdominales\nBíceps"),
       ],
-      "D": [tr(context, "Recuperación activa")],
+      "D": [tr(context, "Recuperación activa (Programa RELAX)")],
     };
 
 

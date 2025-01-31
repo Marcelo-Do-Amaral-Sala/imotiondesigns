@@ -55,10 +55,11 @@ class _PanelViewState extends State<PanelView>
   String? macAddress;
   String? grupoKey;
   int? selectedIndex = 0;
+  int? totalBonosSeleccionados = 0;
   String connectionStatus = "desconectado";
   double scaleFactorBack = 1.0;
   Map<String, int> equipSelectionMap = {};
-  Map<String, dynamic> clientSelectionMap = {};
+  ValueNotifier<Map<String, dynamic>> clientSelectionMap = ValueNotifier({});
   Set<String> processedDevices = {};
 
   ValueNotifier<List<String>> successfullyConnectedDevices = ValueNotifier([]);
@@ -307,26 +308,32 @@ class _PanelViewState extends State<PanelView>
   void onClientSelected(
       String key, Map<String, dynamic>? client, String? macAddress) {
     setState(() {
+      // Crear una copia del mapa actual
+      final nuevoMapa = Map<String, dynamic>.from(clientSelectionMap.value);
+
       if (client != null) {
-        // Elimina duplicidades: Verifica si el cliente ya está asociado
-        clientSelectionMap
-            .removeWhere((k, v) => v != null && v['id'] == client['id']);
+        // Elimina cualquier entrada con el mismo 'id' para evitar duplicados
+        nuevoMapa.removeWhere((k, v) => v != null && v['id'] == client['id']);
         print("Cliente eliminado de asociaciones previas: ${client['name']}");
 
         // Asigna el cliente al dispositivo actual
-        clientSelectionMap[key] = client;
+        nuevoMapa[key] = client;
         print("Cliente asignado a $macAddress: ${client['name']}");
       } else {
-        // Desasigna el cliente si es null
+        // Si el cliente es null, elimina la asignación del mapa
         print("Cliente desasignado de $macAddress");
-        clientSelectionMap.remove(key);
+        nuevoMapa.remove(key);
       }
+
+      // Actualiza clientSelectionMap con el nuevo mapa sin duplicados
+      clientSelectionMap.value = nuevoMapa;
 
       // Imprime el estado actual del mapa
       print(
-          "Estado actual de clientSelectionMap: ${clientSelectionMap.map((k, v) => MapEntry(k, v?['name'] ?? 'No asignado'))}");
+          "********Estado actual de clientSelectionMap: ${nuevoMapa.map((k, v) => MapEntry(k, v?['name'] ?? 'No asignado'))}");
     });
   }
+
 
   void handleActiveChange(bool newState) {
     setState(() {
@@ -391,7 +398,7 @@ class _PanelViewState extends State<PanelView>
                               Expanded(
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
-                                      vertical: screenHeight * 0.015,
+                                      vertical: screenHeight * 0.01,
                                       horizontal: screenWidth * 0.015),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -404,7 +411,8 @@ class _PanelViewState extends State<PanelView>
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
-                                            clientSelectionMap[macAddress];
+                                        clientSelectionMap.value[macAddress] as Map<String, dynamic>?;
+
                                         String clientName =
                                             selectedClient?['name'] ?? '';
                                         return MapEntry(
@@ -540,7 +548,7 @@ class _PanelViewState extends State<PanelView>
 
                                                 setState(() {
                                                   // Elimina el cliente de la selección local
-                                                  clientSelectionMap
+                                                  clientSelectionMap.value
                                                       .remove(macAddress);
 
                                                   // Limpia específicamente el cliente en el Provider
@@ -654,7 +662,10 @@ class _PanelViewState extends State<PanelView>
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
-                                                                          10.sp,
+                                                                          12.sp,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
                                                                       color: const Color(
                                                                           0xFF28E2F5),
                                                                     ),
@@ -669,7 +680,7 @@ class _PanelViewState extends State<PanelView>
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
-                                                                          10.sp,
+                                                                          12.sp,
                                                                       color: const Color(
                                                                           0xFF28E2F5),
                                                                     ),
@@ -691,7 +702,7 @@ class _PanelViewState extends State<PanelView>
                                                                         child:
                                                                             Container(
                                                                           width:
-                                                                              screenWidth * 0.01,
+                                                                              screenWidth * 0.0085,
                                                                           height:
                                                                               screenHeight * 0.01,
                                                                           color: index <= (batteryStatuses[macAddress] ?? -1)
@@ -871,6 +882,7 @@ class _PanelViewState extends State<PanelView>
                                     isFullChanged: handleActiveChange,
                                     groupedA: groupedAmcis,
                                     groupedB: groupedBmcis,
+                                    clientSelectedMap: clientSelectionMap,
                                   );
                                 }).toList(),
                               ),
@@ -971,7 +983,7 @@ class _PanelViewState extends State<PanelView>
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
-                                            clientSelectionMap[macAddress];
+                                            clientSelectionMap.value[macAddress];
                                         String clientName =
                                             selectedClient?['name'] ?? '';
 
@@ -1158,7 +1170,7 @@ class _PanelViewState extends State<PanelView>
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
-                                            clientSelectionMap[macAddress];
+                                            clientSelectionMap.value[macAddress];
                                         String clientName =
                                             selectedClient?['name'] ?? '';
 
@@ -1656,6 +1668,7 @@ class ExpandedContentWidget extends StatefulWidget {
   final ValueChanged<int> onSelectEquip;
   final ValueChanged<Map<String, dynamic>?> onClientSelected;
   final ValueChanged<bool> isFullChanged;
+  final ValueNotifier<Map<String, dynamic>> clientSelectedMap;
 
   const ExpandedContentWidget({
     super.key,
@@ -1667,7 +1680,7 @@ class ExpandedContentWidget extends StatefulWidget {
     required this.isFullChanged,
     required this.macAddresses,
     required this.groupedA,
-    required this.groupedB,
+    required this.groupedB, required this.clientSelectedMap,
   });
 
   @override
@@ -1738,6 +1751,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   int _currentImageIndex = 0;
   int? selectedIndex = 0;
   int remainingTime = 0;
+  int totalBonos = 0;
   int? selectedIndivProgramIndex;
   int currentSubprogramIndex = 0;
   int pausedSubprogramIndex = 0;
@@ -1928,12 +1942,20 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         "🛠️ Grupos actualizados B: ${widget.groupedB.value}",
       );
     });
+    // Imprime el valor inicial
+    print("Valor inicial de clientSelectedMap: ${widget.clientSelectedMap.value}");
+
+    // Escucha los cambios y muestra el nuevo valor
+    widget.clientSelectedMap.addListener(_onClientSelectedMapChanged);
     initializeDataProgram();
     if (selectedIndivProgram != null &&
         selectedIndivProgram!['video'] != null &&
         selectedIndivProgram!['video'].isNotEmpty) {
       _initializeVideoController(selectedIndivProgram!['video']);
     }
+  }
+  void _onClientSelectedMapChanged() {
+    print("Nuevo valor de clientSelectedMap: ${widget.clientSelectedMap.value}");
   }
 
   Future<void> initializeDataProgram() async {
@@ -2123,25 +2145,68 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   void onClientSelected(Map<String, dynamic>? client) async {
     if (client == null) {
       setState(() {
-        print("Cliente desasignado de ${widget.macAddress!}: ${selectedClient?['name']}");
-        selectedClients.remove(selectedClient);
         selectedClient = null;
+        totalBonos = 0;
       });
 
-      widget.onClientSelected(client);
+      // 🔥 Asegurar que el mapa se actualice correctamente sin sobrescribir
+      widget.clientSelectedMap.value = Map<String, dynamic>.from(widget.clientSelectedMap.value)
+        ..remove(widget.macAddress);
+
+      widget.onClientSelected(null);
       return;
     }
 
     setState(() {
-      selectedClients.removeWhere((c) => c['id'] == client['id']);
-      selectedClients.add(client);
       selectedClient = client;
+      totalBonos = 0;
     });
 
-    updateMuscleLists(); // Actualiza la lista de músculos basada en el cliente y equipo seleccionado
+    // Consultar bonos disponibles para este cliente en la base de datos
+    final db = await openDatabase('my_database.db');
 
-    widget.onClientSelected(client);
+    print("Consultando bonos para cliente ID: ${client['id']}");
+
+    final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery(
+      '''
+    SELECT cantidad FROM bonos
+    WHERE cliente_id = ? AND estado = 'Disponible'
+    ''',
+      [client['id']],
+    );
+
+    print("Resultado de la consulta: $clientGroupsResult");
+
+    // Calcular total de bonos
+    totalBonos = clientGroupsResult.fold(0, (total, bono) {
+      final int cantidad = (bono['cantidad'] as num?)?.toInt() ?? 0;
+      print("Bono encontrado: $cantidad");
+      return total + cantidad;
+    });
+
+    print("Total de bonos calculado: $totalBonos");
+
+    // 🔥 Crear un nuevo mapa sin sobrescribir valores existentes innecesariamente
+    final nuevoMapa = Map<String, dynamic>.from(widget.clientSelectedMap.value);
+
+    // Verificar si ya existe información previa para el cliente y fusionar datos
+    final datosPrevios = (nuevoMapa[widget.macAddress] as Map<String, dynamic>?) ?? {};
+
+    nuevoMapa[widget.macAddress!] = {
+      ...datosPrevios, // Mantiene datos previos (si existen)
+      ...client,       // Actualiza con los datos del nuevo cliente
+      'bonos': totalBonos, // Asegura que los bonos se mantengan
+    };
+
+    widget.clientSelectedMap.value = nuevoMapa; // 🔥 Asigna el nuevo mapa y notifica el cambio
+
+    print("Nuevo valor de clientSelectedMap: ${widget.clientSelectedMap.value}");
+
+    // **🔥 Evita que onClientSelected sobrescriba los bonos, asegurando el tipo correcto**
+    widget.onClientSelected(nuevoMapa[widget.macAddress] as Map<String, dynamic>?);
   }
+
+
 
 
   void updateMuscleLists() {
@@ -2181,9 +2246,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       });
     });
   }
-
-
-
 
   void _clearGlobals() async {
     if (mounted) {
@@ -3300,7 +3362,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (kDebugMode) {
       print("🔧 Controlador de opacidad liberado.");
     }
-
+    widget.clientSelectedMap.removeListener(_onClientSelectedMapChanged);
     // Limpiar la lista de clientes seleccionados del Provider
     if (_clientsProvider != null) {
       _clientsProvider!.clearSelectedClientsSilently(); // Limpia sin notificar
@@ -3376,93 +3438,133 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                 color: Colors.black.withOpacity(0.5),
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  // Botón "Cliente"
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTapDown: widget.selectedKey == null
-                                          ? null
-                                          : (_) => setState(
-                                              () => scaleFactorCliente = 0.90),
-                                      onTapUp: widget.selectedKey == null
-                                          ? null
-                                          : (_) => setState(
-                                              () => scaleFactorCliente = 1.0),
-                                      onTap: widget.selectedKey == null ||
-                                              isRunning
-                                          ? null
-                                          : () {
-                                              setState(() {
-                                                toggleOverlay(0);
-                                              });
-                                            },
-                                      child: Opacity(
-                                        opacity: widget.selectedKey == null
-                                            ? 1.0
-                                            : 1.0,
-                                        // Indicación visual
-                                        child: AnimatedScale(
-                                          scale: scaleFactorCliente,
-                                          duration:
-                                              const Duration(milliseconds: 100),
-                                          child: Container(
-                                            width: screenHeight * 0.1,
-                                            height: screenWidth * 0.1,
-                                            decoration: const BoxDecoration(
-                                              color: Color(0xFF494949),
-                                              shape: BoxShape
-                                                  .circle, // Forma circular
-                                            ),
-                                            child: Center(
-                                              child: SizedBox(
-                                                width: screenWidth * 0.05,
-                                                height: screenHeight * 0.05,
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    'assets/images/cliente.png',
-                                                    fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    // Container con el cliente y el texto
+                                    Stack(
+                                      children: [
+                                        // Esto se coloca en un contenedor de tamaño fijo, sin usar Expanded
+                                        GestureDetector(
+                                          onTapDown: widget.selectedKey == null
+                                              ? null
+                                              : (_) => setState(() =>
+                                                  scaleFactorCliente = 0.90),
+                                          onTapUp: widget.selectedKey == null
+                                              ? null
+                                              : (_) => setState(() =>
+                                                  scaleFactorCliente = 1.0),
+                                          onTap: widget.selectedKey == null ||
+                                                  isRunning
+                                              ? null
+                                              : () {
+                                                  setState(() {
+                                                    toggleOverlay(0);
+                                                  });
+                                                },
+                                          child: Opacity(
+                                            opacity: widget.selectedKey == null
+                                                ? 1.0
+                                                : 1.0,
+                                            child: AnimatedScale(
+                                              scale: scaleFactorCliente,
+                                              duration: const Duration(
+                                                  milliseconds: 100),
+                                              child: Container(
+                                                width: screenHeight * 0.1,
+                                                height: screenWidth * 0.1,
+                                                decoration: const BoxDecoration(
+                                                  color: Color(0xFF494949),
+                                                  shape: BoxShape
+                                                      .circle, // Forma circular
+                                                ),
+                                                child: Center(
+                                                  child: SizedBox(
+                                                    width: screenWidth * 0.05,
+                                                    height: screenHeight * 0.05,
+                                                    child: ClipOval(
+                                                      child: Image.asset(
+                                                        'assets/images/cliente.png',
+                                                        fit: BoxFit.scaleDown,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
+                                        Visibility(
+                                          visible: widget.clientSelectedMap.value.containsKey(widget.macAddress),
+                                          child: Positioned(
+                                            bottom: 0,
+                                            left: 0,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.001),
+                                              child: ValueListenableBuilder<Map<String, dynamic>>(
+                                                valueListenable: widget.clientSelectedMap,
+                                                builder: (context, clientMap, child) {
+                                                  // Ahora estamos usando el mapa actualizado, que tiene los bonos
+                                                  final client = clientMap[widget.macAddress];
+
+                                                  print("Revisando UI: clientMap = ${widget.clientSelectedMap.value}"); // 🔥 Para depuración
+                                                  print("Revisando UI: buscando ${widget.macAddress} en clientMap");
+
+                                                  if (client == null) return SizedBox();
+
+                                                  final String clientName = client['name'] ?? 'Desconocido';
+                                                  final String mac = widget.macAddress ?? 'Sin MAC';
+                                                  final int bonos = client['bonos'] ?? 0; // Aquí accedemos al total de bonos actualizado
+
+                                                  print("Mostrando en UI -> Cliente: $clientName | MAC: $mac | Bonos: $bonos");
+
+                                                  return Text(
+                                                    "Bonos: $bonos", // Mostramos los bonos correctamente
+                                                    style: TextStyle(
+                                                      fontSize: 10.sp,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        )
+
+
+
+                                      ],
                                     ),
-                                  ),
-                                  SizedBox(width: screenWidth * 0.01),
+                                    SizedBox(width: screenWidth * 0.01),
                                   // Botón "Equipo 0"
                                   Expanded(
                                     child: AbsorbPointer(
-                                      absorbing: widget.selectedKey == null ||
-                                          isRunning,
-                                      // Bloquear interacción si no hay selección
-                                      child: GestureDetector(
-                                        onTap: () {
+                                        absorbing: widget.selectedKey == null ||
+                                            isRunning,
+                                        child: GestureDetector(
+                                          onTap: () {
                                           selectEquip(0);
-
                                         },
                                         child: Opacity(
-                                          opacity: widget.selectedKey == null
-                                              ? 1.0
-                                              : 1.0,
-                                          // Indicación visual
-                                          child: Container(
-                                            width: screenWidth * 0.1,
+                                            opacity: widget.selectedKey == null
+                                                ? 1.0
+                                                : 1.0,
+                                            child: Container(
+                                              width: screenWidth * 0.1,
                                             height: screenHeight * 0.1,
                                             decoration: BoxDecoration(
-                                              color: selectedIndexEquip == 0
-                                                  ? selectedColor
-                                                  : unselectedColor,
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                topLeft: Radius.circular(10.0),
-                                                bottomLeft:
-                                                    Radius.circular(10.0),
+                                                color: selectedIndexEquip == 0
+                                                    ? selectedColor
+                                                    : unselectedColor,
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                  topLeft:
+                                                      Radius.circular(10.0),
+                                                  bottomLeft:
+                                                      Radius.circular(10.0),
+                                                ),
                                               ),
-                                            ),
                                             child: Center(
                                               child: Image.asset(
                                                 'assets/images/chalecoblanco.png',
@@ -3474,34 +3576,35 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       ),
                                     ),
                                   ),
-                                  Expanded(
-                                    child: AbsorbPointer(
-                                      absorbing: widget.selectedKey == null ||
-                                          isRunning,
-                                      // Bloquear interacción si no hay selección
-                                      child: GestureDetector(
-                                        onTap: () {
+
+                                    // Botón "Equipo 1"
+                                    Expanded(
+                                      child: AbsorbPointer(
+                                        absorbing: widget.selectedKey == null ||
+                                            isRunning,
+                                        child: GestureDetector(
+                                          onTap: () {
                                           selectEquip(1);
                                         },
                                         child: Opacity(
-                                          opacity: widget.selectedKey == null
-                                              ? 1.0
-                                              : 1.0,
-                                          // Indicación visual
-                                          child: Container(
-                                            width: screenWidth * 0.1,
+                                            opacity: widget.selectedKey == null
+                                                ? 1.0
+                                                : 1.0,
+                                            child: Container(
+                                              width: screenWidth * 0.1,
                                             height: screenHeight * 0.1,
                                             decoration: BoxDecoration(
-                                              color: selectedIndexEquip == 1
-                                                  ? selectedColor
-                                                  : unselectedColor,
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                topRight: Radius.circular(10.0),
-                                                bottomRight:
-                                                    Radius.circular(10.0),
+                                                color: selectedIndexEquip == 1
+                                                    ? selectedColor
+                                                    : unselectedColor,
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                  topRight:
+                                                      Radius.circular(10.0),
+                                                  bottomRight:
+                                                      Radius.circular(10.0),
+                                                ),
                                               ),
-                                            ),
                                             child: Center(
                                               child: Image.asset(
                                                 'assets/images/pantalonblanco.png',
@@ -3513,35 +3616,36 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: screenWidth * 0.01),
-                                  // Botón "Repetir"
-                                  Expanded(
+
+                                    SizedBox(width: screenWidth * 0.01),
+
+                                    // Botón "Repetir"
+                                    Expanded(
                                     child: GestureDetector(
                                       onTapDown: widget.selectedKey == null
                                           ? null
-                                          : (_) => setState(
-                                              () => scaleFactorRepeat = 0.90),
-                                      onTapUp: widget.selectedKey == null
-                                          ? null
-                                          : (_) => setState(
-                                              () => scaleFactorRepeat = 1.0),
-                                      onTap: widget.selectedKey == null ||
-                                              isRunning
-                                          ? null
-                                          : () {
-                                              // Acción para botón repetir
-                                            },
-                                      child: Opacity(
-                                        opacity: widget.selectedKey == null
-                                            ? 1.0
-                                            : 1.0,
-                                        // Indicación visual
-                                        child: AnimatedScale(
-                                          scale: scaleFactorRepeat,
-                                          duration:
-                                              const Duration(milliseconds: 100),
-                                          child: Container(
-                                            width: screenHeight * 0.1,
+                                            : (_) => setState(
+                                                () => scaleFactorRepeat = 0.90),
+                                        onTapUp: widget.selectedKey == null
+                                            ? null
+                                            : (_) => setState(
+                                                () => scaleFactorRepeat = 1.0),
+                                        onTap: widget.selectedKey == null ||
+                                                isRunning
+                                            ? null
+                                            : () {
+                                                // Acción para botón repetir
+                                              },
+                                        child: Opacity(
+                                          opacity: widget.selectedKey == null
+                                              ? 1.0
+                                              : 1.0,
+                                          child: AnimatedScale(
+                                            scale: scaleFactorRepeat,
+                                            duration: const Duration(
+                                                milliseconds: 100),
+                                            child: Container(
+                                              width: screenHeight * 0.1,
                                             height: screenWidth * 0.1,
                                             decoration: const BoxDecoration(
                                               color: Colors.transparent,
@@ -3565,8 +3669,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     ),
                                   ),
                                 ],
-                              ),
-                            ),
+                                )),
                           ),
                           SizedBox(width: screenWidth * 0.01),
                           Container(
@@ -3940,11 +4043,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                   ],
                                 ),
                                 SizedBox(width: screenWidth * 0.01),
-                                if (selectedIndexEquip == 0)
+                                if (selectedIndexEquip == 0 &&
+                                    selectedProgram ==
+                                        tr(context, 'Recovery').toUpperCase())
                                   OutlinedButton(
-                                    onPressed: () {
-                                      if (mounted) {
-                                        setState(() {
+                                    onPressed: selectedProgram == null
+                                        ? null // Si selectedProgram es nulo, se deshabilita el botón
+                                        : () {
+                                            if (mounted) {
+                                              setState(() {
                                           toggleOverlay(6);
                                         });
                                       }
@@ -3972,7 +4079,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-                                  ),
+                                  )
                               ],
                             ),
                           ),
@@ -7472,7 +7579,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 selectedClients.length > 4 ? selectedClients.sublist(4) : [];
 
                                                 return Container(
-                                                  padding: const EdgeInsets.all(10.0),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal:
+                                                          screenWidth * 0.005,
+                                                      vertical:
+                                                          screenHeight * 0.005),
                                                   width: _isExpanded2 ? screenWidth * 0.2 : 0,
                                                   height: screenHeight * 0.2,
                                                   alignment: Alignment.center,

@@ -4264,6 +4264,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     return result;
   }
 
+
   // Obtener todos los bonos
   Future<List<Map<String, dynamic>>> getAllBonos() async {
     final db = await database;
