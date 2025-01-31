@@ -2187,7 +2187,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
     print("Total de bonos calculado: $totalBonos");
 
-    // 🔥 Crear un nuevo mapa sin sobrescribir valores existentes innecesariamente
     final nuevoMapa = Map<String, dynamic>.from(widget.clientSelectedMap.value);
 
     // Verificar si ya existe información previa para el cliente y fusionar datos
@@ -2203,9 +2202,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
     print("Nuevo valor de clientSelectedMap: ${widget.clientSelectedMap.value}");
 
-    // **🔥 Evita que onClientSelected sobrescriba los bonos, asegurando el tipo correcto**
     widget.onClientSelected(nuevoMapa[widget.macAddress] as Map<String, dynamic>?);
+
+    updateMuscleLists();
   }
+
 
 
 
