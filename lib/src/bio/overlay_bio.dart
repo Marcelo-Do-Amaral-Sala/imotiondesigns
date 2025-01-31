@@ -96,8 +96,10 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
         // Primera columna
         Expanded(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.02,
+              horizontal: MediaQuery.of(context).size.width * 0.04,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -117,9 +119,13 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                     });
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.height * 0.01,
+                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                    ),
+                    side: BorderSide(
+                        width: MediaQuery.of(context).size.width * 0.001,
+                        color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -159,8 +165,10 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
         const VerticalDivider(color: Color(0xFF28E2F5)),
         Expanded(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.02,
+              horizontal: MediaQuery.of(context).size.width * 0.04,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -176,9 +184,13 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                 OutlinedButton(
                   onPressed: () {},
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.height * 0.01,
+                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                    ),
+                    side: BorderSide(
+                        width: MediaQuery.of(context).size.width * 0.001,
+                        color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -221,7 +233,10 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
 
   Widget _buildNonProContent() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
+      padding: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.height * 0.03,
+        horizontal: MediaQuery.of(context).size.width * 0.03,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -258,7 +273,10 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
               borderRadius: BorderRadius.circular(7.0),
             ),
             child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.02,
+                  horizontal: MediaQuery.of(context).size.width * 0.02,
+                ),
                 child: Column(
                   children: [
                     Text(
@@ -298,9 +316,11 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
             controller: controller,
             style: _inputTextStyle,
             enabled: false,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
-                  horizontal: 10.0, vertical: 10.0), // Padding agregado
+                vertical: MediaQuery.of(context).size.height * 0.01,
+                horizontal: MediaQuery.of(context).size.width * 0.01,
+              ), // Padding agregado
               border: InputBorder.none, // Elimina el borde por defecto
             ),
           ),
@@ -447,7 +467,10 @@ class _OverlaySeleccionarClienteBioState
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.02,
+          horizontal: MediaQuery.of(context).size.width * 0.03,
+        ),
         child: Column(
           children: [
             Row(
@@ -550,8 +573,9 @@ class _OverlaySeleccionarClienteBioState
                 });
               },
               dropdownColor: const Color(0xFF313030),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF2be4f3), size: 30),
+              icon: Icon(Icons.arrow_drop_down,
+                  color: Color(0xFF2be4f3),
+                  size: MediaQuery.of(context).size.height * 0.05),
             ),
           ),
         ],
@@ -568,7 +592,10 @@ class _OverlaySeleccionarClienteBioState
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.02,
+            horizontal: MediaQuery.of(context).size.width * 0.02,
+          ),
           child: Column(
             children: [
               // Encabezado fijo
@@ -587,7 +614,9 @@ class _OverlaySeleccionarClienteBioState
                   ),
                 ],
               ),
-              const SizedBox(height: 10), // Espaciado entre encabezado y filas
+              SizedBox(
+                  height: MediaQuery.of(context).size.height *
+                      0.01), // Espaciado entre encabezado y filas
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -625,7 +654,9 @@ class _OverlaySeleccionarClienteBioState
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20), // Espaciado entre filas
+                          SizedBox(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.02),
                         ],
                       );
                     }).toList(),
@@ -642,7 +673,10 @@ class _OverlaySeleccionarClienteBioState
   Widget _buildHeaderCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.01,
+          horizontal: MediaQuery.of(context).size.width * 0.01,
+        ),
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -659,7 +693,10 @@ class _OverlaySeleccionarClienteBioState
   Widget _buildDataCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.01,
+          horizontal: MediaQuery.of(context).size.width * 0.01,
+        ),
         child: Text(
           text,
           textAlign: TextAlign.center,

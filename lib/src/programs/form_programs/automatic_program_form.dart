@@ -283,8 +283,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Color(0xFF2be4f3), size: 30),
+                                icon:  Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3), size: screenHeight*0.05),
                               ),
                             ),
                           ],
@@ -306,7 +306,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               borderRadius: BorderRadius.circular(7.0),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(5.0),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: MediaQuery.of(context).size.width * 0.01,
+                                vertical: MediaQuery.of(context).size.height * 0.01,
+                              ),
                               child: Column(
                                 children: [
                                   // Encabezados de la tabla (no desplazables)
@@ -326,7 +329,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                       TableRow(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: MediaQuery.of(context).size.width * 0.01,
+                                              vertical: MediaQuery.of(context).size.height * 0.01,
+                                            ),
                                             child: Center(
                                               child: Text(
                                                 tr(context, 'Orden')
@@ -340,7 +346,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: MediaQuery.of(context).size.width * 0.01,
+                                              vertical: MediaQuery.of(context).size.height * 0.01,
+                                            ),
                                             child: Center(
                                               child: Text(
                                                 tr(context, 'Programa')
@@ -354,7 +363,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: MediaQuery.of(context).size.width * 0.01,
+                                              vertical: MediaQuery.of(context).size.height * 0.01,
+                                            ),
                                             child: Center(
                                               child: Text(
                                                 tr(context, 'Duración')
@@ -368,7 +380,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: MediaQuery.of(context).size.width * 0.01,
+                                              vertical: MediaQuery.of(context).size.height * 0.01,
+                                            ),
                                             child: Center(
                                               child: Text(
                                                 tr(context, 'Ajuste')
@@ -382,7 +397,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: MediaQuery.of(context).size.width * 0.01,
+                                              vertical: MediaQuery.of(context).size.height * 0.01,
+                                            ),
                                             child: Center(
                                               child: Text(
                                                 tr(context, 'Acción')
@@ -421,9 +439,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                               TableRow(
                                                 children: [
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
+                                                    padding: EdgeInsets.symmetric(
+                                                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                                                      vertical: MediaQuery.of(context).size.height * 0.01,
+                                                    ),
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['orden']}',
@@ -436,9 +455,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
+                                                    padding: EdgeInsets.symmetric(
+                                                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                                                      vertical: MediaQuery.of(context).size.height * 0.01,
+                                                    ),
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['programa']}',
@@ -449,9 +469,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
+                                                    padding: EdgeInsets.symmetric(
+                                                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                                                      vertical: MediaQuery.of(context).size.height * 0.01,
+                                                    ),
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['duracion']}',
@@ -462,9 +483,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
+                                                    padding: EdgeInsets.symmetric(
+                                                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                                                      vertical: MediaQuery.of(context).size.height * 0.01,
+                                                    ),
                                                     child: Center(
                                                       child: Text(
                                                         '${secuencia['ajuste']}',
@@ -513,9 +535,12 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                             _addSecuencia(context);
                           },
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(10.0),
-                            side: const BorderSide(
-                                width: 1.0, color: Color(0xFF2be4f3)),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: MediaQuery.of(context).size.width * 0.01,
+                              vertical: MediaQuery.of(context).size.height * 0.01,
+                            ),
+                            side:  BorderSide(
+                                width: screenWidth*0.001, color: Color(0xFF2be4f3)),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(7),
                             ),
@@ -540,12 +565,12 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
             SizedBox(width: screenWidth * 0.01),
             SizedBox(
               child: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
+                padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                      onTapDown: (_) => setState(() => scaleFactorTick = 0.9),
                       onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                       onTap: () async {
                         if (_nameController.text.isEmpty ||
@@ -626,7 +651,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: Color(0xFF2be4f3), width: 2),
+            side:  BorderSide(color: Color(0xFF2be4f3), width: screenWidth*0.001),
             borderRadius: BorderRadius.circular(7),
           ),
           child: ConstrainedBox(
@@ -673,10 +698,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                 _descController.clear();
                                 Navigator.of(context).pop();
                               },
-                              icon: const Icon(
+                              icon:  Icon(
                                 Icons.close_sharp,
                                 color: Colors.white,
-                                size: 50,
+                                size: screenHeight*0.07,
                               ),
                             ),
                           ),
@@ -686,8 +711,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                     SizedBox(height: screenHeight * 0.01),
                     Flexible(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 20.0),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.02,
+                          vertical: MediaQuery.of(context).size.height * 0.02,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -745,7 +772,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               children: [
                                 GestureDetector(
                                   onTapDown: (_) =>
-                                      setState(() => scaleFactorTick = 0.95),
+                                      setState(() => scaleFactorTick = 0.9),
                                   onTapUp: (_) =>
                                       setState(() => scaleFactorTick = 1.0),
                                   onTap: () async {
@@ -812,7 +839,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: Color(0xFF2be4f3), width: 2),
+            side:  BorderSide(color: Color(0xFF2be4f3), width: screenWidth*0.001),
             borderRadius: BorderRadius.circular(7),
           ),
           child: ConstrainedBox(
@@ -857,14 +884,14 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                             child: IconButton(
                               onPressed: () {
                                 _ordenController.clear();
-                                _durationController.clear();
+                                _tiempoController.clear();
                                 _ajusteController.clear();
                                 Navigator.of(context).pop();
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.close_sharp,
                                 color: Colors.white,
-                                size: 50,
+                                size: screenHeight*0.07,
                               ),
                             ),
                           ),
@@ -874,8 +901,10 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                     SizedBox(height: screenHeight * 0.01),
                     Flexible(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 20.0),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.02,
+                          vertical: MediaQuery.of(context).size.height * 0.02,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -887,8 +916,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 30.0),
+                                  padding:  EdgeInsets.symmetric(
+                                    horizontal: MediaQuery.of(context).size.width * 0.05),
                                   width: screenWidth * 0.3,
                                   alignment: Alignment.centerLeft,
                                   decoration: _inputDecoration(),
@@ -914,8 +943,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                       });
                                     },
                                     dropdownColor: const Color(0xFF313030),
-                                    icon: const Icon(Icons.arrow_drop_down,
-                                        color: Color(0xFF2be4f3), size: 30),
+                                    icon:  Icon(Icons.arrow_drop_down,
+                                        color: Color(0xFF2be4f3), size: screenHeight*0.05),
                                     hint: Text(
                                       tr(context, 'Seleccione un programa'),
                                       style: _dropdownHintStyle,
@@ -1020,7 +1049,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                               children: [
                                 GestureDetector(
                                   onTapDown: (_) =>
-                                      setState(() => scaleFactorTick = 0.95),
+                                      setState(() => scaleFactorTick = 0.9),
                                   onTapUp: (_) =>
                                       setState(() => scaleFactorTick = 1.0),
                                   onTap: () async {

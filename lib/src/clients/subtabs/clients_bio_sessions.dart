@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/bio_session_table.dart';
@@ -56,7 +57,7 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
                 }
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 5.0),
+                margin: EdgeInsets.symmetric(vertical: screenHeight * 0.005),
                 height: screenHeight * 0.08,
                 width: screenWidth * 0.08,
                 decoration: const BoxDecoration(
@@ -74,8 +75,10 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
         // Expansión de la interfaz
         Expanded(
           child: Container(
-            padding:
-                const EdgeInsets.only(bottom: 20.0, left: 20.0, right: 20.0),
+            padding: EdgeInsets.only(
+                bottom: screenHeight * 0.02,
+                left: screenWidth * 0.02,
+                right: screenWidth * 0.02),
             child: Row(
               children: [
                 // BioSessionTableWidget ocupará un 50% del espacio disponible
@@ -122,7 +125,8 @@ class SpiderChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: Size(300, 300),
+      size: Size(MediaQuery.of(context).size.width * 0.3,
+          MediaQuery.of(context).size.height * 0.3),
       painter: SpiderChartPainter(data),
     );
   }
@@ -253,7 +257,8 @@ class CircunferenciasWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: Size(300, 300), // Tamaño del lienzo
+      size: Size(MediaQuery.of(context).size.width * 0.3,
+          MediaQuery.of(context).size.height * 0.3),
       painter: CircunferenciasPainter(),
     );
   }

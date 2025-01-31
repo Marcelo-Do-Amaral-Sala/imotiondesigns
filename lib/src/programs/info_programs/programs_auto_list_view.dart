@@ -78,7 +78,10 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: const EdgeInsets.all(30.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.03,
+        vertical: screenHeight * 0.03,
+      ),
       child: Container(
         width: screenWidth,
         decoration: BoxDecoration(
@@ -108,7 +111,10 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
           List<Map<String, dynamic>> row = rows[rowIndex];
 
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.02,
+              vertical: screenHeight * 0.02,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center, // Cambiado a start para ajustar desde la izquierda
               children: row.map((program) {
@@ -118,7 +124,9 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
                 List<Map<String, dynamic>> subprogramas = program['subprogramas'] ?? [];
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0), // Espacio entre los elementos
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.02,
+                  ),
                   child: GestureDetector(
                     onTap: () {
                       // Llamamos a la función onProgramTap pasando los datos del programa

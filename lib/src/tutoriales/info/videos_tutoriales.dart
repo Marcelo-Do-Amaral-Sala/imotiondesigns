@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../db/db_helper.dart';
 import '../overlays/overlays_tuto.dart';
@@ -330,11 +329,15 @@ class _VideoTutorialesIncidenciasListViewState extends State<VideoTutorialesInci
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.all(30.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.03,
+            vertical: screenHeight * 0.03,
+          ),
           child: Container(
             width: screenWidth,
             decoration: BoxDecoration(
@@ -374,8 +377,10 @@ class _VideoTutorialesIncidenciasListViewState extends State<VideoTutorialesInci
           List<Map<String, dynamic>> row = rows[rowIndex];
 
           return Padding(
-            padding:
-            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.02,
+              vertical: MediaQuery.of(context).size.height * 0.01,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: row.map((tuto) {

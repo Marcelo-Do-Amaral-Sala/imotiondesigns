@@ -395,16 +395,17 @@ class _ClientsBonosState extends State<ClientsBonos> {
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
-            side:  BorderSide(color: const Color(0xFF2be4f3), width: screenWidth*0.001),
+            side: BorderSide(color: const Color(0xFF2be4f3), width: screenWidth * 0.001),
             borderRadius: BorderRadius.circular(7),
           ),
           child: SizedBox(
-            height: screenHeight * 0.4,
+            height: screenHeight * 0.35,
             width: screenWidth * 0.4,
             child: Column(
               children: [
+                /// 🔹 ENCABEZADO "COMPRAR BONOS"
                 Container(
-                  width: screenWidth,
+                  width: double.infinity,
                   height: screenHeight * 0.1,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
@@ -434,27 +435,29 @@ class _ClientsBonosState extends State<ClientsBonos> {
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          icon:  Icon(
+                          icon: Icon(
                             Icons.close_sharp,
                             color: Colors.white,
-                            size: screenHeight*0.07,
+                            size: screenHeight * 0.07,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Container(
-                    padding:  EdgeInsets.symmetric(horizontal: screenWidth * 0.002,
-                        vertical: screenHeight * 0.002),
+
+                /// 🔹 CUERPO: Distribuye el TextField y el botón uniformemente
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween, // 🔹 Distribuir uniformemente
                       children: [
+                        /// 🔹 CAMPO DE TEXTO
                         Container(
-                          padding:  EdgeInsets.symmetric(horizontal: screenWidth * 0.02,
-                              vertical: screenHeight * 0.02),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: const Color(0xFF313030),
@@ -463,33 +466,28 @@ class _ClientsBonosState extends State<ClientsBonos> {
                           child: TextField(
                             controller: _bonosController,
                             keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            style:
-                            TextStyle(color: Colors.white, fontSize: 17.sp),
+                            inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+                            style: TextStyle(color: Colors.white, fontSize: 17.sp),
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               filled: true,
                               fillColor: const Color(0xFF313030),
                               hintText: tr(context, 'Introduzca los bonos'),
-                              hintStyle: TextStyle(
-                                  color: Colors.grey, fontSize: 17.sp),
+                              hintStyle: TextStyle(color: Colors.grey, fontSize: 17.sp),
                               isDense: true,
                             ),
                           ),
                         ),
-                        SizedBox(height: screenHeight * 0.05),
+
+                        /// 🔹 BOTÓN "AÑADIR"
                         OutlinedButton(
                           onPressed: () async {
-                            final cantidadBonos =
-                                int.tryParse(_bonosController.text);
+                            final cantidadBonos = int.tryParse(_bonosController.text);
                             if (cantidadBonos == null || cantidadBonos <= 0) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    tr(context, 'Introduzca un valor válido')
-                                        .toUpperCase(),
+                                    tr(context, 'Introduzca un valor válido').toUpperCase(),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 20.sp,
@@ -508,8 +506,7 @@ class _ClientsBonosState extends State<ClientsBonos> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  tr(context, 'Bonos añadidos correctamente')
-                                      .toUpperCase(),
+                                  tr(context, 'Bonos añadidos correctamente').toUpperCase(),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 20.sp,
@@ -522,15 +519,9 @@ class _ClientsBonosState extends State<ClientsBonos> {
                           },
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.01,
-                                vertical: screenHeight * 0.01),
-                            side: BorderSide(
-                              width: screenWidth * 0.001,
-                              color: const Color(0xFF2be4f3),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                            ),
+                                horizontal: screenWidth * 0.02, vertical: screenHeight * 0.015),
+                            side: BorderSide(width: screenWidth * 0.001, color: const Color(0xFF2be4f3)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
                             backgroundColor: Colors.transparent,
                           ),
                           child: Text(
@@ -554,4 +545,6 @@ class _ClientsBonosState extends State<ClientsBonos> {
       },
     );
   }
+
+
 }

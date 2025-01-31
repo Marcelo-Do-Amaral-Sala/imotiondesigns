@@ -202,9 +202,12 @@ class _ClientsGroupsState extends State<ClientsGroups> {
         });
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.03,
-        height: MediaQuery.of(context).size.height * 0.03,
-        margin: const EdgeInsets.all(5.0),
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: MediaQuery.of(context).size.height * 0.04,
+        margin: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.004,
+          horizontal: MediaQuery.of(context).size.width * 0.004,
+        ),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: selectedGroups[option] == true
@@ -266,8 +269,8 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                   borderRadius: BorderRadius.circular(7)),
                               child: TextField(
                                 controller: _nameController,
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 14),
+                                style:  TextStyle(
+                                    color: Colors.white, fontSize: 14.sp),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(7)),
@@ -383,16 +386,16 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                     BorderRadius.circular(7),
                                               ),
                                               child: TextField(
-                                                style: const TextStyle(
+                                                style:  TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 14,
+                                                  fontSize: 15.sp,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 14,
+                                                    fontSize: 15.sp,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
@@ -559,16 +562,16 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                     BorderRadius.circular(7),
                                               ),
                                               child: TextField(
-                                                style: const TextStyle(
+                                                style:  TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 14,
+                                                  fontSize: 15.sp,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 14,
+                                                    fontSize: 15.sp,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
@@ -614,8 +617,8 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),
                       child: SizedBox(
-                        width: screenWidth * 0.08,
-                        height: screenHeight * 0.08,
+                        width: screenWidth * 0.1,
+                        height: screenHeight * 0.1,
                         child: ClipOval(
                           child: Image.asset(
                             'assets/images/tick.png',

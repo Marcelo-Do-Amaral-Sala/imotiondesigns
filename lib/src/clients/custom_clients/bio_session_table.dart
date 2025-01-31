@@ -70,7 +70,7 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
   Widget buildCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.001, horizontal: MediaQuery.of(context).size.width * 0.001),
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -127,7 +127,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   Widget buildFeatureCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.01, horizontal: MediaQuery.of(context).size.width * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -144,7 +144,7 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   Widget buildCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.01, horizontal: MediaQuery.of(context).size.width * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center,

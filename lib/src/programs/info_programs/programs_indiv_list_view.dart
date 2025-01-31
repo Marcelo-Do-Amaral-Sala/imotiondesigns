@@ -74,7 +74,10 @@ class _ProgramsIndividualesListViewState
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.03,
+        vertical: screenHeight * 0.03,
+      ),
       child: Column(
         children: [
           _buildDataTable(screenHeight, screenWidth), // Construimos la tabla
@@ -93,7 +96,10 @@ class _ProgramsIndividualesListViewState
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.02,
+            vertical: screenHeight * 0.02,
+          ),
           child: IndividualTableWidget(
             programData: allPrograms, // Pasamos los programas a la tabla
           ),

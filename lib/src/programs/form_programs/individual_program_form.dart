@@ -166,10 +166,10 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     if (_nameController.text.isEmpty || selectedEquipOption == null) {
       // Verificación de '@' en el correo
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
             "Por favor, introduzca un nombre y el tipo de equipamiento al programa",
-            style: TextStyle(color: Colors.white, fontSize: 17),
+            style: TextStyle(color: Colors.white, fontSize: 17.sp),
           ),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
@@ -218,7 +218,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          tr(context, "Programa recovery creado correctamente").toUpperCase(),
+          tr(context, "Programa individual creado correctamente").toUpperCase(),
           style: TextStyle(color: Colors.white, fontSize: 17.sp),
         ),
         backgroundColor: Colors.green,
@@ -366,8 +366,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         });
       },
       child: Container(
-        width: 22.0,
-        height: 22.0,
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: MediaQuery.of(context).size.height * 0.04,
         margin: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -378,7 +378,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
             color: selectedGroups[option] == true
                 ? const Color(0xFF2be4f3)
                 : Colors.white,
-            width: 1.0,
+            width: MediaQuery.of(context).size.width * 0.001,
           ),
         ),
       ),
@@ -448,7 +448,10 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                      vertical: MediaQuery.of(context).size.height * 0.01,
+                    ),
                     side: BorderSide(
                       width: MediaQuery.of(context).size.width * 0.001,
                       color: const Color(0xFF2be4f3),
@@ -555,7 +558,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       ignoring: isDisabled, // 🔹 Bloquea la interacción si el programa no está guardado
       child: Tab(
         child: SizedBox(
-          width: 150,
+          width: MediaQuery.of(context).size.width * 0.15,
           child: Text(
             text,
             textAlign: TextAlign.center,
@@ -640,8 +643,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                 });
                               },
                               dropdownColor: const Color(0xFF313030),
-                              icon: const Icon(Icons.arrow_drop_down,
-                                  color: Color(0xFF2be4f3), size: 30),
+                              icon: Icon(Icons.arrow_drop_down,
+                                  color: Color(0xFF2be4f3),
+                                  size: screenHeight * 0.05),
                             ),
                           ),
                         ],
@@ -844,12 +848,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           SizedBox(
             child: Padding(
-              padding: const EdgeInsets.only(top: 10.0),
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.02),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                    onTapDown: (_) => setState(() => scaleFactorTick = 0.9),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
                       await guardarProgramaPredeterminado();
@@ -948,10 +953,10 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.arrow_drop_down,
                                   color: Color(0xFF2be4f3),
-                                  size: 30,
+                                  size: screenHeight * 0.05,
                                 ),
                               ),
                             ),
@@ -967,7 +972,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   // Campos específicos para BIO-JACKET
                   Expanded(
                       child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.03,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -1114,7 +1121,9 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   // Campos específicos para BIO-SHAPE
                   Expanded(
                       child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.03,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -1230,12 +1239,12 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           SizedBox(
             child: Padding(
-              padding: const EdgeInsets.only(top: 10.0),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                    onTapDown: (_) => setState(() => scaleFactorTick = 0.9),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
                       // Crear una instancia de DatabaseHelper
@@ -1352,10 +1361,10 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                   });
                                 },
                                 dropdownColor: const Color(0xFF313030),
-                                icon: const Icon(
+                                icon:  Icon(
                                   Icons.arrow_drop_down,
                                   color: Color(0xFF2be4f3),
-                                  size: 30,
+                                  size: screenHeight*0.05,
                                 ),
                               ),
                             ),
@@ -1857,12 +1866,12 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           SizedBox(
             child: Padding(
-              padding: const EdgeInsets.only(top: 10.0),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                    onTapDown: (_) => setState(() => scaleFactorTick = 0.9),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
                       await actualizarGruposEnPrograma();

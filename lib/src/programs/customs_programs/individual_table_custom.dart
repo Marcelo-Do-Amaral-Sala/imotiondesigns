@@ -62,34 +62,37 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        buildCell(''),
-        buildCell(
+        buildCell(context, ''),
+        buildCell(context,
           tr(context, 'Nombre').toUpperCase(),
         ),
-        buildCell(
+        buildCell(context,
           tr(context, 'Frecuencia (Hz)').toUpperCase(),
         ),
-        buildCell(
+        buildCell(context,
           tr(context, 'Pulso (ms)').toUpperCase(),
         ),
-        buildCell(
+        buildCell(context,
           tr(context, 'Rampa').toUpperCase(),
         ),
-        buildCell(
+        buildCell(context,
           tr(context, 'Contracción').toUpperCase(),
         ),
-        buildCell(
+        buildCell(context,
           tr(context, 'Pausa').toUpperCase(),
         ),
       ],
     );
   }
 
-  Widget buildCell(String text, {bool isNameColumn = false}) {
+  Widget buildCell(BuildContext context, String text, {bool isNameColumn = false}) {
     return Expanded(
       child: Container(
-        height: 40, // Establecemos una altura fija para las celdas
-        padding: const EdgeInsets.all(2.0),
+        height: MediaQuery.of(context).size.height *0.04,
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.002,
+          vertical: MediaQuery.of(context).size.height * 0.002,
+        ),
         child: Align(
           alignment: Alignment.topCenter, // Alineamos el texto arriba
           child: Text(
@@ -170,14 +173,18 @@ class _DataRowWidgetState extends State<DataRowWidget> {
   Widget buildCell(String text, {bool isNameColumn = false}) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.01,
+          vertical: MediaQuery.of(context).size.height * 0.01,
+        ),
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada
           style: TextStyle(
             color: isNameColumn
-                ? const Color.fromARGB(255, 3, 236, 244)
-                : Colors.white, // Texto negro solo para la columna de nombre
+                ? const Color.fromARGB(
+                255, 3, 236, 244) // Color para la columna de nombre
+                : Colors.white,
             fontSize: 15.sp,
             fontWeight: FontWeight.bold, // Ajuste del tamaño del texto
           ),
@@ -192,11 +199,13 @@ class _DataRowWidgetState extends State<DataRowWidget> {
     }
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(2.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.001,
+          vertical: MediaQuery.of(context).size.height * 0.001,
+        ),
         child: Image.asset(
           imagePath,
-          width: 100, // Tamaño de la imagen
-          height: 100, // Tamaño de la imagen
+          height: MediaQuery.of(context).size.height * 0.15, // Tamaño de la imagen
           fit: BoxFit.contain, // Asegurarse que la imagen se ajuste
         ),
       ),

@@ -152,9 +152,12 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
         });
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.03,
-        height: MediaQuery.of(context).size.height * 0.03,
-        margin: const EdgeInsets.all(5.0),
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: MediaQuery.of(context).size.height * 0.04,
+        margin: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.004,
+          horizontal: MediaQuery.of(context).size.width * 0.004,
+        ),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: selectedGroups[option] == true
@@ -335,14 +338,14 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                               child: TextField(
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 14.sp,
+                                                  fontSize: 15.sp,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 14.sp,
+                                                    fontSize: 15.sp,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
@@ -507,14 +510,14 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                                               child: TextField(
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 14.sp,
+                                                  fontSize: 15.sp,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
                                                   hintText: group,
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
-                                                    fontSize: 14.sp,
+                                                    fontSize: 15.sp,
                                                   ),
                                                   border: OutlineInputBorder(
                                                     borderRadius:
@@ -573,10 +576,10 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                       } else {
                         // Mostrar mensaje y evitar el guardado si no hay grupos seleccionados
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                           SnackBar(
                             content: Text(
                               "Debes seleccionar al menos un grupo muscular",
-                              style: TextStyle(color: Colors.white, fontSize: 17),
+                              style: TextStyle(color: Colors.white, fontSize: 17.sp),
                             ),
                             backgroundColor: Colors.orange,
                             duration: Duration(seconds: 2),
@@ -589,8 +592,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),
                       child: SizedBox(
-                        width: screenWidth * 0.08,
-                        height: screenHeight * 0.08,
+                        width: screenWidth * 0.1,
+                        height: screenHeight * 0.1,
                         child: ClipOval(
                           child: Image.asset(
                             'assets/images/tick.png',

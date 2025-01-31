@@ -72,24 +72,32 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-      child: Column(children: [
-        _buildDataTable(screenHeight, screenWidth),
-      ]),
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.03,
+        vertical: screenHeight * 0.03,
+      ),
+      child: Column(
+        children: [
+          _buildDataTable(screenHeight, screenWidth), // Construimos la tabla
+        ],
+      ),
     );
   }
 
   Widget _buildDataTable(double screenHeight, double screenWidth) {
-    return Flexible( // Flexible permite que el Container ocupe una fracción del espacio disponible
-      flex: 1, // Este valor define cuánta parte del espacio disponible debe ocupar el widget
+    return Flexible(
+      flex: 1,
       child: Container(
-        width: screenWidth, // Mantiene el ancho completo de la pantalla
+        width: screenWidth,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 46, 46, 46),
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.02,
+            vertical: screenHeight * 0.02,
+          ),
           child: RecoveryTableWidget(
             programData: allPrograms,
           ),

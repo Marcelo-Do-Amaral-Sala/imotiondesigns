@@ -55,26 +55,29 @@ class SubprogramTableWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         buildCell(
-          tr(context, 'Orden').toUpperCase(),
+         context, tr(context, 'Orden').toUpperCase(),
         ),
         buildCell(
-          tr(context, 'Programa').toUpperCase(),
+          context, tr(context, 'Programa').toUpperCase(),
         ),
         buildCell(
-          tr(context, 'Duración').toUpperCase(),
+          context, tr(context, 'Duración').toUpperCase(),
         ),
         buildCell(
-          tr(context, 'Ajuste').toUpperCase(),
+          context, tr(context, 'Ajuste').toUpperCase(),
         ),
       ],
     );
   }
 
-  Widget buildCell(String text, {bool isNameColumn = false}) {
+  Widget buildCell( BuildContext context, String text, {bool isNameColumn = false}) {
     return Expanded(
       child: Container(
-        height: 40, // Establecemos una altura fija para las celdas
-        padding: const EdgeInsets.all(2.0),
+        height: MediaQuery.of(context).size.height *0.04, // Establecemos una altura fija para las celdas
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.002,
+          vertical: MediaQuery.of(context).size.height * 0.002,
+        ),
         child: Align(
           alignment: Alignment.topCenter, // Alineamos el texto arriba
           child: Text(
@@ -118,19 +121,22 @@ class DataRowWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildCell(orden.toString()),
-          buildCell(nombre, isNameColumn: true),
-          buildCell(duracion.toString()),
-          buildCell(ajuste.toString()),
+          buildCell(context, orden.toString()),
+          buildCell(context,nombre, isNameColumn: true),
+          buildCell(context,duracion.toString()),
+          buildCell(context,ajuste.toString()),
         ],
       ),
     );
   }
 
-  Widget buildCell(String text, {bool isNameColumn = false}) {
+  Widget buildCell(BuildContext context, String text, {bool isNameColumn = false}) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.01,
+          vertical: MediaQuery.of(context).size.height * 0.01,
+        ),
         child: Text(
           text,
           textAlign: TextAlign.center, // Alineación centrada

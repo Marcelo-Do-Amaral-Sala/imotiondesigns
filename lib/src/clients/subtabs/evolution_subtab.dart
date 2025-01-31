@@ -60,7 +60,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
                 }
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 5.0),
+                margin:  EdgeInsets.symmetric(vertical: screenHeight*0.005),
                 height: screenHeight * 0.08,
                 width: screenWidth * 0.08,
                 decoration: const BoxDecoration(
@@ -96,9 +96,9 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
 
   Widget _buildTabBar() {
     return Padding(
-        padding: const EdgeInsets.only(
-          left: 20.0,
-          bottom: 10.0,
+        padding: EdgeInsets.only(
+          left: MediaQuery.of(context).size.width*0.02,
+          bottom:MediaQuery.of(context).size.height*0.01,
         ),
         child: Container(
           color: Colors.black, // Fondo negro para la barra
@@ -127,10 +127,10 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
         });
       },
       child: Padding(
-        padding: const EdgeInsets.only(left: 20.0),
+        padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*0.02),
         child: Container(
           height: MediaQuery.of(context).size.height * 0.1,
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.height*0.01),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFF494949) : Colors.transparent,
             borderRadius:
@@ -176,7 +176,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      padding: const EdgeInsets.all(20.0),
+      padding:  EdgeInsets.symmetric(vertical: screenHeight*0.02, horizontal: screenWidth*0.02),
       child: SizedBox(
         height: screenHeight,
         width: screenWidth,

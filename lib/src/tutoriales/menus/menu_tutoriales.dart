@@ -96,13 +96,19 @@ class _TutorialesMenuViewState extends State<TutorialesMenuView> {
                                       fit: BoxFit.fill,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.01,
+                                        vertical: screenHeight * 0.01,
+                                      ),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.all(10.0),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: screenWidth * 0.001,
+                                              vertical: screenHeight * 0.001,
+                                            ),
                                             width: screenWidth * 0.05,
                                             height: screenHeight * 0.1,
                                             child: Image.asset(

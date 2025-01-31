@@ -175,7 +175,7 @@ class _OverlayVideosState extends State<OverlayVideos> {
               height: MediaQuery.of(context).size.height * 0.7,
               decoration: BoxDecoration(
                 color: Colors.black,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: Colors.white, width: MediaQuery.of(context).size.width * 0.001),
               ),
               child: Column(
                 children: [
@@ -192,8 +192,10 @@ class _OverlayVideosState extends State<OverlayVideos> {
                   // Control bar
                   Container(
                     color: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 1.0, horizontal: 10.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                      vertical: MediaQuery.of(context).size.height * 0.001,
+                    ),
                     child: Column(
                       children: [
                         VideoProgressIndicator(
@@ -209,13 +211,13 @@ class _OverlayVideosState extends State<OverlayVideos> {
                           children: [
                             Text(
                               _formatDuration(_controller.value.position),
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 15),
+                              style:  TextStyle(
+                                  color: Colors.white, fontSize: 15.sp),
                             ),
                             Text(
                               _formatDuration(_controller.value.duration),
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 15),
+                              style:  TextStyle(
+                                  color: Colors.white, fontSize: 15.sp),
                             ),
                           ],
                         ),
@@ -223,8 +225,8 @@ class _OverlayVideosState extends State<OverlayVideos> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.fast_rewind,
-                                  color: Colors.white, size: 40),
+                              icon:  Icon(Icons.fast_rewind,
+                                  color: Colors.white, size: MediaQuery.of(context).size.height * 0.04),
                               onPressed: () => _controller.seekTo(
                                 _controller.value.position -
                                     const Duration(seconds: 5),
@@ -236,7 +238,7 @@ class _OverlayVideosState extends State<OverlayVideos> {
                                     ? Icons.pause_circle
                                     : Icons.play_circle,
                                 color: Colors.white,
-                                size: 60,
+                                size: MediaQuery.of(context).size.height * 0.07,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -247,8 +249,8 @@ class _OverlayVideosState extends State<OverlayVideos> {
                               },
                             ),
                             IconButton(
-                              icon: const Icon(Icons.fast_forward,
-                                  color: Colors.white, size: 40),
+                              icon:  Icon(Icons.fast_forward,
+                                  color: Colors.white, size: MediaQuery.of(context).size.height * 0.04),
                               onPressed: () => _controller.seekTo(
                                 _controller.value.position +
                                     const Duration(seconds: 5),
@@ -267,7 +269,7 @@ class _OverlayVideosState extends State<OverlayVideos> {
             Positioned(
               right: 0,
               child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 40),
+                icon:  Icon(Icons.close, color: Colors.white, size: MediaQuery.of(context).size.height * 0.05),
                 onPressed: widget.onClose,
               ),
             ),

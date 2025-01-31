@@ -123,12 +123,18 @@ class _OverlayAutoState extends State<OverlayAuto> {
     debugPrint('Selected Program: ${program.toString()}');
 
     return Padding(
-      padding: const EdgeInsets.all(20.0), // Añadir padding general
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.02,
+        vertical: MediaQuery.of(context).size.height * 0.02,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.02,
+              vertical: MediaQuery.of(context).size.height * 0.02,
+            ),
             width: MediaQuery.of(context).size.width,
             child: Stack(
               children: [
@@ -146,7 +152,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
 
                     // Contenedor para el texto
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.01),
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.4,
                         child: Column(
@@ -237,7 +243,10 @@ class _OverlayAutoState extends State<OverlayAuto> {
                 borderRadius: BorderRadius.circular(7.0),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.02,
+                  vertical: MediaQuery.of(context).size.height * 0.02,
+                ),
                 child: SubprogramTableWidget(
                   subprogramData: program['subprogramas'] ??
                       [], // Aquí se pasa la lista de subprogramas
@@ -389,7 +398,7 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
   Widget _buildTab(String text, int index) {
     return Tab(
       child: SizedBox(
-        width: 200,
+        width: MediaQuery.of(context).size.height * 0.2,
         child: Text(
           text,
           textAlign: TextAlign.center,
