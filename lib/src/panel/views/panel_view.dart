@@ -983,7 +983,8 @@ class _PanelViewState extends State<PanelView>
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
-                                            clientSelectionMap.value[macAddress];
+                                            clientSelectionMap.value[macAddress]
+                                                as Map<String, dynamic>?;
                                         String clientName =
                                             selectedClient?['name'] ?? '';
 
@@ -3444,7 +3445,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     // Container con el cliente y el texto
                                     Stack(
                                       children: [
-                                        // Esto se coloca en un contenedor de tamaño fijo, sin usar Expanded
                                         GestureDetector(
                                           onTapDown: widget.selectedKey == null
                                               ? null
@@ -3475,8 +3475,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 height: screenWidth * 0.1,
                                                 decoration: const BoxDecoration(
                                                   color: Color(0xFF494949),
-                                                  shape: BoxShape
-                                                      .circle, // Forma circular
+                                                  shape: BoxShape.circle,
                                                 ),
                                                 child: Center(
                                                   child: SizedBox(
@@ -3495,49 +3494,50 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ),
                                         ),
                                         Visibility(
-                                          visible: widget.clientSelectedMap.value.containsKey(widget.macAddress),
+                                          visible: widget
+                                              .clientSelectedMap.value
+                                              .containsKey(widget.macAddress),
                                           child: Positioned(
                                             bottom: 0,
                                             left: 0,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.001),
-                                              child: ValueListenableBuilder<Map<String, dynamic>>(
-                                                valueListenable: widget.clientSelectedMap,
-                                                builder: (context, clientMap, child) {
-                                                  // Ahora estamos usando el mapa actualizado, que tiene los bonos
-                                                  final client = clientMap[widget.macAddress];
+                                            right: 0,
+                                            // Se usa para que el `Align` funcione correctamente
+                                            child: Align(
+                                              alignment: Alignment.center,
+                                        
+                                                child: ValueListenableBuilder<
+                                                    Map<String, dynamic>>(
+                                                  valueListenable:
+                                                      widget.clientSelectedMap,
+                                                  builder: (context, clientMap,
+                                                      child) {
+                                                    final client = clientMap[
+                                                        widget.macAddress];
+                                                    if (client == null)
+                                                      return SizedBox();
+                                                    final int bonos =
+                                                        client['bonos'] ?? 0;
 
-                                                  print("Revisando UI: clientMap = ${widget.clientSelectedMap.value}"); // 🔥 Para depuración
-                                                  print("Revisando UI: buscando ${widget.macAddress} en clientMap");
-
-                                                  if (client == null) return SizedBox();
-
-                                                  final String clientName = client['name'] ?? 'Desconocido';
-                                                  final String mac = widget.macAddress ?? 'Sin MAC';
-                                                  final int bonos = client['bonos'] ?? 0; // Aquí accedemos al total de bonos actualizado
-
-                                                  print("Mostrando en UI -> Cliente: $clientName | MAC: $mac | Bonos: $bonos");
-
-                                                  return Text(
-                                                    "Bonos: $bonos", // Mostramos los bonos correctamente
-                                                    style: TextStyle(
-                                                      fontSize: 10.sp,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.white,
-                                                    ),
-                                                  );
-                                                },
-                                              ),
+                                                    return Text(
+                                                      "$bonos",
+                                                      style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              
                                             ),
                                           ),
-                                        )
-
-
-
+                                        ),
                                       ],
                                     ),
+
                                     SizedBox(width: screenWidth * 0.01),
-                                  // Botón "Equipo 0"
+                                    // Botón "Equipo 0"
                                   Expanded(
                                     child: AbsorbPointer(
                                         absorbing: widget.selectedKey == null ||
