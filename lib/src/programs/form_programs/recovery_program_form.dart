@@ -25,6 +25,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
   final _contractionController = TextEditingController();
   final _rampaController = TextEditingController();
   final _pauseController = TextEditingController();
+  bool _cronaxiaEnabled = true; // Inicialmente habilitados
 
   late TabController _tabController;
 
@@ -59,6 +60,34 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     _tabController = TabController(length: 3, vsync: this);
     fetchGruposMusculares();
     fetchCronaxias();
+    _pulseController.addListener(() {
+      String pulseValue = _pulseController.text;
+      double? pulse = double.tryParse(pulseValue);
+
+      if (pulse != null && pulse != 0) {
+        setState(() {
+          _cronaxiaEnabled = false; // Deshabilitar si el pulso es distinto de 0
+        });
+
+        for (var key in controllersJacket.keys) {
+          controllersJacket[key]?.text = pulseValue;
+        }
+        for (var key in controllersShape.keys) {
+          controllersShape[key]?.text = pulseValue;
+        }
+      } else {
+        setState(() {
+          _cronaxiaEnabled = true; // Habilitar si el pulso es 0 o vacío
+        });
+
+        for (var key in controllersJacket.keys) {
+          controllersJacket[key]?.clear();
+        }
+        for (var key in controllersShape.keys) {
+          controllersShape[key]?.clear();
+        }
+      }
+    });
   }
 
   @override
@@ -76,7 +105,8 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     // Liberar el controlador de tabulación
     _tabController.dispose();
 
-    // Llamar a super.dispose() para garantizar la limpieza general
+    _pulseController.removeListener(() {}); // Remueve el listener para evitar fugas de memoria
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -548,9 +578,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
       ),
     );
   }
-
-
-
   Widget _buildTab(String text, int index) {
     bool isDisabled = !programaGuardado && index != 0; // Bloquear si no está guardado y no es Configuración
 
@@ -572,9 +599,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
       ),
     );
   }
-
-
-
   Widget _buildConfigurationTab(double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -882,7 +906,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
       ),
     );
   }
-
   Widget _buildCronaxiaTab(double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -1005,6 +1028,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                   RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
+                                            enabled: _cronaxiaEnabled,
                                           ),
                                         ),
                                       ],
@@ -1039,6 +1063,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                   RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
+                                            enabled: _cronaxiaEnabled,
                                           ),
                                         ),
                                       ],
@@ -1073,6 +1098,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                   RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
+                                            enabled: _cronaxiaEnabled,
                                           ),
                                         ),
                                       ],
@@ -1107,6 +1133,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                   RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
+                                            enabled: _cronaxiaEnabled,
                                           ),
                                         ),
                                       ],
@@ -1154,6 +1181,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                   RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
+                                            enabled: _cronaxiaEnabled,
                                           ),
                                         ),
                                       ],
@@ -1188,6 +1216,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                   RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
+                                            enabled: _cronaxiaEnabled,
                                           ),
                                         ),
                                       ],
@@ -1222,6 +1251,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                   RegExp(r'^\d*\.?\d*$')),
                                             ],
                                             style: _inputTextStyle,
+                                            enabled: _cronaxiaEnabled,
                                           ),
                                         ),
                                       ],
@@ -1261,7 +1291,16 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
 
                         // Llamar a la función actualizarCronaxias pasando ambos valores
                         await actualizarCronaxias(programaId, tipoEquipamiento);
-                        print('Cronaxias actualizadas al hacer tap.');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Cronaxias añadidas correctamente",
+                              style: TextStyle(color: Colors.white, fontSize: 17.sp),
+                            ),
+                            backgroundColor: Colors.green,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
                       } else {
                         print(
                             'No se encontraron programas en la base de datos');
@@ -1290,7 +1329,6 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
       ),
     );
   }
-
   Widget _buildGroupsTab(double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -1865,7 +1903,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           SizedBox(
             child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.001),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

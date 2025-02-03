@@ -4559,7 +4559,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(
       Database db, int programaId) async {
     return await db.rawQuery('''
-    SELECT c.nombre, pc.valor
+    SELECT c.id, c.nombre, pc.valor
     FROM programa_cronaxia AS pc
     INNER JOIN cronaxia AS c ON pc.cronaxia_id = c.id
     WHERE pc.programa_id = ?

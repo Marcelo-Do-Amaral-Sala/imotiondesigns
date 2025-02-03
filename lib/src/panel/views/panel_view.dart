@@ -1743,6 +1743,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Map<String, dynamic>? selectedIndivProgram;
   Map<String, dynamic>? selectedRecoProgram;
   Map<String, dynamic>? selectedAutoProgram;
+  List<Map<String, dynamic>> selectedCronaxias = [];
+  List<Map<String, dynamic>> selectedGrupos = [];
+
   Map<String, dynamic>? selectedClient;
   int overlayIndex = -1;
   int selectedIndexEquip = 0;
@@ -2931,84 +2934,48 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   Future<void> printElectrostimulationValues(
       String macAddress,
       List<int> porcentajesMusculoTraje,
-      String? selectedProgram,
-      ) async {
+      String? selectedProgram) async {
     try {
+      debugPrint("🔹 printElectrostimulationValues() - Iniciando");
+
       if (porcentajesMusculoTraje.length != 10) {
-        debugPrint(
-            "❌ La lista porcentajesMusculoTraje debe tener exactamente 10 elementos.");
+        debugPrint("❌ La lista porcentajesMusculoTraje debe tener exactamente 10 elementos.");
         return;
       }
 
-      // Configurar los valores de los canales del traje
-      List<int> valoresCanalesTraje = List.filled(10, 0);
-      valoresCanalesTraje[0] = porcentajesMusculoTraje[5];
-      valoresCanalesTraje[1] = porcentajesMusculoTraje[6];
-      valoresCanalesTraje[2] = porcentajesMusculoTraje[7];
-      valoresCanalesTraje[3] = porcentajesMusculoTraje[8];
-      valoresCanalesTraje[4] = porcentajesMusculoTraje[9];
-      valoresCanalesTraje[5] = porcentajesMusculoTraje[0];
-      valoresCanalesTraje[6] = porcentajesMusculoTraje[2];
-      valoresCanalesTraje[7] = porcentajesMusculoTraje[3];
-      valoresCanalesTraje[8] = porcentajesMusculoTraje[1];
-      valoresCanalesTraje[9] = porcentajesMusculoTraje[4];
+      List<int> valoresCanalesTraje = [
+        porcentajesMusculoTraje[5], porcentajesMusculoTraje[6],
+        porcentajesMusculoTraje[7], porcentajesMusculoTraje[8],
+        porcentajesMusculoTraje[9], porcentajesMusculoTraje[0],
+        porcentajesMusculoTraje[2], porcentajesMusculoTraje[3],
+        porcentajesMusculoTraje[1], porcentajesMusculoTraje[4],
+      ];
 
       debugPrint("📊 Valores de canales configurados: $valoresCanalesTraje");
 
-      // Obtener configuraciones del programa seleccionado
       Map<String, dynamic> settings = getProgramSettings(selectedProgram);
       double frecuencia = settings['frecuencia'] ?? 50;
       double rampa = settings['rampa'] ?? 30;
       double pulso = settings['pulso'] ?? 20;
-
-      // Validar y convertir la lista de cronaxias
       List<Map<String, dynamic>> cronaxias = settings['cronaxias'] ?? [];
       List<Map<String, dynamic>> grupos = settings['grupos'] ?? [];
 
-      // Depurar la lista de cronaxias
-      if (cronaxias.isEmpty) {
-        debugPrint(
-            "⚠️ No se encontraron cronaxias para el programa seleccionado.");
-      } else {
-        debugPrint("✅ Se encontraron ${cronaxias.length} cronaxias:");
-      }
+      debugPrint("📊 Datos obtenidos en printElectrostimulationValues:");
+      debugPrint("   - Frecuencia: $frecuencia");
+      debugPrint("   - Rampa: $rampa");
+      debugPrint("   - Pulso: $pulso");
+      debugPrint("   - Cronaxias: $cronaxias");
+      debugPrint("   - Grupos musculares: $grupos");
 
-      // Eliminar duplicados (usar 'nombre' como clave) en cronaxias
-      final uniqueCronaxias = {
-        for (var cronaxia in cronaxias) cronaxia['nombre']: cronaxia
-      }.values.toList();
-
-      for (var cronaxia in uniqueCronaxias) {
-        debugPrint(
-            "Cronaxia: ${cronaxia['nombre']}, Valor: ${cronaxia['valor']}");
-      }
-
-      // Depurar la lista de grupos
-      if (grupos.isEmpty) {
-        debugPrint("⚠️ No se encontraron grupos para el programa seleccionado.");
-      } else {
-        debugPrint("✅ Se encontraron ${grupos.length} grupos:");
-      }
-
-      // Eliminar duplicados (usar 'nombre' como clave) en grupos
-      final uniqueGrupos = {
-        for (var grupo in grupos) grupo['nombre']: grupo
-      }.values.toList();
-
-      for (var grupo in uniqueGrupos) {
-        debugPrint("Grupo: ${grupo['nombre']}, Configuración: ${grupo['config']}");
-      }
-
-      // Ajustes de conversión
       rampa *= 10;
       pulso /= 5;
 
-      debugPrint(
-          "⚙️ Configuración del programa: Frecuencia: $frecuencia Hz, Rampa: $rampa ms, Pulso: $pulso µs");
-
-      debugPrint("✅ Todos los valores se imprimieron correctamente.");
+      debugPrint("⚙️ Configuración ajustada:");
+      debugPrint("   - Frecuencia: $frecuencia");
+      debugPrint("   - Rampa: $rampa");
+      debugPrint("   - Pulso: $pulso");
     } catch (e) {
-      debugPrint("❌ Error al procesar los valores de electroestimulación: $e");
+      debugPrint("❌ Error en printElectrostimulationValues: $e");
     }
   }
 
@@ -3326,28 +3293,120 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("Programa seleccionado: $selectedProgram");
   }
 
-  void onIndivProgramSelected(Map<String, dynamic>? programI) {
+
+  void onIndivProgramSelected(Map<String, dynamic>? programI) async {
+    debugPrint("🔹 onIndivProgramSelected() - Iniciando");
+    if (programI == null) return;
+
     setState(() {
-      selectedIndivProgram = programI; // Actualizas el valor seleccionado
+      selectedIndivProgram = programI;
     });
-    updateContractionAndPauseValues(); // Llamada para actualizar contracción y pausa
-    print("Programa seleccionado: $selectedIndivProgram");
+
+    var db = await DatabaseHelper().database;
+
+    try {
+      List<Map<String, dynamic>> cronaxias = (await DatabaseHelper().obtenerCronaxiasPorPrograma(db, programI['id_programa'])).map((c) => {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']}).toList();
+      List<Map<String, dynamic>> grupos = (await DatabaseHelper().obtenerGruposPorPrograma(db, programI['id_programa'])).map((g) => {'id': g['id']}).toList();
+
+
+      debugPrint("📊 Cronaxias obtenidas: $cronaxias");
+      debugPrint("📊 Grupos musculares obtenidos: $grupos");
+
+      setState(() {
+        selectedCronaxias = cronaxias;
+        selectedGrupos = grupos;
+      });
+      updateContractionAndPauseValues();
+    } catch (e) {
+      debugPrint("❌ Error en onIndivProgramSelected: $e");
+    }
   }
 
-  void onRecoProgramSelected(Map<String, dynamic>? programR) {
+  void onRecoProgramSelected(Map<String, dynamic>? programR) async {
+    debugPrint("🔹 onRecoProgramSelected() - Iniciando");
+    if (programR == null) return;
+
     setState(() {
-      selectedRecoProgram = programR; // Actualizas el valor seleccionado
+      selectedRecoProgram = programR;
     });
-    updateContractionAndPauseValues(); // Llamada para actualizar contracción y pausa
-    print("Programa seleccionado: $selectedRecoProgram");
+
+    var db = await DatabaseHelper().database;
+
+    try {
+      var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, programR['id_programa']);
+      var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, programR['id_programa']);
+
+      debugPrint("📊 Cronaxias obtenidas: $cronaxias");
+      debugPrint("📊 Grupos musculares obtenidos: $grupos");
+
+      setState(() {
+        selectedCronaxias = cronaxias;
+        selectedGrupos = grupos;
+      });
+      updateContractionAndPauseValues();
+    } catch (e) {
+      debugPrint("❌ Error en onRecoProgramSelected: $e");
+    }
   }
 
-  void onAutoProgramSelected(Map<String, dynamic>? programA) {
+  void onAutoProgramSelected(Map<String, dynamic>? programA) async {
+    debugPrint("🔹 onAutoProgramSelected() - Iniciando");
+    if (programA == null) return;
+
     setState(() {
-      selectedAutoProgram = programA; // Actualizas el valor seleccionado
+      selectedAutoProgram = Map<String, dynamic>.from(programA);
     });
-    updateContractionAndPauseValues(); // Llamada para actualizar contracción y pausa
-    print("Programa seleccionado: $selectedAutoProgram");
+
+    var db = await DatabaseHelper().database;
+    try {
+      List<Map<String, dynamic>> subprogramas = (programA['subprogramas'] as List<dynamic>?)
+          ?.map((sp) => Map<String, dynamic>.from(sp))
+          .toList() ?? [];
+
+      for (var i = 0; i < subprogramas.length; i++) {
+        var subprograma = Map<String, dynamic>.from(subprogramas[i]); // Asegurar mutabilidad
+
+        if (subprograma['id_programa_relacionado'] == null) {
+          debugPrint("⚠️ Subprograma sin id_programa en índice $i");
+          continue; // Salta este subprograma si no tiene id_programa
+        }
+
+        int idPrograma = subprograma['id_programa_relacionado'] as int;
+
+        List<Map<String, dynamic>> cronaxias = (await DatabaseHelper().obtenerCronaxiasPorPrograma(db, idPrograma))
+            .map((c) => {
+          'id': c['id'],
+          'nombre': c['nombre'] ?? 'Desconocido',
+          'valor': c['valor'] ?? 0.0
+        })
+            .toList();
+
+        List<Map<String, dynamic>> grupos = (await DatabaseHelper().obtenerGruposPorPrograma(db, idPrograma))
+            .map((g) => {
+          'id': g['id'],
+          'nombre': g['nombre'] ?? 'Desconocido',
+          'imagen': g['imagen'] ?? '',
+          'tipo_equipamiento': g['tipo_equipamiento'] ?? 'Desconocido'
+        })
+            .toList();
+
+        subprogramas[i] = {
+          ...subprograma,
+          'cronaxias': cronaxias,
+          'grupos': grupos,
+        };
+      }
+
+      debugPrint("📊 Subprogramas actualizados con cronaxias y grupos: $subprogramas");
+
+      setState(() {
+        selectedAutoProgram?['subprogramas'] = List<Map<String, dynamic>>.from(subprogramas);
+      });
+
+      updateContractionAndPauseValues();
+    } catch (e) {
+      debugPrint("❌ Error en onAutoProgramSelected: $e");
+    }
   }
 
   void onCycleSelected(String cycle) {
@@ -8081,147 +8140,50 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Map<String, dynamic> getProgramSettings(String? selectedProgram) {
+    debugPrint("🔹 getProgramSettings() - Iniciando con selectedProgram: $selectedProgram");
     double frecuencia = 0;
     double rampa = valueRampa;
     double pulso = 0;
-    List<Map<String, dynamic>> grupos = [];
+
+    Map<String, dynamic>? selectedProgramData;
     List<Map<String, dynamic>> cronaxias = [];
+    List<Map<String, dynamic>> grupos = [];
 
-    if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
-        allIndividualPrograms.isNotEmpty) {
-      if (selectedIndivProgram != null) {
-        frecuencia = selectedIndivProgram!['frecuencia'] ?? 0;
-        rampa = selectedIndivProgram!['rampa'] ?? 0;
-        pulso = selectedIndivProgram!['pulso'] ?? 0;
-
-        if (selectedIndivProgram!['cronaxias'] is List) {
-          cronaxias = (selectedIndivProgram!['cronaxias'] as List)
-              .where((e) => e is Map<String, dynamic>)
-              .cast<Map<String, dynamic>>()
-              .toList();
-        } else if (selectedIndivProgram!['grupos'] is List) {
-          grupos = (selectedIndivProgram!['grupos'] as List)
-              .where((e) => e is Map<String, dynamic>)
-              .cast<Map<String, dynamic>>()
-              .toList();
-        }
-      } else {
-        var program =
-        allIndividualPrograms.isNotEmpty ? allIndividualPrograms[0] : null;
-        if (program != null) {
-          frecuencia = program['frecuencia'] ?? 0;
-          rampa = program['rampa'] ?? 0;
-          pulso = program['pulso'] ?? 0;
-
-          if (program['cronaxias'] is List) {
-            cronaxias = (program['cronaxias'] as List)
-                .where((e) => e is Map<String, dynamic>)
-                .cast<Map<String, dynamic>>()
-                .toList();
-          } else if (program['grupos'] is List) {
-            grupos = (program['grupos'] as List)
-                .where((e) => e is Map<String, dynamic>)
-                .cast<Map<String, dynamic>>()
-                .toList();
-          }
-        }
-      }
-    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
-        allRecoveryPrograms.isNotEmpty) {
-      if (selectedRecoProgram != null) {
-        frecuencia = selectedRecoProgram!['frecuencia'] ?? 0;
-        rampa = selectedRecoProgram!['rampa'] ?? 0;
-        pulso = selectedRecoProgram!['pulso'] ?? 0;
-
-        if (selectedRecoProgram!['cronaxias'] is List) {
-          cronaxias = (selectedRecoProgram!['cronaxias'] as List)
-              .where((e) => e is Map<String, dynamic>)
-              .cast<Map<String, dynamic>>()
-              .toList();
-        } else if (selectedRecoProgram!['grupos'] is List) {
-          grupos = (selectedRecoProgram!['grupos'] as List)
-              .where((e) => e is Map<String, dynamic>)
-              .cast<Map<String, dynamic>>()
-              .toList();
-        }
-      } else {
-        var program =
-        allRecoveryPrograms.isNotEmpty ? allRecoveryPrograms[0] : null;
-        if (program != null) {
-          frecuencia = program['frecuencia'] ?? 0;
-          rampa = program['rampa'] ?? 0;
-          pulso = program['pulso'] ?? 0;
-
-          if (program['cronaxias'] is List) {
-            cronaxias = (program['cronaxias'] as List)
-                .where((e) => e is Map<String, dynamic>)
-                .cast<Map<String, dynamic>>()
-                .toList();
-          } else if (program['grupos'] is List) {
-            grupos = (program['grupos'] as List)
-                .where((e) => e is Map<String, dynamic>)
-                .cast<Map<String, dynamic>>()
-                .toList();
-          }
-        }
-      }
-    } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
-        allAutomaticPrograms.isNotEmpty) {
-      if (selectedAutoProgram != null) {
-        // Obtener el subprograma actual
-        var subprogram =
-        selectedAutoProgram!['subprogramas'][currentSubprogramIndex];
-        frecuencia = subprogram['frecuencia'] ?? 0;
-        rampa = subprogram['rampa'] ?? 0;
-        pulso = subprogram['pulso'] ?? 0;
-
-        // Verificar si el subprograma tiene cronaxias
-        if (subprogram['cronaxias'] is List) {
-          cronaxias = (subprogram['cronaxias'] as List)
-              .where((e) => e is Map<String, dynamic>)
-              .cast<Map<String, dynamic>>()
-              .toList();
-        } else if (subprogram['grupos'] is List) {
-          grupos = (subprogram['grupos'] as List)
-              .where((e) => e is Map<String, dynamic>)
-              .cast<Map<String, dynamic>>()
-              .toList();
-        }
-      } else {
-        var program =
-        allAutomaticPrograms.isNotEmpty ? allAutomaticPrograms[0] : null;
-        if (program != null) {
-          var subprogram = program['subprogramas'].isNotEmpty
-              ? program['subprogramas'][0]
-              : null;
-          if (subprogram != null) {
-            frecuencia = subprogram['frecuencia'] ?? 0;
-            rampa = subprogram['rampa'] ?? 0;
-            pulso = subprogram['pulso'] ?? 0;
-
-            // Obtener cronaxias de este subprograma
-            if (subprogram['cronaxias'] is List) {
-              cronaxias = (subprogram['cronaxias'] as List)
-                  .where((e) => e is Map<String, dynamic>)
-                  .cast<Map<String, dynamic>>()
-                  .toList();
-            } else // Obtener cronaxias de este subprograma
-            if (subprogram['grupos'] is List) {
-              grupos = (subprogram['grupos'] as List)
-                  .where((e) => e is Map<String, dynamic>)
-                  .cast<Map<String, dynamic>>()
-                  .toList();
-            }
-          }
-        }
-      }
+    if (selectedProgram == tr(context, 'Individual').toUpperCase()) {
+      selectedProgramData = selectedIndivProgram;
+      cronaxias = selectedCronaxias;
+      grupos = selectedGrupos;
+    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase()) {
+      selectedProgramData = selectedRecoProgram;
+      cronaxias = selectedCronaxias;
+      grupos = selectedGrupos;
+    }  else if (selectedProgram == tr(context, 'Automáticos').toUpperCase()) {
+      selectedProgramData = selectedAutoProgram?['subprogramas'][currentSubprogramIndex];
+      cronaxias = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]['cronaxias'] as List<dynamic>?)?.map((c) => {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']}).toList() ?? [];
+      grupos = (selectedProgramData?['selectedGrupos'] as List<dynamic>?)?.map((g) => {'id': g['id']}).toList() ?? [];
+      cronaxias = (selectedProgramData?['cronaxias'] as List<dynamic>?)?.map((c) => {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']}).toList() ?? [];
+      grupos = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]['grupos'] as List<dynamic>?)?.map((g) => {'id': g['id']}).toList() ?? [];
     }
+
+    if (selectedProgramData != null) {
+      frecuencia = selectedProgramData['frecuencia'] ?? 0;
+      rampa = selectedProgramData['rampa'] ?? 0;
+      pulso = selectedProgramData['pulso'] ?? 0;
+    }
+
+    debugPrint("📊 Datos obtenidos en getProgramSettings:");
+    debugPrint("   - Frecuencia: $frecuencia");
+    debugPrint("   - Rampa: $rampa");
+    debugPrint("   - Pulso: $pulso");
+    debugPrint("   - Cronaxias: $cronaxias");
+    debugPrint("   - Grupos musculares: $grupos");
+
     return {
       'frecuencia': frecuencia,
       'rampa': rampa,
       'pulso': pulso,
-      'grupos': grupos,
       'cronaxias': cronaxias,
+      'grupos': grupos,
     };
   }
 
