@@ -31,6 +31,8 @@ class LoginViewState extends State<LoginView> {
   String _errorMessage = ''; // Para almacenar el mensaje de error
 
 
+  final FocusNode _userFocusNode = FocusNode(); // 🔹 FocusNode para usuario
+  final FocusNode _pwdFocusNode = FocusNode();
   List<Map<String, dynamic>> allAdmins = []; // Lista original de clientes
   List<Map<String, dynamic>> filteredAdmins = []; // Lista filtrada
 
@@ -47,6 +49,10 @@ class LoginViewState extends State<LoginView> {
     _requestLocationPermissions();
     _fetchAdmins();
     _checkUserProfile();
+    clearFields();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
   }
 
   @override
@@ -54,16 +60,25 @@ class LoginViewState extends State<LoginView> {
     super.dispose();
     _user.dispose();
     _pwd.dispose();
+    _userFocusNode.dispose(); // 🔹 Liberar recursos
+    _pwdFocusNode.dispose();
   }
 
   void clearFields() {
-    setState(() {
-      _isPasswordHidden = true;
-      _user.clear();
-      _pwd.clear();
-      _errorMessage = ''; // Limpia mensajes de error también
+    if (!mounted) return; // 🔹 Evita errores si el widget se desmontó
+
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!mounted) return;
+      setState(() {
+        _isPasswordHidden = true;
+        _user.clear();
+        _pwd.clear();
+        _errorMessage = '';
+      });
     });
   }
+
 
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -315,11 +330,16 @@ class LoginViewState extends State<LoginView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _user,
+                                        focusNode: _userFocusNode, // 🔹 Asigna FocusNode al campo de usuario
                                         keyboardType: TextInputType.text,
                                         style: _inputTextStyle,
                                         decoration: _inputDecorationStyle(
                                           hintText: tr(context, ''),
                                         ),
+                                        textInputAction: TextInputAction.next, // Muestra "Siguiente" en el teclado
+                                        onSubmitted: (_) {
+                                          FocusScope.of(context).requestFocus(_pwdFocusNode); // 🔹 Mueve el foco al campo de contraseña
+                                        },
                                       ),
                                     ),
                                   ],
@@ -340,35 +360,33 @@ class LoginViewState extends State<LoginView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _pwd,
+                                        focusNode: _pwdFocusNode, // 🔹 Asigna FocusNode al campo de contraseña
                                         keyboardType: TextInputType.text,
                                         obscureText: _isPasswordHidden,
-                                        // Controlamos la visibilidad aquí
                                         style: _inputTextStyle,
                                         decoration: _inputDecorationStyle(
                                           hintText: tr(context, ''),
                                           suffixIcon: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _isPasswordHidden =
-                                                      !_isPasswordHidden; // Cambiar la visibilidad
-                                                });
-                                              },
-                                              child: Container(
-                                                padding:  EdgeInsets.only(
-                                                    right: screenWidth*0.01),
-                                                width: screenWidth * 0.01,
-                                                // Ajustar tamaño si es necesario
-                                                height: screenHeight * 0.01,
-                                                child: Image.asset(
-                                                  _isPasswordHidden
-                                                      ? 'assets/images/ojo1.png' // Imagen para "ocultar"
-                                                      : 'assets/images/ojo2.png',
-                                                  // Imagen para "mostrar"
-
-                                                  fit: BoxFit.scaleDown,
-                                                ),
-                                              )),
+                                            onTap: () {
+                                              setState(() {
+                                                _isPasswordHidden = !_isPasswordHidden;
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.only(right: screenWidth * 0.01),
+                                              width: screenWidth * 0.01,
+                                              height: screenHeight * 0.01,
+                                              child: Image.asset(
+                                                _isPasswordHidden ? 'assets/images/ojo1.png' : 'assets/images/ojo2.png',
+                                                fit: BoxFit.scaleDown,
+                                              ),
+                                            ),
+                                          ),
                                         ),
+                                        textInputAction: TextInputAction.done, // Muestra "Hecho" en el teclado
+                                        onSubmitted: (_) {
+                                          FocusScope.of(context).unfocus(); // 🔹 Cierra el teclado al presionar "Hecho"
+                                        },
                                       ),
                                     ),
                                   ],

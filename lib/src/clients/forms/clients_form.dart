@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
@@ -21,7 +22,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   final _phoneController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
-
+  final FocusNode _heightFocus = FocusNode();
+  final FocusNode _weightFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _phoneFocus = FocusNode();
   String? selectedOption;
   String? selectedGender;
   String? _birthDate;
@@ -30,6 +34,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context)
+          .unfocus(); // 🔹 Asegurar que no haya focus al abrir la vista
+    });
   }
 
   @override
@@ -40,6 +48,10 @@ class PersonalDataFormState extends State<PersonalDataForm> {
      _phoneController.dispose();
      _heightController.dispose();
      _weightController.dispose();
+    _heightFocus.dispose();
+    _weightFocus.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
     super.dispose();
   }
 
@@ -299,6 +311,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _phoneController,
+                                focusNode: _phoneFocus,
+                                textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.digitsOnly,
@@ -307,6 +321,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 decoration: _inputDecorationStyle(
                                     hintText:
                                         tr(context, 'Introducir teléfono')),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_heightFocus),
                               ),
                             ),
                           ],
@@ -324,6 +340,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _heightController,
+                                focusNode: _heightFocus,
+                                textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.digitsOnly,
@@ -333,6 +351,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 decoration: _inputDecorationStyle(
                                   hintText: tr(context, 'Introducir altura'),
                                 ),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_weightFocus),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
@@ -343,6 +363,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _weightController,
+                                focusNode: _weightFocus,
+                                textInputAction: TextInputAction.next,
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
                                         decimal: true),
@@ -356,6 +378,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 decoration: _inputDecorationStyle(
                                   hintText: tr(context, 'Introducir peso'),
                                 ),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_emailFocus),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
@@ -365,7 +389,9 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _emailController,
+                                focusNode: _emailFocus,
                                 keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.done,
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.deny(
                                       RegExp(r'\s')),
@@ -374,6 +400,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
                                 decoration: _inputDecorationStyle(
                                   hintText: tr(context, 'Introducir e-mail'),
                                 ),
+                                onSubmitted: (_) =>
+                                    FocusScope.of(context).unfocus(),
                               ),
                             ),
                           ],

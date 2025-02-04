@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../utils/translation_utils.dart';
 import '../clients/overlays/main_overlay.dart';
 import '../db/db_helper.dart';
@@ -166,7 +166,8 @@ class OverlayChangePwdState extends State<OverlayChangePwd> {
   String? userTipoPerfil;
   bool _isPasswordHidden = true;
   bool _isPassword2Hidden = true;
-
+  final FocusNode _pwdFocusNode = FocusNode();
+  final FocusNode _pwd2FocusNode = FocusNode();
   @override
   void initState() {
     clearFields();
@@ -186,6 +187,8 @@ class OverlayChangePwdState extends State<OverlayChangePwd> {
     super.dispose();
     _pwd.dispose();
     _pwd2.dispose();
+    _pwdFocusNode.dispose(); // 🔹 Liberar recursos del FocusNode
+    _pwd2FocusNode.dispose();
   }
 
   Future<void> _updatePassword() async {
@@ -279,34 +282,38 @@ class OverlayChangePwdState extends State<OverlayChangePwd> {
                     decoration: _inputDecoration(),
                     child: TextField(
                       controller: _pwd,
+                      focusNode: _pwdFocusNode,
+                      // 🔹 Asigna FocusNode al campo de contraseña
                       keyboardType: TextInputType.text,
                       obscureText: _isPasswordHidden,
-                      // Controlamos la visibilidad aquí
                       style: _inputTextStyle,
                       decoration: _inputDecorationStyle(
                         hintText: tr(context, ''),
                         suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isPasswordHidden =
-                                !_isPasswordHidden; // Cambiar la visibilidad
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(right: 10.0),
-                              width: screenWidth * 0.01,
-                              // Ajustar tamaño si es necesario
-                              height: screenHeight * 0.01,
-                              child: Image.asset(
-                                _isPasswordHidden
-                                    ? 'assets/images/ojo1.png' // Imagen para "ocultar"
-                                    : 'assets/images/ojo2.png',
-                                // Imagen para "mostrar"
-
-                                fit: BoxFit.scaleDown,
-                              ),
-                            )),
+                          onTap: () {
+                            setState(() {
+                              _isPasswordHidden = !_isPasswordHidden;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            width: screenWidth * 0.01,
+                            height: screenHeight * 0.01,
+                            child: Image.asset(
+                              _isPasswordHidden
+                                  ? 'assets/images/ojo1.png'
+                                  : 'assets/images/ojo2.png',
+                              fit: BoxFit.scaleDown,
+                            ),
+                          ),
+                        ),
                       ),
+                      textInputAction: TextInputAction.next,
+                      // 🔹 Muestra "Siguiente" en el teclado
+                      onSubmitted: (_) {
+                        FocusScope.of(context).requestFocus(
+                            _pwd2FocusNode); // 🔹 Mueve el foco al campo de repetir contraseña
+                      },
                     ),
                   ),
                 ],
@@ -324,34 +331,38 @@ class OverlayChangePwdState extends State<OverlayChangePwd> {
                     decoration: _inputDecoration(),
                     child: TextField(
                       controller: _pwd2,
+                      focusNode: _pwd2FocusNode,
+                      // 🔹 Asigna FocusNode al campo de repetir contraseña
                       keyboardType: TextInputType.text,
                       obscureText: _isPassword2Hidden,
-                      // Controlamos la visibilidad aquí
                       style: _inputTextStyle,
                       decoration: _inputDecorationStyle(
                         hintText: tr(context, ''),
                         suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isPassword2Hidden =
-                                    !_isPassword2Hidden; // Cambiar la visibilidad
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(right: 10.0),
-                              width: screenWidth * 0.01,
-                              // Ajustar tamaño si es necesario
-                              height: screenHeight * 0.01,
-                              child: Image.asset(
-                                _isPassword2Hidden
-                                    ? 'assets/images/ojo1.png' // Imagen para "ocultar"
-                                    : 'assets/images/ojo2.png',
-                                // Imagen para "mostrar"
-
-                                fit: BoxFit.scaleDown,
-                              ),
-                            )),
+                          onTap: () {
+                            setState(() {
+                              _isPassword2Hidden = !_isPassword2Hidden;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            width: screenWidth * 0.01,
+                            height: screenHeight * 0.01,
+                            child: Image.asset(
+                              _isPassword2Hidden
+                                  ? 'assets/images/ojo1.png'
+                                  : 'assets/images/ojo2.png',
+                              fit: BoxFit.scaleDown,
+                            ),
+                          ),
+                        ),
                       ),
+                      textInputAction: TextInputAction.done,
+                      // 🔹 Muestra "Hecho" en el teclado
+                      onSubmitted: (_) {
+                        FocusScope.of(context)
+                            .unfocus(); // 🔹 Cierra el teclado al presionar "Hecho"
+                      },
                     ),
                   ),
                 ],

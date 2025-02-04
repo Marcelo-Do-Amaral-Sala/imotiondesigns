@@ -38,6 +38,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
   final _cityController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final FocusNode _nLicenciaFocus = FocusNode();
+  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _adressFocus = FocusNode();
+  final FocusNode _cityFocus = FocusNode();
+  final FocusNode _provinciaFocus = FocusNode();
+  final FocusNode _countryFocus = FocusNode();
+  final FocusNode _phoneFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
   List<Map<String, dynamic>> allMcis = []; // Lista original de clientes
   Map<String, dynamic> licenciaData =
       {}; // Mapa para almacenar la respuesta de la licencia
@@ -78,11 +86,24 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
         _emailController.text = AppState.instance.email;
       });
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus(); // 🔹 Asegurar que no haya focus al abrir la vista
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
+    // 🔹 Liberar los FocusNodes
+    _nLicenciaFocus.dispose();
+    _nameFocus.dispose();
+    _adressFocus.dispose();
+    _cityFocus.dispose();
+    _provinciaFocus.dispose();
+    _countryFocus.dispose();
+    _phoneFocus.dispose();
+    _emailFocus.dispose();
+
   }
 
   void toggleOverlay(int index) {
@@ -537,12 +558,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _nLicenciaController,
+                                        focusNode: _nLicenciaFocus, // 🔹 FocusNode asignado
                                         keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.next, // 🔹 Muestra "Siguiente"
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText: tr(context,
-                                              'Introducir nº licencia'),
-                                        ),
+                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir nº licencia')),
+                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_nameFocus), // 🔹 Mover foco al siguiente campo
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -553,10 +574,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _nameController,
+                                        focusNode: _nameFocus, // 🔹 FocusNode asignado
+                                        keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                            hintText: 'Introducir nombre'),
+                                        decoration: _inputDecorationStyle(hintText: 'Introducir nombre'),
+                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_adressFocus),
                                       ),
+
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
                                     Text(tr(context, 'Dirección').toUpperCase(),
@@ -566,11 +591,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _adressController,
+                                        focusNode: _adressFocus,
+                                        keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText: tr(
-                                              context, 'Introducir dirección'),
-                                        ),
+                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir dirección')),
+                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_cityFocus),
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -581,11 +607,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _cityController,
+                                        focusNode: _cityFocus,
+                                        keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText:
-                                              tr(context, 'Introducir ciudad'),
-                                        ),
+                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir ciudad')),
+                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_provinciaFocus),
                                       ),
                                     ),
                                   ],
@@ -604,11 +631,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _provinciaController,
+                                        focusNode: _provinciaFocus,
+                                        keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText: tr(
-                                              context, 'Introducir provincia'),
-                                        ),
+                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir provincia')),
+                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_countryFocus),
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -619,12 +647,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _countryController,
+                                        focusNode: _countryFocus,
+                                        keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText:
-                                              tr(context, 'Introducir país'),
-                                        ),
+                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir país')),
+                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocus),
                                       ),
+
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
                                     Text(tr(context, 'Teléfono').toUpperCase(),
@@ -634,17 +664,16 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _phoneController,
+                                        focusNode: _phoneFocus,
                                         keyboardType: TextInputType.number,
+                                        textInputAction: TextInputAction.next,
                                         inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          LengthLimitingTextInputFormatter(3),
+                                          FilteringTextInputFormatter.digitsOnly,
+                                          LengthLimitingTextInputFormatter(10), // Limita la longitud del teléfono
                                         ],
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText: tr(
-                                              context, 'Introducir teléfono'),
-                                        ),
+                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir teléfono')),
+                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -654,17 +683,15 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _emailController,
-                                        keyboardType:
-                                            TextInputType.emailAddress,
+                                        focusNode: _emailFocus,
+                                        keyboardType: TextInputType.emailAddress,
+                                        textInputAction: TextInputAction.done, // 🔹 Último campo, muestra "Hecho"
                                         inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.deny(
-                                              RegExp(r'\s')),
+                                          FilteringTextInputFormatter.deny(RegExp(r'\s')), // 🔹 Evita espacios en blanco
                                         ],
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText:
-                                              tr(context, 'Introducir e-mail'),
-                                        ),
+                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir e-mail')),
+                                        onSubmitted: (_) => FocusScope.of(context).unfocus(), // 🔹 Cierra el teclado
                                       ),
                                     ),
                                   ],

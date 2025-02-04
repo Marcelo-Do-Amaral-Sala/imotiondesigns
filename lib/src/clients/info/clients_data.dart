@@ -30,6 +30,10 @@ class _ClientsDataState extends State<ClientsData> {
   final _phoneController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
+  final FocusNode _heightFocus = FocusNode();
+  final FocusNode _weightFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _phoneFocus = FocusNode();
   String? selectedOption;
   String? selectedGender;
   String? _birthDate;
@@ -43,6 +47,10 @@ class _ClientsDataState extends State<ClientsData> {
     clientId = int.tryParse(widget.clientData['id'].toString());
     _indexController.text = clientId.toString(); // Set controller text
     _refreshControllers(); // Load initial data from the database
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context)
+          .unfocus(); // 🔹 Asegurar que no haya focus al abrir la vista
+    });
   }
 
   @override
@@ -53,6 +61,10 @@ class _ClientsDataState extends State<ClientsData> {
     _phoneController.dispose();
     _heightController.dispose();
     _weightController.dispose();
+    _heightFocus.dispose();
+    _weightFocus.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
     super.dispose();
   }
 
@@ -468,6 +480,8 @@ class _ClientsDataState extends State<ClientsData> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _phoneController,
+                                focusNode: _phoneFocus,
+                                textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.digitsOnly,
@@ -476,6 +490,8 @@ class _ClientsDataState extends State<ClientsData> {
                                 decoration: _inputDecorationStyle(
                                   hintText: tr(context, 'Introducir teléfono'),
                                 ),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_heightFocus),
                               ),
                             ),
                           ],
@@ -493,6 +509,8 @@ class _ClientsDataState extends State<ClientsData> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _heightController,
+                                focusNode: _heightFocus,
+                                textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.digitsOnly,
@@ -501,6 +519,8 @@ class _ClientsDataState extends State<ClientsData> {
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
                                     hintText: tr(context, 'Introducir altura')),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_weightFocus),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
@@ -511,6 +531,8 @@ class _ClientsDataState extends State<ClientsData> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _weightController,
+                                focusNode: _weightFocus,
+                                textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.digitsOnly,
@@ -520,6 +542,8 @@ class _ClientsDataState extends State<ClientsData> {
                                 decoration: _inputDecorationStyle(
                                   hintText: tr(context, 'Introducir peso'),
                                 ),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_emailFocus),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.03),
@@ -529,6 +553,8 @@ class _ClientsDataState extends State<ClientsData> {
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _emailController,
+                                focusNode: _emailFocus,
+                                textInputAction: TextInputAction.done,
                                 keyboardType: TextInputType.emailAddress,
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.deny(
@@ -537,6 +563,8 @@ class _ClientsDataState extends State<ClientsData> {
                                 style: _inputTextStyle,
                                 decoration: _inputDecorationStyle(
                                     hintText: tr(context, 'Introducir e-mail')),
+                                onSubmitted: (_) =>
+                                    FocusScope.of(context).unfocus(),
                               ),
                             ),
                           ],

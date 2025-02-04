@@ -25,6 +25,13 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
   final _contractionController = TextEditingController();
   final _rampaController = TextEditingController();
   final _pauseController = TextEditingController();
+  final FocusNode _frequencyFocus = FocusNode();
+  final FocusNode _pulseFocus = FocusNode();
+  final FocusNode _contractionFocus = FocusNode();
+  final FocusNode _rampaFocus = FocusNode();
+  final FocusNode _pauseFocus = FocusNode();
+  List<FocusNode> _focusNodesJacket = [];
+  List<FocusNode> _focusNodesShape = [];
   bool _cronaxiaEnabled = true; // Inicialmente habilitados
 
   late TabController _tabController;
@@ -88,11 +95,21 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         }
       }
     });
+    _focusNodesJacket = List.generate(10, (_) => FocusNode());
+    _focusNodesShape = List.generate(7, (_) => FocusNode());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus(); // 🔹 Asegurar que no haya focus al abrir la vista
+    });
   }
 
   @override
   void dispose() {
-    // Liberar los controladores dinámicos de BIO-JACKET
+    for (var node in _focusNodesJacket) {
+      node.dispose();
+    }
+    for (var node in _focusNodesShape) {
+      node.dispose();
+    }
     controllersJacket.forEach((key, controller) {
       controller.dispose();
     });
@@ -107,6 +124,11 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
 
     _pulseController.removeListener(() {}); // Remueve el listener para evitar fugas de memoria
     _pulseController.dispose();
+    _frequencyFocus.dispose();
+    _pulseFocus.dispose();
+    _contractionFocus.dispose();
+    _rampaFocus.dispose();
+    _pauseFocus.dispose();
     super.dispose();
   }
 
@@ -695,18 +717,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _frequencyController,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
+                                focusNode: _frequencyFocus, // 🔹 FocusNode asignado
+                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                textInputAction: TextInputAction.next,
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'^\d*\.?\d*$')),
+                                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                 ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText:
-                                      tr(context, 'Introducir frecuencia'),
-                                ),
+                                decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir frecuencia')),
+                                onSubmitted: (_) => FocusScope.of(context).requestFocus(_pulseFocus),
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.01),
@@ -717,17 +736,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                               decoration: _inputDecoration(),
                               child: TextField(
                                 controller: _pulseController,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
+                                focusNode: _pulseFocus,
+                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                textInputAction: TextInputAction.next,
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'^\d*\.?\d*$')),
+                                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                 ],
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir pulso'),
-                                ),
+                                decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir pulso')),
+                                onSubmitted: (_) => FocusScope.of(context).requestFocus(_rampaFocus),
                               ),
                             ),
                           ],
@@ -761,16 +778,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _rampaController,
-                                          keyboardType: const TextInputType
-                                              .numberWithOptions(decimal: true),
+                                          focusNode: _rampaFocus,
+                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                          textInputAction: TextInputAction.next,
                                           inputFormatters: [
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'^\d*\.?\d*$')),
+                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                           ],
                                           style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(
-                                              hintText: tr(
-                                                  context, 'Introducir rampa')),
+                                          decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir rampa')),
+                                          onSubmitted: (_) => FocusScope.of(context).requestFocus(_contractionFocus),
                                         ),
                                       ),
                                     ],
@@ -801,17 +817,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _contractionController,
-                                          keyboardType: const TextInputType
-                                              .numberWithOptions(decimal: true),
+                                          focusNode: _contractionFocus,
+                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                          textInputAction: TextInputAction.next,
                                           inputFormatters: [
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'^\d*\.?\d*$')),
+                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                           ],
                                           style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(
-                                            hintText: tr(context,
-                                                'Introducir contracción'),
-                                          ),
+                                          decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir contracción')),
+                                          onSubmitted: (_) => FocusScope.of(context).requestFocus(_pauseFocus),
                                         ),
                                       ),
                                     ],
@@ -842,17 +856,15 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                         decoration: _inputDecoration(),
                                         child: TextField(
                                           controller: _pauseController,
-                                          keyboardType: const TextInputType
-                                              .numberWithOptions(decimal: true),
+                                          focusNode: _pauseFocus,
+                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                          textInputAction: TextInputAction.done, // 🔹 Último campo, muestra "Hecho"
                                           inputFormatters: [
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'^\d*\.?\d*$')),
+                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                                           ],
                                           style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(
-                                            hintText:
-                                                tr(context, 'Introducir pausa'),
-                                          ),
+                                          decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir pausa')),
+                                          onSubmitted: (_) => FocusScope.of(context).unfocus(), // 🔹 Cierra el teclado
                                         ),
                                       ),
                                     ],
@@ -994,156 +1006,25 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                 if (selectedEquipOption == 'BIO-JACKET') ...[
                   // Campos específicos para BIO-JACKET
                   Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.03,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Primera columna de TextFields
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Itera sobre los primeros grupos musculares
-                                  for (int i = 0; i < 3; i++)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                          style: _labelStyle,
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          decoration: _inputDecoration(),
-                                          child: TextField(
-                                            controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
-                                            keyboardType: const TextInputType
-                                                .numberWithOptions(decimal: true),
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(r'^\d*\.?\d*$')),
-                                            ],
-                                            style: _inputTextStyle,
-                                            enabled: _cronaxiaEnabled,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.05),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Itera sobre los siguientes grupos musculares
-                                  for (int i = 3; i < 6; i++)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                          style: _labelStyle,
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          decoration: _inputDecoration(),
-                                          child: TextField(
-                                            controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
-                                            keyboardType: const TextInputType
-                                                .numberWithOptions(decimal: true),
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(r'^\d*\.?\d*$')),
-                                            ],
-                                            style: _inputTextStyle,
-                                            enabled: _cronaxiaEnabled,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.05),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Itera sobre los últimos grupos musculares
-                                  for (int i = 6; i < 9; i++)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                          style: _labelStyle,
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          decoration: _inputDecoration(),
-                                          child: TextField(
-                                            controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
-                                            keyboardType: const TextInputType
-                                                .numberWithOptions(decimal: true),
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(r'^\d*\.?\d*$')),
-                                            ],
-                                            style: _inputTextStyle,
-                                            enabled: _cronaxiaEnabled,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.05),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  for (int i = 9;
-                                  i < 10;
-                                  i++) // Aquí ajustamos el rango de grupos
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
-                                          style: _labelStyle,
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          decoration: _inputDecoration(),
-                                          child: TextField(
-                                            controller: controllersJacket[
-                                            gruposBioJacket[i]['nombre']],
-                                            keyboardType: const TextInputType
-                                                .numberWithOptions(decimal: true),
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(r'^\d*\.?\d*$')),
-                                            ],
-                                            style: _inputTextStyle,
-                                            enabled: _cronaxiaEnabled,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.03,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildColumnGroup(0, 3, screenWidth), // Primera columna
+                          SizedBox(width: screenWidth * 0.05),
+                          _buildColumnGroup(3, 6, screenWidth), // Segunda columna
+                          SizedBox(width: screenWidth * 0.05),
+                          _buildColumnGroup(6, 9, screenWidth), // Tercera columna
+                          SizedBox(width: screenWidth * 0.05),
+                          _buildColumnGroup(9, 10, screenWidth), // Cuarta columna (último elemento)
+                        ],
+                      ),
+                    ),
+                  ),
+
                 ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
                   // Campos específicos para BIO-SHAPE
                   Expanded(
@@ -1329,6 +1210,50 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
       ),
     );
   }
+  Widget _buildColumnGroup(int start, int end, double screenWidth) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (int i = start; i < end && i < gruposBioJacket.length; i++)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                  style: _labelStyle,
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  decoration: _inputDecoration(),
+                  child: TextField(
+                    controller: controllersJacket[gruposBioJacket[i]['nombre']],
+                    focusNode: _focusNodesJacket[i],  // 🔹 Maneja el cambio de foco
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    textInputAction: (i == gruposBioJacket.length - 1)
+                        ? TextInputAction.done
+                        : TextInputAction.next,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                    ],
+                    style: _inputTextStyle,
+                    enabled: _cronaxiaEnabled,
+                    onSubmitted: (_) {
+                      if (i < gruposBioJacket.length - 1) {
+                        FocusScope.of(context).requestFocus(_focusNodesJacket[i + 1]);
+                      } else {
+                        FocusScope.of(context).unfocus();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGroupsTab(double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
