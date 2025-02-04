@@ -1727,12 +1727,14 @@ class OverlayCiclos extends StatefulWidget {
 
 class _OverlayCiclosState extends State<OverlayCiclos> {
   String selectedCycle = '';
-  final List<String> cycleNames = ["0", "A", "B", "C", "D"];
+  String tempSelectedCycle = ''; // 🔹 Almacena temporalmente la selección
+  final List<String> cycleNames = ["A", "B", "C", "D"];
 
   @override
   void initState() {
     super.initState();
     selectedCycle = widget.selectedCycle; // 🔹 Cargar ciclo guardado
+    tempSelectedCycle = selectedCycle; // 🔹 Asegurar consistencia inicial
   }
 
   @override
@@ -1772,21 +1774,15 @@ class _OverlayCiclosState extends State<OverlayCiclos> {
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        // 🔥 Si el usuario vuelve a presionar, se deselecciona
-                        selectedCycle =
-                            (selectedCycle == cycleName) ? '' : cycleName;
+                        tempSelectedCycle = (tempSelectedCycle == cycleName) ? '' : cycleName;
                       });
-                      widget.onCycleSelected(
-                          selectedCycle); // 🔹 Pasar ciclo al padre (puede ser vacío)
-                      widget.onClose();
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       decoration: BoxDecoration(
-                        color: selectedCycle == cycleName
-                            ? const Color(0xFF2be4f3) // Seleccionado
-                            : const Color.fromARGB(255, 46, 46, 46),
-                        // No seleccionado
+                        color: tempSelectedCycle == cycleName
+                            ? const Color(0xFF2be4f3) // 🔹 Muestra la selección temporal
+                            : const Color.fromARGB(255, 46, 46, 46), // 🔹 No seleccionado
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: Colors.white,
@@ -1799,6 +1795,35 @@ class _OverlayCiclosState extends State<OverlayCiclos> {
                 },
               ),
             ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    selectedCycle = tempSelectedCycle; // 🔹 Confirmar selección
+                  });
+                  widget.onCycleSelected(selectedCycle); // 🔹 Enviar selección al padre
+                  widget.onClose();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.all(10.0),
+                  side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  backgroundColor: const Color(0xFF2be4f3),
+                ),
+                child: Text(
+                  tr(context, "Seleccionar").toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -1806,6 +1831,7 @@ class _OverlayCiclosState extends State<OverlayCiclos> {
     );
   }
 }
+
 
 class CycleTextWidget extends StatelessWidget {
   final String cycleName;
@@ -1815,7 +1841,6 @@ class CycleTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map<String, List<String>> cycleInfo = {
-      "0": [tr(context, "Todos los músculos")],
       "A": [
         tr(context, "Glúteos\nIsquiotibiales"),
         tr(context, "Trapecios\nDorsales\nLumbares"),

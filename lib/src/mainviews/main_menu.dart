@@ -31,10 +31,10 @@ class MainMenuView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MainMenuView> createState() => _MainMenuViewState();
+  State<MainMenuView> createState() => MainMenuViewState();
 }
 
-class _MainMenuViewState extends State<MainMenuView>
+class MainMenuViewState extends State<MainMenuView>
     with SingleTickerProviderStateMixin {
   double scaleFactorBack = 1.0;
   double scaleFactorPanel = 1.0;
@@ -54,10 +54,13 @@ class _MainMenuViewState extends State<MainMenuView>
   @override
   void initState() {
     super.initState();
-    // Llamar a la función para verificar el userId y tipo de perfil al iniciar
-    _checkUserProfile();
-
   }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    checkUserProfile(); // 🔹 Actualiza el userId al volver a la vista
+  }
+
 
   @override
   void dispose() {
@@ -71,7 +74,7 @@ class _MainMenuViewState extends State<MainMenuView>
     print('Datos de inicio de sesión eliminados de SharedPreferences');
   }
 
-  Future<void> _checkUserProfile() async {
+  Future<void> checkUserProfile() async {
     // Obtener el userId desde SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId =
@@ -157,6 +160,12 @@ class _MainMenuViewState extends State<MainMenuView>
                     OutlinedButton(
                       onPressed: () async {
                         await clearLoginData();
+
+                        setState(() {
+                          userId = null;
+                          userTipoPerfil = null;
+                        });
+
                         Navigator.of(context).pop();
                         widget.onNavigateToLogin();
                       },

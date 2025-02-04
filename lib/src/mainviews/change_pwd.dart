@@ -7,15 +7,16 @@ import '../clients/overlays/main_overlay.dart';
 import '../db/db_helper.dart';
 
 class ChangePwdView extends StatefulWidget {
-  final Function() onNavigateToMainMenu;
+  final Function() onNavigateToLogin;
+  final int userId;
   final double screenWidth;
   final double screenHeight;
 
   const ChangePwdView({
     Key? key,
-    required this.onNavigateToMainMenu,
+    required this.onNavigateToLogin,
     required this.screenWidth,
-    required this.screenHeight,
+    required this.screenHeight, required this.userId,
   }) : super(key: key);
 
   @override
@@ -27,22 +28,33 @@ class _ChangePwdViewState extends State<ChangePwdView> {
   String overlayContentType = '';
   Map<String, String>? clientData;
   int overlayIndex = -1; // -1 indica que no hay overlay visible
+  final GlobalKey<OverlayChangePwdState> _overlayKey = GlobalKey<OverlayChangePwdState>();
 
   @override
   void initState() {
     super.initState();
-    toggleOverlay(0);
-  }
-
-  void toggleOverlay(int index) {
     setState(() {
-      isOverlayVisible = !isOverlayVisible;
-      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
+      isOverlayVisible = true; // 🔹 Asegurar que el overlay esté visible al iniciar
+      overlayIndex = 0;
     });
   }
 
+  void clearOverlayFields() {
+    _overlayKey.currentState?.clearFields(); // ✅ Limpiar los campos del overlay
+  }
+  void toggleOverlay(int index) {
+    setState(() {
+      if (!isOverlayVisible) {
+        isOverlayVisible = true;  // 🔹 Asegurar que siempre se muestra si está oculto
+      }
+      overlayIndex = index;
+    });
+  }
+
+
   @override
   void dispose() {
+    _overlayKey.currentState?.clearFields();
     super.dispose();
   }
 
@@ -120,30 +132,34 @@ class _ChangePwdViewState extends State<ChangePwdView> {
     switch (overlayIndex) {
       case 0:
         return OverlayChangePwd(
+          key: _overlayKey,
+          userId: widget.userId, // 🔹 Pasamos userId correctamente
           onClose: () => toggleOverlay(0),
-          onNavigateToMainMenu: widget.onNavigateToMainMenu,
+          onNavigateToLogin: widget.onNavigateToLogin,
         );
       default:
         return Container();
     }
   }
+
 }
 
 class OverlayChangePwd extends StatefulWidget {
   final VoidCallback onClose;
-  final VoidCallback onNavigateToMainMenu;
+  final VoidCallback onNavigateToLogin;
+  final int userId;
 
   const OverlayChangePwd({
     Key? key,
     required this.onClose,
-    required this.onNavigateToMainMenu,
+    required this.onNavigateToLogin, required this.userId,
   }) : super(key: key);
 
   @override
-  _OverlayChangePwdState createState() => _OverlayChangePwdState();
+  OverlayChangePwdState createState() => OverlayChangePwdState();
 }
 
-class _OverlayChangePwdState extends State<OverlayChangePwd> {
+class OverlayChangePwdState extends State<OverlayChangePwd> {
   final TextEditingController _pwd = TextEditingController();
   final TextEditingController _pwd2 = TextEditingController();
   int? userId;
@@ -153,8 +169,16 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
 
   @override
   void initState() {
+    clearFields();
     super.initState();
-    _checkUserProfile();
+  }
+  void clearFields() {
+    setState(() {
+      _isPasswordHidden = true;
+      _isPassword2Hidden = true;
+      _pwd2.clear();
+      _pwd.clear();
+    });
   }
 
   @override
@@ -164,134 +188,64 @@ class _OverlayChangePwdState extends State<OverlayChangePwd> {
     _pwd2.dispose();
   }
 
-
-  Future<void> _checkUserProfile() async {
-    // Obtener el userId desde SharedPreferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId =
-        prefs.getInt('user_id'); // Guardamos el userId en la variable de clase
-
-    if (userId != null) {
-      // Obtener el tipo de perfil del usuario usando el userId
-      DatabaseHelper dbHelper = DatabaseHelper();
-      String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId!);
-      setState(() {
-        userTipoPerfil = tipoPerfil; // Guardamos el tipo de perfil en el estado
-      });
-    } else {
-      // Si no se encuentra el userId en SharedPreferences
-      print('No se encontró el userId en SharedPreferences.');
-    }
-  }
-
   Future<void> _updatePassword() async {
-    if (userId == null) {
-      print('UserId no disponible.');
-      return;
-    }
+    int userId = widget.userId; // 🔹 Tomamos el userId directamente
 
-    // Verificamos si las contraseñas coinciden
     if (_pwd.text != _pwd2.text) {
-      // Mostrar un mensaje de error antes de desmontar el widget
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              tr(context, 'Las contraseñas no coinciden').toUpperCase(),
-              style: TextStyle(color: Colors.white, fontSize: 17.sp),
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+      _showError('Las contraseñas no coinciden');
       return;
     }
 
-    // Verificamos que la nueva contraseña no sea "0000"
     if (_pwd.text == '0000') {
-      // Mostrar un mensaje de error
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              tr(context, 'La contraseña no puede ser "0000"').toUpperCase(),
-              style: TextStyle(color: Colors.white, fontSize: 17.sp),
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-      print('Intento de contraseña inválida: 0000');
+      _showError('La contraseña no puede ser "0000"');
       return;
     }
 
     try {
-      // Crear el mapa con solo el campo pwd
       final clientData = {'pwd': _pwd.text};
-      print('Datos a actualizar en la base de datos: $clientData');
-
-      // Actualizar el usuario en la base de datos
       DatabaseHelper dbHelper = DatabaseHelper();
-      await dbHelper.updateUser(userId!, clientData);
-      print(
-          'Contraseña actualizada correctamente para el usuario con ID $userId.');
+      await dbHelper.updateUser(userId, clientData);
 
-      // Guardar el userId y tipo de perfil en SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      print('SharedPreferences obtenidas: ${prefs.getKeys()}');
+      print('Contraseña actualizada correctamente para el usuario con ID $userId.');
 
-      // Limpiar los valores anteriores antes de guardar nuevos datos
-      await prefs.remove('user_id');
-      await prefs.remove('user_tipo_perfil');
-      print('Valores previos de user_id y user_tipo_perfil eliminados.');
-
-      // Guardar el nuevo userId en SharedPreferences
-      prefs.setInt('user_id', userId!); // Guardar el userId
-      print('Nuevo user_id guardado: ${prefs.getInt('user_id')}');
-
-      // Obtener el tipo de perfil actualizado para el usuario
-      String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId!);
-      if (tipoPerfil != null) {
-        prefs.setString(
-            'user_tipo_perfil', tipoPerfil); // Guardar el tipo de perfil
-        print(
-            'Nuevo user_tipo_perfil guardado: ${prefs.getString('user_tipo_perfil')}');
-      }
-
-      // Mostrar mensaje de éxito antes de desmontar el widget
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              tr(context, 'Contraseña actualizada con éxito').toUpperCase(),
-              style: TextStyle(color: Colors.white, fontSize: 17.sp),
-            ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        _showSuccess('Contraseña actualizada con éxito');
+        clearFields();
+        Future.delayed(const Duration(milliseconds: 200), () {
+          if (mounted) {
+            widget.onNavigateToLogin(); // ✅ Solo navegar si sigue montado
+          }
+        });
       }
-
-      // Navegar al menú principal
-      widget.onNavigateToMainMenu();
     } catch (e) {
       print('Error al actualizar la contraseña: $e');
-      // Mostrar un SnackBar de error antes de desmontar el widget
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              tr(context, 'Error al resetear la contraseña').toUpperCase(),
-              style: TextStyle(color: Colors.white, fontSize: 17.sp),
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+      if (mounted) _showError('Error al resetear la contraseña');
     }
+
+  }
+
+  void _showError(String message) {
+    if (!mounted) return; // ✅ Evita errores si el widget fue desmontado
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(tr(context, message).toUpperCase()),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void _showSuccess(String message) {
+    if (!mounted) return; // ✅ Evita errores si el widget fue desmontado
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(tr(context, message).toUpperCase()),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+
   }
 
   @override

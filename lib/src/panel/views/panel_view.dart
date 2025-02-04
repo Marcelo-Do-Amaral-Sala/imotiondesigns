@@ -30,10 +30,10 @@ class PanelView extends StatefulWidget {
 
   const PanelView(
       {super.key,
-      required this.onBack,
-      required this.onReset,
-      required this.screenWidth,
-      required this.screenHeight});
+        required this.onBack,
+        required this.onReset,
+        required this.screenWidth,
+        required this.screenHeight});
 
   @override
   State<PanelView> createState() => _PanelViewState();
@@ -81,7 +81,7 @@ class _PanelViewState extends State<PanelView>
   @override
   void initState() {
     super.initState();
-  /*  Future.delayed(const Duration(milliseconds: 2000), () {
+    /*  Future.delayed(const Duration(milliseconds: 2000), () {
       setState(() {
         showBlackScreen = false;
       });
@@ -112,7 +112,7 @@ class _PanelViewState extends State<PanelView>
     for (var mci in mcisList) {
       String macAddress = mci['mac'];
       mciSelectionStatus[macAddress] =
-          null; // Ningún grupo seleccionado por defecto
+      null; // Ningún grupo seleccionado por defecto
     }
   }
 
@@ -125,7 +125,7 @@ class _PanelViewState extends State<PanelView>
     // 2. Cargar los datos desde AppState
     await AppState.instance.loadState();
     List<String> macAddresses =
-        AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
+    AppState.instance.mcis.map((mci) => mci['mac'] as String).toList();
 
     debugPrint("🔍 Direcciones MAC obtenidas: $macAddresses");
 
@@ -158,31 +158,31 @@ class _PanelViewState extends State<PanelView>
 
       // Escuchar el estado de conexión para cada dispositivo
       bleConnectionService.connectionStateStream(macAddress).listen(
-          (isConnected) {
-        if (isConnected) {
-          // Agregar a conexiones exitosas si está conectado
-          if (!successfullyConnectedDevices.value.contains(macAddress)) {
-            successfullyConnectedDevices.value = [
-              ...successfullyConnectedDevices.value,
-              macAddress,
-            ];
-          }
-        } else {
-          // Remover de conexiones exitosas si está desconectado
-          successfullyConnectedDevices.value = successfullyConnectedDevices
-              .value
-              .where((device) => device != macAddress)
-              .toList();
-        }
+              (isConnected) {
+            if (isConnected) {
+              // Agregar a conexiones exitosas si está conectado
+              if (!successfullyConnectedDevices.value.contains(macAddress)) {
+                successfullyConnectedDevices.value = [
+                  ...successfullyConnectedDevices.value,
+                  macAddress,
+                ];
+              }
+            } else {
+              // Remover de conexiones exitosas si está desconectado
+              successfullyConnectedDevices.value = successfullyConnectedDevices
+                  .value
+                  .where((device) => device != macAddress)
+                  .toList();
+            }
 
-        // Actualizar el estado de conexión en la UI
-        if (mounted) {
-          setState(() {
-            deviceConnectionStatus[macAddress] =
+            // Actualizar el estado de conexión en la UI
+            if (mounted) {
+              setState(() {
+                deviceConnectionStatus[macAddress] =
                 isConnected ? 'conectado' : 'desconectado';
-          });
-        }
-      }, onError: (error) {
+              });
+            }
+          }, onError: (error) {
         debugPrint("❌ Error en la conexión de $macAddress: $error");
         if (mounted) {
           setState(() {
@@ -257,8 +257,8 @@ class _PanelViewState extends State<PanelView>
     int indexForGroup = group == "A"
         ? 0
         : group == "B"
-            ? 1
-            : -1;
+        ? 1
+        : -1;
 
     // Seleccionamos los dispositivos del grupo
     groupedDevices[group]?.forEach((deviceMac) {
@@ -406,7 +406,7 @@ class _PanelViewState extends State<PanelView>
                                           .asMap()
                                           .map((index, mci) {
                                         String macAddress = mci[
-                                            'mac']; // Obtener la MAC de cada dispositivo
+                                        'mac']; // Obtener la MAC de cada dispositivo
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
@@ -419,14 +419,14 @@ class _PanelViewState extends State<PanelView>
                                           GestureDetector(
                                             onTap: () async {
                                               if (deviceConnectionStatus[
-                                                      macAddress] ==
+                                              macAddress] ==
                                                   'conectado') {
                                                 setState(() {
                                                   // Asignar índice del dispositivo seleccionado
                                                   selectedIndex = index;
                                                   String? group =
-                                                      mciSelectionStatus[
-                                                          macAddress];
+                                                  mciSelectionStatus[
+                                                  macAddress];
 
                                                   if (group == null ||
                                                       group.isEmpty) {
@@ -442,32 +442,32 @@ class _PanelViewState extends State<PanelView>
                                                     selectedIndex = group == "A"
                                                         ? 0
                                                         : group == "B"
-                                                            ? 1
-                                                            : index;
+                                                        ? 1
+                                                        : index;
                                                     print(
                                                         "📊 Índice global del grupo seleccionado: $selectedIndex");
 
                                                     // Verificar si la dirección MAC pertenece al grupo
                                                     List<String>
-                                                        devicesInGroup =
-                                                        group == "A"
-                                                            ? groupedAmcis.value
-                                                            : group == "B"
-                                                                ? groupedBmcis
-                                                                    .value
-                                                                : [];
+                                                    devicesInGroup =
+                                                    group == "A"
+                                                        ? groupedAmcis.value
+                                                        : group == "B"
+                                                        ? groupedBmcis
+                                                        .value
+                                                        : [];
 
                                                     // Procesar dispositivos en el grupo
                                                     for (String deviceMac
-                                                        in devicesInGroup) {
+                                                    in devicesInGroup) {
                                                       if (!processedDevices
                                                           .contains(
-                                                              deviceMac)) {
+                                                          deviceMac)) {
                                                         print(
                                                             "🚀 Procesando dispositivo del grupo: $deviceMac");
                                                         bleConnectionService
                                                             .processConnectedDevices(
-                                                                deviceMac);
+                                                            deviceMac);
                                                         processedDevices.add(
                                                             deviceMac); // Marcar como procesado
                                                       } else {
@@ -487,7 +487,7 @@ class _PanelViewState extends State<PanelView>
                                                     .contains(macAddress)) {
                                                   await bleConnectionService
                                                       .processConnectedDevices(
-                                                          macAddress);
+                                                      macAddress);
                                                   processedDevices.add(
                                                       macAddress); // Marcar como procesado
                                                 } else {
@@ -504,35 +504,35 @@ class _PanelViewState extends State<PanelView>
                                                     .contains(macAddress)) {
                                                   // Intentar conectar al dispositivo si no está en la lista
                                                   bool success =
-                                                      await bleConnectionService
-                                                          ._connectToDeviceByMac(
-                                                              macAddress);
+                                                  await bleConnectionService
+                                                      ._connectToDeviceByMac(
+                                                      macAddress);
 
                                                   bleConnectionService
                                                       .connectionStateStream(
-                                                          macAddress)
+                                                      macAddress)
                                                       .listen(
                                                           (isConnected) async {
-                                                    if (isConnected) {
-                                                      // Agregar el MAC address a la lista cuando se conecte con éxito
-                                                      successfullyConnectedDevices
-                                                          .value = [
-                                                        ...successfullyConnectedDevices
-                                                            .value,
-                                                        macAddress,
-                                                      ];
-                                                    }
-                                                    if (mounted) {
-                                                      setState(() {
-                                                        // Actualizar el estado de conexión en la UI
-                                                        deviceConnectionStatus[
-                                                                macAddress] =
+                                                        if (isConnected) {
+                                                          // Agregar el MAC address a la lista cuando se conecte con éxito
+                                                          successfullyConnectedDevices
+                                                              .value = [
+                                                            ...successfullyConnectedDevices
+                                                                .value,
+                                                            macAddress,
+                                                          ];
+                                                        }
+                                                        if (mounted) {
+                                                          setState(() {
+                                                            // Actualizar el estado de conexión en la UI
+                                                            deviceConnectionStatus[
+                                                            macAddress] =
                                                             isConnected
                                                                 ? 'conectado'
                                                                 : 'desconectado';
+                                                          });
+                                                        }
                                                       });
-                                                    }
-                                                  });
                                                 } else {
                                                   print(
                                                       "✅ El dispositivo $macAddress ya está conectado exitosamente.");
@@ -547,9 +547,9 @@ class _PanelViewState extends State<PanelView>
                                                 setState(() {
                                                   // 🔥 Crear una nueva copia del mapa sin el cliente eliminado
                                                   final nuevoMapa =
-                                                      Map<String, dynamic>.from(
-                                                          clientSelectionMap
-                                                              .value);
+                                                  Map<String, dynamic>.from(
+                                                      clientSelectionMap
+                                                          .value);
                                                   nuevoMapa.remove(macAddress);
 
                                                   // 🔥 Asignar la nueva copia y notificar cambio
@@ -567,7 +567,7 @@ class _PanelViewState extends State<PanelView>
                                                       null) {
                                                     _clientsProvider!
                                                         .removeClient(
-                                                            selectedClient!);
+                                                        selectedClient!);
                                                     if (kDebugMode) {
                                                       print(
                                                           "📋 Cliente eliminado del Provider: ${selectedClient!['name']}");
@@ -594,141 +594,141 @@ class _PanelViewState extends State<PanelView>
                                                 Padding(
                                                   padding: EdgeInsets.only(
                                                       right:
-                                                          screenWidth * 0.01),
+                                                      screenWidth * 0.01),
                                                   child: SizedBox(
                                                     width: screenWidth * 0.1,
                                                     height: screenHeight * 0.1,
                                                     child: CustomPaint(
                                                       painter:
-                                                          NeonBorderPainter(
+                                                      NeonBorderPainter(
                                                         neonColor: _getBorderColor(
                                                             deviceConnectionStatus[
-                                                                macAddress]),
+                                                            macAddress]),
                                                         opacity:
-                                                            _getOpacityForDevice(
-                                                                macAddress),
+                                                        _getOpacityForDevice(
+                                                            macAddress),
                                                       ),
                                                       child: Container(
                                                         padding: EdgeInsets
                                                             .symmetric(
-                                                                vertical:
-                                                                    screenHeight *
-                                                                        0.005),
+                                                            vertical:
+                                                            screenHeight *
+                                                                0.005),
                                                         decoration:
-                                                            BoxDecoration(
+                                                        BoxDecoration(
                                                           color: Colors
                                                               .transparent,
                                                           borderRadius:
-                                                              BorderRadius
-                                                                  .circular(7),
+                                                          BorderRadius
+                                                              .circular(7),
                                                           boxShadow: [
                                                             BoxShadow(
                                                               color: Colors
                                                                   .black
                                                                   .withOpacity(
                                                                 _getOpacityForDevice(
-                                                                            macAddress) ==
-                                                                        1.0
+                                                                    macAddress) ==
+                                                                    1.0
                                                                     ? 0.3
                                                                     : 0.1,
                                                               ),
                                                               blurRadius: 10,
                                                               offset:
-                                                                  const Offset(
-                                                                      0, 4),
+                                                              const Offset(
+                                                                  0, 4),
                                                             ),
                                                           ],
                                                         ),
                                                         child: Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                           children: [
                                                             Expanded(
                                                               child: Center(
                                                                 child: selectedEquip ==
-                                                                        0
+                                                                    0
                                                                     ? Image
-                                                                        .asset(
-                                                                        'assets/images/chalecoblanco.png',
-                                                                        fit: BoxFit
-                                                                            .contain,
-                                                                      )
+                                                                    .asset(
+                                                                  'assets/images/chalecoblanco.png',
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                )
                                                                     : Image
-                                                                        .asset(
-                                                                        'assets/images/pantalonblanco.png',
-                                                                        fit: BoxFit
-                                                                            .contain,
-                                                                      ),
+                                                                    .asset(
+                                                                  'assets/images/pantalonblanco.png',
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                ),
                                                               ),
                                                             ),
                                                             Expanded(
                                                               flex: 2,
                                                               child: Column(
                                                                 mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
+                                                                MainAxisAlignment
+                                                                    .center,
                                                                 crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
+                                                                CrossAxisAlignment
+                                                                    .center,
                                                                 children: [
                                                                   Text(
                                                                     clientName
-                                                                            .isEmpty
+                                                                        .isEmpty
                                                                         ? ''
                                                                         : clientName,
                                                                     style:
-                                                                        TextStyle(
+                                                                    TextStyle(
                                                                       fontSize:
-                                                                          12.sp,
+                                                                      12.sp,
                                                                       fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
+                                                                      FontWeight
+                                                                          .bold,
                                                                       color: const Color(
                                                                           0xFF28E2F5),
                                                                     ),
                                                                     textAlign:
-                                                                        TextAlign
-                                                                            .left,
+                                                                    TextAlign
+                                                                        .left,
                                                                   ),
                                                                   Text(
                                                                     bluetoothNames[
-                                                                            macAddress] ??
+                                                                    macAddress] ??
                                                                         '',
                                                                     style:
-                                                                        TextStyle(
+                                                                    TextStyle(
                                                                       fontSize:
-                                                                          12.sp,
+                                                                      12.sp,
                                                                       color: const Color(
                                                                           0xFF28E2F5),
                                                                     ),
                                                                     textAlign:
-                                                                        TextAlign
-                                                                            .left,
+                                                                    TextAlign
+                                                                        .left,
                                                                   ),
                                                                   Row(
                                                                     mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
+                                                                    MainAxisAlignment
+                                                                        .center,
                                                                     children: List
                                                                         .generate(
-                                                                            5,
+                                                                        5,
                                                                             (index) {
-                                                                      return Padding(
-                                                                        padding:
+                                                                          return Padding(
+                                                                            padding:
                                                                             EdgeInsets.symmetric(horizontal: screenWidth * 0.001),
-                                                                        child:
+                                                                            child:
                                                                             Container(
-                                                                          width:
+                                                                              width:
                                                                               screenWidth * 0.0085,
-                                                                          height:
+                                                                              height:
                                                                               screenHeight * 0.01,
-                                                                          color: index <= (batteryStatuses[macAddress] ?? -1)
-                                                                              ? _lineColor(macAddress)
-                                                                              : Colors.white.withOpacity(0.5),
-                                                                        ),
-                                                                      );
-                                                                    }),
+                                                                              color: index <= (batteryStatuses[macAddress] ?? -1)
+                                                                                  ? _lineColor(macAddress)
+                                                                                  : Colors.white.withOpacity(0.5),
+                                                                            ),
+                                                                          );
+                                                                        }),
                                                                   ),
                                                                 ],
                                                               ),
@@ -745,31 +745,31 @@ class _PanelViewState extends State<PanelView>
                                                   right: screenWidth * 0.012,
                                                   child: Text(
                                                     (mciSelectionStatus[
-                                                                    macAddress] ??
-                                                                '') ==
-                                                            'Sin grupo'
+                                                    macAddress] ??
+                                                        '') ==
+                                                        'Sin grupo'
                                                         ? '' // Si es 'Sin grupo', mostrar "SG" (o lo que prefieras)
                                                         : (mciSelectionStatus[
-                                                                macAddress] ??
-                                                            ''),
+                                                    macAddress] ??
+                                                        ''),
                                                     style: TextStyle(
                                                       color: (mciSelectionStatus[
-                                                                      macAddress] ??
-                                                                  '') ==
-                                                              'A'
+                                                      macAddress] ??
+                                                          '') ==
+                                                          'A'
                                                           ? Colors
-                                                              .green // Color verde para Grupo A
+                                                          .green // Color verde para Grupo A
                                                           : (mciSelectionStatus[
-                                                                          macAddress] ??
-                                                                      '') ==
-                                                                  'B'
-                                                              ? Colors
-                                                                  .red // Color rojo para Grupo B
-                                                              : Colors
-                                                                  .transparent,
+                                                      macAddress] ??
+                                                          '') ==
+                                                          'B'
+                                                          ? Colors
+                                                          .red // Color rojo para Grupo B
+                                                          : Colors
+                                                          .transparent,
                                                       fontSize: 18.sp,
                                                       fontWeight:
-                                                          FontWeight.bold,
+                                                      FontWeight.bold,
                                                     ),
                                                   ),
                                                 ),
@@ -792,8 +792,8 @@ class _PanelViewState extends State<PanelView>
                                             // Limpiar la lista de dispositivos seleccionados (poner todos en false)
                                             setState(() {
                                               isSelected.updateAll((key,
-                                                      value) =>
-                                                  false); // Establece todos los valores a false
+                                                  value) =>
+                                              false); // Establece todos los valores a false
                                               selectedKey == null;
                                               print(
                                                   "🔴 Todos los dispositivos han sido deseleccionados.");
@@ -801,8 +801,8 @@ class _PanelViewState extends State<PanelView>
 
                                             // Llamar al diálogo y esperar el resultado (mciSelectionStatus)
                                             final updatedSelection =
-                                                await _showMCIListDialog(
-                                                    context);
+                                            await _showMCIListDialog(
+                                                context);
 
                                             // Si el resultado no es null, actualizamos el estado
                                             if (updatedSelection != null) {
@@ -825,7 +825,7 @@ class _PanelViewState extends State<PanelView>
                                           ),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(7),
+                                            BorderRadius.circular(7),
                                           ),
                                           backgroundColor: Colors.transparent,
                                         ),
@@ -843,16 +843,16 @@ class _PanelViewState extends State<PanelView>
                                       SizedBox(width: screenWidth * 0.05),
                                       GestureDetector(
                                         onTapDown: (_) => setState(
-                                            () => scaleFactorBack = 0.90),
+                                                () => scaleFactorBack = 0.90),
                                         onTapUp: (_) => setState(
-                                            () => scaleFactorBack = 1.0),
+                                                () => scaleFactorBack = 1.0),
                                         onTap: () {
                                           _exitScreen(context);
                                         },
                                         child: AnimatedScale(
                                           scale: scaleFactorBack,
                                           duration:
-                                              const Duration(milliseconds: 100),
+                                          const Duration(milliseconds: 100),
                                           child: SizedBox(
                                             child: ClipOval(
                                               child: Image.asset(
@@ -882,7 +882,7 @@ class _PanelViewState extends State<PanelView>
                                 // Muestra el widget según el índice seleccionado
                                 children: AppState.instance.mcis.map((mci) {
                                   int index =
-                                      AppState.instance.mcis.indexOf(mci);
+                                  AppState.instance.mcis.indexOf(mci);
                                   String macAddress = mci['mac'];
 
                                   // Crear el widget para cada contenido con su estado independiente
@@ -914,7 +914,7 @@ class _PanelViewState extends State<PanelView>
               ],
             ),
           ),
- /*         if (showBlackScreen)
+          /*         if (showBlackScreen)
             Container(
               color: Colors.black,
               child: Center(
@@ -995,54 +995,54 @@ class _PanelViewState extends State<PanelView>
                                         // Verificar si está seleccionado para el grupo A
                                         bool isSelected =
                                             temporarySelectionStatus[
-                                                    macAddress] ==
+                                            macAddress] ==
                                                 'A';
 
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
-                                            clientSelectionMap.value[macAddress]
-                                                as Map<String, dynamic>?;
+                                        clientSelectionMap.value[macAddress]
+                                        as Map<String, dynamic>?;
                                         String clientName =
                                             selectedClient?['name'] ?? '';
 
                                         return Padding(
                                           padding: EdgeInsets.only(
                                             bottom: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
+                                                .size
+                                                .height *
                                                 0.02,
                                           ),
                                           child: SizedBox(
                                             width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
+                                                .size
+                                                .width *
                                                 0.1,
                                             height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
+                                                .size
+                                                .height *
                                                 0.1,
                                             child: CustomPaint(
                                               painter: NeonBorderPainter(
                                                 neonColor: _getBorderColor(
                                                     deviceConnectionStatus[
-                                                        macAddress]),
+                                                    macAddress]),
                                               ),
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(
                                                     vertical:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.005),
+                                                    MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                        0.005),
                                                 decoration: BoxDecoration(
                                                   color: Colors.transparent,
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                                                  MainAxisAlignment.start,
                                                   children: [
                                                     customCheckbox(
                                                         macAddress,
@@ -1052,28 +1052,28 @@ class _PanelViewState extends State<PanelView>
                                                     Expanded(
                                                       child: Center(
                                                         child:
-                                                            selectedEquip == 0
-                                                                ? Image.asset(
-                                                                    'assets/images/chalecoblanco.png',
-                                                                    fit: BoxFit
-                                                                        .contain,
-                                                                  )
-                                                                : Image.asset(
-                                                                    'assets/images/pantalonblanco.png',
-                                                                    fit: BoxFit
-                                                                        .contain,
-                                                                  ),
+                                                        selectedEquip == 0
+                                                            ? Image.asset(
+                                                          'assets/images/chalecoblanco.png',
+                                                          fit: BoxFit
+                                                              .contain,
+                                                        )
+                                                            : Image.asset(
+                                                          'assets/images/pantalonblanco.png',
+                                                          fit: BoxFit
+                                                              .contain,
+                                                        ),
                                                       ),
                                                     ),
                                                     Expanded(
                                                       flex: 2,
                                                       child: Column(
                                                         mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                         crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                         children: [
                                                           Text(
                                                             clientName.isEmpty
@@ -1085,11 +1085,11 @@ class _PanelViewState extends State<PanelView>
                                                                   0xFF28E2F5),
                                                             ),
                                                             textAlign:
-                                                                TextAlign.left,
+                                                            TextAlign.left,
                                                           ),
                                                           Text(
                                                             bluetoothNames[
-                                                                    macAddress] ??
+                                                            macAddress] ??
                                                                 "",
                                                             style: TextStyle(
                                                               fontSize: 14.sp,
@@ -1097,40 +1097,40 @@ class _PanelViewState extends State<PanelView>
                                                                   0xFF28E2F5),
                                                             ),
                                                             textAlign:
-                                                                TextAlign.left,
+                                                            TextAlign.left,
                                                           ),
                                                           Row(
                                                             mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
+                                                            MainAxisAlignment
+                                                                .center,
                                                             children:
-                                                                List.generate(
+                                                            List.generate(
                                                               5,
-                                                              (batteryIndex) {
+                                                                  (batteryIndex) {
                                                                 return Padding(
                                                                   padding: EdgeInsets.symmetric(
                                                                       horizontal: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width *
+                                                                          .size
+                                                                          .width *
                                                                           0.001),
                                                                   child:
-                                                                      Container(
+                                                                  Container(
                                                                     width: MediaQuery.of(context)
-                                                                            .size
-                                                                            .width *
+                                                                        .size
+                                                                        .width *
                                                                         0.015,
                                                                     height: MediaQuery.of(context)
-                                                                            .size
-                                                                            .height *
+                                                                        .size
+                                                                        .height *
                                                                         0.015,
                                                                     color: batteryIndex <=
-                                                                            (batteryStatuses[macAddress] ??
-                                                                                -1)
+                                                                        (batteryStatuses[macAddress] ??
+                                                                            -1)
                                                                         ? _lineColor(
-                                                                            macAddress)
+                                                                        macAddress)
                                                                         : Colors
-                                                                            .white
-                                                                            .withOpacity(0.5),
+                                                                        .white
+                                                                        .withOpacity(0.5),
                                                                   ),
                                                                 );
                                                               },
@@ -1153,7 +1153,7 @@ class _PanelViewState extends State<PanelView>
                             ),
                             SizedBox(
                                 width:
-                                    MediaQuery.of(context).size.width * 0.05),
+                                MediaQuery.of(context).size.width * 0.05),
                             // Grupo B
                             Expanded(
                               child: Column(
@@ -1183,53 +1183,53 @@ class _PanelViewState extends State<PanelView>
                                         // Verificar si está seleccionado para el grupo A
                                         bool isSelected =
                                             temporarySelectionStatus[
-                                                    macAddress] ==
+                                            macAddress] ==
                                                 'B';
 
                                         int selectedEquip =
                                             equipSelectionMap[macAddress] ?? 0;
                                         Map<String, dynamic>? selectedClient =
-                                            clientSelectionMap.value[macAddress];
+                                        clientSelectionMap.value[macAddress];
                                         String clientName =
                                             selectedClient?['name'] ?? '';
 
                                         return Padding(
                                           padding: EdgeInsets.only(
                                             bottom: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
+                                                .size
+                                                .height *
                                                 0.02,
                                           ),
                                           child: SizedBox(
                                             width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
+                                                .size
+                                                .width *
                                                 0.1,
                                             height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
+                                                .size
+                                                .height *
                                                 0.1,
                                             child: CustomPaint(
                                               painter: NeonBorderPainter(
                                                 neonColor: _getBorderColor(
                                                     deviceConnectionStatus[
-                                                        macAddress]),
+                                                    macAddress]),
                                               ),
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(
                                                     vertical:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.005),
+                                                    MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                        0.005),
                                                 decoration: BoxDecoration(
                                                   color: Colors.transparent,
                                                   borderRadius:
-                                                      BorderRadius.circular(7),
+                                                  BorderRadius.circular(7),
                                                 ),
                                                 child: Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                                                  MainAxisAlignment.start,
                                                   children: [
                                                     customCheckbox(
                                                         macAddress,
@@ -1239,28 +1239,28 @@ class _PanelViewState extends State<PanelView>
                                                     Expanded(
                                                       child: Center(
                                                         child:
-                                                            selectedEquip == 0
-                                                                ? Image.asset(
-                                                                    'assets/images/chalecoblanco.png',
-                                                                    fit: BoxFit
-                                                                        .contain,
-                                                                  )
-                                                                : Image.asset(
-                                                                    'assets/images/pantalonblanco.png',
-                                                                    fit: BoxFit
-                                                                        .contain,
-                                                                  ),
+                                                        selectedEquip == 0
+                                                            ? Image.asset(
+                                                          'assets/images/chalecoblanco.png',
+                                                          fit: BoxFit
+                                                              .contain,
+                                                        )
+                                                            : Image.asset(
+                                                          'assets/images/pantalonblanco.png',
+                                                          fit: BoxFit
+                                                              .contain,
+                                                        ),
                                                       ),
                                                     ),
                                                     Expanded(
                                                       flex: 2,
                                                       child: Column(
                                                         mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                         crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                         children: [
                                                           Text(
                                                             clientName.isEmpty
@@ -1272,11 +1272,11 @@ class _PanelViewState extends State<PanelView>
                                                                   0xFF28E2F5),
                                                             ),
                                                             textAlign:
-                                                                TextAlign.left,
+                                                            TextAlign.left,
                                                           ),
                                                           Text(
                                                             bluetoothNames[
-                                                                    macAddress] ??
+                                                            macAddress] ??
                                                                 "",
                                                             style: TextStyle(
                                                               fontSize: 14.sp,
@@ -1284,40 +1284,40 @@ class _PanelViewState extends State<PanelView>
                                                                   0xFF28E2F5),
                                                             ),
                                                             textAlign:
-                                                                TextAlign.left,
+                                                            TextAlign.left,
                                                           ),
                                                           Row(
                                                             mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
+                                                            MainAxisAlignment
+                                                                .center,
                                                             children:
-                                                                List.generate(
+                                                            List.generate(
                                                               5,
-                                                              (batteryIndex) {
+                                                                  (batteryIndex) {
                                                                 return Padding(
                                                                   padding: EdgeInsets.symmetric(
                                                                       horizontal: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width *
+                                                                          .size
+                                                                          .width *
                                                                           0.001),
                                                                   child:
-                                                                      Container(
+                                                                  Container(
                                                                     width: MediaQuery.of(context)
-                                                                            .size
-                                                                            .width *
+                                                                        .size
+                                                                        .width *
                                                                         0.015,
                                                                     height: MediaQuery.of(context)
-                                                                            .size
-                                                                            .height *
+                                                                        .size
+                                                                        .height *
                                                                         0.015,
                                                                     color: batteryIndex <=
-                                                                            (batteryStatuses[macAddress] ??
-                                                                                -1)
+                                                                        (batteryStatuses[macAddress] ??
+                                                                            -1)
                                                                         ? _lineColor(
-                                                                            macAddress)
+                                                                        macAddress)
                                                                         : Colors
-                                                                            .white
-                                                                            .withOpacity(0.5),
+                                                                        .white
+                                                                        .withOpacity(0.5),
                                                                   ),
                                                                 );
                                                               },
@@ -1371,16 +1371,16 @@ class _PanelViewState extends State<PanelView>
                             onPressed: () {
                               // Filtrar las MCIs seleccionadas para el Grupo A y B
                               List<String> selectedForGroupA =
-                                  temporarySelectionStatus.entries
-                                      .where((entry) => entry.value == 'A')
-                                      .map((entry) => entry.key)
-                                      .toList();
+                              temporarySelectionStatus.entries
+                                  .where((entry) => entry.value == 'A')
+                                  .map((entry) => entry.key)
+                                  .toList();
 
                               List<String> selectedForGroupB =
-                                  temporarySelectionStatus.entries
-                                      .where((entry) => entry.value == 'B')
-                                      .map((entry) => entry.key)
-                                      .toList();
+                              temporarySelectionStatus.entries
+                                  .where((entry) => entry.value == 'B')
+                                  .map((entry) => entry.key)
+                                  .toList();
 
                               // Actualiza mciSelectionStatus con el estado temporal
                               setState(() {
@@ -1428,10 +1428,10 @@ class _PanelViewState extends State<PanelView>
           if (group == 'A') {
             // Si no existe, inicializa con 'A' o 'B', o invierte el valor
             temporarySelectionStatus[option] =
-                temporarySelectionStatus[option] == 'A' ? '' : 'A';
+            temporarySelectionStatus[option] == 'A' ? '' : 'A';
           } else if (group == 'B') {
             temporarySelectionStatus[option] =
-                temporarySelectionStatus[option] == 'B' ? '' : 'B';
+            temporarySelectionStatus[option] == 'B' ? '' : 'B';
           }
         });
       },
@@ -1612,7 +1612,7 @@ class _PanelViewState extends State<PanelView>
     if (group != null && group.isNotEmpty) {
       // Verificamos si al menos un dispositivo del grupo está seleccionado
       bool groupSelected = isSelected.entries.any((entry) =>
-          entry.value == true && mciSelectionStatus[entry.key] == group);
+      entry.value == true && mciSelectionStatus[entry.key] == group);
       return groupSelected
           ? 1.0
           : 0.5; // Si está seleccionado, opacidad 1.0, sino 0.3
@@ -1822,7 +1822,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double contractionDuration = 0.0;
   Map<String, bool> procesosActivos = {};
   Map<int, double> subprogramElapsedTime =
-      {}; // Almacena elapsedTimeSub para cada subprograma
+  {}; // Almacena elapsedTimeSub para cada subprograma
   Map<int, int> subprogramRemainingTime = {};
   List<Map<String, dynamic>> selectedClients = [];
   List<Map<String, dynamic>> allIndividualPrograms = [];
@@ -2121,7 +2121,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       List<String> datos = await getTrainer("imotion21");
 
       List<String> datosFiltrados =
-          datos.where((element) => element.isNotEmpty).toList();
+      datos.where((element) => element.isNotEmpty).toList();
 
       setState(() {
         respuestaTroceada = datosFiltrados;
@@ -2202,7 +2202,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       for (int i = 0; i < individualProgramData.length; i++) {
         var program = Map<String, dynamic>.from(individualProgramData[i]);
         var video =
-            (i < respuestaTroceada.length) ? respuestaTroceada[i] : null;
+        (i < respuestaTroceada.length) ? respuestaTroceada[i] : null;
         program['video'] = video;
 
         // Añadir cronaxias y grupos al programa
@@ -2253,10 +2253,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         .database; // Obtener la instancia de la base de datos
     try {
       final autoProgramData =
-          await DatabaseHelper().obtenerProgramasAutomaticosConSubprogramas(db);
+      await DatabaseHelper().obtenerProgramasAutomaticosConSubprogramas(db);
 
       List<Map<String, dynamic>> groupedPrograms =
-          _groupProgramsWithSubprograms(autoProgramData);
+      _groupProgramsWithSubprograms(autoProgramData);
 
       if (mounted) {
         setState(() {
@@ -2309,8 +2309,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // 🔥 Asegurar que también se elimine de `clientSelectedMap`
       widget.clientSelectedMap.value =
-          Map<String, dynamic>.from(widget.clientSelectedMap.value)
-            ..remove(widget.macAddress);
+      Map<String, dynamic>.from(widget.clientSelectedMap.value)
+        ..remove(widget.macAddress);
 
       // 🔥 Notificar al padre que el cliente se eliminó
       widget.onClientSelected(null);
@@ -2400,7 +2400,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
     openDatabase('my_database.db').then((db) async {
       final List<Map<String, dynamic>> clientGroupsResult =
-          await db.rawQuery('''
+      await db.rawQuery('''
       SELECT g.id
       FROM grupos_musculares g
       INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
@@ -2466,12 +2466,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     var db = await DatabaseHelper().database;
     try {
       List<Map<String, dynamic>> cronaxias = (await DatabaseHelper()
-              .obtenerCronaxiasPorPrograma(db, programI['id_programa']))
+          .obtenerCronaxiasPorPrograma(db, programI['id_programa']))
           .map((c) =>
-              {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']})
+      {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']})
           .toList();
       List<Map<String, dynamic>> grupos = (await DatabaseHelper()
-              .obtenerGruposPorPrograma(db, programI['id_programa']))
+          .obtenerGruposPorPrograma(db, programI['id_programa']))
           .map((g) => {'id': g['id']})
           .toList();
 
@@ -2531,8 +2531,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     try {
       List<Map<String, dynamic>> subprogramas =
           (programA['subprogramas'] as List<dynamic>?)
-                  ?.map((sp) => Map<String, dynamic>.from(sp))
-                  .toList() ??
+              ?.map((sp) => Map<String, dynamic>.from(sp))
+              .toList() ??
               [];
 
       for (var i = 0; i < subprogramas.length; i++) {
@@ -2543,16 +2543,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         int idPrograma = subprograma['id_programa_relacionado'] as int;
 
         List<Map<String, dynamic>> cronaxias =
-            (await DatabaseHelper().obtenerCronaxiasPorPrograma(db, idPrograma))
-                .map((c) => {
-                      'id': c['id'],
-                      'nombre': c['nombre'] ?? 'Desconocido',
-                      'valor': c['valor'] ?? 0.0
-                    })
-                .toList();
+        (await DatabaseHelper().obtenerCronaxiasPorPrograma(db, idPrograma))
+            .map((c) => {
+          'id': c['id'],
+          'nombre': c['nombre'] ?? 'Desconocido',
+          'valor': c['valor'] ?? 0.0
+        })
+            .toList();
 
         List<Map<String, dynamic>> grupos = (await DatabaseHelper()
-                .obtenerGruposPorPrograma(db, idPrograma))
+            .obtenerGruposPorPrograma(db, idPrograma))
             .map((g) => {'id': g['id'], 'nombre': g['nombre'] ?? 'Desconocido'})
             .toList();
 
@@ -2565,7 +2565,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       setState(() {
         selectedAutoProgram?['subprogramas'] =
-            List<Map<String, dynamic>>.from(subprogramas);
+        List<Map<String, dynamic>>.from(subprogramas);
       });
 
       updateContractionAndPauseValues();
@@ -2600,29 +2600,29 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
             selectedIndivProgram != null) {
           grupos = (await DatabaseHelper().obtenerGruposPorPrograma(
-                  db, selectedIndivProgram!['id_programa']))
+              db, selectedIndivProgram!['id_programa']))
               .map((g) => {'id': g['id']})
               .toList();
         } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
             selectedRecoProgram != null) {
           grupos = (await DatabaseHelper().obtenerGruposPorPrograma(
-                  db, selectedRecoProgram!['id_programa']))
+              db, selectedRecoProgram!['id_programa']))
               .map((g) => {'id': g['id']})
               .toList();
         } else if (selectedProgram ==
-                tr(context, 'Automáticos').toUpperCase() &&
+            tr(context, 'Automáticos').toUpperCase() &&
             selectedAutoProgram != null) {
           List<Map<String, dynamic>> subprogramas =
               (selectedAutoProgram!['subprogramas'] as List<dynamic>?)
-                      ?.map((sp) => Map<String, dynamic>.from(sp))
-                      .toList() ??
+                  ?.map((sp) => Map<String, dynamic>.from(sp))
+                  .toList() ??
                   [];
 
           for (var subprograma in subprogramas) {
             if (subprograma['id_programa_relacionado'] == null) continue;
             int idPrograma = subprograma['id_programa_relacionado'] as int;
             grupos.addAll((await DatabaseHelper()
-                    .obtenerGruposPorPrograma(db, idPrograma))
+                .obtenerGruposPorPrograma(db, idPrograma))
                 .map((g) => {'id': g['id']})
                 .toList());
           }
@@ -2688,13 +2688,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         selectedAutoProgram != null) {
       totalTime = (selectedAutoProgram!['duracion']) ?? totalTime;
       valueContraction = (selectedAutoProgram!['subprogramas']
-              [currentSubprogramIndex]['contraccion'] as double?) ??
+      [currentSubprogramIndex]['contraccion'] as double?) ??
           valueContraction;
       valuePause = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
-              ['pausa'] as double?) ??
+      ['pausa'] as double?) ??
           valuePause;
       valueRampa = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
-              ['rampa'] as double?) ??
+      ['rampa'] as double?) ??
           valueRampa;
     } else if (selectedProgram == tr(context, 'Libre').toUpperCase()) {
       valueContraction = 1.0;
@@ -2727,17 +2727,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       grupos = selectedGrupos;
     } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase()) {
       selectedProgramData =
-          selectedAutoProgram?['subprogramas'][currentSubprogramIndex];
+      selectedAutoProgram?['subprogramas'][currentSubprogramIndex];
       cronaxias = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]
-                  ['cronaxias'] as List<dynamic>?)
-              ?.map((c) =>
-                  {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']})
-              .toList() ??
+      ['cronaxias'] as List<dynamic>?)
+          ?.map((c) =>
+      {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']})
+          .toList() ??
           [];
       grupos = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]
-                  ['grupos'] as List<dynamic>?)
-              ?.map((g) => {'id': g['id']})
-              .toList() ??
+      ['grupos'] as List<dynamic>?)
+          ?.map((g) => {'id': g['id']})
+          .toList() ??
           [];
     } else if (selectedProgram == tr(context, 'Libre').toUpperCase()) {
       frecuencia = valueFrecuency;
@@ -2979,11 +2979,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
   void _startContractionTimer(
-    double contractionDuration,
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    List<int> porcentajesMusculoPantalon,
-  ) {
+      double contractionDuration,
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      List<int> porcentajesMusculoPantalon,
+      ) {
     _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
 
     // Verificar y sincronizar con el estado BLE
@@ -2991,7 +2991,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (selectedIndexEquip == 0) {
         // Si el índice seleccionado es 0, iniciar la sesión para traje
         startFullElectrostimulationTrajeProcess(
-                widget.macAddress!, porcentajesMusculoTraje, selectedProgram)
+            widget.macAddress!, porcentajesMusculoTraje, selectedProgram)
             .then((success) {
           if (success) {
             if (mounted) {
@@ -3011,7 +3011,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       } else if (selectedIndexEquip == 1) {
         // Si el índice seleccionado es 1, iniciar la sesión para pantalón
         startFullElectrostimulationPantalonProcess(
-                widget.macAddress!, porcentajesMusculoPantalon, selectedProgram)
+            widget.macAddress!, porcentajesMusculoPantalon, selectedProgram)
             .then((success) {
           if (success) {
             if (mounted) {
@@ -3038,11 +3038,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
   void _startContractionPhase(
-    double contractionDuration,
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    List<int> porcentajesMusculoPantalon,
-  ) {
+      double contractionDuration,
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      List<int> porcentajesMusculoPantalon,
+      ) {
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) {
         setState(() {
@@ -3060,11 +3060,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
   Future<void> _startPauseTimer(
-    double pauseDuration,
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    List<int> porcentajesMusculoPantalon,
-  ) async {
+      double pauseDuration,
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      List<int> porcentajesMusculoPantalon,
+      ) async {
     // Detener cualquier temporizador previo
     _phaseTimer?.cancel();
 
@@ -3091,11 +3091,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
   void _startPausePhase(
-    double pauseDuration,
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    List<int> porcentajesMusculoPantalon,
-  ) {
+      double pauseDuration,
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      List<int> porcentajesMusculoPantalon,
+      ) {
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) {
         setState(() {
@@ -3126,7 +3126,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (currentSubprogramIndex < programToUse['subprogramas'].length) {
       // Obtener la duración en minutos del subprograma actual y convertirla a segundos
       double durationInMinutes = programToUse['subprogramas']
-          [currentSubprogramIndex]['duracion'] as double;
+      [currentSubprogramIndex]['duracion'] as double;
 
       // Si el subprograma es el primero (índice 0), no restar nada
       // Para los subprogramas posteriores, restar 1 segundo
@@ -3142,7 +3142,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Inicializar o recuperar los tiempos para el subprograma actual
       if (!subprogramElapsedTime.containsKey(currentSubprogramIndex)) {
         subprogramElapsedTime[currentSubprogramIndex] =
-            0.0; // Si no tiene valor, inicializar
+        0.0; // Si no tiene valor, inicializar
       }
       if (!subprogramRemainingTime.containsKey(currentSubprogramIndex)) {
         subprogramRemainingTime[currentSubprogramIndex] =
@@ -3172,7 +3172,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             setState(() {
               remainingTime--;
               elapsedTimeSub +=
-                  1.0; // Aumentar el tiempo transcurrido en segundos
+              1.0; // Aumentar el tiempo transcurrido en segundos
               subprogramRemainingTime[currentSubprogramIndex] =
                   remainingTime; // Actualizar remainingTime en el mapa
               subprogramElapsedTime[currentSubprogramIndex] =
@@ -3287,10 +3287,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
   Future<bool> startFullElectrostimulationTrajeProcess(
-    String macAddress,
-    List<int> porcentajesMusculoTraje,
-    String? selectedProgram,
-  ) async {
+      String macAddress,
+      List<int> porcentajesMusculoTraje,
+      String? selectedProgram,
+      ) async {
     try {
       if (porcentajesMusculoTraje.length != 10) {
         debugPrint(
@@ -3342,7 +3342,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Iniciar sesión de electroestimulación
       final isElectroOn =
-          await bleConnectionService._startElectrostimulationSession(
+      await bleConnectionService._startElectrostimulationSession(
         widget.macAddress!,
         valoresCanalesTraje,
         frecuencia,
@@ -3377,10 +3377,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
   Future<bool> startFullElectrostimulationPantalonProcess(
-    String macAddress,
-    List<int> porcentajesMusculoPantalon,
-    String? selectedProgram,
-  ) async {
+      String macAddress,
+      List<int> porcentajesMusculoPantalon,
+      String? selectedProgram,
+      ) async {
     try {
       // Verificar que la lista tiene exactamente 7 elementos
       if (porcentajesMusculoPantalon.length != 7) {
@@ -3429,7 +3429,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
       // Paso 3: Iniciar la sesión de electroestimulación
       bool isElectroOn =
-          await bleConnectionService._startElectrostimulationSession(
+      await bleConnectionService._startElectrostimulationSession(
         widget.macAddress!,
         valoresCanalesPantalon,
         frecuencia,
@@ -3440,7 +3440,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       if (isElectroOn) {
         // Paso 4: Controlar los canales
         Map<String, dynamic> response =
-            await bleConnectionService._controlAllChannels(
+        await bleConnectionService._controlAllChannels(
           widget.macAddress!,
           1,
           0,
@@ -3485,7 +3485,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           // Actualizar el estado de la UI
           setState(() {
             isElectroOn =
-                false; // Cambiar la bandera para reflejar que está detenida
+            false; // Cambiar la bandera para reflejar que está detenida
           });
         }
 
@@ -3748,7 +3748,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             onTap: () {
                               setState(() {
                                 _isExpanded1 =
-                                    !_isExpanded1; // Cambia el estado de expansión
+                                !_isExpanded1; // Cambia el estado de expansión
                                 rotationAngle1 = _isExpanded1
                                     ? 3.14159
                                     : 0.0; // Cambia la dirección de la flecha (180 grados)
@@ -3773,16 +3773,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                             child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: screenHeight * 0.01,
-                                  horizontal: screenWidth * 0.01),
-                              width: _isExpanded1 ? screenWidth * 0.25 : 0,
-                              height: screenHeight * 0.2,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: screenHeight * 0.01,
+                                    horizontal: screenWidth * 0.01),
+                                width: _isExpanded1 ? screenWidth * 0.25 : 0,
+                                height: screenHeight * 0.2,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -3793,19 +3793,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           onTapDown: widget.selectedKey == null
                                               ? null
                                               : (_) => setState(() =>
-                                                  scaleFactorCliente = 0.90),
+                                          scaleFactorCliente = 0.90),
                                           onTapUp: widget.selectedKey == null
                                               ? null
                                               : (_) => setState(() =>
-                                                  scaleFactorCliente = 1.0),
+                                          scaleFactorCliente = 1.0),
                                           onTap: widget.selectedKey == null ||
-                                                  isRunning
+                                              isRunning
                                               ? null
                                               : () {
-                                                  setState(() {
-                                                    toggleOverlay(0);
-                                                  });
-                                                },
+                                            setState(() {
+                                              toggleOverlay(0);
+                                            });
+                                          },
                                           child: Opacity(
                                             opacity: widget.selectedKey == null
                                                 ? 1.0
@@ -3851,27 +3851,27 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               child: ValueListenableBuilder<
                                                   Map<String, dynamic>>(
                                                 valueListenable:
-                                                    widget.clientSelectedMap,
+                                                widget.clientSelectedMap,
                                                 builder: (context, clientMap,
-                                                      child) {
-                                                    final client = clientMap[
-                                                        widget.macAddress];
-                                                    if (client == null)
-                                                      return SizedBox();
-                                                    final int bonos =
-                                                        client['bonos'] ?? 0;
+                                                    child) {
+                                                  final client = clientMap[
+                                                  widget.macAddress];
+                                                  if (client == null)
+                                                    return SizedBox();
+                                                  final int bonos =
+                                                      client['bonos'] ?? 0;
 
-                                                    return Text(
-                                                      "$bonos",
-                                                      style: TextStyle(
-                                                        fontSize: 15.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
+                                                  return Text(
+                                                    "$bonos",
+                                                    style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                      FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -3880,44 +3880,44 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                     SizedBox(width: screenWidth * 0.01),
                                     // Botón "Equipo 0"
-                                  Expanded(
-                                    child: AbsorbPointer(
+                                    Expanded(
+                                      child: AbsorbPointer(
                                         absorbing: widget.selectedKey == null ||
                                             isRunning,
                                         child: GestureDetector(
                                           onTap: () {
-                                          selectEquip(0);
-                                        },
-                                        child: Opacity(
+                                            selectEquip(0);
+                                          },
+                                          child: Opacity(
                                             opacity: widget.selectedKey == null
                                                 ? 1.0
                                                 : 1.0,
                                             child: Container(
                                               width: screenWidth * 0.1,
-                                            height: screenHeight * 0.1,
-                                            decoration: BoxDecoration(
+                                              height: screenHeight * 0.1,
+                                              decoration: BoxDecoration(
                                                 color: selectedIndexEquip == 0
                                                     ? selectedColor
                                                     : unselectedColor,
                                                 borderRadius:
-                                                    const BorderRadius.only(
+                                                const BorderRadius.only(
                                                   topLeft:
-                                                      Radius.circular(10.0),
+                                                  Radius.circular(10.0),
                                                   bottomLeft:
-                                                      Radius.circular(10.0),
+                                                  Radius.circular(10.0),
                                                 ),
                                               ),
-                                            child: Center(
-                                              child: Image.asset(
-                                                'assets/images/chalecoblanco.png',
-                                                fit: BoxFit.contain,
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/images/chalecoblanco.png',
+                                                  fit: BoxFit.contain,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
 
                                     // Botón "Equipo 1"
                                     Expanded(
@@ -3926,46 +3926,46 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             isRunning,
                                         child: GestureDetector(
                                           onTap: () {
-                                          selectEquip(1);
-                                        },
-                                        child: Opacity(
+                                            selectEquip(1);
+                                          },
+                                          child: Opacity(
                                             opacity: widget.selectedKey == null
                                                 ? 1.0
                                                 : 1.0,
                                             child: Container(
                                               width: screenWidth * 0.1,
-                                            height: screenHeight * 0.1,
-                                            decoration: BoxDecoration(
+                                              height: screenHeight * 0.1,
+                                              decoration: BoxDecoration(
                                                 color: selectedIndexEquip == 1
                                                     ? selectedColor
                                                     : unselectedColor,
                                                 borderRadius:
-                                                    const BorderRadius.only(
+                                                const BorderRadius.only(
                                                   topRight:
-                                                      Radius.circular(10.0),
+                                                  Radius.circular(10.0),
                                                   bottomRight:
-                                                      Radius.circular(10.0),
+                                                  Radius.circular(10.0),
                                                 ),
                                               ),
-                                            child: Center(
-                                              child: Image.asset(
-                                                'assets/images/pantalonblanco.png',
-                                                fit: BoxFit.contain,
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/images/pantalonblanco.png',
+                                                  fit: BoxFit.contain,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
 
                                     SizedBox(width: screenWidth * 0.01),
 
                                     // Botón "Repetir"
                                     Expanded(
-                                    child: GestureDetector(
-                                      onTapDown: widget.selectedKey == null
-                                          ? null
+                                      child: GestureDetector(
+                                        onTapDown: widget.selectedKey == null
+                                            ? null
                                             : (_) => setState(
                                                 () => scaleFactorRepeat = 0.90),
                                         onTapUp: widget.selectedKey == null
@@ -3973,11 +3973,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             : (_) => setState(
                                                 () => scaleFactorRepeat = 1.0),
                                         onTap: widget.selectedKey == null ||
-                                                isRunning
+                                            isRunning
                                             ? null
                                             : () {
-                                                // Acción para botón repetir
-                                              },
+                                          // Acción para botón repetir
+                                        },
                                         child: Opacity(
                                           opacity: widget.selectedKey == null
                                               ? 1.0
@@ -3988,19 +3988,20 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 milliseconds: 100),
                                             child: Container(
                                               width: screenHeight * 0.1,
-                                            height: screenWidth * 0.1,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.transparent,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Center(
-                                              child: SizedBox(
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    'assets/images/repeat.png',
-                                                    width: screenHeight * 0.1,
-                                                    height: screenWidth * 0.1,
-                                                    fit: BoxFit.contain,
+                                              height: screenWidth * 0.1,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.transparent,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Center(
+                                                child: SizedBox(
+                                                  child: ClipOval(
+                                                    child: Image.asset(
+                                                      'assets/images/repeat.png',
+                                                      width: screenHeight * 0.1,
+                                                      height: screenWidth * 0.1,
+                                                      fit: BoxFit.contain,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -4009,8 +4010,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
                                 )),
                           ),
                           SizedBox(width: screenWidth * 0.01),
@@ -4029,14 +4029,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               children: [
                                 OutlinedButton(
                                   onPressed: widget.selectedKey == null ||
-                                          isRunning
+                                      isRunning
                                       ? null // Inhabilitar el botón si selectedKey es null
                                       : () {
-                                          setState(() {
-                                            toggleOverlay(
-                                                1); // Suponiendo que toggleOverlay abre el overlay
-                                          });
-                                        },
+                                    setState(() {
+                                      toggleOverlay(
+                                          1); // Suponiendo que toggleOverlay abre el overlay
+                                    });
+                                  },
                                   style: OutlinedButton.styleFrom(
                                     padding: EdgeInsets.symmetric(
                                         vertical: screenHeight * 0.01,
@@ -4053,7 +4053,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                   ),
                                   child: Text(
                                     (tr(context,
-                                            selectedProgram ?? 'Programas'))
+                                        selectedProgram ?? 'Programas'))
                                         .toUpperCase(),
                                     style: TextStyle(
                                       color: Colors.white,
@@ -4082,8 +4082,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             'assets/images/programacreado.png',
                                             // Imagen predeterminada
                                             height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
+                                                .size
+                                                .height *
                                                 0.1,
                                             fit: BoxFit.contain,
                                           ),
@@ -4095,7 +4095,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         children: [
                                           Text(
                                             selectedIndivProgram?['nombre']
-                                                    ?.toUpperCase() ??
+                                                ?.toUpperCase() ??
                                                 tr(context, 'Nombre programa')
                                                     .toUpperCase(),
                                             style: TextStyle(
@@ -4105,20 +4105,20 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           ),
                                           GestureDetector(
                                             onTap: widget.selectedKey == null ||
-                                                    isRunning
+                                                isRunning
                                                 ? null // Deshabilitar el clic si `selectedKey` es null
                                                 : () {
-                                                    setState(() {
-                                                      _cancelVideoController();
-                                                      toggleOverlay(2);
-                                                    });
-                                                  },
+                                              setState(() {
+                                                _cancelVideoController();
+                                                toggleOverlay(2);
+                                              });
+                                            },
                                             child: Image.asset(
                                               selectedIndivProgram?['imagen'] ??
                                                   'assets/images/programacreado.png',
                                               height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
+                                                  .size
+                                                  .height *
                                                   0.1,
                                               fit: BoxFit.contain,
                                             ),
@@ -4126,7 +4126,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ],
                                       )
                                     else if (selectedProgram ==
-                                        tr(context, 'Recovery').toUpperCase())
+                                          tr(context, 'Recovery').toUpperCase())
                                         Column(
                                           children: [
                                             Text(
@@ -4169,10 +4169,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 // Imagen del botón de "Menos"
                                                 imagePathDisplay:
                                                 'assets/images/frec.png',
-                                            // Imagen que se muestra (Contracción)
-                                            onIncrement: () {
-                                              setState(() {
-                                                valueFrecuency +=
+                                                // Imagen que se muestra (Contracción)
+                                                onIncrement: () {
+                                                  setState(() {
+                                                    valueFrecuency +=
                                                     1.0; // Lógica de incremento
                                                   });
                                                 },
@@ -4203,9 +4203,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 'assets/images/menos.png',
                                                 imagePathDisplay:
                                                 'assets/images/pulso.png',
-                                            onIncrement: () {
-                                              setState(() {
-                                                valuePulse +=
+                                                onIncrement: () {
+                                                  setState(() {
+                                                    valuePulse +=
                                                     1.0; // Incremento en decimales
                                                   });
                                                 },
@@ -4224,100 +4224,100 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                             ],
                                           )
-                                      else if (selectedProgram ==
-                                        tr(context, 'Automáticos')
-                                            .toUpperCase())
-                                      Column(
-                                        children: [
-                                          if (isRunning &&
-                                              selectedAutoProgram != null)
+                                        else if (selectedProgram ==
+                                              tr(context, 'Automáticos')
+                                                  .toUpperCase())
                                             Column(
                                               children: [
-                                                Text(
-                                                  selectedAutoProgram![
-                                                              'nombre_programa_automatico']
-                                                          ?.toUpperCase() ??
-                                                      tr(context,
-                                                              'Programa automático desconocido')
-                                                          .toUpperCase(),
-                                                  style: TextStyle(
-                                                    color:
-                                                        const Color(0xFF2be4f3),
-                                                    fontSize: 15.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                GestureDetector(
-                                                  onTap: widget.selectedKey ==
-                                                              null ||
-                                                          isRunning
-                                                      ? null
-                                                      : () {
+                                                if (isRunning &&
+                                                    selectedAutoProgram != null)
+                                                  Column(
+                                                    children: [
+                                                      Text(
+                                                        selectedAutoProgram![
+                                                        'nombre_programa_automatico']
+                                                            ?.toUpperCase() ??
+                                                            tr(context,
+                                                                'Programa automático desconocido')
+                                                                .toUpperCase(),
+                                                        style: TextStyle(
+                                                          color:
+                                                          const Color(0xFF2be4f3),
+                                                          fontSize: 15.sp,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: widget.selectedKey ==
+                                                            null ||
+                                                            isRunning
+                                                            ? null
+                                                            : () {
                                                           setState(() {
                                                             _cancelVideoController();
                                                             _showVideo = false;
                                                             toggleOverlay(4);
                                                           });
                                                         },
-                                                  child: Image.asset(
-                                                    selectedAutoProgram![
-                                                                    'subprogramas']
-                                                                [
-                                                                currentSubprogramIndex]
-                                                            ['imagen'] ??
-                                                        'assets/images/programacreado.png',
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.1,
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          else
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  selectedAutoProgram?[
-                                                              'nombre_programa_automatico']
-                                                          ?.toUpperCase() ??
-                                                      tr(context,
-                                                              'Nombre programa')
-                                                          .toUpperCase(),
-                                                  style: TextStyle(
-                                                    color:
-                                                        const Color(0xFF2be4f3),
-                                                    fontSize: 15.sp,
-                                                  ),
-                                                ),
-                                                GestureDetector(
-                                                  onTap: widget.selectedKey ==
-                                                              null ||
-                                                          isRunning
-                                                      ? null
-                                                      : () {
+                                                        child: Image.asset(
+                                                          selectedAutoProgram![
+                                                          'subprogramas']
+                                                          [
+                                                          currentSubprogramIndex]
+                                                          ['imagen'] ??
+                                                              'assets/images/programacreado.png',
+                                                          height:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .height *
+                                                              0.1,
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                else
+                                                  Column(
+                                                    children: [
+                                                      Text(
+                                                        selectedAutoProgram?[
+                                                        'nombre_programa_automatico']
+                                                            ?.toUpperCase() ??
+                                                            tr(context,
+                                                                'Nombre programa')
+                                                                .toUpperCase(),
+                                                        style: TextStyle(
+                                                          color:
+                                                          const Color(0xFF2be4f3),
+                                                          fontSize: 15.sp,
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: widget.selectedKey ==
+                                                            null ||
+                                                            isRunning
+                                                            ? null
+                                                            : () {
                                                           setState(() {
                                                             toggleOverlay(4);
                                                           });
                                                         },
-                                                  child: Image.asset(
-                                                    selectedAutoProgram?[
-                                                            'imagen'] ??
-                                                        'assets/images/programacreado.png',
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.1,
-                                                    fit: BoxFit.contain,
+                                                        child: Image.asset(
+                                                          selectedAutoProgram?[
+                                                          'imagen'] ??
+                                                              'assets/images/programacreado.png',
+                                                          height:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .height *
+                                                              0.1,
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
                                               ],
                                             ),
-                                        ],
-                                      ),
                                   ],
                                 ),
                                 SizedBox(width: screenWidth * 0.005),
@@ -4351,100 +4351,100 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         ],
                                       )
                                     else if (selectedProgram ==
-                                        tr(context, 'Recovery').toUpperCase())
-                                      Column(
-                                        children: [
-                                          Text(
-                                            selectedRecoProgram != null
-                                                ? "${selectedRecoProgram!['frecuencia'] != null ? formatNumber(selectedRecoProgram!['frecuencia'] as double) : ''} Hz"
-                                                : "",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15.sp,
-                                            ),
-                                          ),
-                                          Text(
-                                            selectedRecoProgram != null
-                                                ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : ''} ms"
-                                                : "",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15.sp,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else if (selectedProgram ==
-                                        tr(context, 'Automáticos')
-                                            .toUpperCase())
-                                      Column(
-                                        children: [
-                                          if (selectedAutoProgram != null &&
-                                              selectedAutoProgram![
-                                                      'subprogramas']
-                                                  .isNotEmpty)
-                                            Column(
-                                              children: [
-                                                Text.rich(
-                                                  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['orden'] ?? tr(context, 'Subprograma desconocido')}. ',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 15.sp,
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 15.sp,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .underline,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] as double) : 'N/A'} Hz",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 15.sp,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] as double) : 'N/A'} ms",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 15.sp,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  formatTime(remainingTime),
-                                                  style: TextStyle(
-                                                    color:
-                                                        const Color(0xFF2be4f3),
-                                                    fontSize: 18.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          else if (selectedAutoProgram != null)
+                                          tr(context, 'Recovery').toUpperCase())
+                                        Column(
+                                          children: [
                                             Text(
-                                              "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min",
+                                              selectedRecoProgram != null
+                                                  ? "${selectedRecoProgram!['frecuencia'] != null ? formatNumber(selectedRecoProgram!['frecuencia'] as double) : ''} Hz"
+                                                  : "",
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 15.sp,
                                               ),
                                             ),
-                                        ],
-                                      ),
+                                            Text(
+                                              selectedRecoProgram != null
+                                                  ? "${selectedRecoProgram!['pulso'] != null ? formatNumber(selectedRecoProgram!['pulso'] as double) : ''} ms"
+                                                  : "",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15.sp,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      else if (selectedProgram ==
+                                            tr(context, 'Automáticos')
+                                                .toUpperCase())
+                                          Column(
+                                            children: [
+                                              if (selectedAutoProgram != null &&
+                                                  selectedAutoProgram![
+                                                  'subprogramas']
+                                                      .isNotEmpty)
+                                                Column(
+                                                  children: [
+                                                    Text.rich(
+                                                      TextSpan(
+                                                        children: [
+                                                          TextSpan(
+                                                            text:
+                                                            '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['orden'] ?? tr(context, 'Subprograma desconocido')}. ',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 15.sp,
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text:
+                                                            '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 15.sp,
+                                                              decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['frecuencia'] as double) : 'N/A'} Hz",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15.sp,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] != null ? formatNumber(selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['pulso'] as double) : 'N/A'} ms",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15.sp,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      formatTime(remainingTime),
+                                                      style: TextStyle(
+                                                        color:
+                                                        const Color(0xFF2be4f3),
+                                                        fontSize: 18.sp,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              else if (selectedAutoProgram != null)
+                                                Text(
+                                                  "${selectedAutoProgram!['duracionTotal'] != null ? formatNumber(selectedAutoProgram!['duracionTotal'] as double) : 'N/A'} min",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 15.sp,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
                                   ],
                                 ),
                                 SizedBox(width: screenWidth * 0.01),
@@ -4455,8 +4455,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     onPressed: selectedProgram == null
                                         ? null // Si selectedProgram es nulo, se deshabilita el botón
                                         : () {
-                                            if (mounted) {
-                                              setState(() {
+                                      if (mounted) {
+                                        setState(() {
                                           toggleOverlay(6);
                                         });
                                       }
@@ -4474,8 +4474,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     ),
                                     child: Text(
                                       (selectedCycle == null
-                                              ? tr(context, 'Ciclos')
-                                              : selectedCycle!)
+                                          ? tr(context, 'Ciclos')
+                                          : selectedCycle!)
                                           .toUpperCase(),
                                       style: TextStyle(
                                         color: const Color(0xFF2be4f3),
@@ -4549,7 +4549,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     child: AnimatedScale(
                                       scale: 1.0,
                                       duration:
-                                          const Duration(milliseconds: 100),
+                                      const Duration(milliseconds: 100),
                                       child: Container(
                                         decoration: const BoxDecoration(
                                             color: Colors.transparent),
@@ -4557,8 +4557,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                           child: Image.asset(
                                             'assets/images/virtualtrainer.png',
                                             height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
+                                                .size
+                                                .height *
                                                 0.1,
                                             fit: BoxFit.contain,
                                           ),
@@ -4581,7 +4581,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         porcentajesMusculoTraje,
                                         selectedProgram);
                                     _isImageOne =
-                                        !_isImageOne; // Alterna entre las dos imágenes
+                                    !_isImageOne; // Alterna entre las dos imágenes
                                   });
                                 },
                                 child: AnimatedScale(
@@ -4633,58 +4633,58 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                             child: Stack(children: [
                               if (_showVideo &&
                                   GlobalVideoControllerManager
-                                          .instance.activeMacAddress ==
+                                      .instance.activeMacAddress ==
                                       widget.macAddress!)
                                 Positioned.fill(
                                   child: _isLoading
                                       ? Center(
-                                          child: Container(),
-                                        )
+                                    child: Container(),
+                                  )
                                       : (GlobalVideoControllerManager.instance
-                                                      .videoController !=
-                                                  null &&
-                                              GlobalVideoControllerManager
-                                                  .instance
-                                                  .videoController!
-                                                  .value
-                                                  .isInitialized)
-                                          ? SizedBox(
-                                              width: screenWidth,
-                                              height: screenHeight,
-                                              child: FittedBox(
-                                                fit: BoxFit.cover,
-                                                child: SizedBox(
-                                                  width:
-                                                      GlobalVideoControllerManager
-                                                          .instance
-                                                          .videoController!
-                                                          .value
-                                                          .size
-                                                          .width,
-                                                  height:
-                                                      GlobalVideoControllerManager
-                                                          .instance
-                                                          .videoController!
-                                                          .value
-                                                          .size
-                                                          .height,
-                                                  child: VideoPlayer(
-                                                    GlobalVideoControllerManager
-                                                        .instance
-                                                        .videoController!,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          : const Center(
-                                              child: Text(
-                                                "No video available",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
+                                      .videoController !=
+                                      null &&
+                                      GlobalVideoControllerManager
+                                          .instance
+                                          .videoController!
+                                          .value
+                                          .isInitialized)
+                                      ? SizedBox(
+                                    width: screenWidth,
+                                    height: screenHeight,
+                                    child: FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: SizedBox(
+                                        width:
+                                        GlobalVideoControllerManager
+                                            .instance
+                                            .videoController!
+                                            .value
+                                            .size
+                                            .width,
+                                        height:
+                                        GlobalVideoControllerManager
+                                            .instance
+                                            .videoController!
+                                            .value
+                                            .size
+                                            .height,
+                                        child: VideoPlayer(
+                                          GlobalVideoControllerManager
+                                              .instance
+                                              .videoController!,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                      : const Center(
+                                    child: Text(
+                                      "No video available",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               if (_hideControls == false)
                                 Row(
@@ -4692,115 +4692,115 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     if (selectedIndexEquip == 0) ...[
                                       Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         children: [
                                           if (isSessionStarted) ...[
                                             _buildMuscleRow(
                                               index: 0,
                                               imagePathEnabled:
-                                                  'assets/images/pec_naranja.png',
+                                              'assets/images/pec_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/pecazul.png',
+                                              'assets/images/pecazul.png',
                                               imagePathInactive:
-                                                  'assets/images/pec_gris.png',
+                                              'assets/images/pec_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 1,
                                               imagePathEnabled:
-                                                  'assets/images/biceps_naranja.png',
+                                              'assets/images/biceps_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/bicepsazul.png',
+                                              'assets/images/bicepsazul.png',
                                               imagePathInactive:
-                                                  'assets/images/biceps_gris.png',
+                                              'assets/images/biceps_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 2,
                                               imagePathEnabled:
-                                                  'assets/images/abs_naranja.png',
+                                              'assets/images/abs_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/absazul.png',
+                                              'assets/images/absazul.png',
                                               imagePathInactive:
-                                                  'assets/images/abs_gris.png',
+                                              'assets/images/abs_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 3,
                                               imagePathEnabled:
-                                                  'assets/images/cua_naranja.png',
+                                              'assets/images/cua_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/cuazul.png',
+                                              'assets/images/cuazul.png',
                                               imagePathInactive:
-                                                  'assets/images/cua_gris.png',
+                                              'assets/images/cua_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 4,
                                               imagePathEnabled:
-                                                  'assets/images/gemelos_naranja.png',
+                                              'assets/images/gemelos_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/gemelosazul.png',
+                                              'assets/images/gemelosazul.png',
                                               imagePathInactive:
-                                                  'assets/images/gemelos_gris.png',
+                                              'assets/images/gemelos_gris.png',
                                             ),
                                           ] else if (!isSessionStarted) ...[
                                             _buildMuscleRow(
                                               index: 0,
                                               imagePathEnabled:
-                                                  'assets/images/pec_naranja.png',
+                                              'assets/images/pec_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/pec_blanco.png',
+                                              'assets/images/pec_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/pec_gris.png',
+                                              'assets/images/pec_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 1,
                                               imagePathEnabled:
-                                                  'assets/images/biceps_naranja.png',
+                                              'assets/images/biceps_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/biceps_blanco.png',
+                                              'assets/images/biceps_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/biceps_gris.png',
+                                              'assets/images/biceps_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 2,
                                               imagePathEnabled:
-                                                  'assets/images/abs_naranja.png',
+                                              'assets/images/abs_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/abs_blanco.png',
+                                              'assets/images/abs_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/abs_gris.png',
+                                              'assets/images/abs_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 3,
                                               imagePathEnabled:
-                                                  'assets/images/cua_naranja.png',
+                                              'assets/images/cua_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/cua_blanco.png',
+                                              'assets/images/cua_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/cua_gris.png',
+                                              'assets/images/cua_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 4,
                                               imagePathEnabled:
-                                                  'assets/images/gemelos_naranja.png',
+                                              'assets/images/gemelos_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/gemelos_blanco.png',
+                                              'assets/images/gemelos_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/gemelos_gris.png',
+                                              'assets/images/gemelos_gris.png',
                                             ),
                                           ]
                                         ],
@@ -4823,7 +4823,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   // Superposición de imágenes si `musculosTrajeSelected` es verdadero
                                                   if (isSessionStarted) ...[
                                                     if (_isMusculoTrajeInactivo[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -4832,14 +4832,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -4848,9 +4848,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -4859,22 +4859,22 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_pecho_azul.png",
                                                                 // Imagen para el estado animado
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -4884,7 +4884,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -4893,14 +4893,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -4908,9 +4908,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para bíceps
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -4919,21 +4919,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_biceps_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -4943,7 +4943,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -4952,14 +4952,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -4967,9 +4967,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -4978,21 +4978,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_abs_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5002,7 +5002,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5011,14 +5011,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -5026,9 +5026,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5037,21 +5037,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_cua_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5061,7 +5061,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5070,14 +5070,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -5085,9 +5085,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5096,21 +5096,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_gem_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5121,7 +5121,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     ],
                                                   ] else if (!isSessionStarted) ...[
                                                     if (_isMusculoTrajeInactivo[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5130,14 +5130,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -5145,9 +5145,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5160,15 +5160,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5177,14 +5177,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -5192,9 +5192,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5207,15 +5207,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5224,14 +5224,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -5239,9 +5239,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5254,15 +5254,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5271,14 +5271,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -5286,9 +5286,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5301,15 +5301,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5318,14 +5318,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       Positioned(
                                                         top: 0,
                                                         child: Image.asset(
@@ -5333,9 +5333,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen bloqueada para abdominales
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5348,9 +5348,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5360,19 +5360,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               ),
                                               Column(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                MainAxisAlignment.center,
                                                 children: [
                                                   Stack(
                                                     alignment: Alignment.center,
                                                     children: [
                                                       Image.asset(
                                                         imagePaths[
-                                                            _currentImageIndex]!,
+                                                        _currentImageIndex]!,
                                                         // Accede al valor en el mapa usando la clave _currentImageIndex
                                                         height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
+                                                            context)
+                                                            .size
+                                                            .height *
                                                             0.25,
                                                         fit: BoxFit.cover,
                                                       ),
@@ -5396,8 +5396,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             child: Image.asset(
                                                               'assets/images/flecha-arriba.png',
                                                               height:
-                                                                  screenHeight *
-                                                                      0.04,
+                                                              screenHeight *
+                                                                  0.04,
                                                               fit: BoxFit
                                                                   .scaleDown,
                                                             ),
@@ -5407,8 +5407,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             style: TextStyle(
                                                               fontSize: 25.sp,
                                                               fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                              FontWeight
+                                                                  .bold,
                                                               color: const Color(
                                                                   0xFF2be4f3), // Color para la sección seleccionada
                                                             ),
@@ -5431,8 +5431,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             child: Image.asset(
                                                               'assets/images/flecha-abajo.png',
                                                               height:
-                                                                  screenHeight *
-                                                                      0.04,
+                                                              screenHeight *
+                                                                  0.04,
                                                               fit: BoxFit
                                                                   .scaleDown,
                                                             ),
@@ -5443,41 +5443,41 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   ),
                                                   SizedBox(
                                                       height:
-                                                          screenHeight * 0.01),
+                                                      screenHeight * 0.01),
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                     children: [
                                                       CustomPaint(
                                                         size: Size(
                                                           isFullScreen
                                                               ? screenWidth *
-                                                                  0.1
+                                                              0.1
                                                               : screenWidth *
-                                                                  0.1,
+                                                              0.1,
                                                           // Aumentar tamaño si isFullScreen es verdadero
                                                           isFullScreen
                                                               ? screenHeight *
-                                                                  0.03
+                                                              0.03
                                                               : screenHeight *
-                                                                  0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                              0.02, // Aumentar tamaño si isFullScreen es verdadero
                                                         ),
                                                         painter: LinePainter(
                                                           progress2:
-                                                              progressContraction,
+                                                          progressContraction,
                                                           strokeHeight: isFullScreen
                                                               ? screenHeight *
-                                                                  0.025
+                                                              0.025
                                                               : screenHeight *
-                                                                  0.02, // Aumentar altura si isFullScreen es verdadero
+                                                              0.02, // Aumentar altura si isFullScreen es verdadero
                                                         ),
                                                       ),
                                                       SizedBox(
                                                         width: isFullScreen
                                                             ? screenWidth * 0.01
                                                             : screenWidth *
-                                                                0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                            0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                       ),
                                                       Text(
                                                         formatNumber(
@@ -5488,7 +5488,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               ? 25.sp
                                                               : 20.sp,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           color: Colors
                                                               .lightGreenAccent
                                                               .shade400,
@@ -5498,38 +5498,38 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   ),
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                     children: [
                                                       CustomPaint(
                                                         size: Size(
                                                           isFullScreen
                                                               ? screenWidth *
-                                                                  0.1
+                                                              0.1
                                                               : screenWidth *
-                                                                  0.1,
+                                                              0.1,
                                                           // Aumentar tamaño si isFullScreen es verdadero
                                                           isFullScreen
                                                               ? screenHeight *
-                                                                  0.03
+                                                              0.03
                                                               : screenHeight *
-                                                                  0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                              0.02, // Aumentar tamaño si isFullScreen es verdadero
                                                         ),
                                                         painter: LinePainter2(
                                                           progress3:
-                                                              progressPause,
+                                                          progressPause,
                                                           strokeHeight: isFullScreen
                                                               ? screenHeight *
-                                                                  0.025
+                                                              0.025
                                                               : screenHeight *
-                                                                  0.02,
+                                                              0.02,
                                                         ),
                                                       ),
                                                       SizedBox(
                                                         width: isFullScreen
                                                             ? screenWidth * 0.01
                                                             : screenWidth *
-                                                                0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                            0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                       ),
                                                       Text(
                                                         formatNumber(
@@ -5540,7 +5540,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               ? 25.sp
                                                               : 20.sp,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           color: Colors.red,
                                                         ),
                                                       )
@@ -5550,7 +5550,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     height: isFullScreen
                                                         ? screenHeight * 0.02
                                                         : screenHeight *
-                                                            0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                        0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                   ),
                                                   Column(
                                                     children: [
@@ -5562,7 +5562,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               : 18.sp,
                                                           // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           color: const Color(
                                                               0xFF2be4f3),
                                                         ),
@@ -5571,35 +5571,35 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         size: Size(
                                                           isFullScreen
                                                               ? screenWidth *
-                                                                  0.15
+                                                              0.15
                                                               : screenWidth *
-                                                                  0.15,
+                                                              0.15,
                                                           // Aumentar tamaño si isFullScreen es verdadero
                                                           isFullScreen
                                                               ? screenHeight *
-                                                                  0.05
+                                                              0.05
                                                               : screenHeight *
-                                                                  0.05, // Aumentar tamaño si isFullScreen es verdadero
+                                                              0.05, // Aumentar tamaño si isFullScreen es verdadero
                                                         ),
                                                         painter:
-                                                            AverageLineWithTextPainter(
+                                                        AverageLineWithTextPainter(
                                                           average: calculateAverage(
-                                                                  porcentajesMusculoTraje) /
+                                                              porcentajesMusculoTraje) /
                                                               100.0,
                                                           strokeHeight: isFullScreen
                                                               ? screenHeight *
-                                                                  0.03
+                                                              0.03
                                                               : screenHeight *
-                                                                  0.02,
+                                                              0.02,
                                                           // Aumentar altura si isFullScreen es verdadero
                                                           textStyle: TextStyle(
                                                             fontSize:
-                                                                isFullScreen
-                                                                    ? 23.sp
-                                                                    : 18.sp,
+                                                            isFullScreen
+                                                                ? 23.sp
+                                                                : 18.sp,
                                                             // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                             fontWeight:
-                                                                FontWeight.bold,
+                                                            FontWeight.bold,
                                                             fontStyle: FontStyle
                                                                 .italic,
                                                           ),
@@ -5623,7 +5623,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   // Superposición de imágenes si `musculosTrajeSelected` es verdadero
                                                   if (isSessionStarted) ...[
                                                     if (_isMusculoTrajeInactivo[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5632,14 +5632,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -5648,9 +5648,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5660,21 +5660,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_trap_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5684,7 +5684,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5693,14 +5693,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -5709,9 +5709,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5721,21 +5721,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_dorsal_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5745,7 +5745,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        7]) ...[
+                                                    7]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5753,14 +5753,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           "assets/images/capa_lumbar_gris.png",
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        7]) ...[
+                                                    7]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -5769,9 +5769,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5781,21 +5781,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_lumbar_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5805,7 +5805,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        8]) ...[
+                                                    8]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5814,14 +5814,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        8]) ...[
+                                                    8]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -5830,9 +5830,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5842,21 +5842,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_gluteo_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5866,7 +5866,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        9]) ...[
+                                                    9]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5875,14 +5875,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        9]) ...[
+                                                    9]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -5891,9 +5891,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5903,21 +5903,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_isquio_azul.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -5928,7 +5928,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     ],
                                                   ] else if (!isSessionStarted) ...[
                                                     if (_isMusculoTrajeInactivo[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5937,14 +5937,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -5953,9 +5953,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -5968,15 +5968,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -5985,14 +5985,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6001,9 +6001,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6016,15 +6016,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        7]) ...[
+                                                    7]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6033,14 +6033,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        7]) ...[
+                                                    7]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6049,9 +6049,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6064,15 +6064,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        8]) ...[
+                                                    8]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6081,14 +6081,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        8]) ...[
+                                                    8]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6097,9 +6097,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6112,15 +6112,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoTrajeInactivo[
-                                                        9]) ...[
+                                                    9]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6129,14 +6129,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoTrajeBloqueado[
-                                                        9]) ...[
+                                                    9]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6145,9 +6145,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6160,9 +6160,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6178,33 +6178,33 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Botón "Menos"
                                               CustomIconButton(
                                                 onTap: widget.selectedKey ==
-                                                        null
+                                                    null
                                                     ? null // Si selectedKey es null, el botón estará deshabilitado
                                                     : () {
-                                                        setState(() {
-                                                          // Disminuir el porcentaje de los músculos que no están bloqueados ni inactivos
-                                                          for (int i = 0;
-                                                              i <
-                                                                  _isMusculoTrajeBloqueado
-                                                                      .length;
-                                                              i++) {
-                                                            if (!_isMusculoTrajeBloqueado[
-                                                                    i] &&
-                                                                !_isMusculoTrajeInactivo[
-                                                                    i]) {
-                                                              porcentajesMusculoTraje[
-                                                                      i] =
-                                                                  (porcentajesMusculoTraje[
-                                                                              i] -
-                                                                          1)
-                                                                      .clamp(0,
-                                                                          100);
-                                                            }
-                                                          }
-                                                        });
-                                                      },
+                                                  setState(() {
+                                                    // Disminuir el porcentaje de los músculos que no están bloqueados ni inactivos
+                                                    for (int i = 0;
+                                                    i <
+                                                        _isMusculoTrajeBloqueado
+                                                            .length;
+                                                    i++) {
+                                                      if (!_isMusculoTrajeBloqueado[
+                                                      i] &&
+                                                          !_isMusculoTrajeInactivo[
+                                                          i]) {
+                                                        porcentajesMusculoTraje[
+                                                        i] =
+                                                            (porcentajesMusculoTraje[
+                                                            i] -
+                                                                1)
+                                                                .clamp(0,
+                                                                100);
+                                                      }
+                                                    }
+                                                  });
+                                                },
                                                 imagePath:
-                                                    'assets/images/menos.png',
+                                                'assets/images/menos.png',
                                                 size: screenHeight * 0.1,
                                               ),
 
@@ -6213,33 +6213,33 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Botón de control de sesión (Reproducir/Pausar)
                                               GestureDetector(
                                                 onTap: widget.selectedKey ==
-                                                        null
+                                                    null
                                                     ? null // Si selectedKey es null, el botón estará deshabilitado
                                                     : () {
-                                                        setState(() {
-                                                          if (isRunning) {
-                                                            // Pausa el temporizador si está corriendo
-                                                            _pauseTimer(widget
-                                                                .macAddress!);
-                                                          } else {
-                                                            _startTimer(
-                                                                widget
-                                                                    .macAddress!,
-                                                                porcentajesMusculoTraje,
-                                                                porcentajesMusculoPantalon);
-                                                          }
-                                                          _togglePlayPause(
-                                                              widget
-                                                                  .macAddress!);
-                                                          debugPrint(
-                                                              'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
-                                                        });
-                                                      },
+                                                  setState(() {
+                                                    if (isRunning) {
+                                                      // Pausa el temporizador si está corriendo
+                                                      _pauseTimer(widget
+                                                          .macAddress!);
+                                                    } else {
+                                                      _startTimer(
+                                                          widget
+                                                              .macAddress!,
+                                                          porcentajesMusculoTraje,
+                                                          porcentajesMusculoPantalon);
+                                                    }
+                                                    _togglePlayPause(
+                                                        widget
+                                                            .macAddress!);
+                                                    debugPrint(
+                                                        'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
+                                                  });
+                                                },
                                                 child: SizedBox(
                                                   child: ClipOval(
                                                     child: Image.asset(
                                                       height:
-                                                          screenHeight * 0.15,
+                                                      screenHeight * 0.15,
                                                       isRunning
                                                           ? controlImages[1]
                                                           : controlImages[0],
@@ -6254,33 +6254,33 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
                                               CustomIconButton(
                                                 onTap: widget.selectedKey ==
-                                                        null
+                                                    null
                                                     ? null // Si selectedKey es null, el botón estará deshabilitado
                                                     : () {
-                                                        setState(() {
-                                                          // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
-                                                          for (int i = 0;
-                                                              i <
-                                                                  _isMusculoTrajeBloqueado
-                                                                      .length;
-                                                              i++) {
-                                                            if (!_isMusculoTrajeBloqueado[
-                                                                    i] &&
-                                                                !_isMusculoTrajeInactivo[
-                                                                    i]) {
-                                                              porcentajesMusculoTraje[
-                                                                      i] =
-                                                                  (porcentajesMusculoTraje[
-                                                                              i] +
-                                                                          1)
-                                                                      .clamp(0,
-                                                                          100);
-                                                            }
-                                                          }
-                                                        });
-                                                      },
+                                                  setState(() {
+                                                    // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
+                                                    for (int i = 0;
+                                                    i <
+                                                        _isMusculoTrajeBloqueado
+                                                            .length;
+                                                    i++) {
+                                                      if (!_isMusculoTrajeBloqueado[
+                                                      i] &&
+                                                          !_isMusculoTrajeInactivo[
+                                                          i]) {
+                                                        porcentajesMusculoTraje[
+                                                        i] =
+                                                            (porcentajesMusculoTraje[
+                                                            i] +
+                                                                1)
+                                                                .clamp(0,
+                                                                100);
+                                                      }
+                                                    }
+                                                  });
+                                                },
                                                 imagePath:
-                                                    'assets/images/mas.png',
+                                                'assets/images/mas.png',
                                                 size: screenHeight * 0.1,
                                               ),
                                             ],
@@ -6289,115 +6289,115 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       ),
                                       Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         children: [
                                           if (isSessionStarted) ...[
                                             _buildMuscleRow(
                                               index: 5,
                                               imagePathEnabled:
-                                                  'assets/images/trap_naranja.png',
+                                              'assets/images/trap_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/trapazul.png',
+                                              'assets/images/trapazul.png',
                                               imagePathInactive:
-                                                  'assets/images/trap_gris.png',
+                                              'assets/images/trap_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 6,
                                               imagePathEnabled:
-                                                  'assets/images/dorsal_naranja.png',
+                                              'assets/images/dorsal_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/dorsalazul.png',
+                                              'assets/images/dorsalazul.png',
                                               imagePathInactive:
-                                                  'assets/images/dorsal_gris.png',
+                                              'assets/images/dorsal_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 7,
                                               imagePathEnabled:
-                                                  'assets/images/lumbar_naranja.png',
+                                              'assets/images/lumbar_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/lumbarazul.png',
+                                              'assets/images/lumbarazul.png',
                                               imagePathInactive:
-                                                  'assets/images/lumbar_gris.png',
+                                              'assets/images/lumbar_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 8,
                                               imagePathEnabled:
-                                                  'assets/images/gluteo_naranja.png',
+                                              'assets/images/gluteo_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/gluteoazul.png',
+                                              'assets/images/gluteoazul.png',
                                               imagePathInactive:
-                                                  'assets/images/gluteo_gris.png',
+                                              'assets/images/gluteo_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 9,
                                               imagePathEnabled:
-                                                  'assets/images/isquio_naranja.png',
+                                              'assets/images/isquio_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/isquioazul.png',
+                                              'assets/images/isquioazul.png',
                                               imagePathInactive:
-                                                  'assets/images/isquio_gris.png',
+                                              'assets/images/isquio_gris.png',
                                             ),
                                           ] else if (!isSessionStarted) ...[
                                             _buildMuscleRow(
                                               index: 5,
                                               imagePathEnabled:
-                                                  'assets/images/trap_naranja.png',
+                                              'assets/images/trap_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/trap_blanco.png',
+                                              'assets/images/trap_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/trap_gris.png',
+                                              'assets/images/trap_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 6,
                                               imagePathEnabled:
-                                                  'assets/images/dorsal_naranja.png',
+                                              'assets/images/dorsal_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/dorsal_blanco.png',
+                                              'assets/images/dorsal_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/dorsal_gris.png',
+                                              'assets/images/dorsal_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 7,
                                               imagePathEnabled:
-                                                  'assets/images/lumbar_naranja.png',
+                                              'assets/images/lumbar_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/lumbar_blanco.png',
+                                              'assets/images/lumbar_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/lumbar_gris.png',
+                                              'assets/images/lumbar_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 8,
                                               imagePathEnabled:
-                                                  'assets/images/gluteo_naranja.png',
+                                              'assets/images/gluteo_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/gluteo_blanco.png',
+                                              'assets/images/gluteo_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/gluteo_gris.png',
+                                              'assets/images/gluteo_gris.png',
                                             ),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow(
                                               index: 9,
                                               imagePathEnabled:
-                                                  'assets/images/isquio_naranja.png',
+                                              'assets/images/isquio_naranja.png',
                                               imagePathDisabled:
-                                                  'assets/images/isquio_blanco.png',
+                                              'assets/images/isquio_blanco.png',
                                               imagePathInactive:
-                                                  'assets/images/isquio_gris.png',
+                                              'assets/images/isquio_gris.png',
                                             ),
                                           ]
                                         ],
@@ -6405,86 +6405,86 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                     ] else if (selectedIndexEquip == 1) ...[
                                       Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         children: [
                                           if (isSessionStarted) ...[
                                             _buildMuscleRow2(
                                                 index: 0,
                                                 imagePathEnabled:
-                                                    'assets/images/biceps_naranja.png',
+                                                'assets/images/biceps_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/bicepsazul.png',
+                                                'assets/images/bicepsazul.png',
                                                 imagePathInactive:
-                                                    'assets/images/biceps_gris.png'),
+                                                'assets/images/biceps_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 1,
                                                 imagePathEnabled:
-                                                    'assets/images/abs_naranja.png',
+                                                'assets/images/abs_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/absazul.png',
+                                                'assets/images/absazul.png',
                                                 imagePathInactive:
-                                                    'assets/images/abs_gris.png'),
+                                                'assets/images/abs_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 2,
                                                 imagePathEnabled:
-                                                    'assets/images/cua_naranja.png',
+                                                'assets/images/cua_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/cuazul.png',
+                                                'assets/images/cuazul.png',
                                                 imagePathInactive:
-                                                    'assets/images/cua_gris.png'),
+                                                'assets/images/cua_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 3,
                                                 imagePathEnabled:
-                                                    'assets/images/gemelos_naranja.png',
+                                                'assets/images/gemelos_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/gemelosazul.png',
+                                                'assets/images/gemelosazul.png',
                                                 imagePathInactive:
-                                                    'assets/images/gemelos_gris.png'),
+                                                'assets/images/gemelos_gris.png'),
                                           ] else if (!isSessionStarted) ...[
                                             _buildMuscleRow2(
                                                 index: 0,
                                                 imagePathEnabled:
-                                                    'assets/images/biceps_naranja.png',
+                                                'assets/images/biceps_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/biceps_blanco_pantalon.png',
+                                                'assets/images/biceps_blanco_pantalon.png',
                                                 imagePathInactive:
-                                                    'assets/images/biceps_gris.png'),
+                                                'assets/images/biceps_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 1,
                                                 imagePathEnabled:
-                                                    'assets/images/abs_naranja.png',
+                                                'assets/images/abs_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/abs_blanco.png',
+                                                'assets/images/abs_blanco.png',
                                                 imagePathInactive:
-                                                    'assets/images/abs_gris.png'),
+                                                'assets/images/abs_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 2,
                                                 imagePathEnabled:
-                                                    'assets/images/cua_naranja.png',
+                                                'assets/images/cua_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/cua_blanco_pantalon.png',
+                                                'assets/images/cua_blanco_pantalon.png',
                                                 imagePathInactive:
-                                                    'assets/images/cua_gris.png'),
+                                                'assets/images/cua_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 3,
                                                 imagePathEnabled:
-                                                    'assets/images/gemelos_naranja.png',
+                                                'assets/images/gemelos_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/gemelo_blanco_pantalon.png',
+                                                'assets/images/gemelo_blanco_pantalon.png',
                                                 imagePathInactive:
-                                                    'assets/images/gemelos_gris.png'),
+                                                'assets/images/gemelos_gris.png'),
                                           ]
                                         ],
                                       ),
@@ -6506,7 +6506,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   // Superposición de imágenes si `musculosTrajeSelected` es verdadero
                                                   if (isSessionStarted) ...[
                                                     if (_isMusculoPantalonInactivo[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6515,14 +6515,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6531,9 +6531,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6543,21 +6543,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_biceps_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -6567,7 +6567,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6576,9 +6576,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6589,14 +6589,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6605,9 +6605,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6618,9 +6618,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6630,21 +6630,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_abs_inf_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -6656,21 +6656,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_abs_sup_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -6680,7 +6680,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6689,14 +6689,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6705,9 +6705,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6717,21 +6717,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_cua_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -6741,7 +6741,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6750,14 +6750,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6766,9 +6766,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6778,21 +6778,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_gem_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -6803,7 +6803,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     ],
                                                   ] else if (!isSessionStarted) ...[
                                                     if (_isMusculoPantalonInactivo[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6812,14 +6812,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        0]) ...[
+                                                    0]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6828,9 +6828,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6842,15 +6842,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6859,9 +6859,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6872,14 +6872,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        1]) ...[
+                                                    1]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6888,9 +6888,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6901,9 +6901,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6915,9 +6915,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6929,15 +6929,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6946,14 +6946,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        2]) ...[
+                                                    2]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -6962,9 +6962,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -6976,15 +6976,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -6993,14 +6993,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        3]) ...[
+                                                    3]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -7009,9 +7009,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7023,9 +7023,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7035,19 +7035,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               ),
                                               Column(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                MainAxisAlignment.center,
                                                 children: [
                                                   Stack(
                                                     alignment: Alignment.center,
                                                     children: [
                                                       Image.asset(
                                                         imagePaths[
-                                                            _currentImageIndex]!,
+                                                        _currentImageIndex]!,
                                                         // Accede al valor en el mapa usando la clave _currentImageIndex
                                                         height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
+                                                            context)
+                                                            .size
+                                                            .height *
                                                             0.25,
                                                         fit: BoxFit.cover,
                                                       ),
@@ -7072,8 +7072,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             child: Image.asset(
                                                               'assets/images/flecha-arriba.png',
                                                               height:
-                                                                  screenHeight *
-                                                                      0.04,
+                                                              screenHeight *
+                                                                  0.04,
                                                               fit: BoxFit
                                                                   .scaleDown,
                                                             ),
@@ -7083,8 +7083,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             style: TextStyle(
                                                               fontSize: 25.sp,
                                                               fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                              FontWeight
+                                                                  .bold,
                                                               color: const Color(
                                                                   0xFF2be4f3), // Color para la sección seleccionada
                                                             ),
@@ -7106,8 +7106,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             child: Image.asset(
                                                               'assets/images/flecha-abajo.png',
                                                               height:
-                                                                  screenHeight *
-                                                                      0.04,
+                                                              screenHeight *
+                                                                  0.04,
                                                               fit: BoxFit
                                                                   .scaleDown,
                                                             ),
@@ -7118,41 +7118,41 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   ),
                                                   SizedBox(
                                                       height:
-                                                          screenHeight * 0.01),
+                                                      screenHeight * 0.01),
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                     children: [
                                                       CustomPaint(
                                                         size: Size(
                                                           isFullScreen
                                                               ? screenWidth *
-                                                                  0.1
+                                                              0.1
                                                               : screenWidth *
-                                                                  0.1,
+                                                              0.1,
                                                           // Aumentar tamaño si isFullScreen es verdadero
                                                           isFullScreen
                                                               ? screenHeight *
-                                                                  0.03
+                                                              0.03
                                                               : screenHeight *
-                                                                  0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                              0.02, // Aumentar tamaño si isFullScreen es verdadero
                                                         ),
                                                         painter: LinePainter(
                                                           progress2:
-                                                              progressContraction,
+                                                          progressContraction,
                                                           strokeHeight: isFullScreen
                                                               ? screenHeight *
-                                                                  0.025
+                                                              0.025
                                                               : screenHeight *
-                                                                  0.02, // Aumentar altura si isFullScreen es verdadero
+                                                              0.02, // Aumentar altura si isFullScreen es verdadero
                                                         ),
                                                       ),
                                                       SizedBox(
                                                         width: isFullScreen
                                                             ? screenWidth * 0.01
                                                             : screenWidth *
-                                                                0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                            0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                       ),
                                                       Text(
                                                         formatNumber(
@@ -7163,7 +7163,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               ? 25.sp
                                                               : 20.sp,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           color: Colors
                                                               .lightGreenAccent
                                                               .shade400,
@@ -7173,38 +7173,38 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   ),
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                     children: [
                                                       CustomPaint(
                                                         size: Size(
                                                           isFullScreen
                                                               ? screenWidth *
-                                                                  0.1
+                                                              0.1
                                                               : screenWidth *
-                                                                  0.1,
+                                                              0.1,
                                                           // Aumentar tamaño si isFullScreen es verdadero
                                                           isFullScreen
                                                               ? screenHeight *
-                                                                  0.03
+                                                              0.03
                                                               : screenHeight *
-                                                                  0.02, // Aumentar tamaño si isFullScreen es verdadero
+                                                              0.02, // Aumentar tamaño si isFullScreen es verdadero
                                                         ),
                                                         painter: LinePainter2(
                                                           progress3:
-                                                              progressPause,
+                                                          progressPause,
                                                           strokeHeight: isFullScreen
                                                               ? screenHeight *
-                                                                  0.025
+                                                              0.025
                                                               : screenHeight *
-                                                                  0.02,
+                                                              0.02,
                                                         ),
                                                       ),
                                                       SizedBox(
                                                         width: isFullScreen
                                                             ? screenWidth * 0.01
                                                             : screenWidth *
-                                                                0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                            0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                       ),
                                                       Text(
                                                         formatNumber(
@@ -7215,7 +7215,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               ? 25.sp
                                                               : 20.sp,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           color: Colors.red,
                                                         ),
                                                       )
@@ -7225,7 +7225,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     height: isFullScreen
                                                         ? screenHeight * 0.02
                                                         : screenHeight *
-                                                            0.01, // Aumentar el espacio si isFullScreen es verdadero
+                                                        0.01, // Aumentar el espacio si isFullScreen es verdadero
                                                   ),
                                                   Column(
                                                     children: [
@@ -7237,7 +7237,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                               : 18.sp,
                                                           // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                          FontWeight.bold,
                                                           color: const Color(
                                                               0xFF2be4f3),
                                                         ),
@@ -7246,35 +7246,35 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         size: Size(
                                                           isFullScreen
                                                               ? screenWidth *
-                                                                  0.15
+                                                              0.15
                                                               : screenWidth *
-                                                                  0.15,
+                                                              0.15,
                                                           // Aumentar tamaño si isFullScreen es verdadero
                                                           isFullScreen
                                                               ? screenHeight *
-                                                                  0.05
+                                                              0.05
                                                               : screenHeight *
-                                                                  0.05, // Aumentar tamaño si isFullScreen es verdadero
+                                                              0.05, // Aumentar tamaño si isFullScreen es verdadero
                                                         ),
                                                         painter:
-                                                            AverageLineWithTextPainter(
+                                                        AverageLineWithTextPainter(
                                                           average: calculateAverage(
-                                                                  porcentajesMusculoPantalon) /
+                                                              porcentajesMusculoPantalon) /
                                                               100.0,
                                                           strokeHeight: isFullScreen
                                                               ? screenHeight *
-                                                                  0.03
+                                                              0.03
                                                               : screenHeight *
-                                                                  0.02,
+                                                              0.02,
                                                           // Aumentar altura si isFullScreen es verdadero
                                                           textStyle: TextStyle(
                                                             fontSize:
-                                                                isFullScreen
-                                                                    ? 23.sp
-                                                                    : 18.sp,
+                                                            isFullScreen
+                                                                ? 23.sp
+                                                                : 18.sp,
                                                             // Aumentar tamaño de fuente si isFullScreen es verdadero
                                                             fontWeight:
-                                                                FontWeight.bold,
+                                                            FontWeight.bold,
                                                             fontStyle: FontStyle
                                                                 .italic,
                                                           ),
@@ -7298,7 +7298,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   // Superposición de imágenes si `musculosTrajeSelected` es verdadero
                                                   if (isSessionStarted) ...[
                                                     if (_isMusculoPantalonInactivo[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -7307,14 +7307,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -7323,9 +7323,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7335,21 +7335,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_lumbar_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -7359,7 +7359,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -7368,9 +7368,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7381,14 +7381,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -7397,9 +7397,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7410,9 +7410,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7422,21 +7422,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_glut_inf_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -7448,21 +7448,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_glut_sup_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -7472,7 +7472,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -7481,14 +7481,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -7497,9 +7497,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7509,21 +7509,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         top: 0,
                                                         child: AnimatedBuilder(
                                                           animation:
-                                                              _opacityAnimation,
+                                                          _opacityAnimation,
                                                           builder:
                                                               (context, child) {
                                                             return Opacity(
                                                               opacity:
-                                                                  _opacityAnimation
-                                                                      .value,
+                                                              _opacityAnimation
+                                                                  .value,
                                                               child:
-                                                                  Image.asset(
+                                                              Image.asset(
                                                                 "assets/images/capa_isquio_azul_pantalon.png",
                                                                 height: isFullScreen
                                                                     ? screenHeight *
-                                                                        0.65
+                                                                    0.65
                                                                     : screenHeight *
-                                                                        0.4,
+                                                                    0.4,
                                                                 fit: BoxFit
                                                                     .cover,
                                                               ),
@@ -7534,7 +7534,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     ],
                                                   ] else if (!isSessionStarted) ...[
                                                     if (_isMusculoPantalonInactivo[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -7543,14 +7543,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        4]) ...[
+                                                    4]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -7559,9 +7559,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7574,15 +7574,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -7591,9 +7591,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7604,14 +7604,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        5]) ...[
+                                                    5]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -7620,9 +7620,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7633,9 +7633,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7647,9 +7647,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           "assets/images/capa_glut_sup_blanco.png",
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7661,15 +7661,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ],
                                                     if (_isMusculoPantalonInactivo[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está inactivo, muestra otra capa
                                                       Positioned(
                                                         top: 0,
@@ -7678,14 +7678,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado inactivo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ] else if (_isMusculoPantalonBloqueado[
-                                                        6]) ...[
+                                                    6]) ...[
                                                       // Si el músculo está bloqueado, muestra la capa estática bloqueada
                                                       Positioned(
                                                         top: 0,
@@ -7694,9 +7694,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Imagen para el estado bloqueado
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7709,9 +7709,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                           // Reemplaza con la ruta de la imagen del músculo
                                                           height: isFullScreen
                                                               ? screenHeight *
-                                                                  0.65
+                                                              0.65
                                                               : screenHeight *
-                                                                  0.4,
+                                                              0.4,
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
@@ -7727,33 +7727,33 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Botón "Menos"
                                               CustomIconButton(
                                                 onTap: widget.selectedKey ==
-                                                        null
+                                                    null
                                                     ? null // Si selectedKey es null, el botón estará deshabilitado
                                                     : () {
-                                                        setState(() {
-                                                          // Disminuir el porcentaje de los músculos no bloqueados
-                                                          for (int i = 0;
-                                                              i <
-                                                                  _isMusculoPantalonBloqueado
-                                                                      .length;
-                                                              i++) {
-                                                            if (!_isMusculoPantalonBloqueado[
-                                                                    i] &&
-                                                                !_isMusculoPantalonInactivo[
-                                                                    i]) {
-                                                              porcentajesMusculoPantalon[
-                                                                      i] =
-                                                                  (porcentajesMusculoPantalon[
-                                                                              i] -
-                                                                          1)
-                                                                      .clamp(0,
-                                                                          100);
-                                                            }
-                                                          }
-                                                        });
-                                                      },
+                                                  setState(() {
+                                                    // Disminuir el porcentaje de los músculos no bloqueados
+                                                    for (int i = 0;
+                                                    i <
+                                                        _isMusculoPantalonBloqueado
+                                                            .length;
+                                                    i++) {
+                                                      if (!_isMusculoPantalonBloqueado[
+                                                      i] &&
+                                                          !_isMusculoPantalonInactivo[
+                                                          i]) {
+                                                        porcentajesMusculoPantalon[
+                                                        i] =
+                                                            (porcentajesMusculoPantalon[
+                                                            i] -
+                                                                1)
+                                                                .clamp(0,
+                                                                100);
+                                                      }
+                                                    }
+                                                  });
+                                                },
                                                 imagePath:
-                                                    'assets/images/menos.png',
+                                                'assets/images/menos.png',
                                                 size: screenHeight * 0.1,
                                               ),
                                               SizedBox(
@@ -7762,28 +7762,28 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Botón de control de sesión (Reproducir/Pausar)
                                               GestureDetector(
                                                 onTap: widget.selectedKey ==
-                                                        null
+                                                    null
                                                     ? null // Si selectedKey es null, el botón estará deshabilitado
                                                     : () {
-                                                        setState(() {
-                                                          if (isRunning) {
-                                                            // Pausa el temporizador si está corriendo
-                                                            _pauseTimer(widget
-                                                                .macAddress!);
-                                                          } else {
-                                                            _startTimer(
-                                                                widget
-                                                                    .macAddress!,
-                                                                porcentajesMusculoTraje,
-                                                                porcentajesMusculoPantalon);
-                                                          }
-                                                          _togglePlayPause(
-                                                              widget
-                                                                  .macAddress!);
-                                                          debugPrint(
-                                                              'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
-                                                        });
-                                                      },
+                                                  setState(() {
+                                                    if (isRunning) {
+                                                      // Pausa el temporizador si está corriendo
+                                                      _pauseTimer(widget
+                                                          .macAddress!);
+                                                    } else {
+                                                      _startTimer(
+                                                          widget
+                                                              .macAddress!,
+                                                          porcentajesMusculoTraje,
+                                                          porcentajesMusculoPantalon);
+                                                    }
+                                                    _togglePlayPause(
+                                                        widget
+                                                            .macAddress!);
+                                                    debugPrint(
+                                                        'INCIIANDO SESION ELECTRO PARA: ${widget.macAddress!}');
+                                                  });
+                                                },
                                                 child: SizedBox(
                                                   child: ClipOval(
                                                     child: Image.asset(
@@ -7803,33 +7803,33 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                               // Botón "Más"
                                               CustomIconButton(
                                                 onTap: widget.selectedKey ==
-                                                        null
+                                                    null
                                                     ? null // Si selectedKey es null, el botón estará deshabilitado
                                                     : () {
-                                                        setState(() {
-                                                          // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
-                                                          for (int i = 0;
-                                                              i <
-                                                                  _isMusculoPantalonBloqueado
-                                                                      .length;
-                                                              i++) {
-                                                            if (!_isMusculoPantalonBloqueado[
-                                                                    i] &&
-                                                                !_isMusculoPantalonInactivo[
-                                                                    i]) {
-                                                              porcentajesMusculoPantalon[
-                                                                      i] =
-                                                                  (porcentajesMusculoPantalon[
-                                                                              i] +
-                                                                          1)
-                                                                      .clamp(0,
-                                                                          100);
-                                                            }
-                                                          }
-                                                        });
-                                                      },
+                                                  setState(() {
+                                                    // Aumentar el porcentaje de los músculos que no están bloqueados ni inactivos
+                                                    for (int i = 0;
+                                                    i <
+                                                        _isMusculoPantalonBloqueado
+                                                            .length;
+                                                    i++) {
+                                                      if (!_isMusculoPantalonBloqueado[
+                                                      i] &&
+                                                          !_isMusculoPantalonInactivo[
+                                                          i]) {
+                                                        porcentajesMusculoPantalon[
+                                                        i] =
+                                                            (porcentajesMusculoPantalon[
+                                                            i] +
+                                                                1)
+                                                                .clamp(0,
+                                                                100);
+                                                      }
+                                                    }
+                                                  });
+                                                },
                                                 imagePath:
-                                                    'assets/images/mas.png',
+                                                'assets/images/mas.png',
                                                 size: screenHeight * 0.1,
                                               )
                                             ],
@@ -7838,66 +7838,66 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       ),
                                       Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         children: [
                                           if (isSessionStarted) ...[
                                             _buildMuscleRow2(
                                                 index: 4,
                                                 imagePathEnabled:
-                                                    'assets/images/lumbar_naranja_pantalon.png',
+                                                'assets/images/lumbar_naranja_pantalon.png',
                                                 imagePathDisabled:
-                                                    'assets/images/lumbar_pantalon_azul.png',
+                                                'assets/images/lumbar_pantalon_azul.png',
                                                 imagePathInactive:
-                                                    'assets/images/lumbar_gris_pantalon.png'),
+                                                'assets/images/lumbar_gris_pantalon.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 5,
                                                 imagePathEnabled:
-                                                    'assets/images/gluteo_naranja.png',
+                                                'assets/images/gluteo_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/gluteoazul.png',
+                                                'assets/images/gluteoazul.png',
                                                 imagePathInactive:
-                                                    'assets/images/gluteo_gris.png'),
+                                                'assets/images/gluteo_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 6,
                                                 imagePathEnabled:
-                                                    'assets/images/isquio_naranja.png',
+                                                'assets/images/isquio_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/isquioazul.png',
+                                                'assets/images/isquioazul.png',
                                                 imagePathInactive:
-                                                    'assets/images/isquio_gris.png'),
+                                                'assets/images/isquio_gris.png'),
                                           ] else if (!isSessionStarted) ...[
                                             _buildMuscleRow2(
                                                 index: 4,
                                                 imagePathEnabled:
-                                                    'assets/images/lumbar_naranja_pantalon.png',
+                                                'assets/images/lumbar_naranja_pantalon.png',
                                                 imagePathDisabled:
-                                                    'assets/images/lumbar_blanco_pantalon.png',
+                                                'assets/images/lumbar_blanco_pantalon.png',
                                                 imagePathInactive:
-                                                    'assets/images/lumbar_gris_pantalon.png'),
+                                                'assets/images/lumbar_gris_pantalon.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 5,
                                                 imagePathEnabled:
-                                                    'assets/images/gluteo_naranja.png',
+                                                'assets/images/gluteo_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/gluteo_blanco.png',
+                                                'assets/images/gluteo_blanco.png',
                                                 imagePathInactive:
-                                                    'assets/images/gluteo_gris.png'),
+                                                'assets/images/gluteo_gris.png'),
                                             SizedBox(
                                                 height: screenHeight * 0.005),
                                             _buildMuscleRow2(
                                                 index: 6,
                                                 imagePathEnabled:
-                                                    'assets/images/isquio_naranja.png',
+                                                'assets/images/isquio_naranja.png',
                                                 imagePathDisabled:
-                                                    'assets/images/isquio_blanco_pantalon.png',
+                                                'assets/images/isquio_blanco_pantalon.png',
                                                 imagePathInactive:
-                                                    'assets/images/isquio_gris.png'),
+                                                'assets/images/isquio_gris.png'),
                                           ]
                                         ],
                                       ),
@@ -7950,7 +7950,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 onTap: () {
                                                   setState(() {
                                                     _isExpanded2 =
-                                                        !_isExpanded2; // Cambia el estado de expansión
+                                                    !_isExpanded2; // Cambia el estado de expansión
                                                     rotationAngle2 = _isExpanded2
                                                         ? 3.14159
                                                         : 0.0; // Flecha rota 180 grados
@@ -7992,9 +7992,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 return Container(
                                                   padding: EdgeInsets.symmetric(
                                                       horizontal:
-                                                          screenWidth * 0.005,
+                                                      screenWidth * 0.005,
                                                       vertical:
-                                                          screenHeight * 0.005),
+                                                      screenHeight * 0.005),
                                                   width: _isExpanded2 ? screenWidth * 0.2 : 0,
                                                   height: screenHeight * 0.2,
                                                   alignment: Alignment.center,
@@ -8066,7 +8066,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 onTap: () {
                                                   setState(() {
                                                     _isExpanded3 =
-                                                        !_isExpanded3; // Cambia el estado de expansión
+                                                    !_isExpanded3; // Cambia el estado de expansión
                                                     rotationAngle3 = _isExpanded3
                                                         ? 3.14159
                                                         : 0.0; // Flecha rota 180 grados
@@ -8098,9 +8098,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             child: Container(
                                               padding: EdgeInsets.symmetric(
                                                   vertical:
-                                                      screenHeight * 0.015,
+                                                  screenHeight * 0.015,
                                                   horizontal:
-                                                      screenWidth * 0.001),
+                                                  screenWidth * 0.001),
                                               width: _isExpanded3
                                                   ? screenWidth * 0.2
                                                   : 0,
@@ -8110,7 +8110,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 color: Colors.black
                                                     .withOpacity(0.5),
                                                 borderRadius:
-                                                    BorderRadius.circular(20.0),
+                                                BorderRadius.circular(20.0),
                                               ),
                                               child: Column(
                                                 children: [
@@ -8118,18 +8118,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     value: valueContraction,
                                                     // Valor de la contracción
                                                     imagePathIncrement:
-                                                        'assets/images/mas.png',
+                                                    'assets/images/mas.png',
                                                     // Imagen del botón de "Más"
                                                     imagePathDecrement:
-                                                        'assets/images/menos.png',
+                                                    'assets/images/menos.png',
                                                     // Imagen del botón de "Menos"
                                                     imagePathDisplay:
-                                                        'assets/images/CONTRACCION.png',
+                                                    'assets/images/CONTRACCION.png',
                                                     // Imagen que se muestra (Contracción)
                                                     onIncrement: () {
                                                       setState(() {
                                                         valueContraction +=
-                                                            1.0; // Lógica de incremento
+                                                        1.0; // Lógica de incremento
                                                       });
                                                     },
                                                     onDecrement: () {
@@ -8137,7 +8137,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                         if (valueContraction >
                                                             0) {
                                                           valueContraction -=
-                                                              1.0; // Lógica de decremento
+                                                          1.0; // Lógica de decremento
                                                         }
                                                       });
                                                     },
@@ -8146,34 +8146,34 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     screenWidth: screenWidth,
                                                     // Ancho de pantalla
                                                     screenHeight:
-                                                        screenHeight, // Altura de pantalla
+                                                    screenHeight, // Altura de pantalla
                                                   ),
                                                   SizedBox(
                                                       height:
-                                                          screenHeight * 0.02),
+                                                      screenHeight * 0.02),
                                                   buildControlRow(
                                                     value: valuePause,
                                                     // Valor de pausa
                                                     imagePathIncrement:
-                                                        'assets/images/mas.png',
+                                                    'assets/images/mas.png',
                                                     // Imagen del botón de "Más"
                                                     imagePathDecrement:
-                                                        'assets/images/menos.png',
+                                                    'assets/images/menos.png',
                                                     // Imagen del botón de "Menos"
                                                     imagePathDisplay:
-                                                        'assets/images/PAUSA.png',
+                                                    'assets/images/PAUSA.png',
                                                     // Imagen que se muestra (Pausa)
                                                     onIncrement: () {
                                                       setState(() {
                                                         valuePause +=
-                                                            1.0; // Lógica de incremento
+                                                        1.0; // Lógica de incremento
                                                       });
                                                     },
                                                     onDecrement: () {
                                                       setState(() {
                                                         if (valuePause > 0) {
                                                           valuePause -=
-                                                              1.0; // Lógica de decremento
+                                                          1.0; // Lógica de decremento
                                                         }
                                                       });
                                                     },
@@ -8187,7 +8187,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   ),
                                                   SizedBox(
                                                       height:
-                                                          screenHeight * 0.02),
+                                                      screenHeight * 0.02),
                                                   buildControlRow(
                                                     value: valueRampa,
                                                     imagePathIncrement:
@@ -8237,9 +8237,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         left: screenWidth * 0.02,
                                         child: GestureDetector(
                                           onTapDown: (_) => setState(
-                                              () => scaleFactorReset = 0.90),
+                                                  () => scaleFactorReset = 0.90),
                                           onTapUp: (_) => setState(
-                                              () => scaleFactorReset = 1.0),
+                                                  () => scaleFactorReset = 1.0),
                                           onTap: () {
                                             _resetScreen(context);
                                           },
@@ -8267,9 +8267,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                         right: 0,
                                         child: GestureDetector(
                                           onTapDown: (_) => setState(
-                                              () => scaleFactorFull = 0.90),
+                                                  () => scaleFactorFull = 0.90),
                                           onTapUp: (_) => setState(
-                                              () => scaleFactorFull = 1.0),
+                                                  () => scaleFactorFull = 1.0),
                                           onTap: () {
                                             toggleFullScreen();
                                           },
@@ -8331,14 +8331,14 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   }
 
   Widget _getOverlayWidget(
-    int overlayIndex,
-    Function(String) onProgramSelected,
-    Function(Map<String, dynamic>?) onIndivProgramSelected,
-    Function(Map<String, dynamic>?) onRecoProgramSelected,
-    Function(Map<String, dynamic>?) onAutoProgramSelected,
-    Function(Map<String, dynamic>?) onClientSelected,
-    Function(String) onCycleSelected,
-  ) {
+      int overlayIndex,
+      Function(String) onProgramSelected,
+      Function(Map<String, dynamic>?) onIndivProgramSelected,
+      Function(Map<String, dynamic>?) onRecoProgramSelected,
+      Function(Map<String, dynamic>?) onAutoProgramSelected,
+      Function(Map<String, dynamic>?) onClientSelected,
+      Function(String) onCycleSelected,
+      ) {
     switch (overlayIndex) {
       case 0:
         return OverlaySeleccionarCliente(
@@ -8349,7 +8349,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         return OverlayTipoPrograma(
           onClose: () => toggleOverlay(1),
           onProgramSelected:
-              onProgramSelected, // Solo OverlayTipoPrograma recibe este callback
+          onProgramSelected, // Solo OverlayTipoPrograma recibe este callback
         );
       case 2:
         return OverlaySeleccionarProgramaIndividual(
@@ -8366,7 +8366,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           onClose: () => toggleOverlay(4),
           onAutoProgramSelected: onAutoProgramSelected,
         );
-      /*     case 5:
+    /*     case 5:
         return OverlayResumenSesion(
           onClose: () => toggleOverlay(5),
           onClientSelected: onClientSelected,
@@ -8442,9 +8442,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             color: _isMusculoTrajeInactivo[index]
                 ? Colors.grey.withOpacity(0.5) // Gris si está inactivo
                 : _isMusculoTrajeBloqueado[index]
-                    ? const Color(0xFFFFA500)
-                        .withOpacity(0.3) // Naranja si está bloqueado
-                    : Colors.transparent,
+                ? const Color(0xFFFFA500)
+                .withOpacity(0.3) // Naranja si está bloqueado
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(7.0),
           ),
           child: Row(
@@ -8454,19 +8454,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 onTap: widget.selectedKey == null
                     ? null
                     : () {
-                        setState(() {
-                          if (!_isMusculoTrajeBloqueado[index] &&
-                              !_isMusculoTrajeInactivo[index]) {
-                            porcentajesMusculoTraje[index] =
-                                (porcentajesMusculoTraje[index] + 1)
-                                    .clamp(0, 100);
-                            // Llamar a la función con modo 1 (Más)
-                          } else if (_isMusculoTrajeInactivo[index]) {
-                            // Si está inactivo, poner el porcentaje a 0
-                            porcentajesMusculoTraje[index] = 0;
-                          }
-                        });
-                      },
+                  setState(() {
+                    if (!_isMusculoTrajeBloqueado[index] &&
+                        !_isMusculoTrajeInactivo[index]) {
+                      porcentajesMusculoTraje[index] =
+                          (porcentajesMusculoTraje[index] + 1)
+                              .clamp(0, 100);
+                      // Llamar a la función con modo 1 (Más)
+                    } else if (_isMusculoTrajeInactivo[index]) {
+                      // Si está inactivo, poner el porcentaje a 0
+                      porcentajesMusculoTraje[index] = 0;
+                    }
+                  });
+                },
                 imagePath: 'assets/images/mas.png',
                 size: isFullScreen
                     ? MediaQuery.of(context).size.height * 0.065
@@ -8484,7 +8484,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       setState(() {
                         if (!_isMusculoTrajeInactivo[index]) {
                           _isMusculoTrajeBloqueado[index] =
-                              !_isMusculoTrajeBloqueado[index];
+                          !_isMusculoTrajeBloqueado[index];
                         }
                       });
                     },
@@ -8494,7 +8494,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                           _isMusculoTrajeBloqueado[index] = false;
                         }
                         _isMusculoTrajeInactivo[index] =
-                            !_isMusculoTrajeInactivo[index];
+                        !_isMusculoTrajeInactivo[index];
 
                         // Si se pone inactivo, poner el porcentaje a 0
                         if (_isMusculoTrajeInactivo[index]) {
@@ -8529,8 +8529,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               _isMusculoTrajeBloqueado[index]
                                   ? imagePathEnabled // Si está bloqueado, mostrar la imagen de estado activo
                                   : (_isMusculoTrajeInactivo[index]
-                                      ? imagePathInactive // Mostrar la imagen inactiva si está inactivo
-                                      : imagePathDisabled),
+                                  ? imagePathInactive // Mostrar la imagen inactiva si está inactivo
+                                  : imagePathDisabled),
                               // Mostrar la imagen deshabilitada
                               fit: BoxFit.cover,
                             ),
@@ -8555,19 +8555,19 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 onTap: widget.selectedKey == null
                     ? null
                     : () {
-                        setState(() {
-                          if (!_isMusculoTrajeBloqueado[index] &&
-                              !_isMusculoTrajeInactivo[index]) {
-                            porcentajesMusculoTraje[index] =
-                                (porcentajesMusculoTraje[index] - 1)
-                                    .clamp(0, 100);
-                            // Llamar a la función con modo 2 (Menos)
-                          } else if (_isMusculoTrajeInactivo[index]) {
-                            // Si está inactivo, poner el porcentaje a 0
-                            porcentajesMusculoTraje[index] = 0;
-                          }
-                        });
-                      },
+                  setState(() {
+                    if (!_isMusculoTrajeBloqueado[index] &&
+                        !_isMusculoTrajeInactivo[index]) {
+                      porcentajesMusculoTraje[index] =
+                          (porcentajesMusculoTraje[index] - 1)
+                              .clamp(0, 100);
+                      // Llamar a la función con modo 2 (Menos)
+                    } else if (_isMusculoTrajeInactivo[index]) {
+                      // Si está inactivo, poner el porcentaje a 0
+                      porcentajesMusculoTraje[index] = 0;
+                    }
+                  });
+                },
                 imagePath: 'assets/images/menos.png',
                 size: isFullScreen
                     ? MediaQuery.of(context).size.height * 0.065
@@ -8605,7 +8605,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   double calculateAverage(List<int> porcentajesMusculoTraje) {
     double sum =
-        porcentajesMusculoTraje.fold(0, (prev, element) => prev + element);
+    porcentajesMusculoTraje.fold(0, (prev, element) => prev + element);
     return sum / porcentajesMusculoTraje.length;
   }
 
@@ -8624,9 +8624,9 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             color: _isMusculoPantalonInactivo[index]
                 ? Colors.grey.withOpacity(0.3) // Si está inactivo, color gris
                 : _isMusculoPantalonBloqueado[index]
-                    ? const Color(0xFFFFA500)
-                        .withOpacity(0.3) // Si está bloqueado, color naranja
-                    : Colors.transparent,
+                ? const Color(0xFFFFA500)
+                .withOpacity(0.3) // Si está bloqueado, color naranja
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(7.0), // Redondea las esquinas
           ),
           child: Row(
@@ -8636,18 +8636,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 onTap: widget.selectedKey == null
                     ? null // Si selectedKey es null, el botón estará deshabilitado
                     : () {
-                        setState(() {
-                          if (!_isMusculoPantalonBloqueado[index] &&
-                              !_isMusculoPantalonInactivo[index]) {
-                            porcentajesMusculoPantalon[index] =
-                                (porcentajesMusculoPantalon[index] + 1)
-                                    .clamp(0, 100);
-                          } else if (_isMusculoPantalonInactivo[index]) {
-                            // Si está inactivo, poner el porcentaje a 0
-                            porcentajesMusculoPantalon[index] = 0;
-                          }
-                        });
-                      },
+                  setState(() {
+                    if (!_isMusculoPantalonBloqueado[index] &&
+                        !_isMusculoPantalonInactivo[index]) {
+                      porcentajesMusculoPantalon[index] =
+                          (porcentajesMusculoPantalon[index] + 1)
+                              .clamp(0, 100);
+                    } else if (_isMusculoPantalonInactivo[index]) {
+                      // Si está inactivo, poner el porcentaje a 0
+                      porcentajesMusculoPantalon[index] = 0;
+                    }
+                  });
+                },
                 imagePath: 'assets/images/mas.png',
                 size: isFullScreen
                     ? MediaQuery.of(context).size.height * 0.065
@@ -8665,7 +8665,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                       setState(() {
                         if (!_isMusculoPantalonInactivo[index]) {
                           _isMusculoPantalonBloqueado[index] =
-                              !_isMusculoPantalonBloqueado[index];
+                          !_isMusculoPantalonBloqueado[index];
                         }
                       });
                     },
@@ -8677,7 +8677,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                         }
                         // Cambiar el estado de inactivo
                         _isMusculoPantalonInactivo[index] =
-                            !_isMusculoPantalonInactivo[index];
+                        !_isMusculoPantalonInactivo[index];
                         // Si se pone inactivo, poner el porcentaje a 0
                         if (_isMusculoPantalonInactivo[index]) {
                           porcentajesMusculoPantalon[index] = 0;
@@ -8711,8 +8711,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                               _isMusculoPantalonBloqueado[index]
                                   ? imagePathEnabled // Si está bloqueado, mostrar la imagen de estado activo
                                   : (_isMusculoPantalonInactivo[index]
-                                      ? imagePathInactive // Si está inactivo
-                                      : imagePathDisabled), // Si está deshabilitado
+                                  ? imagePathInactive // Si está inactivo
+                                  : imagePathDisabled), // Si está deshabilitado
                               fit: BoxFit.cover,
                             ),
                           ],
@@ -8738,18 +8738,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 onTap: widget.selectedKey == null
                     ? null // Si selectedKey es null, el botón estará deshabilitado
                     : () {
-                        setState(() {
-                          if (!_isMusculoPantalonBloqueado[index] &&
-                              !_isMusculoPantalonInactivo[index]) {
-                            porcentajesMusculoPantalon[index] =
-                                (porcentajesMusculoPantalon[index] - 1)
-                                    .clamp(0, 100);
-                          } else if (_isMusculoPantalonInactivo[index]) {
-                            // Si está inactivo, poner el porcentaje a 0
-                            porcentajesMusculoPantalon[index] = 0;
-                          }
-                        });
-                      },
+                  setState(() {
+                    if (!_isMusculoPantalonBloqueado[index] &&
+                        !_isMusculoPantalonInactivo[index]) {
+                      porcentajesMusculoPantalon[index] =
+                          (porcentajesMusculoPantalon[index] - 1)
+                              .clamp(0, 100);
+                    } else if (_isMusculoPantalonInactivo[index]) {
+                      // Si está inactivo, poner el porcentaje a 0
+                      porcentajesMusculoPantalon[index] = 0;
+                    }
+                  });
+                },
                 imagePath: 'assets/images/menos.png',
                 size: isFullScreen
                     ? MediaQuery.of(context).size.height * 0.065
@@ -8788,7 +8788,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   double calculateAverage2(List<int> porcentajesMusculoPantalon) {
     double sum =
-        porcentajesMusculoPantalon.fold(0, (prev, element) => prev + element);
+    porcentajesMusculoPantalon.fold(0, (prev, element) => prev + element);
     return sum / porcentajesMusculoPantalon.length;
   }
 
@@ -8904,7 +8904,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         ),
         SizedBox(width: screenWidth * 0.005),
         Text(
-       "${value.toStringAsFixed(0)}$suffix",
+          "${value.toStringAsFixed(0)}$suffix",
           style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(width: screenWidth * 0.005),
@@ -8922,11 +8922,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           ),
         ),
         SizedBox(width: screenWidth * 0.001),
-          Image.asset(
-            imagePathDisplay,
-            width: screenWidth * 0.05,
-            height: screenHeight * 0.05,
-          ),
+        Image.asset(
+          imagePathDisplay,
+          width: screenWidth * 0.05,
+          height: screenHeight * 0.05,
+        ),
       ],
     );
   }
@@ -8943,17 +8943,17 @@ class BleConnectionService {
   List<String> targetDeviceIds = []; // Lista para almacenar las direcciones MAC
   final List<String> connectedDevices = []; // Lista de MACs conectadas
   final Map<String, StreamController<bool>> _deviceConnectionStateControllers =
-      {};
+  {};
   final Map<String, StreamSubscription<ConnectionStateUpdate>>
-      _connectionStreams = {};
+  _connectionStreams = {};
   final Uuid serviceUuid = Uuid.parse("49535343-FE7D-4AE5-8FA9-9FAFD205E455");
   final Uuid rxCharacteristicUuid =
-      Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
+  Uuid.parse("49535343-8841-43F4-A8D4-ECBE34729BB4");
   final Uuid txCharacteristicUuid =
-      Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
+  Uuid.parse("49535343-1E4D-4BD9-BA61-23C647249617");
 
   final StreamController<Map<String, dynamic>> _deviceUpdatesController =
-      StreamController.broadcast();
+  StreamController.broadcast();
 
   /// Constructor con limpieza y reinicialización
   BleConnectionService() {
@@ -8981,7 +8981,7 @@ class BleConnectionService {
   Stream<bool> connectionStateStream(String macAddress) {
     if (!_deviceConnectionStateControllers.containsKey(macAddress)) {
       _deviceConnectionStateControllers[macAddress] =
-          StreamController<bool>.broadcast();
+      StreamController<bool>.broadcast();
     }
     return _deviceConnectionStateControllers[macAddress]!.stream;
   }
@@ -8990,7 +8990,7 @@ class BleConnectionService {
   void _updateDeviceConnectionState(String macAddress, bool isConnected) {
     if (!_deviceConnectionStateControllers.containsKey(macAddress)) {
       _deviceConnectionStateControllers[macAddress] =
-          StreamController<bool>.broadcast();
+      StreamController<bool>.broadcast();
     }
     final controller = _deviceConnectionStateControllers[macAddress]!;
     if (!controller.isClosed) {
@@ -9126,7 +9126,7 @@ class BleConnectionService {
     try {
       // Obtener la información del dispositivo (FUN_INFO)
       final deviceInfo =
-          await getDeviceInfo(macAddress).timeout(const Duration(seconds: 15));
+      await getDeviceInfo(macAddress).timeout(const Duration(seconds: 15));
       final parsedInfo = parseDeviceInfo(deviceInfo);
       debugPrint(parsedInfo);
 
@@ -9310,7 +9310,7 @@ class BleConnectionService {
 
       // Esperar la respuesta con timeout
       final deviceInfo =
-          await completer.future.timeout(const Duration(seconds: 15));
+      await completer.future.timeout(const Duration(seconds: 15));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -9339,8 +9339,8 @@ class BleConnectionService {
     final tariff = deviceInfo['tariff'] == 0
         ? "Sin tarifa"
         : deviceInfo['tariff'] == 1
-            ? "Con tarifa"
-            : "Con tarifa agotada";
+        ? "Con tarifa"
+        : "Con tarifa agotada";
 
     final powerType = deviceInfo['powerType'] == 0
         ? "Fuente de alimentación"
@@ -9359,10 +9359,10 @@ class BleConnectionService {
       final type = endpoint['type'] == 0
           ? "Ninguno"
           : endpoint['type'] == 1
-              ? "Electroestimulador (10 canales normal)"
-              : endpoint['type'] == 2
-                  ? "Electroestimulador (10 canales + Ctrl Input)"
-                  : "Desconocido";
+          ? "Electroestimulador (10 canales normal)"
+          : endpoint['type'] == 2
+          ? "Electroestimulador (10 canales + Ctrl Input)"
+          : "Desconocido";
 
       final swVersion = endpoint['swVersion'];
 
@@ -9411,9 +9411,9 @@ $endpoints
         if (data.isNotEmpty && data[0] == 0x05) {
           // FUN_GET_NAMEBT_R recibido
           final nameBytes =
-              data.sublist(1).takeWhile((byte) => byte != 0).toList();
+          data.sublist(1).takeWhile((byte) => byte != 0).toList();
           final name =
-              String.fromCharCodes(nameBytes); // Convertir bytes a string
+          String.fromCharCodes(nameBytes); // Convertir bytes a string
           completer.complete(name);
           debugPrint("📥 FUN_GET_NAMEBT_R recibido desde $macAddress: $name");
         }
@@ -9435,7 +9435,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final bluetoothName =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -9489,17 +9489,17 @@ $endpoints
           final batteryParameters = {
             'batteryStatusRaw': data[3],
             'powerType':
-                data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
+            data[1] == 1 ? "Batería de litio (8.4V)" : "Alimentador AC",
             'batteryModel': data[2] == 0 ? "Por defecto" : "Desconocido",
             'batteryStatus': data[3] == 0
                 ? "Muy baja"
                 : data[3] == 1
-                    ? "Baja"
-                    : data[3] == 2
-                        ? "Media"
-                        : data[3] == 3
-                            ? "Alta"
-                            : "Llena",
+                ? "Baja"
+                : data[3] == 2
+                ? "Media"
+                : data[3] == 3
+                ? "Alta"
+                : "Llena",
             'temperature': "Sin implementar",
             'compensation': (data[6] << 8) | data[7],
             'voltages': {
@@ -9538,7 +9538,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final batteryParameters =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -9619,18 +9619,18 @@ $endpoints
           final tariffStatus = data[1] == 0
               ? "Sin tarifa"
               : data[1] == 1
-                  ? "Con tarifa"
-                  : "Con tarifa agotada";
+              ? "Con tarifa"
+              : "Con tarifa agotada";
 
           final totalSeconds = (data[2] << 24) |
-              (data[3] << 16) |
-              (data[4] << 8) |
-              data[5]; // Contador total (32 bits)
+          (data[3] << 16) |
+          (data[4] << 8) |
+          data[5]; // Contador total (32 bits)
 
           final remainingSeconds = (data[6] << 24) |
-              (data[7] << 16) |
-              (data[8] << 8) |
-              data[9]; // Contador parcial (32 bits)
+          (data[7] << 16) |
+          (data[8] << 8) |
+          data[9]; // Contador parcial (32 bits)
 
           final counters = {
             'tariffStatus': tariffStatus,
@@ -9660,7 +9660,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final counters =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -9794,11 +9794,11 @@ $endpoints
     final endpoint = data[1];
     final state = _mapState(data[2]); // Mapear el estado según lo definido
     final batteryStatus =
-        _mapBatteryStatus(data[3]); // Mapear estado de batería
+    _mapBatteryStatus(data[3]); // Mapear estado de batería
     final frequency = data[4];
     final ramp = data[5]; // Convertir rampa a milisegundos
     final pulseWidth =
-        data[6] == 0 ? "Cronaxia" : data[6] * 5; // Ancho de pulso en µs
+    data[6] == 0 ? "Cronaxia" : data[6] * 5; // Ancho de pulso en µs
     final temperature = ((data[7] << 8) | data[8]) / 10.0; // Temperatura en ºC
     final limitador = data[9] == 0 ? "No" : "Sí";
 
@@ -9836,12 +9836,12 @@ $endpoints
   }
 
   Future<bool> _startElectrostimulationSession(
-    String macAddress,
-    List<int> valoresCanales,
-    double frecuencia,
-    double rampa, {
-    double pulso = 0, // Nuevo parámetro con valor por defecto
-  }) async {
+      String macAddress,
+      List<int> valoresCanales,
+      double frecuencia,
+      double rampa, {
+        double pulso = 0, // Nuevo parámetro con valor por defecto
+      }) async {
     try {
       debugPrint(
           "⚙️ Iniciando sesión de electroestimulación en $macAddress...");
@@ -9978,7 +9978,7 @@ $endpoints
 
       // Esperar respuesta con timeout
       final result =
-          await completer.future.timeout(const Duration(seconds: 20));
+      await completer.future.timeout(const Duration(seconds: 20));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -10068,7 +10068,7 @@ $endpoints
 
       // Esperar respuesta con timeout
       final result =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -10178,7 +10178,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final response =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -10215,11 +10215,11 @@ $endpoints
   }
 
   Future<Map<String, dynamic>> _controlAllChannels(
-    String macAddress,
-    int endpoint,
-    int modo,
-    List<int> valoresCanales,
-  ) async {
+      String macAddress,
+      int endpoint,
+      int modo,
+      List<int> valoresCanales,
+      ) async {
     try {
       // Invocar la función principal que controla todos los canales
       final response = await controlAllElectrostimulatorChannels(
@@ -10343,7 +10343,7 @@ $endpoints
 
       // Esperar la respuesta con timeout
       final response =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar y remover la suscripción después de recibir la respuesta
       await _subscriptions[macAddress]?.cancel();
@@ -10476,7 +10476,7 @@ $canales
 
       // Esperar la respuesta con timeout
       final response =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -10547,7 +10547,7 @@ $canales
 
       // Esperar la respuesta con timeout
       final result =
-          await completer.future.timeout(const Duration(seconds: 10));
+      await completer.future.timeout(const Duration(seconds: 10));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -10622,7 +10622,7 @@ $canales
 
       // Esperar la respuesta con timeout
       final response =
-          await completer.future.timeout(const Duration(seconds: 15));
+      await completer.future.timeout(const Duration(seconds: 15));
 
       // Cancelar la suscripción después de recibir la respuesta
       notificationSubscription?.cancel();
@@ -10636,9 +10636,9 @@ $canales
   }
 
   Future<bool> _getSignalCable(
-    String macAddress,
-    int endpoint,
-  ) async {
+      String macAddress,
+      int endpoint,
+      ) async {
     try {
       // Llamar a getPulseMeter para obtener los datos del pulsómetro
       final pulseMeterResponse = await getPulseMeter(

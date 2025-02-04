@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imotion_designs/src/panel/views/panel_view.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
-import 'package:imotion_designs/src/servicios/json.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
+
 import 'ajustes/form/licencia_form.dart';
 import 'ajustes/menus/ajustes_menu.dart';
 import 'ajustes/menus/gestion_menu.dart';
@@ -24,8 +24,12 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  int _changePwdUserId=0;
   int _selectedIndex = 0; // 🔹 Controla la vista activa
   Map<String, dynamic>? selectedMciData;
+  final GlobalKey<LoginViewState> _loginKey = GlobalKey<LoginViewState>();
+  final GlobalKey<MainMenuViewState> _menuKey = GlobalKey<MainMenuViewState>();
+  final GlobalKey<OverlayChangePwdState> _changePwd = GlobalKey<OverlayChangePwdState>();
 
   @override
   void initState() {
@@ -39,11 +43,30 @@ class _AppState extends State<App> {
     });
   }
 
-  void changePage(int index) {
+  void changePage(int index, {int? userId}) {
+    if (_selectedIndex == 9 && index != 9) {
+      _loginKey.currentState?.clearFields();
+    }
+    if (_selectedIndex == 1 && index == 9) {
+      _menuKey.currentState?.clearLoginData();
+    }
+    if (_selectedIndex == 8 && index == 8) {
+      _changePwd.currentState?.clearFields();
+    }
+
     setState(() {
       _selectedIndex = index;
     });
+
+    if (index == 8 && userId != null) {
+      _changePwdUserId = userId; // 🔹 Guardamos el userId para pasarlo a ChangePwd
+    }
+
+    if (index == 1) {
+      _menuKey.currentState?.checkUserProfile();
+    }
   }
+
 
   /// 🔹 Función para abrir `PanelView` como pantalla independiente
   void openPanelView() {
@@ -81,6 +104,7 @@ class _AppState extends State<App> {
             ),
             // 🔹 1 - Menú Principal
             MainMenuView(
+              key: _menuKey,
               onNavigateToLogin: () => changePage(9),
               onNavigateToPanel: openPanelView, // 🔹 Abre `PanelView` con `Navigator`
               onNavigateToClients: () => changePage(2),
@@ -133,14 +157,17 @@ class _AppState extends State<App> {
             ),
             // 🔹 8 - Cambio de Contraseña
             ChangePwdView(
-              onNavigateToMainMenu: () => changePage(1),
+              key: _changePwd,
+              userId: _changePwdUserId,
+              onNavigateToLogin: () => changePage(9),
               screenWidth: widget.screenWidth,
               screenHeight: widget.screenHeight,
             ),
             // 🔹 9 - Login
             LoginView(
+              key: _loginKey,
               onNavigateToMainMenu: () => changePage(1),
-              onNavigateToChangePwd: () => changePage(8),
+              onNavigateToChangePwd: (int userId) => changePage(8, userId: userId), // 🔹 Pasamos userId aquí
               screenWidth: widget.screenWidth,
               screenHeight: widget.screenHeight,
             ),

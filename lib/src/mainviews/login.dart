@@ -4,18 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../../utils/translation_utils.dart';
 import '../db/db_helper.dart';
-import '../db/db_helper_pc.dart';
-import '../db/db_helper_traducciones.dart';
-import '../db/db_helper_traducciones_pc.dart';
-import '../db/db_helper_traducciones_web.dart';
-import '../db/db_helper_web.dart';
 
 class LoginView extends StatefulWidget {
   final Function() onNavigateToMainMenu;
-  final Function() onNavigateToChangePwd;
+  final Function(int userId) onNavigateToChangePwd;
   final double screenWidth;
   final double screenHeight;
 
@@ -28,10 +22,10 @@ class LoginView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<LoginView> createState() => LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class LoginViewState extends State<LoginView> {
   final TextEditingController _user = TextEditingController();
   final TextEditingController _pwd = TextEditingController();
   String _errorMessage = ''; // Para almacenar el mensaje de error
@@ -62,9 +56,14 @@ class _LoginViewState extends State<LoginView> {
     _pwd.dispose();
   }
 
-
-
-
+  void clearFields() {
+    setState(() {
+      _isPasswordHidden = true;
+      _user.clear();
+      _pwd.clear();
+      _errorMessage = ''; // Limpia mensajes de error también
+    });
+  }
 
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -143,8 +142,6 @@ class _LoginViewState extends State<LoginView> {
       // Si no se encuentra el userId en SharedPreferences
       print('No se encontró el userId en SharedPreferences.');
 
-      // Aquí puedes agregar un flujo para navegar al login si no hay usuario
-      // widget.onNavigateToLogin();
     }
   }
 
@@ -386,7 +383,6 @@ class _LoginViewState extends State<LoginView> {
                                       fontSize: 16.sp,
                                     ),
                                   ),
-
                               // Botón de inicio de sesión
                               OutlinedButton(
                                 onPressed: () async {
@@ -477,68 +473,60 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
-
   Future<void> _validateLogin() async {
     DatabaseHelper dbHelper = DatabaseHelper();
     String username = _user.text.trim();
     String password = _pwd.text.trim();
 
-    // Verificar en la base de datos si las credenciales del usuario son correctas
     bool userExists = await dbHelper.checkUserCredentials(username, password);
 
     if (userExists) {
-      // Si las credenciales son correctas, limpiar el mensaje de error
       setState(() {
         _errorMessage = ''; // Limpiar error
       });
 
-      // Obtener el userId después de la autenticación
       int userId = await dbHelper.getUserIdByUsername(username);
-
-      // Obtener el tipo de perfil del usuario
       String? tipoPerfil = await dbHelper.getTipoPerfilByUserId(userId);
 
-      // Imprimir el userId y el tipo de perfil en consola
       print('User ID: $userId');
       print('Tipo de Perfil: $tipoPerfil');
 
-      // Guardar el userId y tipo de perfil en SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      // Limpiar los valores anteriores antes de guardar nuevos datos
-      await prefs.remove('user_id');
-      await prefs.remove('user_tipo_perfil');
-
-      // Guardar los nuevos valores
-      prefs.setInt('user_id', userId); // Guardar el userId
-      if (tipoPerfil != null) {
-        prefs.setString(
-            'user_tipo_perfil', tipoPerfil); // Guardar el tipo de perfil
-      }
-
-      // Imprimir los datos guardados para verificar
-      print('Nuevo user_id guardado: ${prefs.getInt('user_id')}');
-      print(
-          'Nuevo user_tipo_perfil guardado: ${prefs.getString('user_tipo_perfil')}');
-
-      // Si la contraseña es "0000", navega a cambiar la contraseña
       if (password == "0000") {
-        widget.onNavigateToChangePwd();
+        // 🔹 Pasar userId al navegar a ChangePwd
+        widget.onNavigateToChangePwd(userId);
       } else {
-        // Retraso antes de navegar al menú principal
-        await Future.delayed(
-            const Duration(seconds: 1)); // Retraso de 1 segundo
-        // Navegar al menú principal
+        // 🔹 Guardar userId solo si va al MainMenu
+        await _saveUserToPrefs(userId, tipoPerfil);
+
+        await Future.delayed(const Duration(seconds: 1));
         widget.onNavigateToMainMenu();
       }
     } else {
-      // Si las credenciales son incorrectas, mostrar el mensaje de error
       setState(() {
-        _errorMessage =
-            tr(context, 'Usuario o contraseña incorrectos'); // Mostrar error
+        _errorMessage = tr(context, 'Usuario o contraseña incorrectos');
       });
     }
   }
+
+
+  /// 🔹 Función para guardar el userId en SharedPreferences
+  Future<void> _saveUserToPrefs(int userId, String? tipoPerfil) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Limpiar datos previos antes de guardar
+    await prefs.remove('user_id');
+    await prefs.remove('user_tipo_perfil');
+
+    // Guardar nuevos valores
+    await prefs.setInt('user_id', userId);
+    if (tipoPerfil != null) {
+      await prefs.setString('user_tipo_perfil', tipoPerfil);
+    }
+
+    // Confirmar en consola
+    print('✅ Usuario guardado: ID=$userId, TipoPerfil=${tipoPerfil ?? "N/A"}');
+  }
+
 }
 
 // Ajustes de estilos para simplificar
