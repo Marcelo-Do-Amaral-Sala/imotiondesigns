@@ -362,6 +362,8 @@ flutter:
     - assets/images/i-icon.png
     - assets/images/logopdf.png
     - assets/images/pausaactiva.png
+    - assets/images/frec.png
+    - assets/images/pulso.png
     - assets/icon/icono_app.png
     - .env
     - assets/traduccionesv25.json

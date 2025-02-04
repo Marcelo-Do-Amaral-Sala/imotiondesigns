@@ -541,30 +541,49 @@ class _PanelViewState extends State<PanelView>
                                               }
                                             },
                                             onLongPress: () {
-                                              // Verifica si hay un cliente asociado a esta dirección MAC
                                               if (selectedClient != null) {
                                                 print(
                                                     'Cliente deseleccionado: ${selectedClient!['name']}');
 
                                                 setState(() {
-                                                  // Elimina el cliente de la selección local
-                                                  clientSelectionMap.value
-                                                      .remove(macAddress);
+                                                  // 🔥 Crear una nueva copia del mapa sin el cliente eliminado
+                                                  final nuevoMapa =
+                                                      Map<String, dynamic>.from(
+                                                          clientSelectionMap
+                                                              .value);
+                                                  nuevoMapa.remove(macAddress);
 
-                                                  // Limpia específicamente el cliente en el Provider
+                                                  // 🔥 Asignar la nueva copia y notificar cambio
+                                                  clientSelectionMap.value =
+                                                      nuevoMapa;
+                                                  clientSelectionMap
+                                                      .notifyListeners(); // 🔥 Esto activará _onClientSelectedMapChanged() en el hijo
+
+                                                  // 🔥 Notificar al hijo enviando `null`
+                                                  onClientSelected(selectedKey!,
+                                                      null, macAddress);
+
+                                                  // 🔥 También lo eliminamos del Provider si existe
                                                   if (_clientsProvider !=
                                                       null) {
-                                                    _clientsProvider!.removeClient(
-                                                        selectedClient!); // Método del Provider para eliminar cliente
+                                                    _clientsProvider!
+                                                        .removeClient(
+                                                            selectedClient!);
                                                     if (kDebugMode) {
                                                       print(
                                                           "📋 Cliente eliminado del Provider: ${selectedClient!['name']}");
                                                     }
                                                   }
 
-                                                  // Limpia la selección local para esta dirección MAC
+                                                  // 🔥 Borra por completo `selectedClient`
                                                   selectedClient = null;
                                                 });
+
+                                                // 🔥 Verificación en consola
+                                                debugPrint(
+                                                    "✅ selectedClient después de eliminación: $selectedClient");
+                                                debugPrint(
+                                                    "✅ Estado de clientSelectionMap después de eliminación: ${clientSelectionMap.value}");
                                               } else {
                                                 print(
                                                     "❌ No hay cliente asociado a esta dirección MAC para desasignar.");
@@ -1732,6 +1751,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool _showVideo = false;
   bool _isImageOne = true;
   bool _hideControls = false;
+  bool _isPauseActive = false;
   GlobalKey<_PanelViewState> panelViewKey = GlobalKey<_PanelViewState>();
   String modulo =
       "imotion21"; // Cambia "moduloEjemplo" por el valor real del módulo.
@@ -1865,15 +1885,34 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     [0, 15, 30, 50], // Isquiotibial
   ];
   // **Definir las asignaciones de IDs según el equipamiento seleccionado**
-  final Map<int, int> muscleIdToIndexTraje = {
+  final Map<int, int> muscleIdToIndexClienteTraje = {
     1: 0,  2: 5,  3: 6,  4: 8,  5: 9,
     6: 7,  7: 2,  8: 3,  9: 1,  10: 4
   };
 
-  final Map<int, int> muscleIdToIndexPantalon = {
+  final Map<int, int> muscleIdToIndexClientePantalon = {
     4: 5,  5: 6,  6: 4,  7: 1,  8: 2,
     9: 0,  10: 3  // Solo 7 elementos
   };
+
+  final Map<int, int> muscleIdToIndexProgramaTraje = {
+    1: 5,
+    2: 6,
+    3: 7,
+    4: 8,
+    5: 9,
+    6: 0,
+    7: 2,
+    8: 3,
+    9: 1,
+    10: 4
+  };
+
+  final Map<int, int> muscleIdToIndexProgramaPantalon = {
+    1: 4, 2: 5, 3: 6, 4: 1, 5: 2,
+    6: 0, 7: 3 // Solo 7 elementos
+  };
+
   final List<int> porcentajesMusculoTraje = List.filled(10, 0);
   final List<int> porcentajesMusculoPantalon = List.filled(7, 0);
 
@@ -1961,7 +2000,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     // Imprime el valor inicial
     print("Valor inicial de clientSelectedMap: ${widget.clientSelectedMap.value}");
 
-    // Escucha los cambios y muestra el nuevo valor
     widget.clientSelectedMap.addListener(_onClientSelectedMapChanged);
     initializeDataProgram();
     if (selectedIndivProgram != null &&
@@ -1970,25 +2008,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       _initializeVideoController(selectedIndivProgram!['video']);
     }
   }
-  void _onClientSelectedMapChanged() {
-    print("Nuevo valor de clientSelectedMap: ${widget.clientSelectedMap.value}");
-  }
-
-  Future<void> initializeDataProgram() async {
-    // Esperar a que se obtengan los datos
-    _fetchClients();
-    await obtenerDatos();
-    await _fetchIndividualPrograms(); // Esperar a que se asigne la información
-    await _fetchRecoveryPrograms();
-    await _fetchAutoPrograms();
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _preloadImages();
   } // Verificar que BLE esté inicializado correctamente
-
   @override
   void didUpdateWidget(covariant ExpandedContentWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -1998,62 +2022,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         selectedIndivProgram!['video'] != selectedIndivProgram?['video']) {
       _initializeVideoController(selectedIndivProgram!['video']);
     }
-  }
-
-  Future<void> _initializeVideoController(String videoUrl) async {
-    try {
-      await GlobalVideoControllerManager.instance
-          .initializeVideo(videoUrl, widget.macAddress!);
-
-      setState(() {
-        _isLoading = false;
-        _showVideo = true;
-      });
-
-      print("✅ Video inicializado con éxito: $videoUrl");
-    } catch (e) {
-      print("❌ Error al inicializar el video: $e");
-      setState(() {
-        _isLoading = false;
-        _showVideo = false;
-      });
-    }
-  }
-
-  Future<void> _cancelVideoController() async {
-    try {
-      await GlobalVideoControllerManager.instance
-          .cancelVideo(widget.macAddress!);
-      setState(() {
-        _showVideo = false;
-      });
-      print("✅ Video cancelado y recursos liberados.");
-    } catch (e) {
-      print("❌ Error al cancelar el video: $e");
-    }
-  }
-
-  void _togglePlayPause(String macAddress) {
-    final globalManager = GlobalVideoControllerManager.instance;
-    final videoController = globalManager.videoController;
-
-    if (videoController == null ||
-        !videoController.value.isInitialized ||
-        globalManager.activeMacAddress != macAddress) {
-      debugPrint(
-          "⚠️ No hay un video activo o el video no pertenece a este macAddress.");
-      return;
-    }
-
-    if (videoController.value.isPlaying) {
-      videoController.pause();
-      debugPrint("⏸️ Video pausado para macAddress: $macAddress");
-    } else {
-      videoController.play();
-      debugPrint("▶️ Video reproduciéndose para macAddress: $macAddress");
-    }
-
-    setState(() {});
   }
 
   Future<void> _preloadImages() async {
@@ -2076,12 +2044,80 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     });
   }
 
+  Future<void> _initializeVideoController(String videoUrl) async {
+    try {
+      await GlobalVideoControllerManager.instance
+          .initializeVideo(videoUrl, widget.macAddress!);
+
+      setState(() {
+        _isLoading = false;
+        _showVideo = true;
+      });
+
+      print("✅ Video inicializado con éxito: $videoUrl");
+    } catch (e) {
+      print("❌ Error al inicializar el video: $e");
+      setState(() {
+        _isLoading = false;
+        _showVideo = false;
+      });
+    }
+  }
+  Future<void> _cancelVideoController() async {
+    try {
+      await GlobalVideoControllerManager.instance
+          .cancelVideo(widget.macAddress!);
+      setState(() {
+        _showVideo = false;
+      });
+      print("✅ Video cancelado y recursos liberados.");
+    } catch (e) {
+      print("❌ Error al cancelar el video: $e");
+    }
+  }
   void playBeep() async {
     // Asegúrate de que la ruta del archivo sea correcta
     await _audioPlayer.play(AssetSource('sounds/beep.mp3'));
   }
 
-  // Función de encriptación
+  Future<void> initializeDataProgram() async {
+    // Esperar a que se obtengan los datos
+    _fetchClients();
+    await obtenerDatos();
+    await _fetchIndividualPrograms(); // Esperar a que se asigne la información
+    await _fetchRecoveryPrograms();
+    await _fetchAutoPrograms();
+  }
+
+  Future<void> _fetchClients() async {
+    final dbHelper = DatabaseHelper();
+    try {
+      final clientData = await dbHelper.getClients();
+      if (mounted) {
+        setState(() {
+          allClients = clientData; // Asigna a la lista original
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching clients: $e');
+    }
+  }
+
+  Future<void> obtenerDatos() async {
+    try {
+      List<String> datos = await getTrainer("imotion21");
+
+      List<String> datosFiltrados =
+          datos.where((element) => element.isNotEmpty).toList();
+
+      setState(() {
+        respuestaTroceada = datosFiltrados;
+      });
+    } catch (e) {
+      print("Error al obtener datos: $e");
+    }
+  }
+
   String encrip(String wcadena) {
     String xkkk =
         'ABCDE0FGHIJ1KLMNO2PQRST3UVWXY4Zabcd5efghi6jklmn7opqrs8tuvwx9yz(),-.:;@';
@@ -2118,7 +2154,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print("Cadena encriptada: $wres"); // Imprime la cadena encriptada
     return wres;
   }
-
   Future<List<String>> getTrainer(String modulo) async {
     // Encripta el módulo
     String datos = encrip("18<#>$modulo");
@@ -2137,256 +2172,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
     } catch (e) {
       throw Exception("Ocurrió un error: $e");
-    }
-  }
-
-  // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
-  void toggleFullScreen() {
-    setState(() {
-      isFullScreen = !isFullScreen;
-    });
-    widget.isFullChanged(isFullScreen);
-  }
-
-  void toggleOverlay(int index) {
-    setState(() {
-      isOverlayVisible = !isOverlayVisible;
-      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
-    });
-  }
-
-  void selectEquip(int index) {
-    setState(() {
-      selectedIndexEquip = index; // Actualizar índice local
-      updateMuscleLists();
-    });
-    widget.onSelectEquip(index); // Notificar cambio a PanelView
-    print("🔄 Cambiado al equipo $index para clave: ${widget.selectedKey}");
-
-  }
-
-  void onClientSelected(Map<String, dynamic>? client) async {
-    if (client == null) {
-      setState(() {
-        selectedClient = null;
-        totalBonos = 0;
-      });
-
-      // 🔥 Asegurar que el mapa se actualice correctamente sin sobrescribir
-      widget.clientSelectedMap.value = Map<String, dynamic>.from(widget.clientSelectedMap.value)
-        ..remove(widget.macAddress);
-
-      widget.onClientSelected(null);
-      return;
-    }
-
-    setState(() {
-      selectedClient = client;
-      totalBonos = 0;
-    });
-
-    // Consultar bonos disponibles para este cliente en la base de datos
-    final db = await openDatabase('my_database.db');
-
-    print("Consultando bonos para cliente ID: ${client['id']}");
-
-    final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery(
-      '''
-    SELECT cantidad FROM bonos
-    WHERE cliente_id = ? AND estado = 'Disponible'
-    ''',
-      [client['id']],
-    );
-
-    print("Resultado de la consulta: $clientGroupsResult");
-
-    // Calcular total de bonos
-    totalBonos = clientGroupsResult.fold(0, (total, bono) {
-      final int cantidad = (bono['cantidad'] as num?)?.toInt() ?? 0;
-      print("Bono encontrado: $cantidad");
-      return total + cantidad;
-    });
-
-    print("Total de bonos calculado: $totalBonos");
-
-    final nuevoMapa = Map<String, dynamic>.from(widget.clientSelectedMap.value);
-
-    // Verificar si ya existe información previa para el cliente y fusionar datos
-    final datosPrevios = (nuevoMapa[widget.macAddress] as Map<String, dynamic>?) ?? {};
-
-    nuevoMapa[widget.macAddress!] = {
-      ...datosPrevios, // Mantiene datos previos (si existen)
-      ...client,       // Actualiza con los datos del nuevo cliente
-      'bonos': totalBonos, // Asegura que los bonos se mantengan
-    };
-
-    widget.clientSelectedMap.value = nuevoMapa; // 🔥 Asigna el nuevo mapa y notifica el cambio
-
-    print("Nuevo valor de clientSelectedMap: ${widget.clientSelectedMap.value}");
-
-    widget.onClientSelected(nuevoMapa[widget.macAddress] as Map<String, dynamic>?);
-
-    updateMuscleLists();
-  }
-
-
-
-
-
-  void updateMuscleLists() {
-    if (selectedClient == null) return;
-
-    final clientId = selectedClient!['id'];
-    if (clientId == null) return;
-
-    openDatabase('my_database.db').then((db) async {
-      final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery('''
-      SELECT g.id
-      FROM grupos_musculares g
-      INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
-      WHERE cg.cliente_id = ?
-    ''', [clientId]);
-
-      final Map<int, int> selectedMuscleIdToIndex = selectedIndexEquip == 0
-          ? muscleIdToIndexTraje
-          : muscleIdToIndexPantalon;
-
-      final Set<int> muscleIndexes = clientGroupsResult
-          .map((group) => selectedMuscleIdToIndex[group['id'] as int])
-          .where((index) => index != null)
-          .cast<int>()
-          .toSet();
-
-      setState(() {
-        if (selectedIndexEquip == 0) {
-          for (int i = 0; i < _isMusculoTrajeInactivo.length; i++) {
-            _isMusculoTrajeInactivo[i] = !muscleIndexes.contains(i);
-          }
-        } else if (selectedIndexEquip == 1) {
-          for (int i = 0; i < _isMusculoPantalonInactivo.length; i++) {
-            _isMusculoPantalonInactivo[i] = !muscleIndexes.contains(i);
-          }
-        }
-      });
-    });
-  }
-
-  void _clearGlobals() async {
-    if (mounted) {
-      setState(() {
-        _cancelVideoController();
-        _phaseTimer?.cancel();
-        timerSub?.cancel();
-        _timer.cancel();
-
-        // Reiniciar todas las variables globales
-        isElectroOn = false;
-        _isLoading = false;
-
-        // Restablecer valores de los programas y selección
-        selectedProgram = null;
-        selectedAutoProgram = null;
-        selectedIndivProgram = null;
-        selectedRecoProgram = null;
-        selectedClient = null;
-
-        // Reiniciar estado de sesión
-        isSessionStarted = false;
-        _isImagesLoaded = false;
-        isRunning = false;
-        isContractionPhase = true;
-        isPantalonSelected = false;
-        selectedIndexEquip = 0;
-
-        // Restablecer valores de escala
-        scaleFactorFull = 1.0;
-        scaleFactorCliente = 1.0;
-        scaleFactorRepeat = 1.0;
-        scaleFactorTrainer = 1.0;
-        scaleFactorRayo = 1.0;
-        scaleFactorReset = 1.0;
-        scaleFactorMas = 1.0;
-        scaleFactorMenos = 1.0;
-
-        // Restablecer ángulos de rotación
-        rotationAngle1 = 0.0;
-        rotationAngle2 = 0.0;
-        rotationAngle3 = 0.0;
-
-        // Reiniciar expansión
-        _isExpanded1 = false;
-        _isExpanded2 = false;
-        _isExpanded3 = false;
-
-        // Restablecer imágenes y temporizador
-        _currentImageIndex = 31 - 25;
-        currentSubprogramIndex = 0;
-        remainingTime = 0;
-
-        // Restablecer los estados de músculos
-        _isMusculoTrajeInactivo.fillRange(0, 10, false);
-        _isMusculoPantalonInactivo.fillRange(0, 7, false);
-        _isMusculoTrajeBloqueado.fillRange(0, 10, false);
-        _isMusculoPantalonBloqueado.fillRange(0, 7, false);
-
-        // Reiniciar tiempos de subprogramas
-        subprogramElapsedTime = {};
-        subprogramRemainingTime = {};
-
-        // Restablecer porcentajes
-        porcentajesMusculoTraje.fillRange(0, 10, 0);
-        porcentajesMusculoPantalon.fillRange(0, 7, 0);
-
-        // Reiniciar temporizadores generales
-        elapsedTime = 0.0;
-        elapsedTimeSub = 0.0;
-        time = 25;
-        seconds = 0.0;
-        progress = 1.0;
-        elapsedTimeContraction = 0.0;
-        elapsedTimePause = 0.0;
-        progressContraction = 0.0;
-        progressPause = 0.0;
-        startTime = DateTime.now();
-        pausedTime = 0.0;
-        valueRampa = 1.0;
-        valuePause = 1.0;
-        valueContraction = 1.0;
-
-        _hideControls = false;
-        _showVideo = false;
-        isFullScreen = false;
-        isOverlayVisible = false;
-      });
-    }
-  }
-
-  Future<void> _fetchClients() async {
-    final dbHelper = DatabaseHelper();
-    try {
-      final clientData = await dbHelper.getClients();
-      if (mounted) {
-        setState(() {
-          allClients = clientData; // Asigna a la lista original
-        });
-      }
-    } catch (e) {
-      debugPrint('Error fetching clients: $e');
-    }
-  }
-
-  Future<void> obtenerDatos() async {
-    try {
-      List<String> datos = await getTrainer("imotion21");
-
-      List<String> datosFiltrados =
-          datos.where((element) => element.isNotEmpty).toList();
-
-      setState(() {
-        respuestaTroceada = datosFiltrados;
-      });
-    } catch (e) {
-      print("Error al obtener datos: $e");
     }
   }
 
@@ -2496,6 +2281,494 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     return groupedPrograms;
   }
 
+  void onClientSelected(Map<String, dynamic>? client) async {
+    if (client == null) {
+      setState(() {
+        selectedClient = null; // 🔥 Eliminar la referencia interna
+        totalBonos = 0;
+
+        // 🔥 Reiniciar listas de músculos
+        _isMusculoTrajeInactivo.setAll(
+            0, List.filled(_isMusculoTrajeInactivo.length, false));
+        _isMusculoPantalonInactivo.setAll(
+            0, List.filled(_isMusculoPantalonInactivo.length, false));
+      });
+
+      // 🔥 Asegurar que también se elimine de `clientSelectedMap`
+      widget.clientSelectedMap.value =
+          Map<String, dynamic>.from(widget.clientSelectedMap.value)
+            ..remove(widget.macAddress);
+
+      // 🔥 Notificar al padre que el cliente se eliminó
+      widget.onClientSelected(null);
+
+      // 🔥 Imprimir para verificar la eliminación
+      debugPrint(
+          "✅ selectedClient en el hijo después de eliminación: $selectedClient");
+
+      return;
+    }
+
+    setState(() {
+      selectedClient = client;
+      totalBonos = 0;
+      _isMusculoTrajeInactivo.setAll(
+          0, List.filled(_isMusculoTrajeInactivo.length, false));
+      _isMusculoPantalonInactivo.setAll(
+          0, List.filled(_isMusculoPantalonInactivo.length, false));
+    });
+
+    final db = await openDatabase('my_database.db');
+
+    final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery(
+      '''
+    SELECT cantidad FROM bonos
+    WHERE cliente_id = ? AND estado = 'Disponible'
+    ''',
+      [client['id']],
+    );
+
+    totalBonos = clientGroupsResult.fold(0, (total, bono) {
+      final int cantidad = (bono['cantidad'] as num?)?.toInt() ?? 0;
+      return total + cantidad;
+    });
+
+    final nuevoMapa = Map<String, dynamic>.from(widget.clientSelectedMap.value);
+    final datosPrevios =
+        (nuevoMapa[widget.macAddress] as Map<String, dynamic>?) ?? {};
+
+    nuevoMapa[widget.macAddress!] = {
+      ...datosPrevios,
+      ...client,
+      'bonos': totalBonos,
+    };
+
+    widget.clientSelectedMap.value = nuevoMapa;
+    widget.onClientSelected(
+        nuevoMapa[widget.macAddress] as Map<String, dynamic>?);
+
+    // 🔥 Asegurar que se actualicen los músculos cada vez que se seleccione un cliente
+    updateMuscleLists();
+    updateMuscleListsForProgramsOnly();
+  }
+
+  void _onClientSelectedMapChanged() {
+    print(
+        "🔄 Listener activado: Nuevo valor de clientSelectedMap: ${widget.clientSelectedMap.value}");
+
+    if (!mounted) return;
+
+    // 🔥 Si el cliente fue eliminado, actualizar el estado en el widget hijo
+    if (!widget.clientSelectedMap.value.containsKey(widget.macAddress)) {
+      setState(() {
+        selectedClient = null;
+        totalBonos = 0;
+        _isMusculoTrajeInactivo.setAll(
+            0, List.filled(_isMusculoTrajeInactivo.length, false));
+        _isMusculoPantalonInactivo.setAll(
+            0, List.filled(_isMusculoPantalonInactivo.length, false));
+      });
+
+      // 🔥 Forzar la reconstrucción de la UI después del cambio
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+
+      print("🚀 Cliente eliminado desde el padre en el hijo.");
+    }
+  }
+
+  void updateMuscleLists() {
+    if (selectedClient == null) return;
+
+    final clientId = selectedClient!['id'];
+
+    openDatabase('my_database.db').then((db) async {
+      final List<Map<String, dynamic>> clientGroupsResult =
+          await db.rawQuery('''
+      SELECT g.id
+      FROM grupos_musculares g
+      INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
+      WHERE cg.cliente_id = ?
+    ''', [clientId]);
+
+      final Map<int, int> selectedMuscleIdToIndex = selectedIndexEquip == 0
+          ? muscleIdToIndexClienteTraje
+          : muscleIdToIndexClientePantalon;
+
+      final Set<int> clientMuscleIndexes = clientGroupsResult
+          .map((group) => selectedMuscleIdToIndex[group['id'] as int])
+          .where((index) => index != null)
+          .cast<int>()
+          .toSet();
+
+      setState(() {
+        if (selectedIndexEquip == 0) {
+          for (int i = 0; i < _isMusculoTrajeInactivo.length; i++) {
+            _isMusculoTrajeInactivo[i] =
+                _isMusculoTrajeInactivo[i] || !clientMuscleIndexes.contains(i);
+          }
+        } else if (selectedIndexEquip == 1) {
+          for (int i = 0; i < _isMusculoPantalonInactivo.length; i++) {
+            _isMusculoPantalonInactivo[i] = _isMusculoPantalonInactivo[i] ||
+                !clientMuscleIndexes.contains(i);
+          }
+        }
+      });
+    });
+  }
+
+  void onProgramSelected(String program) {
+    setState(() {
+      selectedProgram = program;
+
+      // Reinicia las listas a su estado inicial
+      _isMusculoTrajeInactivo.setAll(
+          0, List.filled(_isMusculoTrajeInactivo.length, false));
+      _isMusculoPantalonInactivo.setAll(
+          0, List.filled(_isMusculoPantalonInactivo.length, false));
+    });
+
+    updateContractionAndPauseValues();
+    print("Programa seleccionado: $selectedProgram");
+
+    // 🔥 Asegurar que la UI se actualice con la nueva selección
+    updateMuscleLists();
+    updateMuscleListsForProgramsOnly();
+  }
+
+  void onIndivProgramSelected(Map<String, dynamic>? programI) async {
+    if (programI == null) return;
+
+    setState(() {
+      selectedIndivProgram = programI;
+      _isMusculoTrajeInactivo.setAll(
+          0, List.filled(_isMusculoTrajeInactivo.length, false));
+      _isMusculoPantalonInactivo.setAll(
+          0, List.filled(_isMusculoPantalonInactivo.length, false));
+    });
+
+    var db = await DatabaseHelper().database;
+    try {
+      List<Map<String, dynamic>> cronaxias = (await DatabaseHelper()
+              .obtenerCronaxiasPorPrograma(db, programI['id_programa']))
+          .map((c) =>
+              {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']})
+          .toList();
+      List<Map<String, dynamic>> grupos = (await DatabaseHelper()
+              .obtenerGruposPorPrograma(db, programI['id_programa']))
+          .map((g) => {'id': g['id']})
+          .toList();
+
+      setState(() {
+        selectedCronaxias = cronaxias;
+        selectedGrupos = grupos;
+      });
+
+      updateContractionAndPauseValues();
+      updateMuscleLists();
+      updateMuscleListsForProgramsOnly();
+    } catch (e) {
+      debugPrint("❌ Error en onIndivProgramSelected: $e");
+    }
+  }
+
+  void onRecoProgramSelected(Map<String, dynamic>? programR) async {
+    if (programR == null) return;
+
+    setState(() {
+      selectedRecoProgram = programR;
+      _isMusculoTrajeInactivo.setAll(
+          0, List.filled(_isMusculoTrajeInactivo.length, false));
+      _isMusculoPantalonInactivo.setAll(
+          0, List.filled(_isMusculoPantalonInactivo.length, false));
+    });
+
+    var db = await DatabaseHelper().database;
+
+    try {
+      var cronaxias = await DatabaseHelper()
+          .obtenerCronaxiasPorPrograma(db, programR['id_programa']);
+      var grupos = await DatabaseHelper()
+          .obtenerGruposPorPrograma(db, programR['id_programa']);
+
+      setState(() {
+        selectedCronaxias = cronaxias;
+        selectedGrupos = grupos;
+      });
+
+      updateContractionAndPauseValues();
+      updateMuscleLists();
+      updateMuscleListsForProgramsOnly();
+    } catch (e) {
+      debugPrint("❌ Error en onRecoProgramSelected: $e");
+    }
+  }
+
+  void onAutoProgramSelected(Map<String, dynamic>? programA) async {
+    if (programA == null) return;
+
+    setState(() {
+      selectedAutoProgram = Map<String, dynamic>.from(programA);
+    });
+
+    var db = await DatabaseHelper().database;
+    try {
+      List<Map<String, dynamic>> subprogramas =
+          (programA['subprogramas'] as List<dynamic>?)
+                  ?.map((sp) => Map<String, dynamic>.from(sp))
+                  .toList() ??
+              [];
+
+      for (var i = 0; i < subprogramas.length; i++) {
+        var subprograma = Map<String, dynamic>.from(subprogramas[i]);
+
+        if (subprograma['id_programa_relacionado'] == null) continue;
+
+        int idPrograma = subprograma['id_programa_relacionado'] as int;
+
+        List<Map<String, dynamic>> cronaxias =
+            (await DatabaseHelper().obtenerCronaxiasPorPrograma(db, idPrograma))
+                .map((c) => {
+                      'id': c['id'],
+                      'nombre': c['nombre'] ?? 'Desconocido',
+                      'valor': c['valor'] ?? 0.0
+                    })
+                .toList();
+
+        List<Map<String, dynamic>> grupos = (await DatabaseHelper()
+                .obtenerGruposPorPrograma(db, idPrograma))
+            .map((g) => {'id': g['id'], 'nombre': g['nombre'] ?? 'Desconocido'})
+            .toList();
+
+        subprogramas[i] = {
+          ...subprograma,
+          'cronaxias': cronaxias,
+          'grupos': grupos
+        };
+      }
+
+      setState(() {
+        selectedAutoProgram?['subprogramas'] =
+            List<Map<String, dynamic>>.from(subprogramas);
+      });
+
+      updateContractionAndPauseValues();
+      updateMuscleLists();
+      updateMuscleListsForProgramsOnly();
+    } catch (e) {
+      debugPrint("❌ Error en onAutoProgramSelected: $e");
+    }
+  }
+
+  void updateMuscleListsForProgramsOnly() {
+    if (selectedGrupos.isEmpty) return;
+
+    openDatabase('my_database.db').then((db) async {
+      try {
+        List<Map<String, dynamic>> grupos = [];
+        debugPrint("🔹 Iniciando actualización de músculos para programas");
+
+        if (selectedProgram == null ||
+            selectedProgram == tr(context, 'Libre').toUpperCase() ||
+            (selectedProgram == tr(context, 'Individual').toUpperCase() &&
+                selectedIndivProgram == null) ||
+            (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
+                selectedRecoProgram == null) ||
+            (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
+                selectedAutoProgram == null)) {
+          debugPrint(
+              "📌 Programa no seleccionado o Libre, manteniendo todos los músculos activos");
+          return;
+        }
+
+        if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
+            selectedIndivProgram != null) {
+          grupos = (await DatabaseHelper().obtenerGruposPorPrograma(
+                  db, selectedIndivProgram!['id_programa']))
+              .map((g) => {'id': g['id']})
+              .toList();
+        } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
+            selectedRecoProgram != null) {
+          grupos = (await DatabaseHelper().obtenerGruposPorPrograma(
+                  db, selectedRecoProgram!['id_programa']))
+              .map((g) => {'id': g['id']})
+              .toList();
+        } else if (selectedProgram ==
+                tr(context, 'Automáticos').toUpperCase() &&
+            selectedAutoProgram != null) {
+          List<Map<String, dynamic>> subprogramas =
+              (selectedAutoProgram!['subprogramas'] as List<dynamic>?)
+                      ?.map((sp) => Map<String, dynamic>.from(sp))
+                      .toList() ??
+                  [];
+
+          for (var subprograma in subprogramas) {
+            if (subprograma['id_programa_relacionado'] == null) continue;
+            int idPrograma = subprograma['id_programa_relacionado'] as int;
+            grupos.addAll((await DatabaseHelper()
+                    .obtenerGruposPorPrograma(db, idPrograma))
+                .map((g) => {'id': g['id']})
+                .toList());
+          }
+        }
+
+        final Map<int, int> selectedMuscleIdToIndex = selectedIndexEquip == 0
+            ? muscleIdToIndexProgramaTraje
+            : muscleIdToIndexProgramaPantalon;
+
+        final Set<int> activeMuscleIndexes = grupos
+            .map((g) => selectedMuscleIdToIndex[g['id'] as int])
+            .where((index) => index != null)
+            .cast<int>()
+            .toSet();
+
+        setState(() {
+          if (selectedIndexEquip == 0) {
+            for (int i = 0; i < _isMusculoTrajeInactivo.length; i++) {
+              _isMusculoTrajeInactivo[i] = _isMusculoTrajeInactivo[i] ||
+                  !activeMuscleIndexes.contains(i);
+            }
+          } else if (selectedIndexEquip == 1) {
+            for (int i = 0; i < _isMusculoPantalonInactivo.length; i++) {
+              _isMusculoPantalonInactivo[i] = _isMusculoPantalonInactivo[i] ||
+                  !activeMuscleIndexes.contains(i);
+            }
+          }
+        });
+        updateMuscleLists();
+      } catch (e) {
+        debugPrint("❌ Error en updateMuscleListsForProgramsOnly: $e");
+      }
+    });
+  }
+
+  void onCycleSelected(String cycle) {
+    setState(() {
+      selectedCycle = cycle; // Aquí actualizas el valor seleccionado
+      if (selectedCycle == "${tr(context, 'Ciclo')} D") {
+        selectedRecoProgram = allRecoveryPrograms[3]; // 🔥 Direct assignment
+      }
+      if (selectedCycle == '') {
+        selectedCycle = null; // 🔥 Direct assignment
+      }
+      updateContractionAndPauseValues();
+    });
+    print("Ciclo seleccionado: $selectedCycle");
+  }
+  void updateContractionAndPauseValues() {
+    if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
+        selectedIndivProgram != null) {
+      valueContraction =
+          (selectedIndivProgram!['contraccion'] as double?) ?? valueContraction;
+      valuePause = (selectedIndivProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa = (selectedIndivProgram!['rampa'] as double?) ?? valueRampa;
+    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
+        selectedRecoProgram != null) {
+      valueContraction =
+          (selectedRecoProgram!['contraccion'] as double?) ?? valueContraction;
+      valuePause = (selectedRecoProgram!['pausa'] as double?) ?? valuePause;
+      valueRampa = (selectedRecoProgram!['rampa'] as double?) ?? valueRampa;
+    } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
+        selectedAutoProgram != null) {
+      totalTime = (selectedAutoProgram!['duracion']) ?? totalTime;
+      valueContraction = (selectedAutoProgram!['subprogramas']
+              [currentSubprogramIndex]['contraccion'] as double?) ??
+          valueContraction;
+      valuePause = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
+              ['pausa'] as double?) ??
+          valuePause;
+      valueRampa = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
+              ['rampa'] as double?) ??
+          valueRampa;
+    } else if (selectedProgram == tr(context, 'Libre').toUpperCase()) {
+      valueContraction = 1.0;
+      valuePause = 1.0;
+      valueRampa = 1.0;
+    }
+  }
+
+  Map<String, dynamic> getProgramSettings(String? selectedProgram) {
+    debugPrint(
+        "🔹 getProgramSettings() - Iniciando con selectedProgram: $selectedProgram");
+
+    double frecuencia = 0;
+    double rampa = valueRampa;
+    double pulso = 0;
+    double pause = valuePause;
+    double contraction = valueContraction;
+
+    Map<String, dynamic>? selectedProgramData;
+    List<Map<String, dynamic>> cronaxias = [];
+    List<Map<String, dynamic>> grupos = [];
+
+    if (selectedProgram == tr(context, 'Individual').toUpperCase()) {
+      selectedProgramData = selectedIndivProgram;
+      cronaxias = selectedCronaxias;
+      grupos = selectedGrupos;
+    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase()) {
+      selectedProgramData = selectedRecoProgram;
+      cronaxias = selectedCronaxias;
+      grupos = selectedGrupos;
+    } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase()) {
+      selectedProgramData =
+          selectedAutoProgram?['subprogramas'][currentSubprogramIndex];
+      cronaxias = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]
+                  ['cronaxias'] as List<dynamic>?)
+              ?.map((c) =>
+                  {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']})
+              .toList() ??
+          [];
+      grupos = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]
+                  ['grupos'] as List<dynamic>?)
+              ?.map((g) => {'id': g['id']})
+              .toList() ??
+          [];
+    } else if (selectedProgram == tr(context, 'Libre').toUpperCase()) {
+      frecuencia = valueFrecuency;
+      rampa = valueRampa;
+      pulso = valuePulse;
+      pause = valuePause;
+      contraction = valueContraction;
+    }
+
+    if (selectedProgramData != null) {
+      frecuencia = selectedProgramData['frecuencia'] ?? 0;
+      rampa = selectedProgramData['rampa'] ?? 0;
+      pulso = selectedProgramData['pulso'] ?? 0;
+    }
+
+    // 🔥 Evitar devolver `selectedClient` si ya fue eliminado
+    Map<String, dynamic>? clienteData = selectedClient;
+    if (selectedClient == null ||
+        !widget.clientSelectedMap.value.containsValue(selectedClient)) {
+      clienteData = null;
+    }
+
+    debugPrint("📊 Datos obtenidos en getProgramSettings:");
+    debugPrint(
+        "   - Cliente: ${clienteData != null ? clienteData['name'] : 'Ninguno'}");
+    debugPrint("   - Frecuencia: $frecuencia");
+    debugPrint("   - Rampa: $rampa");
+    debugPrint("   - Pulso: $pulso");
+    debugPrint("   - Cronaxias: $cronaxias");
+    debugPrint("   - Grupos musculares: $grupos");
+
+    return {
+      'cliente': clienteData,
+      // 🔥 Solo devuelve el cliente si aún está en `clientSelectedMap`
+      'frecuencia': frecuencia,
+      'rampa': rampa,
+      'pulso': pulso,
+      'pausa': pause,
+      'contraccion': contraction,
+      'cronaxias': cronaxias,
+      'grupos': grupos,
+    };
+  }
+
   Future<void> _saveProgramsToCache(List<Map<String, dynamic>> programs) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -2532,32 +2805,60 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
-  void updateContractionAndPauseValues() {
-    if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
-        selectedIndivProgram != null) {
-      valueContraction =
-          (selectedIndivProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause = (selectedIndivProgram!['pausa'] as double?) ?? valuePause;
-      valueRampa = (selectedIndivProgram!['rampa'] as double?) ?? valueRampa;
-    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
-        selectedRecoProgram != null) {
-      valueContraction =
-          (selectedRecoProgram!['contraccion'] as double?) ?? valueContraction;
-      valuePause = (selectedRecoProgram!['pausa'] as double?) ?? valuePause;
-      valueRampa = (selectedRecoProgram!['rampa'] as double?) ?? valueRampa;
-    } else if (selectedProgram == tr(context, 'Automáticos').toUpperCase() &&
-        selectedAutoProgram != null) {
-      totalTime = (selectedAutoProgram!['duracion']) ?? totalTime;
-      valueContraction = (selectedAutoProgram!['subprogramas']
-              [currentSubprogramIndex]['contraccion'] as double?) ??
-          valueContraction;
-      valuePause = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
-              ['pausa'] as double?) ??
-          valuePause;
-      valueRampa = (selectedAutoProgram!['subprogramas'][currentSubprogramIndex]
-              ['rampa'] as double?) ??
-          valueRampa;
+  // La función toggleFullScreen se define aquí, pero será ejecutada por el hijo
+  void toggleFullScreen() {
+    setState(() {
+      isFullScreen = !isFullScreen;
+    });
+    widget.isFullChanged(isFullScreen);
+  }
+
+  void toggleOverlay(int index) {
+    setState(() {
+      isOverlayVisible = !isOverlayVisible;
+      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
+    });
+  }
+
+  void selectEquip(int index) {
+    if (selectedProgram == tr(context, 'Recovery').toUpperCase() &&
+        selectedRecoProgram?['id_programa'] == 21) {
+      debugPrint(
+          "⚠️ Bloqueo de ejecución: selectedProgram es Recovery y el id_programa es 21");
+      return;
     }
+
+    setState(() {
+      selectedIndexEquip = index; // Actualizar índice local
+      updateMuscleLists();
+      updateMuscleListsForProgramsOnly();
+    });
+
+    widget.onSelectEquip(index); // Notificar cambio a PanelView
+    print("🔄 Cambiado al equipo $index para clave: ${widget.selectedKey}");
+  }
+
+  void _togglePlayPause(String macAddress) {
+    final globalManager = GlobalVideoControllerManager.instance;
+    final videoController = globalManager.videoController;
+
+    if (videoController == null ||
+        !videoController.value.isInitialized ||
+        globalManager.activeMacAddress != macAddress) {
+      debugPrint(
+          "⚠️ No hay un video activo o el video no pertenece a este macAddress.");
+      return;
+    }
+
+    if (videoController.value.isPlaying) {
+      videoController.pause();
+      debugPrint("⏸️ Video pausado para macAddress: $macAddress");
+    } else {
+      videoController.play();
+      debugPrint("▶️ Video reproduciéndose para macAddress: $macAddress");
+    }
+
+    setState(() {});
   }
 
   void _startTimer(String macAddress, List<int> porcentajesMusculoTraje,
@@ -2608,6 +2909,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
+  void _pauseTimer(String macAddress) {
+    if (mounted) {
+      setState(() {
+        stopElectrostimulationProcess(widget.macAddress!);
+        isRunning = false;
+        isSessionStarted = false;
+        pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
+        _timer.cancel();
+        stopSubprogramTimer(
+            widget.macAddress!); // Detiene el temporizador de subprograma
+        _phaseTimer?.cancel(); // Detiene el temporizador de fase
+      });
+    }
+  }
+
   void _updateTime(int newTime) {
     if (mounted) {
       setState(() {
@@ -2631,22 +2947,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       });
     }
   }
-
-  void _pauseTimer(String macAddress) {
-    if (mounted) {
-      setState(() {
-        stopElectrostimulationProcess(widget.macAddress!);
-        isRunning = false;
-        isSessionStarted = false;
-        pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
-        _timer.cancel();
-        stopSubprogramTimer(
-            widget.macAddress!); // Detiene el temporizador de subprograma
-        _phaseTimer?.cancel(); // Detiene el temporizador de fase
-      });
-    }
-  }
-
   void _stopAllTimersAndReset(String macAddress) {
     if (mounted) {
       // Pausa el temporizador antes de reiniciar las variables globales
@@ -2665,7 +2965,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       });
     }
   }
-
   void _startContractionTimer(
     double contractionDuration,
     String macAddress,
@@ -2725,7 +3024,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           porcentajesMusculoTraje, porcentajesMusculoPantalon);
     }
   }
-
   void _startContractionPhase(
     double contractionDuration,
     String macAddress,
@@ -2748,7 +3046,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
     });
   }
-
   Future<void> _startPauseTimer(
     double pauseDuration,
     String macAddress,
@@ -2780,7 +3077,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           "❌ Error al detener la electroestimulación antes de la pausa: $e");
     }
   }
-
   void _startPausePhase(
     double pauseDuration,
     String macAddress,
@@ -2803,7 +3099,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
     });
   }
-
   void startSubprogramTimer(String macAddress) {
     // Verificar si selectedAutoProgram es nulo y usar allAutoPrograms[0] si es el caso
     var programToUse = selectedAutoProgram ?? allAutomaticPrograms[0];
@@ -2878,6 +3173,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           // Pasar al siguiente subprograma
           currentSubprogramIndex++;
           updateContractionAndPauseValues();
+          updateMuscleLists();
+          updateMuscleListsForProgramsOnly();
           startSubprogramTimer(
               widget.macAddress!); // Iniciar el siguiente subprograma
         }
@@ -2888,7 +3185,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       // Aquí puedes agregar una acción al finalizar todos los subprogramas
     }
   }
-
   void stopSubprogramTimer(String macAddress) {
     timerSub?.cancel();
     if (mounted) {
@@ -2907,7 +3203,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     print(
         "Temporizador detenido. Tiempo transcurrido: $elapsedTimeSub segundos.");
   }
-
   void resetSubprogramState() {
     if (mounted) {
       setState(() {
@@ -2978,7 +3273,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       debugPrint("❌ Error en printElectrostimulationValues: $e");
     }
   }
-
   Future<bool> startFullElectrostimulationTrajeProcess(
     String macAddress,
     List<int> porcentajesMusculoTraje,
@@ -3069,7 +3363,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       return false;
     }
   }
-
   Future<bool> startFullElectrostimulationPantalonProcess(
     String macAddress,
     List<int> porcentajesMusculoPantalon,
@@ -3164,7 +3457,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       return false;
     }
   }
-
   Future<bool> stopElectrostimulationProcess(String macAddress) async {
     try {
       // Verificar si la electroestimulación está activa
@@ -3196,6 +3488,96 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       debugPrint(
           "❌ Error al detener la electroestimulación en ${widget.macAddress!}: $e");
       return false; // Error durante la operación
+    }
+  }
+
+  void _clearGlobals() async {
+    if (mounted) {
+      setState(() {
+        _cancelVideoController();
+        _phaseTimer?.cancel();
+        timerSub?.cancel();
+        _timer.cancel();
+
+        // Reiniciar todas las variables globales
+        isElectroOn = false;
+        _isLoading = false;
+
+        // Restablecer valores de los programas y selección
+        selectedProgram = null;
+        selectedAutoProgram = null;
+        selectedIndivProgram = null;
+        selectedRecoProgram = null;
+        selectedClient = null;
+
+        // Reiniciar estado de sesión
+        isSessionStarted = false;
+        _isImagesLoaded = false;
+        isRunning = false;
+        isContractionPhase = true;
+        isPantalonSelected = false;
+        selectedIndexEquip = 0;
+
+        // Restablecer valores de escala
+        scaleFactorFull = 1.0;
+        scaleFactorCliente = 1.0;
+        scaleFactorRepeat = 1.0;
+        scaleFactorTrainer = 1.0;
+        scaleFactorRayo = 1.0;
+        scaleFactorReset = 1.0;
+        scaleFactorMas = 1.0;
+        scaleFactorMenos = 1.0;
+
+        // Restablecer ángulos de rotación
+        rotationAngle1 = 0.0;
+        rotationAngle2 = 0.0;
+        rotationAngle3 = 0.0;
+
+        // Reiniciar expansión
+        _isExpanded1 = false;
+        _isExpanded2 = false;
+        _isExpanded3 = false;
+
+        // Restablecer imágenes y temporizador
+        _currentImageIndex = 31 - 25;
+        currentSubprogramIndex = 0;
+        remainingTime = 0;
+
+        // Restablecer los estados de músculos
+        _isMusculoTrajeInactivo.fillRange(0, 10, false);
+        _isMusculoPantalonInactivo.fillRange(0, 7, false);
+        _isMusculoTrajeBloqueado.fillRange(0, 10, false);
+        _isMusculoPantalonBloqueado.fillRange(0, 7, false);
+
+        // Reiniciar tiempos de subprogramas
+        subprogramElapsedTime = {};
+        subprogramRemainingTime = {};
+
+        // Restablecer porcentajes
+        porcentajesMusculoTraje.fillRange(0, 10, 0);
+        porcentajesMusculoPantalon.fillRange(0, 7, 0);
+
+        // Reiniciar temporizadores generales
+        elapsedTime = 0.0;
+        elapsedTimeSub = 0.0;
+        time = 25;
+        seconds = 0.0;
+        progress = 1.0;
+        elapsedTimeContraction = 0.0;
+        elapsedTimePause = 0.0;
+        progressContraction = 0.0;
+        progressPause = 0.0;
+        startTime = DateTime.now();
+        pausedTime = 0.0;
+        valueRampa = 1.0;
+        valuePause = 1.0;
+        valueContraction = 1.0;
+        _isPauseActive = false;
+        _hideControls = false;
+        _showVideo = false;
+        isFullScreen = false;
+        isOverlayVisible = false;
+      });
     }
   }
 
@@ -3284,143 +3666,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         );
       },
     );
-  }
-
-  void onProgramSelected(String program) {
-    setState(() {
-      selectedProgram = program; // Aquí actualizas el valor seleccionado
-    });
-    print("Programa seleccionado: $selectedProgram");
-  }
-
-
-  void onIndivProgramSelected(Map<String, dynamic>? programI) async {
-    debugPrint("🔹 onIndivProgramSelected() - Iniciando");
-    if (programI == null) return;
-
-    setState(() {
-      selectedIndivProgram = programI;
-    });
-
-    var db = await DatabaseHelper().database;
-
-    try {
-      List<Map<String, dynamic>> cronaxias = (await DatabaseHelper().obtenerCronaxiasPorPrograma(db, programI['id_programa'])).map((c) => {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']}).toList();
-      List<Map<String, dynamic>> grupos = (await DatabaseHelper().obtenerGruposPorPrograma(db, programI['id_programa'])).map((g) => {'id': g['id']}).toList();
-
-
-      debugPrint("📊 Cronaxias obtenidas: $cronaxias");
-      debugPrint("📊 Grupos musculares obtenidos: $grupos");
-
-      setState(() {
-        selectedCronaxias = cronaxias;
-        selectedGrupos = grupos;
-      });
-      updateContractionAndPauseValues();
-    } catch (e) {
-      debugPrint("❌ Error en onIndivProgramSelected: $e");
-    }
-  }
-
-  void onRecoProgramSelected(Map<String, dynamic>? programR) async {
-    debugPrint("🔹 onRecoProgramSelected() - Iniciando");
-    if (programR == null) return;
-
-    setState(() {
-      selectedRecoProgram = programR;
-    });
-
-    var db = await DatabaseHelper().database;
-
-    try {
-      var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, programR['id_programa']);
-      var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, programR['id_programa']);
-
-      debugPrint("📊 Cronaxias obtenidas: $cronaxias");
-      debugPrint("📊 Grupos musculares obtenidos: $grupos");
-
-      setState(() {
-        selectedCronaxias = cronaxias;
-        selectedGrupos = grupos;
-      });
-      updateContractionAndPauseValues();
-    } catch (e) {
-      debugPrint("❌ Error en onRecoProgramSelected: $e");
-    }
-  }
-
-  void onAutoProgramSelected(Map<String, dynamic>? programA) async {
-    debugPrint("🔹 onAutoProgramSelected() - Iniciando");
-    if (programA == null) return;
-
-    setState(() {
-      selectedAutoProgram = Map<String, dynamic>.from(programA);
-    });
-
-    var db = await DatabaseHelper().database;
-    try {
-      List<Map<String, dynamic>> subprogramas = (programA['subprogramas'] as List<dynamic>?)
-          ?.map((sp) => Map<String, dynamic>.from(sp))
-          .toList() ?? [];
-
-      for (var i = 0; i < subprogramas.length; i++) {
-        var subprograma = Map<String, dynamic>.from(subprogramas[i]); // Asegurar mutabilidad
-
-        if (subprograma['id_programa_relacionado'] == null) {
-          debugPrint("⚠️ Subprograma sin id_programa en índice $i");
-          continue; // Salta este subprograma si no tiene id_programa
-        }
-
-        int idPrograma = subprograma['id_programa_relacionado'] as int;
-
-        List<Map<String, dynamic>> cronaxias = (await DatabaseHelper().obtenerCronaxiasPorPrograma(db, idPrograma))
-            .map((c) => {
-          'id': c['id'],
-          'nombre': c['nombre'] ?? 'Desconocido',
-          'valor': c['valor'] ?? 0.0
-        })
-            .toList();
-
-        List<Map<String, dynamic>> grupos = (await DatabaseHelper().obtenerGruposPorPrograma(db, idPrograma))
-            .map((g) => {
-          'id': g['id'],
-          'nombre': g['nombre'] ?? 'Desconocido',
-          'imagen': g['imagen'] ?? '',
-          'tipo_equipamiento': g['tipo_equipamiento'] ?? 'Desconocido'
-        })
-            .toList();
-
-        subprogramas[i] = {
-          ...subprograma,
-          'cronaxias': cronaxias,
-          'grupos': grupos,
-        };
-      }
-
-      debugPrint("📊 Subprogramas actualizados con cronaxias y grupos: $subprogramas");
-
-      setState(() {
-        selectedAutoProgram?['subprogramas'] = List<Map<String, dynamic>>.from(subprogramas);
-      });
-
-      updateContractionAndPauseValues();
-    } catch (e) {
-      debugPrint("❌ Error en onAutoProgramSelected: $e");
-    }
-  }
-
-  void onCycleSelected(String cycle) {
-    setState(() {
-      selectedCycle = cycle; // Aquí actualizas el valor seleccionado
-      if (selectedCycle == "${tr(context, 'Ciclo')} D") {
-        selectedRecoProgram = allRecoveryPrograms[3]; // 🔥 Direct assignment
-      }
-      if (selectedCycle == '') {
-        selectedCycle = null; // 🔥 Direct assignment
-      }
-      updateContractionAndPauseValues();
-    });
-    print("Ciclo seleccionado: $selectedCycle");
   }
 
   @override
@@ -3591,12 +3836,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             // Se usa para que el `Align` funcione correctamente
                                             child: Align(
                                               alignment: Alignment.center,
-                                        
-                                                child: ValueListenableBuilder<
-                                                    Map<String, dynamic>>(
-                                                  valueListenable:
-                                                      widget.clientSelectedMap,
-                                                  builder: (context, clientMap,
+                                              child: ValueListenableBuilder<
+                                                  Map<String, dynamic>>(
+                                                valueListenable:
+                                                    widget.clientSelectedMap,
+                                                builder: (context, clientMap,
                                                       child) {
                                                     final client = clientMap[
                                                         widget.macAddress];
@@ -3616,7 +3860,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                     );
                                                   },
                                                 ),
-                                              
                                             ),
                                           ),
                                         ),
@@ -3913,11 +4156,11 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 'assets/images/menos.png',
                                                 // Imagen del botón de "Menos"
                                                 imagePathDisplay:
-                                                'assets/images/CONTRACCION.png',
-                                                // Imagen que se muestra (Contracción)
-                                                onIncrement: () {
-                                                  setState(() {
-                                                    valueFrecuency +=
+                                                'assets/images/frec.png',
+                                            // Imagen que se muestra (Contracción)
+                                            onIncrement: () {
+                                              setState(() {
+                                                valueFrecuency +=
                                                     1.0; // Lógica de incremento
                                                   });
                                                 },
@@ -3947,10 +4190,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                 imagePathDecrement:
                                                 'assets/images/menos.png',
                                                 imagePathDisplay:
-                                                'assets/images/RAMPA.png',
-                                                onIncrement: () {
-                                                  setState(() {
-                                                    valuePulse +=
+                                                'assets/images/pulso.png',
+                                            onIncrement: () {
+                                              setState(() {
+                                                valuePulse +=
                                                     1.0; // Incremento en decimales
                                                   });
                                                 },
@@ -8139,54 +8382,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
-  Map<String, dynamic> getProgramSettings(String? selectedProgram) {
-    debugPrint("🔹 getProgramSettings() - Iniciando con selectedProgram: $selectedProgram");
-    double frecuencia = 0;
-    double rampa = valueRampa;
-    double pulso = 0;
-
-    Map<String, dynamic>? selectedProgramData;
-    List<Map<String, dynamic>> cronaxias = [];
-    List<Map<String, dynamic>> grupos = [];
-
-    if (selectedProgram == tr(context, 'Individual').toUpperCase()) {
-      selectedProgramData = selectedIndivProgram;
-      cronaxias = selectedCronaxias;
-      grupos = selectedGrupos;
-    } else if (selectedProgram == tr(context, 'Recovery').toUpperCase()) {
-      selectedProgramData = selectedRecoProgram;
-      cronaxias = selectedCronaxias;
-      grupos = selectedGrupos;
-    }  else if (selectedProgram == tr(context, 'Automáticos').toUpperCase()) {
-      selectedProgramData = selectedAutoProgram?['subprogramas'][currentSubprogramIndex];
-      cronaxias = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]['cronaxias'] as List<dynamic>?)?.map((c) => {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']}).toList() ?? [];
-      grupos = (selectedProgramData?['selectedGrupos'] as List<dynamic>?)?.map((g) => {'id': g['id']}).toList() ?? [];
-      cronaxias = (selectedProgramData?['cronaxias'] as List<dynamic>?)?.map((c) => {'id': c['id'], 'nombre': c['nombre'], 'valor': c['valor']}).toList() ?? [];
-      grupos = (selectedAutoProgram?['subprogramas'][currentSubprogramIndex]['grupos'] as List<dynamic>?)?.map((g) => {'id': g['id']}).toList() ?? [];
-    }
-
-    if (selectedProgramData != null) {
-      frecuencia = selectedProgramData['frecuencia'] ?? 0;
-      rampa = selectedProgramData['rampa'] ?? 0;
-      pulso = selectedProgramData['pulso'] ?? 0;
-    }
-
-    debugPrint("📊 Datos obtenidos en getProgramSettings:");
-    debugPrint("   - Frecuencia: $frecuencia");
-    debugPrint("   - Rampa: $rampa");
-    debugPrint("   - Pulso: $pulso");
-    debugPrint("   - Cronaxias: $cronaxias");
-    debugPrint("   - Grupos musculares: $grupos");
-
-    return {
-      'frecuencia': frecuencia,
-      'rampa': rampa,
-      'pulso': pulso,
-      'cronaxias': cronaxias,
-      'grupos': grupos,
-    };
-  }
-
   Widget _buildClientCard(Map<String, dynamic> client, double screenWidth) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.008),
@@ -8643,6 +8838,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
               imageNotifier!.value = imageNotifier.value == imagePathDisplay
                   ? 'assets/images/pausaactiva.png' // Imagen alterna
                   : imagePathDisplay;
+              setState(() {
+                _isPauseActive = !_isPauseActive;
+                debugPrint('${_isPauseActive}');
+              });
             },
             child: ValueListenableBuilder<String>(
               valueListenable: imageNotifier,
