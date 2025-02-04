@@ -354,7 +354,6 @@ class _PanelViewState extends State<PanelView>
     if (kDebugMode) {
       print("Lista despues del dispose $successfullyConnectedDevices}");
     }
-
     super.dispose();
     if (kDebugMode) {
       print("🚀 dispose() ejecutado correctamente.");
@@ -1521,13 +1520,27 @@ class _PanelViewState extends State<PanelView>
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        await bleConnectionService.disposeBle();
-                        if (kDebugMode) {
-                          print("💡 Recursos BLE liberados.");
+                        try {
+                          // 🔥 Bloquear interacción para evitar doble ejecución
+                          if (kDebugMode) {
+                            print("🛑 Cerrando BLE Connections antes de salir...");
+                          }
+
+                          // 🔥 Esperar a que `disposeBle()` se complete antes de continuar
+                          await bleConnectionService.disposeBle();
+
+                          if (kDebugMode) {
+                            print("✅ BLE completamente cerrado. Ahora se cerrará la vista.");
+                          }
+
+                          // 🔥 SOLO después de que `disposeBle()` haya terminado, ejecutar `onBack()`
+                          widget.onBack();
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          if (kDebugMode) {
+                            print("❌ Error en disposeBle(): $e");
+                          }
                         }
-                        widget.onBack();
-                        Navigator.of(context)
-                            .pop(); // Cierra el diálogo de confirmación
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.red),
@@ -3705,7 +3718,6 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
     }
     imagePauseNotifier.dispose();
-    bleConnectionService.dispose();
     super.dispose();
   }
 
@@ -9034,7 +9046,6 @@ class BleConnectionService {
           case DeviceConnectionState.disconnected:
             debugPrint("⛓️ Dispositivo $deviceId desconectado.");
             _updateDeviceConnectionState(deviceId, false);
-            _onDeviceDisconnected(deviceId);
             break;
 
           default:
@@ -9051,106 +9062,59 @@ class BleConnectionService {
     return success;
   }
 
-  void _onDeviceDisconnected(String macAddress) {
-    if (kDebugMode) {
-      print("️‍️‍⛓️‍💥--->>>Dispositivo $macAddress desconectado.");
-    }
-    connectedDevices.remove(macAddress);
-    disconnect(macAddress);
-    // Cancelar el stream asociado a la MAC
-    _connectionStreams[macAddress]?.cancel();
+  /// ✅ **Desconectar y limpiar recursos de un dispositivo**
+  Future<void> disconnect(String macAddress) async {
+    debugPrint("🔴 Desconectando del dispositivo: $macAddress");
+
+    // Cancelar la suscripción del stream de conexión
+    await _connectionStreams[macAddress]?.cancel();
     _connectionStreams.remove(macAddress);
 
-    // Actualizar el estado en los StreamControllers
+    // Verificar si el StreamController no está cerrado antes de cerrarlo
     final controller = _deviceConnectionStateControllers[macAddress];
     if (controller != null && !controller.isClosed) {
-      controller.add(false); // Estado desconectado
+      controller.add(false);
+      await controller.close();
+      _deviceConnectionStateControllers.remove(macAddress);
+      debugPrint("🗑️ Stream controller cerrado para $macAddress.");
     }
   }
 
-  void disconnect(String macAddress) async {
-    if (_deviceConnectionStateControllers.containsKey(macAddress)) {
-      if (kDebugMode) {
-        print("Desconectando del dispositivo: $macAddress");
-      }
-
-      // Cancelar la suscripción del stream de conexión
-      if (_connectionStreams.containsKey(macAddress)) {
-        await _connectionStreams[macAddress]?.cancel();
-        if (kDebugMode) {
-          print("⚠️ Suscripción cancelada para el dispositivo $macAddress.");
-        }
-        _connectionStreams.remove(macAddress);
-      }
-
-      // Verificar si el StreamController no está cerrado antes de agregar un evento
-      final controller = _deviceConnectionStateControllers[macAddress];
-      if (controller != null && !controller.isClosed) {
-        controller.add(false); // Estado desconectado
-        if (kDebugMode) {
-          print(
-              "🔴 Evento 'desconectado' agregado al controller del dispositivo $macAddress.");
-        }
-      } else {
-        if (kDebugMode) {
-          print(
-              "⚠️ El StreamController ya está cerrado para la MAC $macAddress.");
-        }
-      }
-    } else {
-      if (kDebugMode) {
-        print("No hay dispositivo conectado con la MAC $macAddress.");
-      }
-    }
-  }
-
+  /// ✅ **Cerrar correctamente todas las conexiones y limpiar recursos**
   Future<void> disposeBle() async {
     debugPrint("🧹 Limpiando recursos y desconectando dispositivos...");
 
-    for (var macAddress in _deviceConnectionStateControllers.keys) {
-      disconnect(macAddress);
-      disconnect(macAddress); // Esperar a que la desconexión termine
-      if (kDebugMode) {
-        debugPrint("🛑 Desconectando dispositivo con MAC: $macAddress");
-      }
+    // 🔴 Desconectar todos los dispositivos conectados
+    for (var macAddress in connectedDevices.toList()) {
+      await disconnect(macAddress);
+      debugPrint("🛑 Desconectado: $macAddress");
     }
-    _deviceConnectionStateControllers.forEach((macAddress, controller) {
-      if (!controller.isClosed) {
-        controller.close();
-        if (kDebugMode) {
-          debugPrint(
-              "🗑️ Stream controller para el dispositivo $macAddress cerrado.");
-        }
-      } else {
-        if (kDebugMode) {
-          debugPrint(
-              "⚠️ El Stream controller ya estaba cerrado para el dispositivo $macAddress.");
-          debugPrint("🗑️ Stream controller cerrado.");
-        }
-      }
-    });
-    if (!_deviceUpdatesController.isClosed) {
-      _deviceUpdatesController.close();
-      if (kDebugMode) {
-        debugPrint(
-            "🗑️ Stream controller de actualizaciones generales cerrado.");
-      }
-    } else {
-      if (kDebugMode) {
-        debugPrint(
-            "⚠️ El Stream controller de actualizaciones generales ya estaba cerrado.");
-      }
-    }
-    flutterReactiveBle.deinitialize();
-  }
 
-  Future<void> dispose() async {
-    debugPrint("🔒 Liberando recursos de BleConnectionService");
-    // Cancelar y limpiar suscripciones
-    for (var subscription in _subscriptions.values) {
-      await subscription.cancel();
+    // 🔴 Cerrar todas las suscripciones activas
+    for (var sub in _subscriptions.values) {
+      await sub.cancel();
     }
     _subscriptions.clear();
+
+    for (var sub in _connectionStreams.values) {
+      await sub.cancel();
+    }
+    _connectionStreams.clear();
+
+    // 🔴 Cerrar todos los StreamControllers
+    for (var controller in _deviceConnectionStateControllers.values) {
+      if (!controller.isClosed) {
+        await controller.close();
+      }
+    }
+    _deviceConnectionStateControllers.clear();
+
+    if (!_deviceUpdatesController.isClosed) {
+      await _deviceUpdatesController.close();
+    }
+
+
+    debugPrint("✅ BLE limpiado completamente.");
   }
 
   bool get isConnected => _connected;
