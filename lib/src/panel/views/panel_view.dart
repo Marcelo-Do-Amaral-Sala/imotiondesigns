@@ -1817,8 +1817,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double valueContraction = 1.0;
   double valueRampa = 1.0;
   double valuePause = 1.0;
-  double valueFrecuency = 50.0;
-  double valuePulse = 50.0;
+  double valueFrecuency = 80.0;
+  double valuePulse = 350.0;
   double contractionDuration = 0.0;
   Map<String, bool> procesosActivos = {};
   Map<int, double> subprogramElapsedTime =
@@ -2661,8 +2661,26 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   void onCycleSelected(String cycle) {
     setState(() {
       selectedCycle = cycle; // Aquí actualizas el valor seleccionado
+      // 🔥 Si selecciona un ciclo, usar la imagen inicial y desactivar pausa
+      if (selectedCycle != null) {
+        imagePauseNotifier.value =  'assets/images/PAUSA.png';
+        _isPauseActive = false;
+      }
+
       if (selectedCycle == "${tr(context, 'Ciclo')} D") {
         selectedRecoProgram = allRecoveryPrograms[3]; // 🔥 Direct assignment
+      } else if (selectedCycle == "${tr(context, 'Ciclo')} A") {
+        valueRampa = 1.0; // 🔥 Direct assignment
+        valuePause = 1.0; // 🔥 Direct assignment
+        valueContraction = 3.0; // 🔥 Direct assignment
+      } else if (selectedCycle == "${tr(context, 'Ciclo')} B") {
+        valueRampa = 1.0; // 🔥 Direct assignment
+        valuePause = 1.0; // 🔥 Direct assignment
+        valueContraction = 6.0; // 🔥 Direct assignment
+      } else if (selectedCycle == "${tr(context, 'Ciclo')} C") {
+        valueRampa = 1.0; // 🔥 Direct assignment
+        valuePause = 1.0; // 🔥 Direct assignment
+        valueContraction = 4.0; // 🔥 Direct assignment
       }
       if (selectedCycle == '') {
         selectedCycle = null; // 🔥 Direct assignment
@@ -8847,11 +8865,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         if (isPausa)
           GestureDetector(
             onTap: () {
-              imageNotifier!.value = imageNotifier.value == imagePathDisplay
-                  ? 'assets/images/pausaactiva.png' // Imagen alterna
-                  : imagePathDisplay;
+              if (selectedCycle != null) {
+                imageNotifier!.value = imagePathDisplay; // 🔹 Mantiene imagen original
+                _isPauseActive = false; // 🔹 Asegura que se desactive la pausa activa
+                return; // 🔥 Evita que se ejecute el cambio de imagen
+              }
+
               setState(() {
-                _isPauseActive = !_isPauseActive;
+                _isPauseActive = !_isPauseActive; // 🔥 Cambia el estado solo si no hay ciclo
+                imageNotifier!.value = _isPauseActive
+                    ? 'assets/images/pausaactiva.png' // Imagen cuando está activa la pausa
+                    : imagePathDisplay; // Imagen inicial
                 debugPrint('${_isPauseActive}');
               });
             },
@@ -8866,6 +8890,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
               },
             ),
           )
+
         else
           Image.asset(
             imagePathDisplay,
