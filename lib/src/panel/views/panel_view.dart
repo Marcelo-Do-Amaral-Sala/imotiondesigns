@@ -8961,16 +8961,21 @@ class BleConnectionService {
     flutterReactiveBle.initialize();
   }
 
-  /// Actualizar la lista de dispositivos objetivo
-  void updateMacAddresses(List<String> macAddresses) {
+  void updateMacAddresses(List<String> macAddresses) async {
+    debugPrint("🔍 Direcciones MAC obtenidas: $macAddresses");
+
+    // 🔥 Esperar 2 segundos antes de intentar la reconexión
+    await Future.delayed(Duration(seconds: 2));
+
     targetDeviceIds.clear();
     targetDeviceIds.addAll(macAddresses);
-    debugPrint(
-        "🔄 Lista de dispositivos objetivo actualizada: $targetDeviceIds");
+    debugPrint("🔄 Lista de dispositivos objetivo actualizada: $targetDeviceIds");
+
     for (String deviceId in targetDeviceIds) {
       _connectToDeviceByMac(deviceId);
     }
   }
+
 
   /// Stream de estado de conexión por dispositivo
   Stream<bool> connectionStateStream(String macAddress) {
@@ -9062,60 +9067,39 @@ class BleConnectionService {
     return success;
   }
 
-  /// ✅ **Desconectar y limpiar recursos de un dispositivo**
   Future<void> disconnect(String macAddress) async {
     debugPrint("🔴 Desconectando del dispositivo: $macAddress");
 
-    // Cancelar la suscripción del stream de conexión
     await _connectionStreams[macAddress]?.cancel();
     _connectionStreams.remove(macAddress);
 
-    // Verificar si el StreamController no está cerrado antes de cerrarlo
+    // ❌ NO cerrar los StreamControllers, solo limpiar el estado
     final controller = _deviceConnectionStateControllers[macAddress];
     if (controller != null && !controller.isClosed) {
       controller.add(false);
-      await controller.close();
-      _deviceConnectionStateControllers.remove(macAddress);
-      debugPrint("🗑️ Stream controller cerrado para $macAddress.");
+      debugPrint("🗑️ Stream controller para $macAddress actualizado.");
     }
   }
 
-  /// ✅ **Cerrar correctamente todas las conexiones y limpiar recursos**
+
   Future<void> disposeBle() async {
     debugPrint("🧹 Limpiando recursos y desconectando dispositivos...");
 
-    // 🔴 Desconectar todos los dispositivos conectados
     for (var macAddress in connectedDevices.toList()) {
       await disconnect(macAddress);
       debugPrint("🛑 Desconectado: $macAddress");
     }
 
-    // 🔴 Cerrar todas las suscripciones activas
-    for (var sub in _subscriptions.values) {
-      await sub.cancel();
-    }
+    // 🔥 Agregar un pequeño `delay` para evitar problemas de reconexión inmediata
+    await Future.delayed(Duration(seconds: 2));
+
+    // ❌ NO cerrar los StreamControllers, solo vaciar listas
+    connectedDevices.clear();
     _subscriptions.clear();
-
-    for (var sub in _connectionStreams.values) {
-      await sub.cancel();
-    }
     _connectionStreams.clear();
-
-    // 🔴 Cerrar todos los StreamControllers
-    for (var controller in _deviceConnectionStateControllers.values) {
-      if (!controller.isClosed) {
-        await controller.close();
-      }
-    }
-    _deviceConnectionStateControllers.clear();
-
-    if (!_deviceUpdatesController.isClosed) {
-      await _deviceUpdatesController.close();
-    }
-
-
-    debugPrint("✅ BLE limpiado completamente.");
+    debugPrint("✅ BLE limpiado sin cerrar StreamControllers.");
   }
+
 
   bool get isConnected => _connected;
 
