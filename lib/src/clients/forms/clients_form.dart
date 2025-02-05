@@ -92,13 +92,11 @@ class PersonalDataFormState extends State<PersonalDataForm> {
         selectedGender == null ||
         selectedOption == null ||
         _birthDate == null ||
-        !_emailController.text.contains('@')) {
-      // Verificación de '@' en el correo
+        !_emailController.text.contains('@')) { // Verificación básica de correo
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            tr(context, 'Por favor, complete todos los campos correctamente')
-                .toUpperCase(),
+            tr(context, 'Por favor, complete todos los campos correctamente').toUpperCase(),
             style: const TextStyle(color: Colors.white, fontSize: 17),
           ),
           backgroundColor: Colors.red,
@@ -145,9 +143,25 @@ class PersonalDataFormState extends State<PersonalDataForm> {
     };
 
     DatabaseHelper dbHelper = DatabaseHelper();
-    await dbHelper.insertClient(clientData);
 
-    print('Datos del cliente insertados: $clientData');
+    // 🔹 Insertar cliente y obtener el ID creado
+    int? clienteId = await dbHelper.insertClient(clientData);
+
+    if (clienteId != null) {
+      print('✔ Cliente insertado con ID: $clienteId');
+
+      // 🔹 Asignar todos los grupos musculares al cliente recién creado
+      bool gruposInsertados = await dbHelper.insertClientAllGroups(clienteId);
+
+      if (gruposInsertados) {
+        print('✔ Todos los grupos musculares asignados correctamente al cliente.');
+      } else {
+        print('❌ Error al asignar grupos musculares al cliente.');
+      }
+    } else {
+      print('❌ Error al insertar el cliente en la base de datos.');
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -161,9 +175,8 @@ class PersonalDataFormState extends State<PersonalDataForm> {
     );
 
     // Llama a la función onDataChanged para informar de los datos
-    widget.onDataChanged(clientData); // Aquí notificamos que los datos fueron guardados
+    widget.onDataChanged(clientData);
   }
-
 
 
 

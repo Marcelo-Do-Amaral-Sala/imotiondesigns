@@ -3754,20 +3754,23 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
   /*METODOS DE INSERCION BBDD*/
 
-  // Insertar un cliente
-  Future<void> insertClient(Map<String, dynamic> client) async {
+// Insertar un cliente y devolver el ID generado
+  Future<int?> insertClient(Map<String, dynamic> client) async {
     final db = await database;
     try {
-      await db.insert(
+      int clienteId = await db.insert(
         'clientes',
         client,
-        conflictAlgorithm:
-            ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        conflictAlgorithm: ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
+      print('✔ Cliente insertado con ID: $clienteId');
+      return clienteId; // Retornar el ID del cliente insertado
     } catch (e) {
-      print('Error inserting client: $e');
+      print('❌ Error al insertar el cliente: $e');
+      return null; // Retornar null si hay error
     }
   }
+
 
   // Insertar relación entre un cliente y un grupo muscular
   Future<bool> insertClientGroup(int clienteId, int grupoMuscularId) async {
@@ -3788,6 +3791,42 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       return false; // Si ocurrió un error, retorna false
     }
   }
+
+  // Insertar relación entre un cliente y TODOS los grupos musculares
+  Future<bool> insertClientAllGroups(int clienteId) async {
+    final db = await database;
+    try {
+      // Obtener todos los IDs de los grupos musculares
+      final List<Map<String, dynamic>> grupos = await db.query('grupos_musculares', columns: ['id']);
+
+      if (grupos.isEmpty) {
+        print('No hay grupos musculares en la base de datos.');
+        return false;
+      }
+
+      // Iniciar una transacción para mejor rendimiento
+      await db.transaction((txn) async {
+        for (var grupo in grupos) {
+          await txn.insert(
+            'clientes_grupos_musculares',
+            {
+              'cliente_id': clienteId,
+              'grupo_muscular_id': grupo['id'],
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+      });
+
+      print('✔ Todos los grupos musculares fueron insertados para el cliente $clienteId');
+      return true;
+
+    } catch (e) {
+      print('❌ Error al insertar todos los grupos musculares para el cliente: $e');
+      return false;
+    }
+  }
+
 
   // Insertar un bono
   Future<void> insertBono(Map<String, dynamic> bono) async {

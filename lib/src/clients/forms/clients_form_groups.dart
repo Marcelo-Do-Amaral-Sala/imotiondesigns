@@ -25,6 +25,7 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
   final _indexController = TextEditingController();
   final _nameController = TextEditingController();
   String? selectedOption;
+  int? clientId;
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
   Map<String, dynamic>? selectedClient;
@@ -58,22 +59,56 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     super.dispose();
   }
 
+  // Obtener los IDs de los grupos seleccionados
+  List<int> getSelectedGroupIds() {
+    List<int> selectedGroupIds = [];
+    selectedGroups.forEach((groupName, isSelected) {
+      if (isSelected) {
+        selectedGroupIds.add(groupIds[
+        groupName]!); // Añadir el ID del grupo si está seleccionado
+      }
+    });
+    return selectedGroupIds;
+  }
 
-  // Método para obtener los grupos musculares desde la base de datos
+
   Future<void> loadMuscleGroups() async {
-    final db = await openDatabase(
-        'my_database.db'); // Asegúrate de tener la ruta correcta de la base de datos
-    final List<Map<String, dynamic>> result =
-        await db.query('grupos_musculares');
+    final db = await openDatabase('my_database.db');
 
-    // Inicializar selectedGroups y hintColors con los grupos musculares obtenidos
+    // 1. Obtener todos los grupos musculares disponibles
+    final List<Map<String, dynamic>> result =
+    await db.query('grupos_musculares');
+
+    // 2. Obtener los grupos musculares asociados a este cliente
+    final List<Map<String, dynamic>> clientGroupsResult = await db.rawQuery('''
+    SELECT g.id, g.nombre
+    FROM grupos_musculares g
+    INNER JOIN clientes_grupos_musculares cg ON g.id = cg.grupo_muscular_id
+    WHERE cg.cliente_id = ?
+  ''', [clientId]);
+
+    // Actualizar el estado de los grupos y sus colores
     setState(() {
-      selectedGroups = {for (var row in result) row['nombre']: true};
-      hintColors = {
-        for (var row in result) row['nombre']: const Color(0xFF2be4f3)
-      };
+      selectedGroups = {for (var row in result) row['nombre']: false};
+      hintColors = {for (var row in result) row['nombre']: Colors.white};
       groupIds = {for (var row in result) row['nombre']: row['id']};
       imagePaths = {for (var row in result) row['nombre']: row['imagen']};
+
+      // Marcar los grupos asociados al cliente como seleccionados
+      for (var group in clientGroupsResult) {
+        final groupName = group['nombre'];
+        if (groupName != null) {
+          selectedGroups[groupName] = true;
+          hintColors[groupName] =
+          const Color(0xFF2be4f3); // Color para los grupos seleccionados
+        }
+      }
+    });
+
+    // Imprimir los grupos asociados al cliente (clientGroupsResult)
+    print("Grupos musculares asociados al cliente $clientId:");
+    clientGroupsResult.forEach((group) {
+      print("- ${group['nombre']} (ID: ${group['id']})");
     });
   }
 
@@ -85,58 +120,42 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     if (client != null) {
       setState(() {
         selectedClient = client;
-        _indexController.text = client['id'].toString();
+        clientId= client['id'].toInt();
         _nameController.text = client['name'] ?? '';
         selectedOption = client['status'];
       });
     }
   }
 
-// Función para insertar la relación entre cliente y grupos musculares
-  Future<void> insertClientGroups(
-      int clienteId, List<int> grupoMuscularIds) async {
-    // Variable para acumular el éxito de las inserciones
-    bool allSuccess = true;
+  // Función para actualizar los grupos musculares del cliente
+  Future<void> updateClientGroups() async {
+    List<int> selectedGroupIds =
+    getSelectedGroupIds(); // Obtener los IDs de los grupos seleccionados
 
-    // Imprimir los datos antes de intentar insertar las relaciones
-    print(
-        "Intentando insertar relaciones: Cliente ID: $clienteId, Grupos Musculares IDs: $grupoMuscularIds");
+    // Llamar al método en DatabaseHelper para actualizar la relación en la tabla
+    await dbHelper.updateClientGroups(clientId!, selectedGroupIds);
 
-    // Recorrer la lista de grupos musculares e insertar cada uno
-    for (int grupoMuscularId in grupoMuscularIds) {
-      bool success =
-          await dbHelper.insertClientGroup(clienteId, grupoMuscularId);
+    // Imprimir los grupos actualizados
+    print("Grupos musculares actualizados para el cliente $clientId:");
+    selectedGroupIds.forEach((groupId) {
+      final groupName =
+      groupIds.keys.firstWhere((key) => groupIds[key] == groupId);
+      print("- $groupName (ID: $groupId)");
+    });
 
-      if (!success) {
-        allSuccess = false; // Si alguna inserción falla, cambiamos el estado
-        break; // Salimos del bucle si alguna inserción falla
-      }
-    }
-
-    // Mostrar el SnackBar solo una vez, dependiendo del resultado final
-    if (allSuccess) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            tr(context, 'Grupos añadidos correctamente').toUpperCase(),
-            style: TextStyle(color: Colors.white, fontSize: 17.sp),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          tr(context, 'Grupos actualizados correctamente').toUpperCase(),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 17.sp,
           ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
         ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "No se han podido añadir todos los grupos",
-            style: TextStyle(color: Colors.white, fontSize: 17),
-          ),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+        backgroundColor: const Color(0xFF2be4f3),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   /// Crear el checkbox redondo personalizado
@@ -557,37 +576,9 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
-                      // Crear una lista para los IDs de los grupos seleccionados
-                      List<int> selectedGroupIds = [];
-
-                      // Recoger los grupos seleccionados
-                      for (var groupName in selectedGroups.keys) {
-                        if (selectedGroups[groupName] == true) {
-                          int grupoMuscularId = groupIds[groupName]!;
-                          selectedGroupIds.add(grupoMuscularId);
-                        }
-                      }
-
-                      // Permitir guardar solo si hay al menos un grupo seleccionado
-                      if (selectedGroupIds.isNotEmpty) {
-                        int clienteId = selectedClient!['id']; // Obtener el ID del cliente
-                        await insertClientGroups(clienteId, selectedGroupIds);
-                        widget.onClose();
-                      } else {
-                        // Mostrar mensaje y evitar el guardado si no hay grupos seleccionados
-                        ScaffoldMessenger.of(context).showSnackBar(
-                           SnackBar(
-                            content: Text(
-                              "Debes seleccionar al menos un grupo muscular",
-                              style: TextStyle(color: Colors.white, fontSize: 17.sp),
-                            ),
-                            backgroundColor: Colors.orange,
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      }
+                      updateClientGroups();
+                      widget.onClose();
                     },
-
                     child: AnimatedScale(
                       scale: scaleFactorTick,
                       duration: const Duration(milliseconds: 100),
