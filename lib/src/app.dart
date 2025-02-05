@@ -83,6 +83,8 @@ class _AppState extends State<App> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -106,7 +108,7 @@ class _AppState extends State<App> {
             MainMenuView(
               key: _menuKey,
               onNavigateToLogin: () => changePage(9),
-              onNavigateToPanel: openPanelView, // 🔹 Abre `PanelView` con `Navigator`
+              onNavigateToPanel: () => openPanelView(), // 🔹 Ahora pasamos `context`
               onNavigateToClients: () => changePage(2),
               onNavigateToPrograms: () => changePage(3),
               onNavigateToAjustes: () => changePage(4),

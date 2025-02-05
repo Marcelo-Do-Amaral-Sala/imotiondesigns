@@ -407,10 +407,6 @@ class LoginViewState extends State<LoginView> {
                                   // Cerrar el teclado
                                   FocusScope.of(context).unfocus();
 
-                                  // Esperar un pequeño retraso para asegurar que el teclado se cierre
-                                  await Future.delayed(
-                                      const Duration(milliseconds: 300));
-
                                   // Llamar a la función de validación
                                   await _validateLogin();
                                 },
@@ -516,7 +512,7 @@ class LoginViewState extends State<LoginView> {
         // 🔹 Guardar userId solo si va al MainMenu
         await _saveUserToPrefs(userId, tipoPerfil);
 
-        await Future.delayed(const Duration(seconds: 1));
+        await Future.delayed(const Duration(milliseconds: 10));
         widget.onNavigateToMainMenu();
       }
     } else {

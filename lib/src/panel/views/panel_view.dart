@@ -1521,18 +1521,6 @@ class _PanelViewState extends State<PanelView>
                     OutlinedButton(
                       onPressed: () async {
                         try {
-                          // 🔥 Bloquear interacción para evitar doble ejecución
-                          if (kDebugMode) {
-                            print("🛑 Cerrando BLE Connections antes de salir...");
-                          }
-
-                          // 🔥 Esperar a que `disposeBle()` se complete antes de continuar
-                          await bleConnectionService.disposeBle();
-
-                          if (kDebugMode) {
-                            print("✅ BLE completamente cerrado. Ahora se cerrará la vista.");
-                          }
-
                           // 🔥 SOLO después de que `disposeBle()` haya terminado, ejecutar `onBack()`
                           widget.onBack();
                           Navigator.of(context).pop();

@@ -159,14 +159,13 @@ class MainMenuViewState extends State<MainMenuView>
                     ),
                     OutlinedButton(
                       onPressed: () async {
+                        Navigator.of(context).pop();
                         await clearLoginData();
-
                         setState(() {
                           userId = null;
                           userTipoPerfil = null;
                         });
 
-                        Navigator.of(context).pop();
                         widget.onNavigateToLogin();
                       },
                       style: OutlinedButton.styleFrom(
@@ -309,7 +308,7 @@ class MainMenuViewState extends State<MainMenuView>
                                   setState(() => scaleFactorPanel = 1); // 🔹 Restaurar tamaño antes de navegar
 
                                   // 🔹 Esperar 200ms antes de navegar para asegurarnos de que el botón recupere su tamaño
-                                  await Future.delayed(Duration(milliseconds: 200));
+                                  await Future.delayed(const Duration(milliseconds: 200));
 
                                   Navigator.push(
                                     context,
@@ -321,17 +320,7 @@ class MainMenuViewState extends State<MainMenuView>
                                           MaterialPageRoute(
                                             builder: (context) => PanelView(
                                               onBack: () => Navigator.pop(context),
-                                              onReset: () => Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => PanelView(
-                                                    onBack: () => Navigator.pop(context),
-                                                    onReset: () {}, // 🔹 Evita bucle infinito en navegación
-                                                    screenWidth: MediaQuery.of(context).size.width,
-                                                    screenHeight: MediaQuery.of(context).size.height,
-                                                  ),
-                                                ),
-                                              ),
+                                              onReset: () {}, // 🔹 Evita bucle infinito en navegación
                                               screenWidth: MediaQuery.of(context).size.width,
                                               screenHeight: MediaQuery.of(context).size.height,
                                             ),
@@ -345,7 +334,7 @@ class MainMenuViewState extends State<MainMenuView>
                                     setState(() => scaleFactorPanel = 1); // 🔹 Restaurar tamaño al volver
                                   });
                                 },
-                                    () => setState(() => scaleFactorPanel = 0.90),
+                                    () => setState(() => scaleFactorPanel = 1),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
