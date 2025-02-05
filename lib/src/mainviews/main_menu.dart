@@ -54,6 +54,9 @@ class MainMenuViewState extends State<MainMenuView>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
   }
   @override
   void didChangeDependencies() {
