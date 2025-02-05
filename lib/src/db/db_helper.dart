@@ -292,7 +292,7 @@ class DatabaseHelper {
         contraccion REAL,
         pausa REAL,
         tipo TEXT,
-        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET', 'AMBOS'))
       );
     ''');
     print("Tabla 'programas_predeterminados' creada.");
@@ -432,7 +432,7 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 1,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET' // Equipamiento seleccionado
+        'tipo_equipamiento': 'AMBOS' // Equipamiento seleccionado
       });
 
       print("Programa insertado con ID: $programaId1");
@@ -494,7 +494,7 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId2");
@@ -550,7 +550,7 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 3,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId3");
@@ -604,7 +604,7 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId4");
@@ -687,7 +687,7 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId5");
@@ -752,7 +752,7 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId6");
@@ -817,7 +817,7 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId7");
@@ -882,7 +882,7 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
       print("Programa insertado con ID: $programaId8");
 
@@ -946,7 +946,7 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId9");
@@ -1011,7 +1011,7 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId10");
@@ -1076,7 +1076,7 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId11");
@@ -1141,7 +1141,7 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId12");
@@ -1206,7 +1206,7 @@ class DatabaseHelper {
         'contraccion': 10,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
       print("Programa insertado con ID: $programaId13");
 
@@ -1270,7 +1270,7 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId14");
@@ -1335,7 +1335,7 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
       print("Programa insertado con ID: $programaId15");
 
@@ -1399,7 +1399,7 @@ class DatabaseHelper {
         'contraccion': 4,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId16");
@@ -1464,7 +1464,7 @@ class DatabaseHelper {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId17");
@@ -1529,7 +1529,7 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 1,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId18");
@@ -1593,7 +1593,7 @@ class DatabaseHelper {
         'contraccion': 10,
         'pausa': 1,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId19");
@@ -1657,7 +1657,7 @@ class DatabaseHelper {
         'contraccion': 3,
         'pausa': 2,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId20");
@@ -1797,7 +1797,7 @@ class DatabaseHelper {
         'contraccion': 5,
         'pausa': 3,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId22");
@@ -1861,7 +1861,7 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId23");
@@ -1925,7 +1925,7 @@ class DatabaseHelper {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId24");
@@ -1987,7 +1987,7 @@ class DatabaseHelper {
         imagen TEXT,
         descripcion TEXT,
         duracionTotal REAL,
-        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+         tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET', 'AMBOS'))
       );
     ''');
 
@@ -2012,7 +2012,7 @@ class DatabaseHelper {
           'imagen': 'assets/images/TONING.png',
           'descripcion': 'Aumento de la resistencia y retraso de la fatiga.',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2349,7 +2349,7 @@ class DatabaseHelper {
           'imagen': 'assets/images/SUELOPELV.png',
           'descripcion': 'Fortalece los músculos del suelo pélvico',
           'duracionTotal': 25, // Duración total del programa en minutos
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2519,7 +2519,7 @@ class DatabaseHelper {
           'descripcion':
               'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
           'duracionTotal': 25, // Duración total del programa en minutos
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2668,7 +2668,7 @@ class DatabaseHelper {
           'descripcion':
               'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
           'duracionTotal': 25, // Duración total del programa en minutos
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2977,7 +2977,7 @@ class DatabaseHelper {
           'descripcion':
               'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3144,7 +3144,7 @@ class DatabaseHelper {
           'descripcion':
               'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3329,7 +3329,7 @@ class DatabaseHelper {
           'descripcion':
               'Programa experto. Entrenamiento para la mejora de la condición física.',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles

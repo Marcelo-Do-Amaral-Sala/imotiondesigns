@@ -298,7 +298,7 @@ class DatabaseHelperPC {
         contraccion REAL,
         pausa REAL,
         tipo TEXT,
-        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+         tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET', 'AMBOS'))
       );
     ''');
     print("Tabla 'programas_predeterminados' creada.");
@@ -438,7 +438,7 @@ class DatabaseHelperPC {
         'contraccion': 4,
         'pausa': 1,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET' // Equipamiento seleccionado
+        'tipo_equipamiento': 'AMBOS' // Equipamiento seleccionado
       });
 
       print("Programa insertado con ID: $programaId1");
@@ -500,7 +500,7 @@ class DatabaseHelperPC {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId2");
@@ -556,7 +556,7 @@ class DatabaseHelperPC {
         'contraccion': 5,
         'pausa': 3,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId3");
@@ -610,7 +610,7 @@ class DatabaseHelperPC {
         'contraccion': 6,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId4");
@@ -693,7 +693,7 @@ class DatabaseHelperPC {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId5");
@@ -758,7 +758,7 @@ class DatabaseHelperPC {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId6");
@@ -823,7 +823,7 @@ class DatabaseHelperPC {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId7");
@@ -888,7 +888,7 @@ class DatabaseHelperPC {
         'contraccion': 4,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
       print("Programa insertado con ID: $programaId8");
 
@@ -952,7 +952,7 @@ class DatabaseHelperPC {
         'contraccion': 5,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId9");
@@ -1017,7 +1017,7 @@ class DatabaseHelperPC {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId10");
@@ -1082,7 +1082,7 @@ class DatabaseHelperPC {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId11");
@@ -1147,7 +1147,7 @@ class DatabaseHelperPC {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId12");
@@ -1212,7 +1212,7 @@ class DatabaseHelperPC {
         'contraccion': 10,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
       print("Programa insertado con ID: $programaId13");
 
@@ -1276,7 +1276,7 @@ class DatabaseHelperPC {
         'contraccion': 6,
         'pausa': 2,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId14");
@@ -1341,7 +1341,7 @@ class DatabaseHelperPC {
         'contraccion': 4,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
       print("Programa insertado con ID: $programaId15");
 
@@ -1405,7 +1405,7 @@ class DatabaseHelperPC {
         'contraccion': 4,
         'pausa': 4,
         'tipo': 'Individual',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId16");
@@ -1470,7 +1470,7 @@ class DatabaseHelperPC {
         'contraccion': 6,
         'pausa': 3,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId17");
@@ -1535,7 +1535,7 @@ class DatabaseHelperPC {
         'contraccion': 5,
         'pausa': 1,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId18");
@@ -1599,7 +1599,7 @@ class DatabaseHelperPC {
         'contraccion': 10,
         'pausa': 1,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId19");
@@ -1663,7 +1663,7 @@ class DatabaseHelperPC {
         'contraccion': 3,
         'pausa': 2,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId20");
@@ -1803,7 +1803,7 @@ class DatabaseHelperPC {
         'contraccion': 5,
         'pausa': 3,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId22");
@@ -1867,7 +1867,7 @@ class DatabaseHelperPC {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId23");
@@ -1931,7 +1931,7 @@ class DatabaseHelperPC {
         'contraccion': 1,
         'pausa': 0,
         'tipo': 'Recovery',
-        'tipo_equipamiento': 'BIO-JACKET'
+        'tipo_equipamiento': 'AMBOS'
       });
 
       print("Programa insertado con ID: $programaId24");
@@ -1993,7 +1993,7 @@ class DatabaseHelperPC {
         imagen TEXT,
         descripcion TEXT,
         duracionTotal REAL,
-        tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET'))
+     tipo_equipamiento TEXT CHECK(tipo_equipamiento IN ('BIO-SHAPE', 'BIO-JACKET', 'AMBOS'))
       );
     ''');
 
@@ -2018,7 +2018,7 @@ class DatabaseHelperPC {
           'imagen': 'assets/images/TONING.png',
           'descripcion': 'Aumento de la resistencia y retraso de la fatiga.',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2355,7 +2355,7 @@ class DatabaseHelperPC {
           'imagen': 'assets/images/SUELOPELV.png',
           'descripcion': 'Fortalece los músculos del suelo pélvico',
           'duracionTotal': 25, // Duración total del programa en minutos
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2525,7 +2525,7 @@ class DatabaseHelperPC {
           'descripcion':
           'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
           'duracionTotal': 25, // Duración total del programa en minutos
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2674,7 +2674,7 @@ class DatabaseHelperPC {
           'descripcion':
           'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
           'duracionTotal': 25, // Duración total del programa en minutos
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -2983,7 +2983,7 @@ class DatabaseHelperPC {
           'descripcion':
           'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3150,7 +3150,7 @@ class DatabaseHelperPC {
           'descripcion':
           'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3335,7 +3335,7 @@ class DatabaseHelperPC {
           'descripcion':
           'Programa experto. Entrenamiento para la mejora de la condición física.',
           'duracionTotal': 25,
-          'tipo_equipamiento': 'BIO-JACKET',
+          'tipo_equipamiento': 'AMBOS',
         });
 
         // Lista de subprogramas con sus detalles
@@ -3760,20 +3760,23 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
   /*METODOS DE INSERCION BBDD*/
 
-  // Insertar un cliente
-  Future<void> insertClient(Map<String, dynamic> client) async {
+// Insertar un cliente y devolver el ID generado
+  Future<int?> insertClient(Map<String, dynamic> client) async {
     final db = await database;
     try {
-      await db.insert(
+      int clienteId = await db.insert(
         'clientes',
         client,
-        conflictAlgorithm:
-        ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
+        conflictAlgorithm: ConflictAlgorithm.replace, // Reemplazar en caso de conflicto
       );
+      print('✔ Cliente insertado con ID: $clienteId');
+      return clienteId; // Retornar el ID del cliente insertado
     } catch (e) {
-      print('Error inserting client: $e');
+      print('❌ Error al insertar el cliente: $e');
+      return null; // Retornar null si hay error
     }
   }
+
 
   // Insertar relación entre un cliente y un grupo muscular
   Future<bool> insertClientGroup(int clienteId, int grupoMuscularId) async {
@@ -3794,6 +3797,42 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
       return false; // Si ocurrió un error, retorna false
     }
   }
+
+  // Insertar relación entre un cliente y TODOS los grupos musculares
+  Future<bool> insertClientAllGroups(int clienteId) async {
+    final db = await database;
+    try {
+      // Obtener todos los IDs de los grupos musculares
+      final List<Map<String, dynamic>> grupos = await db.query('grupos_musculares', columns: ['id']);
+
+      if (grupos.isEmpty) {
+        print('No hay grupos musculares en la base de datos.');
+        return false;
+      }
+
+      // Iniciar una transacción para mejor rendimiento
+      await db.transaction((txn) async {
+        for (var grupo in grupos) {
+          await txn.insert(
+            'clientes_grupos_musculares',
+            {
+              'cliente_id': clienteId,
+              'grupo_muscular_id': grupo['id'],
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+      });
+
+      print('✔ Todos los grupos musculares fueron insertados para el cliente $clienteId');
+      return true;
+
+    } catch (e) {
+      print('❌ Error al insertar todos los grupos musculares para el cliente: $e');
+      return false;
+    }
+  }
+
 
   // Insertar un bono
   Future<void> insertBono(Map<String, dynamic> bono) async {
@@ -4270,6 +4309,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     return result;
   }
 
+
   // Obtener todos los bonos
   Future<List<Map<String, dynamic>>> getAllBonos() async {
     final db = await database;
@@ -4564,7 +4604,7 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
   Future<List<Map<String, dynamic>>> obtenerCronaxiasPorPrograma(
       Database db, int programaId) async {
     return await db.rawQuery('''
-    SELECT c.nombre, pc.valor
+    SELECT c.id, c.nombre, pc.valor
     FROM programa_cronaxia AS pc
     INNER JOIN cronaxia AS c ON pc.cronaxia_id = c.id
     WHERE pc.programa_id = ?
