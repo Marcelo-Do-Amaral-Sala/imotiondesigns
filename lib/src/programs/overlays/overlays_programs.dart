@@ -119,9 +119,6 @@ class _OverlayAutoState extends State<OverlayAuto> {
     var program =
         selectedProgram!; // Obtenemos los datos del programa seleccionado
 
-    // Debug print para verificar la estructura de los datos
-    debugPrint('Selected Program: ${program.toString()}');
-
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: MediaQuery.of(context).size.width * 0.02,
@@ -322,8 +319,6 @@ class OverlayCrearPrograma extends StatefulWidget {
 class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Map<String, dynamic>?
-      selectedClientData; // Nullable Map, no late initialization required
 
   @override
   void initState() {

@@ -65,6 +65,9 @@ class MainMenuViewState extends State<MainMenuView>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      FocusScope.of(context).unfocus();
+    });
     checkUserProfile();
   }
 
@@ -171,6 +174,7 @@ class MainMenuViewState extends State<MainMenuView>
                 OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Cerrar el diálogo
+                    FocusScope.of(context).unfocus();
                   },
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
@@ -562,7 +566,7 @@ class MainMenuViewState extends State<MainMenuView>
                                     height: screenHeight * 0.1,
                                     child: ClipOval(
                                       child: Image.asset(
-                                        'assets/images/back2.png',
+                                        'assets/images/back.png',
                                         fit: BoxFit.scaleDown,
                                       ),
                                     ),

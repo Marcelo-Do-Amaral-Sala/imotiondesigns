@@ -83,8 +83,6 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
       final programData = await DatabaseHelper().getAllPrograms();
 
-      // Verifica el contenido de los datos obtenidos
-      print('Programas obtenidos: $programData');
 
       // Actualizamos el estado con los programas obtenidos
       setState(() {
@@ -639,7 +637,6 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
 
     return secuencias;
   }
-
   Future<void> _addProgramaAuto(BuildContext context) async {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -654,86 +651,101 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
             side: BorderSide(color: Color(0xFF2be4f3), width: screenWidth * 0.001),
             borderRadius: BorderRadius.circular(7),
           ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // Ajuste dinámico
-              children: [
-                Container(
-                  width: screenWidth,
-                  height: screenHeight * 0.1,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    border: const Border(bottom: BorderSide(color: Color(0xFF2be4f3))),
+          child: StatefulBuilder(
+            builder: (BuildContext context, void Function(void Function()) setState) {
+              return AnimatedPadding(
+                duration: const Duration(milliseconds: 300),
+                padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: screenHeight * 0.6,
+                    maxWidth: screenWidth * 0.6,
                   ),
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: Text(
-                          tr(context, 'Agregar programa automático').toUpperCase(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.bold, color: const Color(0xFF2be4f3)),
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: IconButton(
-                          onPressed: () {
-                            _descController.clear();
-                            Navigator.of(context).pop();
-                          },
-                          icon: Icon(Icons.close_sharp, color: Colors.white, size: screenHeight * 0.07),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        tr(context, "¡Estás a un paso de terminar! Solo falta añadir una descripción para guardar tu programa"),
-                        style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold, color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: screenHeight * 0.05),
-                      TextField(
-                        controller: _descController,
-                        maxLines: 4,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.done,
-                        style: _inputTextStyle,
-                        decoration: _inputDecorationStyle(hintText: tr(context, 'Añadir una descripción')),
-                      ),
-                      SizedBox(height: screenHeight * 0.05),
-                      GestureDetector(
-                        onTap: () async {
-                          _crearProgramaAutomatico();
-                          Navigator.pop(context);
-                          await widget.onClose();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                tr(context, "Programa automático creado correctamente").toUpperCase(),
-                                style: TextStyle(color: Colors.white, fontSize: 17.sp),
+                      // Encabezado del diálogo
+                      Container(
+                        width: screenWidth,
+                        height: screenHeight * 0.1,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(7),
+                          border: const Border(bottom: BorderSide(color: Color(0xFF2be4f3))),
+                        ),
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Text(
+                                tr(context, 'Agregar programa automático').toUpperCase(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.bold, color: const Color(0xFF2be4f3)),
                               ),
-                              backgroundColor: Colors.green,
-                              duration: const Duration(seconds: 2),
                             ),
-                          );
-                        },
-                        child: SizedBox(
-                          width: screenWidth * 0.1,
-                          height: screenHeight * 0.1,
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/tick.png',
-                              fit: BoxFit.contain,
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              bottom: 0,
+                              child: IconButton(
+                                onPressed: () {
+                                  _descController.clear();
+                                  Navigator.of(context).pop();
+                                },
+                                icon: Icon(Icons.close_sharp, color: Colors.white, size: screenHeight * 0.07),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.01),
+                      // Contenido desplazable
+                      Flexible(
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  tr(context, "¡Estás a un paso de terminar! Solo falta añadir una descripción para guardar tu programa"),
+                                  style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold, color: Colors.white),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: screenHeight * 0.05),
+                                TextField(
+                                  controller: _descController,
+                                  maxLines: 4,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.done,
+                                  style: _inputTextStyle,
+                                  decoration: _inputDecorationStyle(hintText: tr(context, 'Añadir una descripción'),isdesc: true),
+                                ),
+                                SizedBox(height: screenHeight * 0.05),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      _crearProgramaAutomatico();
+                                      Navigator.pop(context);
+                                      await widget.onClose();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            tr(context, "Programa automático creado correctamente").toUpperCase(),
+                                            style: TextStyle(color: Colors.white, fontSize: 17.sp),
+                                          ),
+                                          backgroundColor: Colors.green,
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
+                                    },
+                                    child: ClipOval(
+                                      child: Image.asset('assets/images/tick.png', width: screenWidth * 0.1, height: screenHeight * 0.1),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -741,8 +753,8 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                     ],
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         );
       },
@@ -759,292 +771,230 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         String? localSelectedProgram = selectedProgramOption;
-        int? localSelectedProgramId =
-            null; // Variable para almacenar el ID del programa seleccionado
+        int? localSelectedProgramId;
 
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
-            side:  BorderSide(color: Color(0xFF2be4f3), width: screenWidth*0.001),
+            side: BorderSide(
+                color: Color(0xFF2be4f3), width: screenWidth * 0.001),
             borderRadius: BorderRadius.circular(7),
           ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.6,
-              maxWidth: screenWidth * 0.6,
-            ),
-            child: StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Encabezado del diálogo
-                    Container(
-                      width: screenWidth,
-                      height: screenHeight * 0.1,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(7),
-                        border: const Border(
-                          bottom: BorderSide(color: Color(0xFF2be4f3)),
-                        ),
-                      ),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Text(
-                              tr(context, 'Crear secuencia').toUpperCase(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 30.sp,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF2be4f3),
-                              ),
-                            ),
+          child: StatefulBuilder(
+            builder: (BuildContext context,
+                void Function(void Function()) setState) {
+              return AnimatedPadding(
+                duration: const Duration(milliseconds: 300),
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: screenHeight * 0.6,
+                    maxWidth: screenWidth * 0.6,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Encabezado del diálogo
+                      Container(
+                        width: screenWidth,
+                        height: screenHeight * 0.1,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(7),
+                          border: const Border(
+                            bottom: BorderSide(color: Color(0xFF2be4f3)),
                           ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: IconButton(
-                              onPressed: () {
-                                _descController.clear();
-                                _ordenController.clear();
-                                _tiempoController.clear();
-                                _ajusteController.clear();
-                                Navigator.of(context).pop();
-                              },
-                              icon: Icon(
-                                Icons.close_sharp,
-                                color: Colors.white,
-                                size: screenHeight*0.07,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.01),
-                    Flexible(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.02,
-                          vertical: MediaQuery.of(context).size.height * 0.02,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Stack(
                           children: [
-                            Text(
-                                tr(context, 'Selección programa').toUpperCase(),
-                                style: _labelStyle),
-                            SizedBox(height: screenHeight * 0.01),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding:  EdgeInsets.symmetric(
-                                    horizontal: MediaQuery.of(context).size.width * 0.05),
-                                  width: screenWidth * 0.3,
-                                  alignment: Alignment.centerLeft,
-                                  decoration: _inputDecoration(),
-                                  child: DropdownButton<String>(
-                                    value: localSelectedProgram,
-                                    items: allPrograms.map((program) {
-                                      return DropdownMenuItem<String>(
-                                        value: program['nombre'],
-                                        child: Text(
-                                          '${program['id_programa']} - ${program['nombre']}',
-                                          style: _dropdownItemStyle,
-                                        ),
-                                      );
-                                    }).toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        localSelectedProgram = value;
-                                        // Al seleccionar un programa, guardar su ID también
-                                        localSelectedProgramId =
-                                            allPrograms.firstWhere((program) =>
-                                                program['nombre'] ==
-                                                value)['id_programa'];
-                                      });
-                                    },
-                                    dropdownColor: const Color(0xFF313030),
-                                    icon:  Icon(Icons.arrow_drop_down,
-                                        color: Color(0xFF2be4f3), size: screenHeight*0.05),
-                                    hint: Text(
-                                      tr(context, 'Seleccione un programa'),
-                                      style: _dropdownHintStyle,
-                                    ),
-                                  ),
+                            Center(
+                              child: Text(
+                                tr(context, 'Crear secuencia').toUpperCase(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 30.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF2be4f3),
                                 ),
-                              ],
+                              ),
                             ),
-                            SizedBox(height: screenHeight * 0.05),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: screenWidth * 0.02),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(tr(context, 'Orden').toUpperCase(),
-                                          style: _labelStyle),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        decoration: _inputDecoration(),
-                                        child: TextField(
-                                          controller: _ordenController,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                          ],
-                                          style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(
-                                              hintText: ''),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              bottom: 0,
+                              child: IconButton(
+                                onPressed: () {
+                                  _descController.clear();
+                                  _ordenController.clear();
+                                  _tiempoController.clear();
+                                  _ajusteController.clear();
+                                  Navigator.of(context).pop();
+                                },
+                                icon: Icon(
+                                  Icons.close_sharp,
+                                  color: Colors.white,
+                                  size: screenHeight * 0.07,
                                 ),
-                                SizedBox(width: screenWidth * 0.02),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                          '${tr(context, 'Duración').toUpperCase()} (s)',
-                                          style: _labelStyle),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        decoration: _inputDecoration(),
-                                        child: TextField(
-                                          controller: _tiempoController,
-                                          keyboardType: const TextInputType
-                                              .numberWithOptions(decimal: true),
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'^\d*\.?\d*$')),
-                                            // Permite números enteros y decimales
-                                          ],
-                                          style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(
-                                              hintText: '', enabled: true),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: screenWidth * 0.02),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(tr(context, 'Ajuste').toUpperCase(),
-                                          style: _labelStyle),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        decoration: _inputDecoration(),
-                                        child: TextField(
-                                          controller: _ajusteController,
-                                          keyboardType: const TextInputType
-                                              .numberWithOptions(decimal: true),
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'^\d*\.?\d*$')),
-                                            // Permite números enteros y decimales
-                                          ],
-                                          style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(
-                                              hintText: '', enabled: true),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: screenHeight * 0.05),
-                            const Spacer(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTapDown: (_) =>
-                                      setState(() => scaleFactorTick = 0.9),
-                                  onTapUp: (_) =>
-                                      setState(() => scaleFactorTick = 1.0),
-                                  onTap: () async {
-                                    // Verificar los valores que se están recogiendo
-                                    print(
-                                        "Programa Seleccionado: $localSelectedProgram");
-                                    print(
-                                        "ID Programa Seleccionado: $localSelectedProgramId");
-                                    print("Orden: ${_ordenController.text}");
-                                    print(
-                                        "Duración: ${_tiempoController.text}");
-                                    print("Ajuste: ${_ajusteController.text}");
-
-                                    // Guardar la secuencia y actualizar la UI
-                                    if (localSelectedProgram != null &&
-                                        localSelectedProgramId != null) {
-                                      Map<String, dynamic> nuevaSecuencia = {
-                                        'programa': localSelectedProgram,
-                                        'id_programa': localSelectedProgramId,
-                                        // Guardar el ID del programa
-                                        'orden': _ordenController.text,
-                                        'duracion': _tiempoController.text,
-                                        'ajuste': _ajusteController.text,
-                                      };
-
-                                      _addSecuenciaCallback(
-                                          nuevaSecuencia); // Actualiza el estado en el widget principal
-
-                                      // Limpiar los campos
-                                      _ordenController.clear();
-                                      _tiempoController.clear();
-                                      _ajusteController.clear();
-
-                                      setState(
-                                          () {}); // Asegúrate de que el diálogo se actualice
-
-                                      Navigator.of(context)
-                                          .pop(); // Cerrar el diálogo
-                                    }
-                                  },
-                                  child: AnimatedScale(
-                                    scale: scaleFactorTick,
-                                    duration: const Duration(milliseconds: 100),
-                                    child: SizedBox(
-                                      width: screenWidth * 0.1,
-                                      height: screenHeight * 0.1,
-                                      child: ClipOval(
-                                        child: Image.asset(
-                                          'assets/images/tick.png',
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                      SizedBox(height: screenHeight * 0.01),
+                      // Contenido desplazable
+                      Flexible(
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.02,
+                              vertical: screenHeight * 0.02,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    tr(context, 'Selección programa')
+                                        .toUpperCase(),
+                                    style: _labelStyle),
+                                SizedBox(height: screenHeight * 0.01),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Flexible(
+                                      flex: 2, // Ajusta este valor para controlar cuánto espacio ocupa
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: MediaQuery.of(context).size.width * 0.02,
+                                        ),
+                                        alignment: Alignment.centerLeft,
+                                        decoration: _inputDecoration(),
+                                        child: DropdownButton<String>(
+                                          value: localSelectedProgram,
+                                          items: allPrograms.map((program) {
+                                            return DropdownMenuItem<String>(
+                                              value: program['nombre'],
+                                              child: Text(
+                                                '${program['id_programa']} - ${program['nombre']}',
+                                                style: _dropdownItemStyle,
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              localSelectedProgram = value;
+                                              localSelectedProgramId = allPrograms.firstWhere(
+                                                    (program) => program['nombre'] == value,
+                                              )['id_programa'];
+                                            });
+                                          },
+                                          dropdownColor: const Color(0xFF313030),
+                                          icon: Icon(Icons.arrow_drop_down, color: Color(0xFF2be4f3), size: screenHeight * 0.05),
+                                          hint: Text(tr(context, 'Seleccione un programa'), style: _dropdownHintStyle),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: screenWidth*0.3), // Espacio entre elementos si hay otros en la fila
+                                  ],
+                                ),
+
+                                SizedBox(height: screenHeight * 0.05),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildTextField(tr(context, 'Orden'),
+                                        _ordenController, TextInputType.number),
+                                    SizedBox(width: screenWidth * 0.03),
+                                    _buildTextField(
+                                        tr(context, 'Duración (s)'),
+                                        _tiempoController,
+                                        TextInputType.numberWithOptions(
+                                            decimal: true)),
+                                    SizedBox(width: screenWidth * 0.03),
+                                    _buildTextField(
+                                        tr(context, 'Ajuste'),
+                                        _ajusteController,
+                                        TextInputType.numberWithOptions(
+                                            decimal: true)),
+                                  ],
+                                ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      if (localSelectedProgram != null &&
+                                          localSelectedProgramId != null) {
+                                        Map<String, dynamic> nuevaSecuencia = {
+                                          'programa': localSelectedProgram,
+                                          'id_programa': localSelectedProgramId,
+                                          'orden': _ordenController.text,
+                                          'duracion': _tiempoController.text,
+                                          'ajuste': _ajusteController.text,
+                                        };
+
+                                        _addSecuenciaCallback(nuevaSecuencia);
+                                        _ordenController.clear();
+                                        _tiempoController.clear();
+                                        _ajusteController.clear();
+                                        setState(() {});
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                          'assets/images/tick.png',
+                                          width: screenWidth * 0.1,
+                                          height: screenHeight * 0.1),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         );
       },
+    );
+  }
+
+// Widget auxiliar para textfields
+  Widget _buildTextField(String label, TextEditingController controller,
+      TextInputType keyboardType) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label.toUpperCase(), style: _labelStyle),
+          SizedBox(height: MediaQuery.of(context).size.height*0.02),
+          Container(
+            alignment: Alignment.center,
+            decoration: _inputDecoration(),
+            child: TextField(
+              controller: controller,
+              keyboardType: keyboardType,
+              inputFormatters: [
+                if (keyboardType == TextInputType.number)
+                  FilteringTextInputFormatter.digitsOnly,
+                if (keyboardType ==
+                    TextInputType.numberWithOptions(decimal: true))
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+              ],
+              style: _inputTextStyle,
+              decoration: _inputDecorationStyle(hintText: ''),
+            ),
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height*0.02),
+        ],
+      ),
     );
   }
 
@@ -1060,18 +1010,21 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
   TextStyle get _dropdownItemStyle =>
       TextStyle(color: Colors.white, fontSize: 15.sp);
 
-  InputDecoration _inputDecorationStyle(
-      {String hintText = '', bool enabled = true}) {
+  InputDecoration _inputDecorationStyle({String hintText = '', bool enabled = true, bool isdesc = false}) {
     return InputDecoration(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
       filled: true,
       fillColor: const Color(0xFF313030),
       isDense: true,
       hintText: hintText,
-      hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
+      hintStyle: TextStyle(
+        color: Colors.grey,
+        fontSize: isdesc ? 16.sp : 14.sp, // Aumenta el tamaño si isdesc es true
+      ),
       enabled: enabled,
     );
   }
+
 
   BoxDecoration _inputDecoration() {
     return BoxDecoration(

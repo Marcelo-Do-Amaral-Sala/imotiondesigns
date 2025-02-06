@@ -166,8 +166,6 @@ class _ClientsDataState extends State<ClientsData> {
     await dbHelper.updateClient(
         clientId!, clientData); // Pass the ID and client data
 
-    // Print updated data
-    print('Datos del cliente actualizados: $clientData');
 
     // Refresh the text controllers with the updated data
     await _refreshControllers();

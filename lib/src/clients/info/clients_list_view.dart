@@ -113,11 +113,8 @@ class _ClientListViewState extends State<ClientListView> {
 
   void _showPrint(Map<String, dynamic> clientData) {
     _updateClientFields(clientData);
-    // Asegúrate de que los datos se pasen correctamente como Map<String, String>
     widget.onClientTap(
         clientData.map((key, value) => MapEntry(key, value.toString())));
-    debugPrint(
-        'Client Data: ${clientData.toString()}'); // Imprime todos los datos del cliente
   }
 
   void _updateClientFields(Map<String, dynamic> clientData) {

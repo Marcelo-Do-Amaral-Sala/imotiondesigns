@@ -185,8 +185,6 @@ class AdminsDataState extends State<AdminsData> {
     // Actualizar el usuario en la base de datos
     await dbHelper.updateUser(userId!, clientData);
 
-    // Imprimir los datos actualizados del cliente
-    print('Datos del cliente actualizados: $clientData');
 
     // Obtener el perfilId correspondiente al tipo de perfil seleccionado
     int? perfilId = await dbHelper.getTipoPerfilId(selectedTipoPerfil!);

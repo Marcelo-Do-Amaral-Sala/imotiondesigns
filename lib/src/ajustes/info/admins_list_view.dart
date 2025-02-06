@@ -102,8 +102,6 @@ class _AdminsListViewState extends State<AdminsListView> {
     // Asegúrate de que los datos se pasen correctamente como Map<String, String>
     widget.onAdminTap(
         adminData.map((key, value) => MapEntry(key, value.toString())));
-    debugPrint(
-        'Client Data: ${adminData.toString()}'); // Imprime todos los datos del cliente
   }
 
   void _updateAdminFields(Map<String, dynamic> adminData) {

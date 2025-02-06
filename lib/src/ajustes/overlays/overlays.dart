@@ -1240,8 +1240,6 @@ class _OverlayVitaState extends State<OverlayVita>
 
   void updateClientData() {
     if (selectedBioClient != null && selectedBioClient!.isNotEmpty) {
-      print("Cliente seleccionado: $selectedBioClient");
-
       setState(() {
         // Actualizar datos del cliente
         _clientName = selectedBioClient?['name'] ?? '';

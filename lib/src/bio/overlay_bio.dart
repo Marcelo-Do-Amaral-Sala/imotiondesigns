@@ -34,7 +34,6 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
 
   void updateClientData() {
     if (selectedBioClient != null && selectedBioClient!.isNotEmpty) {
-      print("Cliente seleccionado: $selectedBioClient");
       setState(() {
         _nameController.text = selectedBioClient!['name'] ?? 'No Name';
         _genderController.text = selectedBioClient!['gender'] ?? '';
@@ -629,7 +628,6 @@ class _OverlaySeleccionarClienteBioState
                               setState(() {
                                 selectedBioClient = client;
                               });
-                              print('Cliente seleccionado overlay cliente: ${client['name']}');
                               widget.onClose(); // Cerrar el overlay
                             },
                             child: Container(
