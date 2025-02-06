@@ -651,178 +651,104 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
         return Dialog(
           backgroundColor: const Color(0xFF494949),
           shape: RoundedRectangleBorder(
-            side:  BorderSide(color: Color(0xFF2be4f3), width: screenWidth*0.001),
+            side: BorderSide(color: Color(0xFF2be4f3), width: screenWidth * 0.001),
             borderRadius: BorderRadius.circular(7),
           ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.65,
-              maxWidth: screenWidth * 0.6,
-            ),
-            child: StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: screenWidth,
-                      height: screenHeight * 0.1,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(7),
-                        border: const Border(
-                          bottom: BorderSide(color: Color(0xFF2be4f3)),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // Ajuste dinámico
+              children: [
+                Container(
+                  width: screenWidth,
+                  height: screenHeight * 0.1,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(7),
+                    border: const Border(bottom: BorderSide(color: Color(0xFF2be4f3))),
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Text(
+                          tr(context, 'Agregar programa automático').toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.bold, color: const Color(0xFF2be4f3)),
                         ),
                       ),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Text(
-                              tr(context, 'Agregar programa automático')
-                                  .toUpperCase(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 30.sp,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF2be4f3),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: IconButton(
+                          onPressed: () {
+                            _descController.clear();
+                            Navigator.of(context).pop();
+                          },
+                          icon: Icon(Icons.close_sharp, color: Colors.white, size: screenHeight * 0.07),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        tr(context, "¡Estás a un paso de terminar! Solo falta añadir una descripción para guardar tu programa"),
+                        style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold, color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: screenHeight * 0.05),
+                      TextField(
+                        controller: _descController,
+                        maxLines: 4,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
+                        style: _inputTextStyle,
+                        decoration: _inputDecorationStyle(hintText: tr(context, 'Añadir una descripción')),
+                      ),
+                      SizedBox(height: screenHeight * 0.05),
+                      GestureDetector(
+                        onTap: () async {
+                          _crearProgramaAutomatico();
+                          Navigator.pop(context);
+                          await widget.onClose();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                tr(context, "Programa automático creado correctamente").toUpperCase(),
+                                style: TextStyle(color: Colors.white, fontSize: 17.sp),
                               ),
+                              backgroundColor: Colors.green,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        child: SizedBox(
+                          width: screenWidth * 0.1,
+                          height: screenHeight * 0.1,
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/tick.png',
+                              fit: BoxFit.contain,
                             ),
                           ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: IconButton(
-                              onPressed: () {
-                                _descController.clear();
-                                Navigator.of(context).pop();
-                              },
-                              icon:  Icon(
-                                Icons.close_sharp,
-                                color: Colors.white,
-                                size: screenHeight*0.07,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.01),
-                    Flexible(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.02,
-                          vertical: MediaQuery.of(context).size.height * 0.02,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Title(
-                              color: Colors.white,
-                              child: Text(
-                                tr(context,
-                                    "¡Estás a un paso de terminar! Solo falta añadir una descripción para guardar tu programa"),
-                                style: TextStyle(
-                                  fontSize: 25.sp,
-                                  // Tamaño de la fuente
-                                  fontWeight: FontWeight.bold,
-                                  // Estilo de la fuente
-                                  color: Colors.white,
-                                  // Color del texto
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.05),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: screenWidth * 0.02),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        alignment: Alignment.center,
-                                        decoration: _inputDecoration(),
-                                        child: TextField(
-                                          controller: _descController,
-                                          style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(
-                                              hintText:
-                                                  tr(context, 'Añadir una descripción')),
-                                          maxLines: 4,
-                                          keyboardType: TextInputType.text,
-                                          // Asegura que el teclado sea de tipo texto
-                                          textInputAction: TextInputAction
-                                              .done, // Muestra el botón "Hecho" en el teclado
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: screenHeight * 0.05),
-                            const Spacer(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTapDown: (_) =>
-                                      setState(() => scaleFactorTick = 0.9),
-                                  onTapUp: (_) =>
-                                      setState(() => scaleFactorTick = 1.0),
-                                  onTap: () async {
-                                    _crearProgramaAutomatico();
-                                    Navigator.pop(context);
-                                    await widget.onClose();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          tr(context,
-                                              "Programa automático creado correctamente").toUpperCase(),
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 17.sp),
-                                        ),
-                                        backgroundColor: Colors.green,
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                  child: AnimatedScale(
-                                    scale: scaleFactorTick,
-                                    duration: const Duration(milliseconds: 100),
-                                    child: SizedBox(
-                                      width: screenWidth * 0.1,
-                                      height: screenHeight * 0.1,
-                                      child: ClipOval(
-                                        child: Image.asset(
-                                          'assets/images/tick.png',
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         );
       },
     );
   }
+
 
   Future<void> _addSecuencia(BuildContext context) async {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -883,6 +809,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                             bottom: 0,
                             child: IconButton(
                               onPressed: () {
+                                _descController.clear();
                                 _ordenController.clear();
                                 _tiempoController.clear();
                                 _ajusteController.clear();

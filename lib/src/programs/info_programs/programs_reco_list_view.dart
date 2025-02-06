@@ -1,70 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:imotion_designs/src/programs/customs_programs/recovery_table_widget.dart';
 import '../../db/db_helper.dart';
+
 class ProgramsRecoveryListView extends StatefulWidget {
-  const ProgramsRecoveryListView({Key? key})
-      : super(key: key);
+  const ProgramsRecoveryListView({Key? key}) : super(key: key);
 
   @override
   _ProgramsRecoveryListViewState createState() => _ProgramsRecoveryListViewState();
 }
 
 class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
-  List<Map<String, dynamic>> allPrograms = []; // Lista de programas
+  late Future<List<Map<String, dynamic>>> _futurePrograms;
 
   @override
   void initState() {
     super.initState();
-    _fetchRecoveryPrograms(); // Cargar los programas al iniciar el estado
-  }
-  @override
-  void dispose() {
-    super.dispose();
+    _futurePrograms = _fetchRecoveryPrograms(); // 🔹 Carga los programas una sola vez
   }
 
-  Future<void> _fetchRecoveryPrograms() async {
-    var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
+  Future<List<Map<String, dynamic>>> _fetchRecoveryPrograms() async {
+    final db = await DatabaseHelper().database;
     try {
-      // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
-      final programData = await DatabaseHelper().obtenerProgramasPredeterminadosPorTipoRecovery(db);
-
-      // Verifica el contenido de los datos obtenidos
-      print('Programas obtenidos: $programData');
-
-      // Iteramos sobre los programas y obtenemos las cronaxias y los grupos de las tablas intermedias
-      for (var program in programData) {
-        // Obtener cronaxias
-        var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, program['id_programa']);
-        var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, program['id_programa']);
-
-        // Imprimir los valores de las cronaxias y los grupos
-        print('Programa: ${program['nombre']}');
-
-        print('Cronaxias asociadas:');
-        for (var cronaxia in cronaxias) {
-          print(' - ${cronaxia['nombre']} (Valor: ${cronaxia['valor']})');
-        }
-
-        print('Grupos musculares asociados:');
-        for (var grupo in grupos) {
-          print(' - ${grupo['nombre']}');
-        }
-
-        print('---');  // Separador para cada programa
-      }
-
-      // Actualizamos el estado con los programas obtenidos
-      setState(() {
-        allPrograms = programData; // Asignamos los programas obtenidos a la lista
-      });
+      return await DatabaseHelper().obtenerProgramasPredeterminadosPorTipoRecovery(db);
     } catch (e) {
-      print('Error fetching programs: $e');
+      print('❌ Error fetching recovery programs: $e');
+      return [];
     }
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +40,7 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
       ),
       child: Column(
         children: [
-          _buildDataTable(screenHeight, screenWidth), // Construimos la tabla
+          _buildDataTable(screenHeight, screenWidth), // 🔹 Renderizado eficiente
         ],
       ),
     );
@@ -86,7 +48,6 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
 
   Widget _buildDataTable(double screenHeight, double screenWidth) {
     return Flexible(
-      flex: 1,
       child: Container(
         width: screenWidth,
         decoration: BoxDecoration(
@@ -98,12 +59,22 @@ class _ProgramsRecoveryListViewState extends State<ProgramsRecoveryListView> {
             horizontal: screenWidth * 0.02,
             vertical: screenHeight * 0.02,
           ),
-          child: RecoveryTableWidget(
-            programData: allPrograms,
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+            future: _futurePrograms, // 🔹 Usamos FutureBuilder para la carga de datos
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(); // 🔹 Loader mientras carga
+              } else if (snapshot.hasError) {
+                return Center(child: Text("❌ Error al cargar programas", style: TextStyle(color: Colors.white)));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text("📭 No hay programas disponibles", style: TextStyle(color: Colors.white)));
+              }
+
+              return RecoveryTableWidget(programData: snapshot.data!);
+            },
           ),
         ),
       ),
     );
   }
-
 }

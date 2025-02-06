@@ -3939,6 +3939,39 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
     }
   }
 
+  Future<void> insertarCronaxiasConPulso(int programaId, String tipoEquipamiento, double pulso) async {
+    final db = await database;
+
+    // Obtener todas las cronaxias del tipo de equipamiento
+    List<Map<String, dynamic>> cronaxias = await db.query(
+      'cronaxia',
+      where: 'tipo_equipamiento = ?',
+      whereArgs: [tipoEquipamiento],
+    );
+
+    print('📌 Insertando cronaxias con pulso $pulso para $tipoEquipamiento. Encontradas: ${cronaxias.length}');
+
+    for (var cronaxia in cronaxias) {
+      var existingCronaxia = await db.query(
+        'programa_cronaxia',
+        where: 'programa_id = ? AND cronaxia_id = ?',
+        whereArgs: [programaId, cronaxia['id']],
+      );
+
+      if (existingCronaxia.isEmpty) {
+        await db.insert('programa_cronaxia', {
+          'programa_id': programaId,
+          'cronaxia_id': cronaxia['id'],
+          'valor': pulso, // 🔹 Se inserta el pulso en todas las cronaxias
+        });
+        print('✅ Cronaxia ${cronaxia['nombre']} insertada con pulso $pulso en el programa $programaId');
+      } else {
+        print('⚠️ Cronaxia ${cronaxia['nombre']} ya existe para el programa $programaId');
+      }
+    }
+  }
+
+
 // Función para insertar los grupos musculares por defecto
   Future<void> insertarGruposMuscularesPorDefecto(
       int programaId, String tipoEquipamiento) async {

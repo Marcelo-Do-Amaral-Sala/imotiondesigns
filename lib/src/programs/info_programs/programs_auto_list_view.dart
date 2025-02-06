@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../db/db_helper.dart';
 
 class ProgramsAutoListView extends StatefulWidget {
-  final Function(Map<String, dynamic>) onProgramTap; // Callback para manejar el tap
+  final Function(Map<String, dynamic>) onProgramTap;
 
   const ProgramsAutoListView({Key? key, required this.onProgramTap}) : super(key: key);
 
@@ -12,64 +12,37 @@ class ProgramsAutoListView extends StatefulWidget {
 }
 
 class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
-  List<Map<String, dynamic>> allPrograms = []; // Lista de programas automáticos con subprogramas
+  late Future<List<Map<String, dynamic>>> _futurePrograms;
 
   @override
   void initState() {
     super.initState();
-    _fetchPrograms(); // Cargar los programas automáticos al iniciar el estado
-  }
-  @override
-  void dispose() {
-    super.dispose();
+    _futurePrograms = _fetchPrograms(); // 🔹 Carga los programas solo una vez
   }
 
-
-  Future<void> _fetchPrograms() async {
-    var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
+  Future<List<Map<String, dynamic>>> _fetchPrograms() async {
+    final db = await DatabaseHelper().database;
     try {
-      // Llamamos a la función que obtiene los programas automáticos y sus subprogramas
       final programData = await DatabaseHelper().obtenerProgramasAutomaticosConSubprogramas(db);
-
-      // Verifica si se obtuvieron datos correctamente
-      if (programData.isEmpty) {
-        print('No se encontraron programas automáticos.');
-      } else {
-        print('Programas obtenidos:');
-        print(programData); // Mostrar la estructura completa de los programas y subprogramas
-      }
-
-      // Agrupamos los subprogramas por programa automático
-      List<Map<String, dynamic>> groupedPrograms = _groupProgramsWithSubprograms(programData);
-
-      setState(() {
-        allPrograms = groupedPrograms; // Asigna los programas obtenidos a la lista
-      });
+      return _groupProgramsWithSubprograms(programData);
     } catch (e) {
-      print('Error fetching programs: $e');
+      print('❌ Error fetching programs: $e');
+      return [];
     }
   }
 
   List<Map<String, dynamic>> _groupProgramsWithSubprograms(List<Map<String, dynamic>> programData) {
-    List<Map<String, dynamic>> groupedPrograms = [];
-
-    for (var program in programData) {
-      List<Map<String, dynamic>> subprogramas = program['subprogramas'] ?? [];
-
-      Map<String, dynamic> groupedProgram = {
+    return programData.map((program) {
+      return {
         'id_programa_automatico': program['id_programa_automatico'],
         'nombre_programa_automatico': program['nombre'],
         'imagen': program['imagen'],
         'descripcion_programa_automatico': program['descripcion'],
         'duracionTotal': program['duracionTotal'],
-        'tipo_equipamiento' : program['tipo_equipamiento'],
-        'subprogramas': subprogramas,
+        'tipo_equipamiento': program['tipo_equipamiento'],
+        'subprogramas': program['subprogramas'] ?? [],
       };
-
-      groupedPrograms.add(groupedProgram);
-    }
-
-    return groupedPrograms;
+    }).toList();
   }
 
   @override
@@ -88,75 +61,78 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
           color: const Color.fromARGB(255, 46, 46, 46),
           borderRadius: BorderRadius.circular(7.0),
         ),
-        child: Column(
-          children: [
-            _buildRowView(screenHeight, screenWidth),
-          ],
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _futurePrograms,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(); // 🔹 Loader mientras carga
+            } else if (snapshot.hasError) {
+              return Center(child: Text("❌ Error al cargar programas", style: TextStyle(color: Colors.white)));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text("📭 No hay programas disponibles", style: TextStyle(color: Colors.white)));
+            }
+
+            return _buildRowView(snapshot.data!, screenHeight, screenWidth);
+          },
         ),
       ),
     );
   }
 
-  Widget _buildRowView(double screenHeight, double screenWidth) {
-    // Dividir la lista en chunks de 4 elementos por fila
+  Widget _buildRowView(List<Map<String, dynamic>> allPrograms, double screenHeight, double screenWidth) {
     List<List<Map<String, dynamic>>> rows = [];
     for (int i = 0; i < allPrograms.length; i += 4) {
       rows.add(allPrograms.sublist(i, i + 4 > allPrograms.length ? allPrograms.length : i + 4));
     }
 
-    return Expanded(
-      child: ListView.builder(
-        itemCount: rows.length,
-        itemBuilder: (context, rowIndex) {
-          List<Map<String, dynamic>> row = rows[rowIndex];
+    return ListView.builder(
+      shrinkWrap: true, // 🔹 Evita errores de overflow en Column()
+      itemCount: rows.length,
+      itemBuilder: (context, rowIndex) {
+        List<Map<String, dynamic>> row = rows[rowIndex];
 
-          return Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.02,
-              vertical: screenHeight * 0.02,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Cambiado a start para ajustar desde la izquierda
-              children: row.map((program) {
-                String imagen = program['imagen'] ?? 'assets/default_image.png';
-                String nombre = program['nombre_programa_automatico'] ?? 'Sin nombre';
-                String descripcion = program['descripcion_programa_automatico'] ?? 'Sin descripción';
-                List<Map<String, dynamic>> subprogramas = program['subprogramas'] ?? [];
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.02,
+            vertical: screenHeight * 0.02,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: row.map((program) {
+              return _buildProgramCard(program, screenWidth, screenHeight);
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
 
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.02,
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      // Llamamos a la función onProgramTap pasando los datos del programa
-                      widget.onProgramTap(program); // Ejecuatemos el callback
-                    },
-                    child: Column(
-                      children: [
-                        Text(
-                          nombre,
-                          textAlign: TextAlign.center,
-                          style:  TextStyle(
-                            color: const Color(0xFF2be4f3),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.sp,
-                          ),
-                        ),
-                        Image.asset(
-                          imagen,
-                          width: screenWidth * 0.15, // Ajuste dinámico para el tamaño de la imagen
-                          height: screenHeight * 0.15, // Ajuste dinámico para el tamaño de la imagen
-                          fit: BoxFit.contain,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          );
+  Widget _buildProgramCard(Map<String, dynamic> program, double screenWidth, double screenHeight) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+      child: GestureDetector(
+        onTap: () {
+          widget.onProgramTap(program); // 🔹 Llama al callback
         },
+        child: Column(
+          children: [
+            Text(
+              program['nombre_programa_automatico'] ?? 'Sin nombre',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: const Color(0xFF2be4f3),
+                fontWeight: FontWeight.bold,
+                fontSize: 20.sp,
+              ),
+            ),
+            Image.asset(
+              program['imagen'] ?? 'assets/default_image.png',
+              width: screenWidth * 0.15,
+              height: screenHeight * 0.15,
+              fit: BoxFit.contain,
+            ),
+          ],
+        ),
       ),
     );
   }

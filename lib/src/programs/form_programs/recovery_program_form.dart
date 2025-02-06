@@ -213,10 +213,8 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     }
   }
 
-  // Función para guardar el programa predeterminado desde el formulario
   Future<void> guardarProgramaPredeterminado() async {
     if (_nameController.text.isEmpty || selectedEquipOption == null) {
-      // Verificación de '@' en el correo
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -232,8 +230,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
 
     // Recoger los valores de los controladores de texto
     String nombrePrograma = _nameController.text;
-    String equipamiento = selectedEquipOption ??
-        ''; // Manejar el caso de que no se seleccione una opción
+    String equipamiento = selectedEquipOption ?? '';
     double frecuencia = double.tryParse(_frequencyController.text) ?? 0.0;
     double pulso = double.tryParse(_pulseController.text) ?? 0.0;
     double contraccion = double.tryParse(_contractionController.text) ?? 0.0;
@@ -244,29 +241,32 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
     Map<String, dynamic> programa = {
       'nombre': nombrePrograma,
       'imagen': 'assets/images/programacreado.png',
-      // Puedes agregar la ruta de la imagen aquí si es necesario
       'frecuencia': frecuencia,
       'pulso': pulso,
       'contraccion': contraccion,
       'rampa': rampa,
       'pausa': pausa,
       'tipo': 'Recovery',
-      // Puedes actualizar esto según el tipo de programa que quieras
       'tipo_equipamiento': equipamiento,
     };
 
     // Insertar el programa en la base de datos
-    int programaId =
-    await DatabaseHelper().insertarProgramaPredeterminado(programa);
+    int programaId = await DatabaseHelper().insertarProgramaPredeterminado(programa);
 
-    // Insertar las cronaxias y grupos musculares por defecto
-    await DatabaseHelper()
-        .insertarCronaxiasPorDefecto(programaId, equipamiento);
-    await DatabaseHelper()
-        .insertarGruposMuscularesPorDefecto(programaId, equipamiento);
+    // 🔹 Insertar cronaxias según el valor de `rampa`
+    if (rampa == 0) {
+      await DatabaseHelper().insertarCronaxiasPorDefecto(programaId, equipamiento);
+    } else {
+      await DatabaseHelper().insertarCronaxiasConPulso(programaId, equipamiento, pulso);
+    }
+
+    // 🔹 Insertar grupos musculares
+    await DatabaseHelper().insertarGruposMuscularesPorDefecto(programaId, equipamiento);
+
     setState(() {
       programaGuardado = true; // 🔹 Ahora el usuario puede cambiar de pestañas
     });
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(

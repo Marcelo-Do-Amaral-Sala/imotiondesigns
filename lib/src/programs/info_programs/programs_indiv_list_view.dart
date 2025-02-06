@@ -1,72 +1,32 @@
 import 'package:flutter/material.dart';
-import '../../db/db_helper.dart'; // Asegúrate de que estás importando correctamente tu clase DatabaseHelper
-import '../customs_programs/individual_table_custom.dart'; // Tu widget personalizado para mostrar los programas
+import '../../db/db_helper.dart';
+import '../customs_programs/individual_table_custom.dart';
 
 class ProgramsIndividualesListView extends StatefulWidget {
   const ProgramsIndividualesListView({Key? key}) : super(key: key);
 
   @override
-  _ProgramsIndividualesListViewState createState() =>
-      _ProgramsIndividualesListViewState();
+  _ProgramsIndividualesListViewState createState() => _ProgramsIndividualesListViewState();
 }
 
-class _ProgramsIndividualesListViewState
-    extends State<ProgramsIndividualesListView> {
-  List<Map<String, dynamic>> allPrograms = []; // Lista para almacenar los programas
+class _ProgramsIndividualesListViewState extends State<ProgramsIndividualesListView> {
+  late Future<List<Map<String, dynamic>>> _futurePrograms;
 
   @override
   void initState() {
     super.initState();
-    _fetchIndividualPrograms(); // Llamamos a la función para obtener los programas al iniciar
+    _futurePrograms = _fetchIndividualPrograms(); // 🔹 Carga los programas una sola vez
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-
-  Future<void> _fetchIndividualPrograms() async {
-    var db = await DatabaseHelper().database; // Obtener la instancia de la base de datos
+  Future<List<Map<String, dynamic>>> _fetchIndividualPrograms() async {
+    final db = await DatabaseHelper().database;
     try {
-      // Llamamos a la función que obtiene los programas de la base de datos filtrados por tipo 'Individual'
-      final programData = await DatabaseHelper().obtenerProgramasPredeterminadosPorTipoIndividual(db);
-
-      // Verifica el contenido de los datos obtenidos
-      print('Programas obtenidos: $programData');
-
-      // Iteramos sobre los programas y obtenemos las cronaxias y los grupos de las tablas intermedias
-      for (var program in programData) {
-        // Obtener cronaxias
-        var cronaxias = await DatabaseHelper().obtenerCronaxiasPorPrograma(db, program['id_programa']);
-        var grupos = await DatabaseHelper().obtenerGruposPorPrograma(db, program['id_programa']);
-
-        // Imprimir los valores de las cronaxias y los grupos
-        print('Programa: ${program['nombre']}');
-
-        print('Cronaxias asociadas:');
-        for (var cronaxia in cronaxias) {
-          print(' - ${cronaxia['nombre']} (Valor: ${cronaxia['valor']})');
-        }
-
-        print('Grupos musculares asociados:');
-        for (var grupo in grupos) {
-          print(' - ${grupo['nombre']}');
-        }
-
-        print('---');  // Separador para cada programa
-      }
-
-      // Actualizamos el estado con los programas obtenidos
-      setState(() {
-        allPrograms = programData; // Asignamos los programas obtenidos a la lista
-      });
+      return await DatabaseHelper().obtenerProgramasPredeterminadosPorTipoIndividual(db);
     } catch (e) {
-      print('Error fetching programs: $e');
+      print('❌ Error fetching programs: $e');
+      return [];
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +40,7 @@ class _ProgramsIndividualesListViewState
       ),
       child: Column(
         children: [
-          _buildDataTable(screenHeight, screenWidth), // Construimos la tabla
+          _buildDataTable(screenHeight, screenWidth), // 🔹 Se renderiza de forma optimizada
         ],
       ),
     );
@@ -88,7 +48,6 @@ class _ProgramsIndividualesListViewState
 
   Widget _buildDataTable(double screenHeight, double screenWidth) {
     return Flexible(
-      flex: 1,
       child: Container(
         width: screenWidth,
         decoration: BoxDecoration(
@@ -100,8 +59,19 @@ class _ProgramsIndividualesListViewState
             horizontal: screenWidth * 0.02,
             vertical: screenHeight * 0.02,
           ),
-          child: IndividualTableWidget(
-            programData: allPrograms, // Pasamos los programas a la tabla
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+            future: _futurePrograms, // 🔹 Usamos FutureBuilder para manejar la carga de datos
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(); // 🔹 Muestra un loader mientras carga
+              } else if (snapshot.hasError) {
+                return Center(child: Text("❌ Error al cargar programas", style: TextStyle(color: Colors.white)));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text("📭 No hay programas disponibles", style: TextStyle(color: Colors.white)));
+              }
+
+              return IndividualTableWidget(programData: snapshot.data!);
+            },
           ),
         ),
       ),
