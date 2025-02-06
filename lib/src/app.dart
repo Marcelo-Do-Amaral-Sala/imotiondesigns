@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:imotion_designs/src/panel/views/panel_view.dart';
 import 'package:imotion_designs/src/programs/programs_menu.dart';
+import 'package:imotion_designs/src/servicios/json.dart';
 import 'package:imotion_designs/src/tutoriales/menus/menu_tutoriales.dart';
 
 import 'ajustes/form/licencia_form.dart';
@@ -173,6 +174,8 @@ class _AppState extends State<App> {
               onNavigateToChangePwd: (int userId) => changePage(8, userId: userId), // 🔹 Pasamos userId aquí
               screenWidth: widget.screenWidth,
               screenHeight: widget.screenHeight,
+            ),
+            UploadJsonView(
             ),
           ],
         ),
