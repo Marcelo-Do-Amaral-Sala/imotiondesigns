@@ -26,7 +26,7 @@ class PersonalDataFormState extends State<PersonalDataForm> {
   final FocusNode _weightFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _phoneFocus = FocusNode();
-  String? selectedOption;
+  String? selectedOption = 'Activo';
   String? selectedGender;
   String? _birthDate;
   double scaleFactorTick = 1.0;

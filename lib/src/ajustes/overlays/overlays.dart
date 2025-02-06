@@ -477,12 +477,12 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    final provider = context.watch<TranslationProvider>(); // 🔹 Escucha cambios del provider
+    final translations = provider.translations;
 
     return MainOverlay(
       title: Text(
-        tr(context, 'Idioma').toUpperCase(),
+        translations['Idioma']?.toUpperCase() ?? 'IDIOMA',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 34.sp,
@@ -492,33 +492,28 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
       ),
       content: Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.03, vertical: screenHeight * 0.03),
+            horizontal: MediaQuery.of(context).size.width * 0.03,
+            vertical: MediaQuery.of(context).size.height * 0.03),
         child: Column(
           children: [
-            // Fila para las dos columnas
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                // Distribuye uniformemente
                 children: [
-                  // Primera columna con parte de los ListTiles
                   Expanded(
                     flex: 1,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      // Distribuye uniformemente
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: _languageMap.keys.take(3).map((language) {
                         return buildCustomCheckboxTile(language);
                       }).toList(),
                     ),
                   ),
-                  // Segunda columna con el resto de los ListTiles
                   Expanded(
                     flex: 1,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      // Distribuye uniformemente
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: _languageMap.keys.skip(3).map((language) {
                         return buildCustomCheckboxTile(language);
@@ -528,24 +523,27 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                 ],
               ),
             ),
-            // Botón de selección en la parte inferior
             Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.03),
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.03),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: OutlinedButton(
                   onPressed: () {
                     if (_selectedLanguage != null) {
-                      _changeAppLanguage(_selectedLanguage!); // 🔹 Cambia el idioma y actualiza la UI inmediatamente
+                      _changeAppLanguage(_selectedLanguage!);
                     }
+                    setState(() {
+
+                    });
                     widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.01,
-                        vertical: screenHeight * 0.01),
+                        horizontal: MediaQuery.of(context).size.width * 0.01,
+                        vertical: MediaQuery.of(context).size.height * 0.01),
                     side: BorderSide(
-                        width: screenWidth * 0.001,
+                        width: MediaQuery.of(context).size.width * 0.001,
                         color: const Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
@@ -553,7 +551,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                     backgroundColor: const Color(0xFF2be4f3),
                   ),
                   child: Text(
-                    tr(context, 'Seleccionar').toUpperCase(),
+                    translations['Seleccionar']?.toUpperCase() ?? 'SELECCIONAR',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25.sp,
@@ -562,7 +560,6 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-
               ),
             ),
           ],
@@ -571,6 +568,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
       onClose: widget.onClose,
     );
   }
+
 
   Widget buildCustomCheckboxTile(String language) {
     return Column(

@@ -55,12 +55,17 @@ class _AppState extends State<App> {
       _changePwd.currentState?.clearFields();
     }
 
+    // 🔹 Ocultar el teclado al cambiar de pantalla
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
+
     setState(() {
       _selectedIndex = index;
     });
 
     if (index == 8 && userId != null) {
-      _changePwdUserId = userId; // 🔹 Guardamos el userId para pasarlo a ChangePwd
+      _changePwdUserId = userId;
     }
 
     if (index == 1) {
@@ -94,92 +99,88 @@ class _AppState extends State<App> {
       theme: ThemeData(
         textTheme: GoogleFonts.oswaldTextTheme(),
       ),
-      home: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: [
-            // 🔹 0 - Splash Screen (se muestra primero)
-            SplashView(
-              onNavigateToMainMenu: () => changePage(1),
-              onNavigateToLogin: () => changePage(9),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 1 - Menú Principal
-            MainMenuView(
-              key: _menuKey,
-              onNavigateToLogin: () => changePage(9),
-              onNavigateToPanel: () => openPanelView(), // 🔹 Ahora pasamos `context`
-              onNavigateToClients: () => changePage(2),
-              onNavigateToPrograms: () => changePage(3),
-              onNavigateToAjustes: () => changePage(4),
-              onNavigateToTutoriales: () => changePage(5),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 2 - Clientes
-            ClientsView(
-              onBack: () => changePage(1),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 3 - Programas
-            ProgramsMenuView(
-              onBack: () => changePage(1),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 4 - Ajustes
-            AjustesMenuView(
-              onBack: () => changePage(1),
-              onNavigatetoLicencia: () => changePage(6),
-              onNavigatetoGestion: () => changePage(7),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 5 - Tutoriales
-            TutorialesMenuView(
-              onBack: () => changePage(1),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 6 - Licencia
-            LicenciaFormView(
-              onBack: () => changePage(4),
-              onMciTap: (mciData) {
-                selectMCI(mciData);
-              },
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 7 - Gestión
-            GestionMenuView(
-              onBack: () => changePage(4),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 8 - Cambio de Contraseña
-            ChangePwdView(
-              key: _changePwd,
-              userId: _changePwdUserId,
-              onNavigateToLogin: () => changePage(9),
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            // 🔹 9 - Login
-            LoginView(
-              key: _loginKey,
-              onNavigateToMainMenu: () => changePage(1),
-              onNavigateToChangePwd: (int userId) => changePage(8, userId: userId), // 🔹 Pasamos userId aquí
-              screenWidth: widget.screenWidth,
-              screenHeight: widget.screenHeight,
-            ),
-            UploadJsonView(
-            ),
-          ],
+      home: GestureDetector(
+        behavior: HitTestBehavior.opaque, // 🔹 Captura toques fuera de widgets interactivos
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus(); // 🔹 Cierra el teclado al tocar fuera
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: IndexedStack(
+            index: _selectedIndex,
+            children: [
+              SplashView(
+                onNavigateToMainMenu: () => changePage(1),
+                onNavigateToLogin: () => changePage(9),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              MainMenuView(
+                key: _menuKey,
+                onNavigateToLogin: () => changePage(9),
+                onNavigateToPanel: () => openPanelView(),
+                onNavigateToClients: () => changePage(2),
+                onNavigateToPrograms: () => changePage(3),
+                onNavigateToAjustes: () => changePage(4),
+                onNavigateToTutoriales: () => changePage(5),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              ClientsView(
+                onBack: () => changePage(1),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              ProgramsMenuView(
+                onBack: () => changePage(1),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              AjustesMenuView(
+                onBack: () => changePage(1),
+                onNavigatetoLicencia: () => changePage(6),
+                onNavigatetoGestion: () => changePage(7),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              TutorialesMenuView(
+                onBack: () => changePage(1),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              LicenciaFormView(
+                onBack: () => changePage(4),
+                onMciTap: (mciData) {
+                  selectMCI(mciData);
+                },
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              GestionMenuView(
+                onBack: () => changePage(4),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              ChangePwdView(
+                key: _changePwd,
+                userId: _changePwdUserId,
+                onNavigateToLogin: () => changePage(9),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              LoginView(
+                key: _loginKey,
+                onNavigateToMainMenu: () => changePage(1),
+                onNavigateToChangePwd: (int userId) => changePage(8, userId: userId),
+                screenWidth: widget.screenWidth,
+                screenHeight: widget.screenHeight,
+              ),
+              UploadJsonView(),
+            ],
+          ),
         ),
       ),
     );
   }
+
 }

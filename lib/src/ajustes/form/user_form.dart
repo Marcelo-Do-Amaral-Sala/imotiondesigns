@@ -20,7 +20,7 @@ class UserDataFormState extends State<UserDataForm> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
 
-  String? selectedOption;
+  String? selectedOption='Activo';
   String? selectedGender;
   String? selectedTipoPerfil;
   String? selectedControlSesiones;
