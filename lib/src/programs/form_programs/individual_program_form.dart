@@ -981,6 +981,11 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                     child: Text('BIO-SHAPE',
                                         style: _dropdownItemStyle),
                                   ),
+                                  DropdownMenuItem(
+                                    value: 'AMBOS',
+                                    child: Text('AMBOS',
+                                        style: _dropdownItemStyle),
+                                  ),
                                 ],
                                 onChanged: (value) {
                                   setState(() {

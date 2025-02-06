@@ -64,6 +64,7 @@ class _AppState extends State<App> {
 
     if (index == 1) {
       _menuKey.currentState?.checkUserProfile();
+      _menuKey.currentState?.checkAppState();
     }
   }
 

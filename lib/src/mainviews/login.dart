@@ -85,9 +85,11 @@ class LoginViewState extends State<LoginView> {
       PermissionStatus permission = PermissionStatus.denied;
 
       if (Platform.isAndroid) {
-        permission = await Permission.locationWhenInUse.request();
+        permission = await Permission.location.request();
         if (permission == PermissionStatus.granted) {
           permission = await Permission.locationAlways.request();
+        } if (permission == PermissionStatus.granted) {
+          permission = await Permission.nearbyWifiDevices.request();
         }
       } else if (Platform.isIOS) {
         permission = await Permission.locationWhenInUse.request();

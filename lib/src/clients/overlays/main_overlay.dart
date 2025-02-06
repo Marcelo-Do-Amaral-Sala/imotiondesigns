@@ -5,13 +5,15 @@ class MainOverlay extends StatefulWidget {
   final Widget content;
   final VoidCallback onClose;
   final bool isChangePwdView;
+  final bool isBloc;
 
   const MainOverlay({
     Key? key,
     required this.content,
     required this.onClose,
-    required this.title,  this.isChangePwdView = false,
-  }) : super(key: key);
+      required this.title,
+      this.isChangePwdView = false,
+      this.isBloc = false}) : super(key: key);
 
   @override
   _MainOverlayState createState() => _MainOverlayState();
@@ -72,17 +74,17 @@ class _MainOverlayState extends State<MainOverlay> {
           Center(
             child: widget.title,
           ),
-          if (!widget.isChangePwdView) // Mostrar el botón solo si isChangePwdView es false
+          if (!(widget.isChangePwdView || widget.isBloc)) // ✅ Corrección aquí
             Positioned(
               right: 0,
               top: 0,
               bottom: 0,
               child: IconButton(
                 onPressed: closeOverlay,
-                icon:  Icon(
+                icon: Icon(
                   Icons.close_sharp,
                   color: Colors.white,
-                  size: MediaQuery.of(context).size.height*0.06,
+                  size: MediaQuery.of(context).size.height * 0.06,
                 ),
               ),
             ),
@@ -90,6 +92,7 @@ class _MainOverlayState extends State<MainOverlay> {
       ),
     );
   }
+
 
   Widget _buildContent() {
     return Center(child: widget.content); // Muestra el contenido pasado

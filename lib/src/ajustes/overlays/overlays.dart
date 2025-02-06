@@ -2631,3 +2631,123 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
         color: const Color(0xFF313030), borderRadius: BorderRadius.circular(7));
   }
 }
+
+class OverlayLicenciaBloc extends StatefulWidget {
+  final VoidCallback onClose;
+
+  ///final Function() onNavigateToLogin;
+
+  const OverlayLicenciaBloc({
+    Key? key,
+    required this.onClose,
+  }) : super(key: key);
+
+  @override
+  _OverlayLicenciaBlocState createState() => _OverlayLicenciaBlocState();
+}
+
+class _OverlayLicenciaBlocState extends State<OverlayLicenciaBloc> {
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return MainOverlay(
+      title: Text(
+        tr(context, 'Aviso').toUpperCase(),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 34.sp,
+          fontWeight: FontWeight.bold,
+          color: Colors.red,
+        ),
+      ),
+      content: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.02,
+          vertical: screenHeight * 0.02,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 🔹 Mensaje principal
+            Text(
+              tr(context,
+                  'Su licencia está bloqueada, por favor contacte con el servicio técnico'),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 30.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+            // 🔹 Contenedor con la información de contacto
+            Container(
+              width: screenWidth * 0.8,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 46, 46, 46),
+                borderRadius: BorderRadius.circular(7.0),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.03,
+                vertical: screenHeight * 0.03,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // 📌 Centrado
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "E-MAIL: technical_service@i-motiongroup.com",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  Text(
+                    "WHATSAPP: (+34) 618 112 271",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: OutlinedButton(
+                onPressed: () {
+                  widget.onClose();
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.all(10.0),
+                  side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  backgroundColor: Colors.transparent,
+                ),
+                child: Text(
+                  tr(context, 'Cerrar').toUpperCase(),
+                  style: TextStyle(
+                    color: const Color(0xFF2be4f3),
+                    fontSize: 25.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+            // 🔹 Botón de salir
+          ],
+        ),
+      ),
+      onClose: widget.onClose,
+      isBloc: true,
+    );
+  }
+}

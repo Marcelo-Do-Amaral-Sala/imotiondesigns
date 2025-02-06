@@ -7,6 +7,7 @@ import '../../utils/translation_utils.dart';
 import '../bio/overlay_bio.dart';
 import '../db/db_helper.dart';
 import '../panel/views/panel_view.dart';
+import '../servicios/licencia_state.dart';
 
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToLogin;
@@ -50,24 +51,156 @@ class MainMenuViewState extends State<MainMenuView>
   int overlayIndex = -1; // -1 indica que no hay overlay visible
   int? userId;
   String? userTipoPerfil;
+  bool isBlocked = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       FocusScope.of(context).unfocus();
     });
+    checkAppState();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    checkUserProfile(); // 🔹 Actualiza el userId al volver a la vista
+    checkUserProfile();
   }
 
+  Future<void> checkAppState() async {
+    await AppState.instance.loadState();
+    print("Valor de bloqueada: ${AppState.instance.bloqueada}");
+
+    if (_isAppBlocked() && mounted) {
+      Future.delayed(Duration(milliseconds: 300), () {
+        if (mounted) {
+          setState(() {
+            isBlocked = true;
+            isOverlayVisible = true;
+            overlayIndex = 2; // Mostrar el overlay de licencia bloqueada
+          });
+        }
+      });
+    }
+  }
+
+  bool _isAppBlocked() {
+    return AppState.instance.bloqueada == "1";
+  }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> _validateLicenseAndNavigate() async {
+    await AppState.instance.loadState(); // Cargar el estado de la aplicación
+
+    if (AppState.instance.nLicencia.isEmpty) {
+      _showLicenseDialog(
+          context); // Mostrar el diálogo si la licencia está vacía
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PanelView(
+            onBack: () => Navigator.pop(context),
+            onReset: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PanelView(
+                  onBack: () => Navigator.pop(context),
+                  onReset: () {},
+                  screenWidth: widget.screenWidth,
+                  screenHeight: widget.screenHeight,
+                ),
+              ),
+            ),
+            screenWidth: widget.screenWidth,
+            screenHeight: widget.screenHeight,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showLicenseDialog(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            // Ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.4,
+            // Alto del diálogo
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.01,
+                vertical: MediaQuery.of(context).size.height * 0.01),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: MediaQuery.of(context).size.width * 0.001,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              // Distribuye uniformemente
+              crossAxisAlignment: CrossAxisAlignment.center,
+              // Centra horizontalmente
+              children: [
+                Text(
+                  tr(context, 'Aviso').toUpperCase(),
+                  style: TextStyle(
+                      color: const Color(0xFF28E2F5),
+                      fontSize: 30.sp,
+                      decoration: TextDecoration.underline,
+                      decorationColor: const Color(0xFF28E2F5),
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  tr(context, 'Para usar el panel de control debe validar su licencia'),
+                  style: TextStyle(color: Colors.white, fontSize: 24.sp),
+                  textAlign: TextAlign.center,
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Cerrar el diálogo
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.01,
+                        vertical: MediaQuery.of(context).size.height * 0.01),
+                    side: BorderSide(
+                      width: MediaQuery.of(context).size.width * 0.001,
+                      color: const Color(0xFF2be4f3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    tr(context, '¡Entendido!').toUpperCase(),
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> clearLoginData() async {
@@ -101,10 +234,19 @@ class MainMenuViewState extends State<MainMenuView>
 
   void toggleOverlay(int index) {
     setState(() {
-      isOverlayVisible = !isOverlayVisible;
-      overlayIndex = isOverlayVisible ? index : -1; // Actualiza el índice
+      if (isOverlayVisible && overlayIndex == index) {
+        // Si el mismo overlay está visible, se cierra
+        isOverlayVisible = false;
+        overlayIndex = -1;
+      } else {
+        // Si no, se muestra el nuevo overlay
+        isOverlayVisible = true;
+        overlayIndex = index;
+      }
     });
   }
+
+
 
   Future<void> _logOut(BuildContext context) async {
     showDialog(
@@ -308,36 +450,10 @@ class MainMenuViewState extends State<MainMenuView>
                                 tr(context, 'Panel de control').toUpperCase(),
                                 scaleFactorPanel,
                                     () async {
-                                  setState(() => scaleFactorPanel = 1); // 🔹 Restaurar tamaño antes de navegar
-
-                                  // 🔹 Esperar 200ms antes de navegar para asegurarnos de que el botón recupere su tamaño
-                                  await Future.delayed(const Duration(milliseconds: 200));
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PanelView(
-                                        onBack: () => Navigator.pop(context), // 🔹 Volver al menú principal
-                                        onReset: () => Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => PanelView(
-                                              onBack: () => Navigator.pop(context),
-                                              onReset: () {}, // 🔹 Evita bucle infinito en navegación
-                                              screenWidth: MediaQuery.of(context).size.width,
-                                              screenHeight: MediaQuery.of(context).size.height,
-                                            ),
-                                          ),
-                                        ),
-                                        screenWidth: MediaQuery.of(context).size.width,
-                                        screenHeight: MediaQuery.of(context).size.height,
-                                      ),
-                                    ),
-                                  ).then((_) {
-                                    setState(() => scaleFactorPanel = 1); // 🔹 Restaurar tamaño al volver
-                                  });
+                                  setState(() => scaleFactorPanel = 1);
+                                  _validateLicenseAndNavigate();
                                 },
-                                    () => setState(() => scaleFactorPanel = 1),
+                                () => setState(() => scaleFactorPanel = 0.95),
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               buildButton(
@@ -494,12 +610,34 @@ class MainMenuViewState extends State<MainMenuView>
             ),
           ),
           if (isOverlayVisible)
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.center,
-                child: _getOverlayWidget(overlayIndex),
-              ),
+            Stack(
+              children: [
+                if (overlayIndex == 2)
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () {}, // Captura los toques pero no hace nada (bloquea eventos debajo)
+                      behavior: HitTestBehavior.opaque, // 🔹 Captura todos los eventos táctiles
+                      child: Container(
+                        color: Colors.black.withOpacity(0.7), // 🔥 Fondo oscurecido
+                      ),
+                    ),
+                  ),
+
+                // 🔹 Posicionamiento del overlay
+                Positioned.fill(
+                  top: overlayIndex == 2 ? screenHeight * 0.2 : 0,
+                  bottom: overlayIndex == 2 ? screenHeight * 0.2 : 0,
+                  left: overlayIndex == 2 ? screenWidth * 0.2 : 0,
+                  right: overlayIndex == 2 ? screenWidth * 0.2 : 0,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: _getOverlayWidget(overlayIndex),
+                  ),
+                ),
+              ],
             ),
+
+
         ],
       ),
     );
@@ -515,10 +653,24 @@ class MainMenuViewState extends State<MainMenuView>
         return OverlayVita(
           onClose: () => toggleOverlay(1),
         );
+      case 2:
+        return OverlayLicenciaBloc(
+          onClose: () {
+            if (isBlocked) {
+              clearLoginData();
+              widget.onNavigateToLogin();
+            }
+            setState(() {
+              isOverlayVisible = false;
+              overlayIndex = -1;
+            });
+          },
+        );
       default:
         return Container();
     }
   }
+
 
   Widget buildButton(BuildContext context, String imagePath, String text,
       double scale, VoidCallback onTapUp, VoidCallback onTapDown,
@@ -535,7 +687,8 @@ class MainMenuViewState extends State<MainMenuView>
         // Deshabilitar acción si está deshabilitado
         child: AnimatedScale(
           scale: scale,
-          duration: const Duration(milliseconds: 100),
+          duration: const Duration(milliseconds: 100), // 🔥 ¡Animación más rápida!
+          curve: Curves.easeInToLinear,
           child: Opacity(
             opacity: isDisabled ? 0.5 : 1.0,
             // Aplica opacidad solo si está deshabilitado

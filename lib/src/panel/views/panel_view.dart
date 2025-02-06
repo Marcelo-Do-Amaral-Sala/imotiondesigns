@@ -1483,6 +1483,8 @@ class _PanelViewState extends State<PanelView>
                   tr(context, 'Aviso').toUpperCase(),
                   style: TextStyle(
                     color: const Color(0xFF2be4f3),
+                    decoration: TextDecoration.underline,
+                    decorationColor: const Color(0xFF28E2F5),
                     fontSize: 30.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -3628,6 +3630,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                   style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 30.sp,
+                      decoration: TextDecoration.underline,
+                      decorationColor: const Color(0xFF28E2F5),
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
