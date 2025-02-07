@@ -30,6 +30,7 @@ class LicenciaFormView extends StatefulWidget {
 
 class _LicenciaFormViewState extends State<LicenciaFormView> {
   double scaleFactorBack = 1.0;
+  double _sliderValue = 25;
   final _nLicenciaController = TextEditingController();
   final _nameController = TextEditingController();
   final _countryController = TextEditingController();
@@ -848,10 +849,85 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                               ),
                             ),
                           ),
-                        ],
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Expanded(
+                                flex: 1,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      tr(context, 'Tiempo de sesión')
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 17.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return StatefulBuilder(
+                                          builder: (context, setState) {
+                                            double _sliderValue = 25; // Valor inicial
+                                            return Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      '0',
+                                                      style: TextStyle(
+                                                        fontSize: 14.sp,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Slider(
+                                                        value: _sliderValue,
+                                                        min: 0,
+                                                        max: 30,
+                                                        divisions: 30,
+                                                        label: '${_sliderValue.round()}',
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            _sliderValue = value;
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '30',
+                                                      style: TextStyle(
+                                                        fontSize: 14.sp,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Text(
+                                                  '${_sliderValue.round()} minutos',
+                                                  style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                       ),
                     ),
-                  ],
+                    ],
                 ),
               ),
             ),
@@ -866,7 +942,8 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                     child: _getOverlayWidget(overlayIndex, overlayMac,
                         overlayMacBle, overlayEstado)),
               ),
-          ]),
+            ],
+          ),
         ],
       ),
     );

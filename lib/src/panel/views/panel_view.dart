@@ -856,8 +856,6 @@ class _PanelViewState extends State<PanelView>
                                           child: SizedBox(
                                             child: ClipOval(
                                               child: Image.asset(
-                                                // Ajusta el tamaño como sea necesario
-
                                                 'assets/images/back.png',
                                                 fit: BoxFit.scaleDown,
                                               ),
