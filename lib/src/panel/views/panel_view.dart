@@ -1523,7 +1523,7 @@ class _PanelViewState extends State<PanelView>
                     OutlinedButton(
                       onPressed: () async {
                         try {
-                          // 🔥 SOLO después de que `disposeBle()` haya terminado, ejecutar `onBack()`
+                          bleConnectionService.disposeBle();
                           widget.onBack();
                           Navigator.of(context).pop();
                         } catch (e) {
@@ -9115,6 +9115,7 @@ class BleConnectionService {
     _subscriptions.clear();
     _connectionStreams.clear();
     debugPrint("✅ BLE limpiado sin cerrar StreamControllers.");
+    flutterReactiveBle.initialize();
   }
 
 

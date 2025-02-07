@@ -61,11 +61,12 @@ class SubprogramTableWidget extends StatelessWidget {
           context, tr(context, 'Programa').toUpperCase(),
         ),
         buildCell(
-          context, tr(context, 'Duración').toUpperCase(),
+          context, '${tr(context, 'Duración').toUpperCase()} (min)',
         ),
         buildCell(
-          context, tr(context, 'Ajuste').toUpperCase(),
+          context, '${tr(context, 'Ajuste').toUpperCase()} (µs)',
         ),
+
       ],
     );
   }
