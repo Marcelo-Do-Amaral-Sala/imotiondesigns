@@ -65,9 +65,6 @@ class MainMenuViewState extends State<MainMenuView>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      FocusScope.of(context).unfocus();
-    });
     checkUserProfile();
   }
 

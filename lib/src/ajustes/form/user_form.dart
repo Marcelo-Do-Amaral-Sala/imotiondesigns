@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
@@ -44,27 +45,36 @@ class UserDataFormState extends State<UserDataForm> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    // Obtener la fecha actual
     DateTime today = DateTime.now();
-
-    // Restar 18 años a la fecha actual para obtener la fecha límite
     DateTime eighteenYearsAgo =
         DateTime(today.year - 18, today.month, today.day);
 
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: eighteenYearsAgo,
-        // Puedes poner cualquier fecha válida aquí, por ejemplo, hoy.
-        firstDate: DateTime(1900),
-        // Establecemos un límite inferior para la selección (por ejemplo, 1900).
-        lastDate:
-            eighteenYearsAgo // La última fecha seleccionable debe ser hace 18 años.
+      context: context,
+      initialDate: eighteenYearsAgo,
+      firstDate: DateTime(1900),
+      lastDate: eighteenYearsAgo,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: const Color(0xFF2be4f3), // 🔥 Color de selección
+              onPrimary: Colors.white, // 🔥 Color del texto en la selección
+              surface: const Color(0xFF494949), // 🔥 Color de fondo
+              onSurface: Colors.white, // 🔥 Color de los días normales
+            ),
+            dialogBackgroundColor: Colors.white, // 🔥 Fondo del diálogo
+          ),
+          child: Transform.scale(
+            scale: 1.1, // 🔥 Aumenta o reduce el tamaño del contenido interno
+            child: child,
+          ),
         );
+      },
+    );
 
     if (picked != null) {
-      // Aquí procesas la fecha seleccionada
       setState(() {
-        // Formateamos la fecha seleccionada en el formato dd/MM/yyyy
         _birthDate = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
@@ -77,8 +87,24 @@ class UserDataFormState extends State<UserDataForm> {
       // Puedes poner cualquier fecha válida aquí, por ejemplo, hoy.
       firstDate: DateTime(1900),
       // Establecemos un límite inferior para la selección (por ejemplo, 1900).
-      lastDate: DateTime(
-          2050), // La última fecha seleccionable debe ser hace 18 años.
+      lastDate: DateTime(2050),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: const Color(0xFF2be4f3), // 🔥 Color de selección
+              onPrimary: Colors.white, // 🔥 Color del texto en la selección
+              surface: const Color(0xFF494949), // 🔥 Color de fondo
+              onSurface: Colors.white, // 🔥 Color de los días normales
+            ),
+            dialogBackgroundColor: Colors.white, // 🔥 Fondo del diálogo
+          ),
+          child: Transform.scale(
+            scale: 1.1, // 🔥 Aumenta o reduce el tamaño del contenido interno
+            child: child,
+          ),
+        );
+      },
     );
 
     if (picked != null) {

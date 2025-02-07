@@ -241,8 +241,10 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
                                     setState(() => scaleFactorBack = 0.90),
                                 onTapUp: (_) =>
                                     setState(() => scaleFactorBack = 1.0),
-                                onTap: () {
-                                  widget
+                                onTap: isOverlayVisible
+                                    ? null
+                                    : () {
+                                        widget
                                       .onBack(); // Llama al callback para volver a la vista anterior
                                 },
                                 child: AnimatedScale(

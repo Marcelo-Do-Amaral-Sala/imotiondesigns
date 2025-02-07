@@ -1,0 +1,388 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.imotion_designs"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-feature
+11-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:2:5-89
+12        android:name="android.hardware.bluetooth_le"
+12-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:2:19-63
+13        android:required="true" />
+13-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:2:64-87
+14    <uses-feature android:name="android.hardware.location.gps" />
+14-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:3:5-65
+14-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:3:19-63
+15    <uses-feature android:name="android.hardware.bluetooth" />
+15-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:4:5-62
+15-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:4:19-60
+16
+17    <!-- Permisos básicos -->
+18    <uses-permission android:name="android.permission.INTERNET" />
+18-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:41:5-67
+18-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:41:22-64
+19    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+19-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:42:5-79
+19-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:42:22-76
+20    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+20-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:43:5-79
+20-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:43:22-77
+21    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+21-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:44:5-80
+21-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:44:22-78
+22    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+22-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:45:5-97
+22-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:45:22-95
+23
+24    <!-- Permisos de Bluetooth -->
+25    <uses-permission
+25-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:49:5-68
+26        android:name="android.permission.BLUETOOTH"
+26-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:49:22-65
+27        android:maxSdkVersion="30" />
+27-->[:reactive_ble_mobile] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\reactive_ble_mobile-5.4.0\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:10:9-35
+28    <uses-permission
+28-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:50:5-74
+29        android:name="android.permission.BLUETOOTH_ADMIN"
+29-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:50:22-71
+30        android:maxSdkVersion="30" />
+30-->[:reactive_ble_mobile] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\reactive_ble_mobile-5.4.0\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:13:9-35
+31    <uses-permission
+31-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:51:5-73
+32        android:name="android.permission.BLUETOOTH_SCAN"
+32-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:51:22-70
+33        android:usesPermissionFlags="neverForLocation" />
+33-->[com.polidea.rxandroidble2:rxandroidble:1.16.0] C:\Users\mamar\.gradle\caches\transforms-3\d05ec9186cab9e5d582446de459f51d8\transformed\jetified-rxandroidble-1.16.0\AndroidManifest.xml:24:9-55
+34    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+34-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:52:5-76
+34-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:52:22-73
+35    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+35-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:53:5-78
+35-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:53:22-75
+36
+37    <!-- Permisos de ubicación (solo hasta Android 11) -->
+38    <uses-permission
+38-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:56:5-105
+39        android:name="android.permission.ACCESS_FINE_LOCATION"
+39-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:56:22-76
+40        android:maxSdkVersion="30" />
+40-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:56:77-103
+41    <uses-permission
+41-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:57:5-107
+42        android:name="android.permission.ACCESS_COARSE_LOCATION"
+42-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:57:22-78
+43        android:maxSdkVersion="30" />
+43-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:57:79-105
+44
+45    <!-- Permiso de ubicación en segundo plano (solo si es necesario) -->
+46    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+46-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:60:5-85
+46-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:60:22-82
+47    <uses-permission
+47-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:62:5-63:57
+48        android:name="android.permission.NEARBY_WIFI_DEVICES"
+48-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:62:22-75
+49        android:usesPermissionFlags="neverForLocation" />
+49-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:63:9-55
+50
+51    <!-- Declaración de intent para escaneo de dispositivos en Android 12+ -->
+52    <queries>
+52-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:66:5-70:15
+53        <intent>
+53-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:67:9-69:18
+54            <action android:name="android.bluetooth.adapter.action.REQUEST_DISCOVERABLE" />
+54-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:68:13-91
+54-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:68:21-89
+55        </intent>
+56    </queries>
+57
+58    <permission
+58-->[androidx.core:core:1.13.1] C:\Users\mamar\.gradle\caches\transforms-3\56171c67d3b3b7353fd1934980ff2166\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+59        android:name="com.example.imotion_designs.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+59-->[androidx.core:core:1.13.1] C:\Users\mamar\.gradle\caches\transforms-3\56171c67d3b3b7353fd1934980ff2166\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+60        android:protectionLevel="signature" />
+60-->[androidx.core:core:1.13.1] C:\Users\mamar\.gradle\caches\transforms-3\56171c67d3b3b7353fd1934980ff2166\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+61
+62    <uses-permission android:name="com.example.imotion_designs.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" /> <!-- required for API 23 - 30, no android:maxSdkVersion because of a potential breaking change -->
+62-->[androidx.core:core:1.13.1] C:\Users\mamar\.gradle\caches\transforms-3\56171c67d3b3b7353fd1934980ff2166\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+62-->[androidx.core:core:1.13.1] C:\Users\mamar\.gradle\caches\transforms-3\56171c67d3b3b7353fd1934980ff2166\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+63    <!-- TODO: add android:maxSdkVersion on 2.0.0 -->
+64    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
+64-->[com.polidea.rxandroidble2:rxandroidble:1.16.0] C:\Users\mamar\.gradle\caches\transforms-3\d05ec9186cab9e5d582446de459f51d8\transformed\jetified-rxandroidble-1.16.0\AndroidManifest.xml:18:5-88
+64-->[com.polidea.rxandroidble2:rxandroidble:1.16.0] C:\Users\mamar\.gradle\caches\transforms-3\d05ec9186cab9e5d582446de459f51d8\transformed\jetified-rxandroidble-1.16.0\AndroidManifest.xml:18:29-85
+65    <uses-permission-sdk-23 android:name="android.permission.ACCESS_FINE_LOCATION" />
+65-->[com.polidea.rxandroidble2:rxandroidble:1.16.0] C:\Users\mamar\.gradle\caches\transforms-3\d05ec9186cab9e5d582446de459f51d8\transformed\jetified-rxandroidble-1.16.0\AndroidManifest.xml:19:5-86
+65-->[com.polidea.rxandroidble2:rxandroidble:1.16.0] C:\Users\mamar\.gradle\caches\transforms-3\d05ec9186cab9e5d582446de459f51d8\transformed\jetified-rxandroidble-1.16.0\AndroidManifest.xml:19:29-83
+66
+67    <application
+68        android:name="android.app.Application"
+68-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:8:9-42
+69        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+69-->[androidx.core:core:1.13.1] C:\Users\mamar\.gradle\caches\transforms-3\56171c67d3b3b7353fd1934980ff2166\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+70        android:enableOnBackInvokedCallback="true"
+70-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:10:9-51
+71        android:extractNativeLibs="true"
+72        android:icon="@mipmap/ic_launcher"
+72-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:9:9-43
+73        android:label="imotion25" >
+73-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:7:9-34
+74        <activity
+74-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:12:9-32:20
+75            android:name="com.example.imotion_designs.MainActivity"
+75-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:13:13-41
+76            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+76-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:18:13-163
+77            android:exported="true"
+77-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:14:13-36
+78            android:hardwareAccelerated="true"
+78-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:19:13-47
+79            android:launchMode="singleTop"
+79-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:15:13-43
+80            android:taskAffinity=""
+80-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:16:13-36
+81            android:theme="@style/LaunchTheme"
+81-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:17:13-47
+82            android:windowSoftInputMode="adjustResize" >
+82-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:20:13-55
+83            <meta-data
+83-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:22:13-24:56
+84                android:name="io.flutter.embedding.android.NormalTheme"
+84-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:23:17-72
+85                android:resource="@style/NormalTheme" />
+85-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:24:17-54
+86            <meta-data
+86-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:25:13-27:73
+87                android:name="com.google.android.gms.version"
+87-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:26:17-62
+88                android:value="@integer/google_play_services_version" />
+88-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:27:17-70
+89
+90            <intent-filter>
+90-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:28:13-31:29
+91                <action android:name="android.intent.action.MAIN" />
+91-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:29:17-68
+91-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:29:25-66
+92
+93                <category android:name="android.intent.category.LAUNCHER" />
+93-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:30:17-76
+93-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:30:27-74
+94            </intent-filter>
+95        </activity>
+96
+97        <!-- Meta-data necesaria para Flutter -->
+98        <meta-data
+98-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:35:9-37:33
+99            android:name="flutterEmbedding"
+99-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:36:13-44
+100            android:value="2" />
+100-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:37:13-30
+101
+102        <service
+102-->[:cloud_firestore] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.2\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:8:9-12:19
+103            android:name="com.google.firebase.components.ComponentDiscoveryService"
+103-->[:cloud_firestore] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.2\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:8:18-89
+104            android:directBootAware="true"
+104-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:32:13-43
+105            android:exported="false" >
+105-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\mamar\.gradle\caches\transforms-3\5bbf61e3d2b49ee62f26243d01dfff0f\transformed\jetified-firebase-firestore-25.1.1\AndroidManifest.xml:16:13-37
+106            <meta-data
+106-->[:cloud_firestore] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.2\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:9:13-11:85
+107                android:name="com.google.firebase.components:io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestoreRegistrar"
+107-->[:cloud_firestore] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.2\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:10:17-134
+108                android:value="com.google.firebase.components.ComponentRegistrar" />
+108-->[:cloud_firestore] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.2\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:11:17-82
+109            <meta-data
+109-->[:firebase_storage] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.1\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:9:13-11:85
+110                android:name="com.google.firebase.components:io.flutter.plugins.firebase.storage.FlutterFirebaseAppRegistrar"
+110-->[:firebase_storage] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.1\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:10:17-126
+111                android:value="com.google.firebase.components.ComponentRegistrar" />
+111-->[:firebase_storage] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.1\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:11:17-82
+112            <meta-data
+112-->[:firebase_core] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.10.1\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:9:13-11:85
+113                android:name="com.google.firebase.components:io.flutter.plugins.firebase.core.FlutterFirebaseCoreRegistrar"
+113-->[:firebase_core] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.10.1\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:10:17-124
+114                android:value="com.google.firebase.components.ComponentRegistrar" />
+114-->[:firebase_core] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.10.1\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:11:17-82
+115            <meta-data
+115-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\mamar\.gradle\caches\transforms-3\5bbf61e3d2b49ee62f26243d01dfff0f\transformed\jetified-firebase-firestore-25.1.1\AndroidManifest.xml:17:13-19:85
+116                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
+116-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\mamar\.gradle\caches\transforms-3\5bbf61e3d2b49ee62f26243d01dfff0f\transformed\jetified-firebase-firestore-25.1.1\AndroidManifest.xml:18:17-122
+117                android:value="com.google.firebase.components.ComponentRegistrar" />
+117-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\mamar\.gradle\caches\transforms-3\5bbf61e3d2b49ee62f26243d01dfff0f\transformed\jetified-firebase-firestore-25.1.1\AndroidManifest.xml:19:17-82
+118            <meta-data
+118-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\mamar\.gradle\caches\transforms-3\5bbf61e3d2b49ee62f26243d01dfff0f\transformed\jetified-firebase-firestore-25.1.1\AndroidManifest.xml:20:13-22:85
+119                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+119-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\mamar\.gradle\caches\transforms-3\5bbf61e3d2b49ee62f26243d01dfff0f\transformed\jetified-firebase-firestore-25.1.1\AndroidManifest.xml:21:17-111
+120                android:value="com.google.firebase.components.ComponentRegistrar" />
+120-->[com.google.firebase:firebase-firestore:25.1.1] C:\Users\mamar\.gradle\caches\transforms-3\5bbf61e3d2b49ee62f26243d01dfff0f\transformed\jetified-firebase-firestore-25.1.1\AndroidManifest.xml:22:17-82
+121            <meta-data
+121-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\mamar\.gradle\caches\transforms-3\b25aff3e8aee314c60fecc49f743616c\transformed\jetified-firebase-storage-21.0.1\AndroidManifest.xml:30:13-32:85
+122                android:name="com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar"
+122-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\mamar\.gradle\caches\transforms-3\b25aff3e8aee314c60fecc49f743616c\transformed\jetified-firebase-storage-21.0.1\AndroidManifest.xml:31:17-118
+123                android:value="com.google.firebase.components.ComponentRegistrar" />
+123-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\mamar\.gradle\caches\transforms-3\b25aff3e8aee314c60fecc49f743616c\transformed\jetified-firebase-storage-21.0.1\AndroidManifest.xml:32:17-82
+124            <meta-data
+124-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\mamar\.gradle\caches\transforms-3\b25aff3e8aee314c60fecc49f743616c\transformed\jetified-firebase-storage-21.0.1\AndroidManifest.xml:33:13-35:85
+125                android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
+125-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\mamar\.gradle\caches\transforms-3\b25aff3e8aee314c60fecc49f743616c\transformed\jetified-firebase-storage-21.0.1\AndroidManifest.xml:34:17-107
+126                android:value="com.google.firebase.components.ComponentRegistrar" />
+126-->[com.google.firebase:firebase-storage:21.0.1] C:\Users\mamar\.gradle\caches\transforms-3\b25aff3e8aee314c60fecc49f743616c\transformed\jetified-firebase-storage-21.0.1\AndroidManifest.xml:35:17-82
+127            <meta-data
+127-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\mamar\.gradle\caches\transforms-3\3844a2608b1558fc97ff4fb20893d29d\transformed\jetified-firebase-appcheck-18.0.0\AndroidManifest.xml:25:13-27:85
+128                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar"
+128-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\mamar\.gradle\caches\transforms-3\3844a2608b1558fc97ff4fb20893d29d\transformed\jetified-firebase-appcheck-18.0.0\AndroidManifest.xml:26:17-120
+129                android:value="com.google.firebase.components.ComponentRegistrar" />
+129-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\mamar\.gradle\caches\transforms-3\3844a2608b1558fc97ff4fb20893d29d\transformed\jetified-firebase-appcheck-18.0.0\AndroidManifest.xml:27:17-82
+130            <meta-data
+130-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\mamar\.gradle\caches\transforms-3\3844a2608b1558fc97ff4fb20893d29d\transformed\jetified-firebase-appcheck-18.0.0\AndroidManifest.xml:28:13-30:85
+131                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar"
+131-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\mamar\.gradle\caches\transforms-3\3844a2608b1558fc97ff4fb20893d29d\transformed\jetified-firebase-appcheck-18.0.0\AndroidManifest.xml:29:17-117
+132                android:value="com.google.firebase.components.ComponentRegistrar" />
+132-->[com.google.firebase:firebase-appcheck:18.0.0] C:\Users\mamar\.gradle\caches\transforms-3\3844a2608b1558fc97ff4fb20893d29d\transformed\jetified-firebase-appcheck-18.0.0\AndroidManifest.xml:30:17-82
+133            <meta-data
+133-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\182bf3b5a0ba944c2c382fc137302632\transformed\jetified-firebase-common-ktx-21.0.0\AndroidManifest.xml:12:13-14:85
+134                android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
+134-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\182bf3b5a0ba944c2c382fc137302632\transformed\jetified-firebase-common-ktx-21.0.0\AndroidManifest.xml:13:17-116
+135                android:value="com.google.firebase.components.ComponentRegistrar" />
+135-->[com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\182bf3b5a0ba944c2c382fc137302632\transformed\jetified-firebase-common-ktx-21.0.0\AndroidManifest.xml:14:17-82
+136            <meta-data
+136-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:35:13-37:85
+137                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+137-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:36:17-109
+138                android:value="com.google.firebase.components.ComponentRegistrar" />
+138-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:37:17-82
+139        </service>
+140
+141        <provider
+141-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:9:9-19:20
+142            android:name="com.crazecoder.openfile.FileProvider"
+142-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:10:13-64
+143            android:authorities="com.example.imotion_designs.fileProvider.com.crazecoder.openfile"
+143-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:11:13-88
+144            android:exported="false"
+144-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:12:13-37
+145            android:grantUriPermissions="true"
+145-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:13:13-47
+146            android:requestLegacyExternalStorage="true" >
+146-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:14:13-56
+147            <meta-data
+147-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:16:13-18:53
+148                android:name="android.support.FILE_PROVIDER_PATHS"
+148-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:17:17-67
+149                android:resource="@xml/filepaths" />
+149-->[:open_file_android] C:\Users\mamar\AppData\Local\Pub\Cache\hosted\pub.dev\open_file_android-1.0.6\android\build\intermediates\merged_manifest\release\AndroidManifest.xml:18:17-50
+150        </provider>
+151
+152        <uses-library
+152-->[androidx.window:window:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\292905771901ff1a1a5d0cce8f8a80b8\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
+153            android:name="androidx.window.extensions"
+153-->[androidx.window:window:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\292905771901ff1a1a5d0cce8f8a80b8\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
+154            android:required="false" />
+154-->[androidx.window:window:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\292905771901ff1a1a5d0cce8f8a80b8\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
+155        <uses-library
+155-->[androidx.window:window:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\292905771901ff1a1a5d0cce8f8a80b8\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
+156            android:name="androidx.window.sidecar"
+156-->[androidx.window:window:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\292905771901ff1a1a5d0cce8f8a80b8\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
+157            android:required="false" />
+157-->[androidx.window:window:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\292905771901ff1a1a5d0cce8f8a80b8\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
+158
+159        <provider
+159-->[androidx.emoji2:emoji2:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\1e77b34067067b212d5a72aa7ad44f9e\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+160            android:name="androidx.startup.InitializationProvider"
+160-->[androidx.emoji2:emoji2:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\1e77b34067067b212d5a72aa7ad44f9e\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
+161            android:authorities="com.example.imotion_designs.androidx-startup"
+161-->[androidx.emoji2:emoji2:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\1e77b34067067b212d5a72aa7ad44f9e\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
+162            android:exported="false" >
+162-->[androidx.emoji2:emoji2:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\1e77b34067067b212d5a72aa7ad44f9e\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
+163            <meta-data
+163-->[androidx.emoji2:emoji2:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\1e77b34067067b212d5a72aa7ad44f9e\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+164                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+164-->[androidx.emoji2:emoji2:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\1e77b34067067b212d5a72aa7ad44f9e\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
+165                android:value="androidx.startup" />
+165-->[androidx.emoji2:emoji2:1.2.0] C:\Users\mamar\.gradle\caches\transforms-3\1e77b34067067b212d5a72aa7ad44f9e\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
+166            <meta-data
+166-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\mamar\.gradle\caches\transforms-3\d275aa26cf92d4ea8837ac1580be80ea\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+167                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+167-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\mamar\.gradle\caches\transforms-3\d275aa26cf92d4ea8837ac1580be80ea\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+168                android:value="androidx.startup" />
+168-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\mamar\.gradle\caches\transforms-3\d275aa26cf92d4ea8837ac1580be80ea\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+169            <meta-data
+169-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+170                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+170-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+171                android:value="androidx.startup" />
+171-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+172        </provider>
+173        <provider
+173-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:23:9-28:39
+174            android:name="com.google.firebase.provider.FirebaseInitProvider"
+174-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:24:13-77
+175            android:authorities="com.example.imotion_designs.firebaseinitprovider"
+175-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:25:13-72
+176            android:directBootAware="true"
+176-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:26:13-43
+177            android:exported="false"
+177-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:27:13-37
+178            android:initOrder="100" />
+178-->[com.google.firebase:firebase-common:21.0.0] C:\Users\mamar\.gradle\caches\transforms-3\7fa71276d4cf118cdc9be21a2841c29b\transformed\jetified-firebase-common-21.0.0\AndroidManifest.xml:28:13-36
+179
+180        <activity
+180-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\mamar\.gradle\caches\transforms-3\e71f633e890b5aef6621a8afc1b2e3d7\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:20:9-22:45
+181            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+181-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\mamar\.gradle\caches\transforms-3\e71f633e890b5aef6621a8afc1b2e3d7\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:20:19-85
+182            android:exported="false"
+182-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\mamar\.gradle\caches\transforms-3\e71f633e890b5aef6621a8afc1b2e3d7\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:22:19-43
+183            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+183-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\mamar\.gradle\caches\transforms-3\e71f633e890b5aef6621a8afc1b2e3d7\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:21:19-78
+184
+185        <meta-data
+185-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:25:13-27:73
+186            android:name="com.google.android.gms.version"
+186-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:26:17-62
+187            android:value="@integer/google_play_services_version" />
+187-->C:\Users\mamar\StudioProjects\imotiondesigns\android\app\src\main\AndroidManifest.xml:27:17-70
+188
+189        <receiver
+189-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+190            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+190-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+191            android:directBootAware="false"
+191-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+192            android:enabled="true"
+192-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+193            android:exported="true"
+193-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+194            android:permission="android.permission.DUMP" >
+194-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+195            <intent-filter>
+195-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+196                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+196-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+196-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+197            </intent-filter>
+198            <intent-filter>
+198-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+199                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+199-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+199-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+200            </intent-filter>
+201            <intent-filter>
+201-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+202                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+202-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+202-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+203            </intent-filter>
+204            <intent-filter>
+204-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+205                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+205-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+205-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\mamar\.gradle\caches\transforms-3\8d6188edf8cdaf48e7eed4779820c1cb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+206            </intent-filter>
+207        </receiver>
+208    </application>
+209
+210</manifest>
