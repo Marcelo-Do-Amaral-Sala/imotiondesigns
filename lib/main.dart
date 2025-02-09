@@ -56,7 +56,7 @@ Future<void> main() async {
   await translationProvider.changeLanguage(savedLanguage);
 
   print('✅ Idioma cargado en main.dart: $savedLanguage');
-
+  await ScreenUtil.ensureScreenSize();
   runApp(
     MultiProvider(
       providers: [

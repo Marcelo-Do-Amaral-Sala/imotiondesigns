@@ -131,78 +131,86 @@ class MainMenuViewState extends State<MainMenuView>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            // Ancho del diálogo
-            height: MediaQuery.of(context).size.height * 0.4,
-            // Alto del diálogo
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.01,
-                vertical: MediaQuery.of(context).size.height * 0.01),
-            decoration: BoxDecoration(
-              color: const Color(0xFF494949),
-              borderRadius: BorderRadius.circular(7),
-              border: Border.all(
-                color: const Color(0xFF28E2F5),
-                width: MediaQuery.of(context).size.width * 0.001,
-              ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.8, // Ancho máximo
+              maxHeight: MediaQuery.of(context).size.height * 0.6, // Alto máximo
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              // Distribuye uniformemente
-              crossAxisAlignment: CrossAxisAlignment.center,
-              // Centra horizontalmente
-              children: [
-                Text(
-                  tr(context, 'Aviso').toUpperCase(),
-                  style: TextStyle(
-                      color: const Color(0xFF28E2F5),
-                      fontSize: 30.sp,
-                      decoration: TextDecoration.underline,
-                      decorationColor: const Color(0xFF28E2F5),
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.01,
+                  vertical: MediaQuery.of(context).size.height * 0.01,
                 ),
-                Text(
-                  tr(context, 'Para usar el panel de control debe validar su licencia'),
-                  style: TextStyle(color: Colors.white, fontSize: 24.sp),
-                  textAlign: TextAlign.center,
-                ),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Cerrar el diálogo
-                    FocusScope.of(context).unfocus();
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.01,
-                        vertical: MediaQuery.of(context).size.height * 0.01),
-                    side: BorderSide(
-                      width: MediaQuery.of(context).size.width * 0.001,
-                      color: const Color(0xFF2be4f3),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    tr(context, '¡Entendido!').toUpperCase(),
-                    style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF494949),
+                  borderRadius: BorderRadius.circular(7),
+                  border: Border.all(
+                    color: const Color(0xFF28E2F5),
+                    width: MediaQuery.of(context).size.width * 0.001,
                   ),
                 ),
-              ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      tr(context, 'Aviso').toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF28E2F5),
+                        fontSize: 30.sp,
+                        decoration: TextDecoration.underline,
+                        decorationColor: const Color(0xFF28E2F5),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 10.h),
+                    Text(
+                      tr(context, 'Para usar el panel de control debe validar su licencia'),
+                      style: TextStyle(color: Colors.white, fontSize: 24.sp),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20.h),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Cerrar el diálogo
+                        FocusScope.of(context).unfocus();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.01,
+                          vertical: MediaQuery.of(context).size.height * 0.01,
+                        ),
+                        side: BorderSide(
+                          width: MediaQuery.of(context).size.width * 0.001,
+                          color: const Color(0xFF2be4f3),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        backgroundColor: Colors.transparent,
+                      ),
+                      child: Text(
+                        tr(context, '¡Entendido!').toUpperCase(),
+                        style: TextStyle(
+                          color: const Color(0xFF2be4f3),
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         );
       },
     );
   }
+
 
   Future<void> clearLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -255,89 +263,96 @@ class MainMenuViewState extends State<MainMenuView>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            height: MediaQuery.of(context).size.height * 0.2,
-            padding: EdgeInsets.symmetric(
-                vertical: MediaQuery.of(context).size.height * 0.01,
-                horizontal: MediaQuery.of(context).size.width * 0.02),
-            decoration: BoxDecoration(
-              color: const Color(0xFF494949),
-              borderRadius: BorderRadius.circular(7),
-              border: Border.all(
-                color: const Color(0xFF28E2F5),
-                width: MediaQuery.of(context).size.width * 0.001,
-              ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.4, // Ancho máximo
+              maxHeight: MediaQuery.of(context).size.height * 0.4, // Alto máximo
             ),
-            child: Column(
-              children: [
-                Text(
-                  ('¿${tr(context, 'Cerrar sesión')}?').toUpperCase(),
-                  style: TextStyle(
-                    color: const Color(0xFF2be4f3),
-                    fontSize: 30.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+            child: Container(
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.01,
+                  horizontal: MediaQuery.of(context).size.width * 0.02,
                 ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF494949),
+                  borderRadius: BorderRadius.circular(7),
+                  border: Border.all(
+                    color: const Color(0xFF28E2F5),
+                    width: MediaQuery.of(context).size.width * 0.001,
+                  ),
+                ),
+                child: Column(
                   children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pop(); // Cierra el diálogo sin hacer nada
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF2be4f3)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
+                    Text(
+                      ('¿${tr(context, 'Cerrar sesión')}?').toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: Text(
-                        tr(context, 'Cancelar').toUpperCase(),
-                        style: TextStyle(
-                          color: const Color(0xFF2be4f3),
-                          fontSize: 17.sp,
-                        ),
-                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    OutlinedButton(
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        await clearLoginData();
-                        setState(() {
-                          userId = null;
-                          userTipoPerfil = null;
-                        });
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(); // Cierra el diálogo sin hacer nada
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF2be4f3)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                          ),
+                          child: Text(
+                            tr(context, 'Cancelar').toUpperCase(),
+                            style: TextStyle(
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 17.sp,
+                            ),
+                          ),
+                        ),
+                        OutlinedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await clearLoginData();
+                            setState(() {
+                              userId = null;
+                              userTipoPerfil = null;
+                            });
 
-                        widget.onNavigateToLogin();
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
+                            widget.onNavigateToLogin();
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.red),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                          child: Text(
+                            tr(context, 'Cerrar sesión').toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17.sp,
+                            ),
+                          ),
                         ),
-                        backgroundColor: Colors.red,
-                      ),
-                      child: Text(
-                        tr(context, 'Cerrar sesión').toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
-                        ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+
           ),
         );
       },
     );
   }
+
 
   Future<void> _showMessage(BuildContext context) async {
     showDialog(

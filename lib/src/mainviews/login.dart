@@ -317,7 +317,7 @@ class LoginViewState extends State<LoginView> {
                                 ),
                               ),
                               // Campo para el nombre de usuario
-                              SizedBox(height: screenHeight * 0.1),
+                              SizedBox(height: screenHeight * 0.05),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +349,6 @@ class LoginViewState extends State<LoginView> {
                               ),
                               // Campo para la contraseña con asteriscos visibles
                               Expanded(
-                                flex: 2,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

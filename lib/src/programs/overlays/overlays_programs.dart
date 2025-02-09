@@ -398,6 +398,7 @@ class _OverlayCrearProgramaState extends State<OverlayCrearPrograma>
           text,
           textAlign: TextAlign.center,
           style: TextStyle(
+            fontSize: 16.sp,
             decoration: _tabController.index == index
                 ? TextDecoration.underline
                 : TextDecoration.none,
