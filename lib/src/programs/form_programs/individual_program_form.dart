@@ -478,53 +478,52 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                 width: MediaQuery.of(context).size.width * 0.001,
               ),
             ),
-            child: Column(
-              children: [
-                Text(
-                  tr(context, '¡Alerta!').toUpperCase(),
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Text(
-                  tr(context, 'Debes completar el formulario para continuar')
-                      .toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.01,
-                      vertical: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    side: BorderSide(
-                      width: MediaQuery.of(context).size.width * 0.001,
-                      color: const Color(0xFF2be4f3),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    tr(context, '¡Entendido!').toUpperCase(),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    tr(context, '¡Alerta!').toUpperCase(),
                     style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        color: Colors.red,
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                ),
-              ],
+                  Text(
+                    tr(context, 'Debes completar el formulario para continuar')
+                        .toUpperCase(),
+                    style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.width * 0.01),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.all(10.0),
+                      side: BorderSide(
+                        width: MediaQuery.of(context).size.width * 0.001,
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    child: Text(
+                      tr(context, '¡Entendido!').toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -628,124 +627,37 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
         vertical: screenHeight * 0.01,
         horizontal: screenWidth * 0.02,
       ),
-      child: Column(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                // Fila 1: Campos ID, Nombre, Estado
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(tr(context, 'Nombre del programa').toUpperCase(),
-                              style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              controller: _nameController,
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: tr(
-                                    context, 'Introducir nombre del programa'),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.05),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(tr(context, 'Equipamiento').toUpperCase(),
-                              style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: DropdownButton<String>(
-                              hint: Text(tr(context, 'Seleccione'),
-                                  style: _dropdownHintStyle),
-                              value: selectedEquipOption,
-                              items: [
-                                DropdownMenuItem(
-                                  value: 'BIO-JACKET',
-                                  child: Text('BIO-JACKET',
-                                      style: _dropdownItemStyle),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'BIO-SHAPE',
-                                  child: Text('BIO-SHAPE',
-                                      style: _dropdownItemStyle),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedEquipOption = value;
-                                });
-                              },
-                              dropdownColor: const Color(0xFF313030),
-                              icon: Icon(Icons.arrow_drop_down,
-                                  color: Color(0xFF2be4f3),
-                                  size: screenHeight * 0.05),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                // Fila 2: Campos de Frecuencia, Pulso, Rampa, Contracción y Pausa
-                Expanded(
-                  child: Row(
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: screenHeight * 0.5, // 🔹 Evita que el contenido colapse
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // 🔹 Permite que el contenido se ajuste
+            children: [
+              Column(
+                children: [
+                  // 🔹 Fila de campos de entrada
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(tr(context, 'Frecuencia (Hz)').toUpperCase(),
+                            Text(
+                                tr(context, 'Nombre del programa').toUpperCase(),
                                 style: _labelStyle),
                             Container(
                               alignment: Alignment.center,
                               decoration: _inputDecoration(),
                               child: TextField(
-                                controller: _frequencyController,
-                                focusNode: _frequencyFocus, // 🔹 FocusNode asignado
-                                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                textInputAction: TextInputAction.next,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
-                                ],
+                                controller: _nameController,
                                 style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir frecuencia')),
-                                onSubmitted: (_) => FocusScope.of(context).requestFocus(_pulseFocus),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            Text(tr(context, 'Pulso (ms)').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _pulseController,
-                                focusNode: _pulseFocus,
-                                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                textInputAction: TextInputAction.next,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
-                                ],
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir pulso')),
-                                onSubmitted: (_) => FocusScope.of(context).requestFocus(_rampaFocus),
+                                decoration: _inputDecorationStyle(
+                                  hintText: tr(context,
+                                      'Introducir nombre del programa'),
+                                ),
                               ),
                             ),
                           ],
@@ -755,139 +667,145 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Campo de RAMPA con imagen a la izquierda
-                            Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/RAMPA.png',
-                                  width: screenWidth * 0.05,
-                                  height: screenHeight * 0.05,
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${tr(context, 'Rampa').toUpperCase()} (sx10)",
-                                        style: _labelStyle,
-                                      ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        decoration: _inputDecoration(),
-                                        child: TextField(
-                                          controller: _rampaController,
-                                          focusNode: _rampaFocus,
-                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                          textInputAction: TextInputAction.next,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
-                                          ],
-                                          style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir rampa')),
-                                          onSubmitted: (_) => FocusScope.of(context).requestFocus(_contractionFocus),
-                                        ),
-                                      ),
-                                    ],
+                            Text(tr(context, 'Equipamiento').toUpperCase(),
+                                style: _labelStyle),
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: _inputDecoration(),
+                              child: DropdownButton<String>(
+                                hint: Text(tr(context, 'Seleccione'),
+                                    style: _dropdownHintStyle),
+                                value: selectedEquipOption,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'BIO-JACKET',
+                                    child: Text('BIO-JACKET',
+                                        style: _dropdownItemStyle),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            // Campo de CONTRACCIÓN con imagen a la izquierda
-                            Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/CONTRACCION.png',
-                                  width: screenWidth * 0.05,
-                                  height: screenHeight * 0.05,
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${tr(context, 'Contracción').toUpperCase()} (s.)",
-                                        style: _labelStyle,
-                                      ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        decoration: _inputDecoration(),
-                                        child: TextField(
-                                          controller: _contractionController,
-                                          focusNode: _contractionFocus,
-                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                          textInputAction: TextInputAction.next,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
-                                          ],
-                                          style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir contracción')),
-                                          onSubmitted: (_) => FocusScope.of(context).requestFocus(_pauseFocus),
-                                        ),
-                                      ),
-                                    ],
+                                  DropdownMenuItem(
+                                    value: 'BIO-SHAPE',
+                                    child: Text('BIO-SHAPE',
+                                        style: _dropdownItemStyle),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            // Campo de PAUSA con imagen a la izquierda
-                            Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/PAUSA.png',
-                                  width: screenWidth * 0.05,
-                                  height: screenHeight * 0.05,
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${tr(context, 'Pausa').toUpperCase()} (s.)",
-                                        style: _labelStyle,
-                                      ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        decoration: _inputDecoration(),
-                                        child: TextField(
-                                          controller: _pauseController,
-                                          focusNode: _pauseFocus,
-                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                          textInputAction: TextInputAction.done, // 🔹 Último campo, muestra "Hecho"
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
-                                          ],
-                                          style: _inputTextStyle,
-                                          decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir pausa')),
-                                          onSubmitted: (_) => FocusScope.of(context).unfocus(), // 🔹 Cierra el teclado
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedEquipOption = value;
+                                  });
+                                },
+                                dropdownColor: const Color(0xFF313030),
+                                icon: Icon(Icons.arrow_drop_down,
+                                    color: Color(0xFF2be4f3),
+                                    size: screenHeight * 0.05),
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-          SizedBox(
-            child: Padding(
-              padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.02),
-              child: Row(
+                  SizedBox(height: screenHeight * 0.05),
+
+                  // 🔹 Fila de parámetros técnicos (Frecuencia, Pulso, Rampa, Contracción, Pausa)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        fit: FlexFit.loose, // 🔹 Permite que se adapte sin expandirse
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(tr(context, 'Frecuencia (Hz)').toUpperCase(),
+                                style: _labelStyle),
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: _inputDecoration(),
+                              child: TextField(
+                                controller: _frequencyController,
+                                focusNode: _frequencyFocus,
+                                keyboardType:
+                                TextInputType.numberWithOptions(decimal: true),
+                                textInputAction: TextInputAction.next,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d*\.?\d*$')),
+                                ],
+                                style: _inputTextStyle,
+                                decoration: _inputDecorationStyle(
+                                    hintText: tr(context, 'Introducir frecuencia')),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_pulseFocus),
+                              ),
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            Text(tr(context, 'Pulso (ms)').toUpperCase(),
+                                style: _labelStyle),
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: _inputDecoration(),
+                              child: TextField(
+                                controller: _pulseController,
+                                focusNode: _pulseFocus,
+                                keyboardType:
+                                TextInputType.numberWithOptions(decimal: true),
+                                textInputAction: TextInputAction.next,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d*\.?\d*$')),
+                                ],
+                                style: _inputTextStyle,
+                                decoration: _inputDecorationStyle(
+                                    hintText: tr(context, 'Introducir pulso')),
+                                onSubmitted: (_) => FocusScope.of(context)
+                                    .requestFocus(_rampaFocus),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.05),
+
+                      // 🔹 Campos con iconos (Rampa, Contracción, Pausa)
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabeledTextField(
+                              tr(context, 'Rampa').toUpperCase(),
+                              'assets/images/RAMPA.png',
+                              _rampaController,
+                              _rampaFocus,
+                              _contractionFocus,
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            _buildLabeledTextField(
+                              tr(context, 'Contracción').toUpperCase(),
+                              'assets/images/CONTRACCION.png',
+                              _contractionController,
+                              _contractionFocus,
+                              _pauseFocus,
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            _buildLabeledTextField(
+                              tr(context, 'Pausa').toUpperCase(),
+                              'assets/images/PAUSA.png',
+                              _pauseController,
+                              _pauseFocus,
+                              null,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: screenHeight * 0.01),
+
+              // 🔹 Botón de confirmación (Guardar programa)
+              Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
@@ -913,249 +831,290 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                   ),
                 ],
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+
+
+  Widget _buildLabeledTextField(
+      String label,
+      String imagePath,
+      TextEditingController controller,
+      FocusNode currentFocus,
+      FocusNode? nextFocus) {
+    // Verificar y modificar la etiqueta según el campo
+    String formattedLabel = label;
+    if (label.toLowerCase() == "rampa") {
+      formattedLabel = "$label (sx100)";
+    } else if (label.toLowerCase() == "contracción" ||
+        label.toLowerCase() == "pausa") {
+      formattedLabel = "$label (s.)";
+    }
+
+    return Row(
+      children: [
+        Image.asset(
+          imagePath,
+          width: MediaQuery.of(context).size.width * 0.05,
+          height: MediaQuery.of(context).size.height * 0.05,
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(formattedLabel, style: _labelStyle),
+              Container(
+                alignment: Alignment.center,
+                decoration: _inputDecoration(),
+                child: TextField(
+                  controller: controller,
+                  focusNode: currentFocus,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: nextFocus != null
+                      ? TextInputAction.next
+                      : TextInputAction.done,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                  ],
+                  style: _inputTextStyle,
+                  decoration: _inputDecorationStyle(
+                    hintText: tr(context, 'Introducir $label'),
+                  ),
+                  onSubmitted: (_) {
+                    if (nextFocus != null) {
+                      FocusScope.of(context).requestFocus(nextFocus);
+                    } else {
+                      FocusScope.of(context).unfocus();
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCronaxiaTab(double screenWidth, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: screenHeight * 0.01,
         horizontal: screenWidth * 0.02,
       ),
-      child: Column(
-        children: [
-          Expanded(
-            child: Column(
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          // 🔹 Permite que la columna se ajuste a su contenido
+          children: [
+            // Fila de Nombre del Programa y Equipamiento
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(tr(context, 'Nombre del programa').toUpperCase(),
-                              style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: TextField(
-                              controller: _nameController,
-                              style: _inputTextStyle,
-                              decoration: _inputDecorationStyle(
-                                hintText: tr(
-                                    context, 'Introducir nombre del programa'),
-                                enabled: false,
-                              ),
-                            ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr(context, 'Nombre del programa').toUpperCase(),
+                          style: _labelStyle),
+                      Container(
+                        alignment: Alignment.center,
+                        decoration: _inputDecoration(),
+                        child: TextField(
+                          controller: _nameController,
+                          style: _inputTextStyle,
+                          decoration: _inputDecorationStyle(
+                            hintText:
+                                tr(context, 'Introducir nombre del programa'),
+                            enabled: false,
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                    SizedBox(width: screenWidth * 0.05),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(tr(context, 'Equipamiento').toUpperCase(),
-                              style: _labelStyle),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: _inputDecoration(),
-                            child: AbsorbPointer(
-                              // Deshabilita interacciones con el Dropdown
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedEquipOption,
-                                items: [
-                                  DropdownMenuItem(
-                                    value: 'BIO-JACKET',
-                                    child: Text('BIO-JACKET',
-                                        style: _dropdownItemStyle),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'BIO-SHAPE',
-                                    child: Text('BIO-SHAPE',
-                                        style: _dropdownItemStyle),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'AMBOS',
-                                    child: Text('AMBOS',
-                                        style: _dropdownItemStyle),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedEquipOption = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon: Icon(
-                                  Icons.arrow_drop_down,
-                                  color: Color(0xFF2be4f3),
-                                  size: screenHeight * 0.05,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.05),
-                // Fila 2: Campos dinámicos dependiendo de la opción seleccionada
-                if (selectedEquipOption == 'BIO-JACKET') ...[
-                  // Campos específicos para BIO-JACKET
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildColumnGroup(0, 3, screenWidth), // Primera columna
-                          SizedBox(width: screenWidth * 0.05),
-                          _buildColumnGroup(3, 6, screenWidth), // Segunda columna
-                          SizedBox(width: screenWidth * 0.05),
-                          _buildColumnGroup(6, 9, screenWidth), // Tercera columna
-                          SizedBox(width: screenWidth * 0.05),
-                          _buildColumnGroup(9, 10, screenWidth), // Cuarta columna (último elemento)
-                        ],
-                      ),
-                    ),
+                    ],
                   ),
-
-                ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
-                  // Campos específicos para BIO-SHAPE
-                  Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.03,
+                ),
+                SizedBox(width: screenWidth * 0.05),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr(context, 'Equipamiento').toUpperCase(),
+                          style: _labelStyle),
+                      Container(
+                        alignment: Alignment.center,
+                        decoration: _inputDecoration(),
+                        child: AbsorbPointer(
+                          child: DropdownButton<String>(
+                            hint: Text(tr(context, 'Seleccione'),
+                                style: _dropdownHintStyle),
+                            value: selectedEquipOption,
+                            items: [
+                              DropdownMenuItem(
+                                value: 'BIO-JACKET',
+                                child: Text('BIO-JACKET',
+                                    style: _dropdownItemStyle),
+                              ),
+                              DropdownMenuItem(
+                                value: 'BIO-SHAPE',
+                                child: Text('BIO-SHAPE',
+                                    style: _dropdownItemStyle),
+                              ),
+                              DropdownMenuItem(
+                                value: 'AMBOS',
+                                child: Text('AMBOS', style: _dropdownItemStyle),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedEquipOption = value;
+                              });
+                            },
+                            dropdownColor: const Color(0xFF313030),
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Color(0xFF2be4f3),
+                              size: screenHeight * 0.05,
+                            ),
+                          ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Primera columna de TextFields
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Itera sobre los primeros grupos musculares
-                                  for (int i = 0; i < 3; i++)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                          style: _labelStyle,
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          decoration: _inputDecoration(),
-                                          child: TextField(
-                                            controller: controllersShape[
-                                            gruposBioShape[i]['nombre']],
-                                            keyboardType: const TextInputType
-                                                .numberWithOptions(decimal: true),
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(r'^\d*\.?\d*$')),
-                                            ],
-                                            style: _inputTextStyle,
-                                            enabled: _cronaxiaEnabled,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.05),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Itera sobre los siguientes grupos musculares
-                                  for (int i = 3; i < 6; i++)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                          style: _labelStyle,
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          decoration: _inputDecoration(),
-                                          child: TextField(
-                                            controller: controllersShape[
-                                            gruposBioShape[i]['nombre']],
-                                            keyboardType: const TextInputType
-                                                .numberWithOptions(decimal: true),
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(r'^\d*\.?\d*$')),
-                                            ],
-                                            style: _inputTextStyle,
-                                            enabled: _cronaxiaEnabled,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.05),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Itera sobre los últimos grupos musculares
-                                  for (int i = 6; i < 7; i++)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
-                                          style: _labelStyle,
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          decoration: _inputDecoration(),
-                                          child: TextField(
-                                            controller: controllersShape[
-                                            gruposBioShape[i]['nombre']],
-                                            keyboardType: const TextInputType
-                                                .numberWithOptions(decimal: true),
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.allow(
-                                                  RegExp(r'^\d*\.?\d*$')),
-                                            ],
-                                            style: _inputTextStyle,
-                                            enabled: _cronaxiaEnabled,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                ],
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-          SizedBox(
-            child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.001),
+            SizedBox(height: screenHeight * 0.05),
+
+            // Contenedor dinámico según la opción seleccionada
+            if (selectedEquipOption == 'BIO-JACKET') ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildColumnGroup(0, 3, screenWidth),
+                  SizedBox(width: screenWidth * 0.05),
+                  _buildColumnGroup(3, 6, screenWidth),
+                  SizedBox(width: screenWidth * 0.05),
+                  _buildColumnGroup(6, 9, screenWidth),
+                  SizedBox(width: screenWidth * 0.05),
+                  _buildColumnGroup(9, 10, screenWidth),
+                ],
+              ),
+            ] else if (selectedEquipOption == 'BIO-SHAPE') ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (int i = 0; i < 3; i++)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                style: _labelStyle,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: controllersShape[gruposBioShape[i]
+                                      ['nombre']],
+                                  keyboardType: TextInputType.numberWithOptions(
+                                      decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d*\.?\d*$')),
+                                  ],
+                                  style: _inputTextStyle,
+                                  enabled: _cronaxiaEnabled,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.05),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (int i = 3; i < 6; i++)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                style: _labelStyle,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: controllersShape[gruposBioShape[i]
+                                      ['nombre']],
+                                  keyboardType: TextInputType.numberWithOptions(
+                                      decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d*\.?\d*$')),
+                                  ],
+                                  style: _inputTextStyle,
+                                  enabled: _cronaxiaEnabled,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.05),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (int i = 6; i < 7; i++)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                style: _labelStyle,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: controllersShape[gruposBioShape[i]
+                                      ['nombre']],
+                                  keyboardType: TextInputType.numberWithOptions(
+                                      decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d*\.?\d*$')),
+                                  ],
+                                  style: _inputTextStyle,
+                                  enabled: _cronaxiaEnabled,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            // Botón de Guardar Cronaxia
+            Padding(
+              padding: EdgeInsets.only(top: screenHeight * 0.02),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -1163,20 +1122,12 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.9),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
-                      // Crear una instancia de DatabaseHelper
                       DatabaseHelper dbHelper = DatabaseHelper();
-
                       Map<String, dynamic>? programa =
-                      await dbHelper.getMostRecentPrograma();
-
+                          await dbHelper.getMostRecentPrograma();
                       if (programa != null) {
                         int programaId = programa['id_programa'];
                         String tipoEquipamiento = programa['tipo_equipamiento'];
-
-                        print('El último id_programa es: $programaId');
-                        print('El tipo de equipamiento es: $tipoEquipamiento');
-
-                        // Llamar a la función actualizarCronaxias pasando ambos valores
                         await actualizarCronaxias(programaId, tipoEquipamiento);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -1188,9 +1139,6 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             duration: Duration(seconds: 2),
                           ),
                         );
-                      } else {
-                        print(
-                            'No se encontraron programas en la base de datos');
                       }
                     },
                     child: AnimatedScale(
@@ -1207,15 +1155,16 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
   Widget _buildColumnGroup(int start, int end, double screenWidth) {
     return Expanded(
       child: Column(

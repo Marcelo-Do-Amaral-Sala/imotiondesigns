@@ -492,72 +492,81 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
       ),
       content: Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.03,
-            vertical: MediaQuery.of(context).size.height * 0.03),
+          horizontal: MediaQuery.of(context).size.width * 0.02,
+          vertical: MediaQuery.of(context).size.height * 0.02,
+        ),
         child: Column(
           children: [
             Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: _languageMap.keys.take(3).map((language) {
-                        return buildCustomCheckboxTile(language);
-                      }).toList(),
+              child: SingleChildScrollView(
+                // 🔹 Hace la lista deslizable si es necesario
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: _languageMap.keys.take(3).map((language) {
+                          return buildCustomCheckboxTile(language);
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: _languageMap.keys.skip(3).map((language) {
-                        return buildCustomCheckboxTile(language);
-                      }).toList(),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: _languageMap.keys.skip(3).map((language) {
+                          return buildCustomCheckboxTile(language);
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.03),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: OutlinedButton(
-                  onPressed: () {
-                    if (_selectedLanguage != null) {
-                      _changeAppLanguage(_selectedLanguage!);
-                    }
-                    setState(() {
-
-                    });
-                    widget.onClose();
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.00001,
+                ),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      if (_selectedLanguage != null) {
+                        _changeAppLanguage(_selectedLanguage!);
+                      }
+                      setState(() {});
+                      widget.onClose();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
                         horizontal: MediaQuery.of(context).size.width * 0.01,
-                        vertical: MediaQuery.of(context).size.height * 0.01),
-                    side: BorderSide(
+                        vertical: MediaQuery.of(context).size.height * 0.01,
+                      ),
+                      side: BorderSide(
                         width: MediaQuery.of(context).size.width * 0.001,
-                        color: const Color(0xFF2be4f3)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: const Color(0xFF2be4f3),
                     ),
-                    backgroundColor: const Color(0xFF2be4f3),
-                  ),
-                  child: Text(
-                    translations['Seleccionar']?.toUpperCase() ?? 'SELECCIONAR',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25.sp,
-                      fontWeight: FontWeight.bold,
+                    child: Text(
+                      translations['Seleccionar']?.toUpperCase() ??
+                          'SELECCIONAR',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -590,9 +599,6 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
             });
           },
         ),
-        SizedBox(
-            height: MediaQuery.of(context).size.height *
-                0.02), // Espacio entre filas
       ],
     );
   }
@@ -610,7 +616,7 @@ class _OverlayIdiomaState extends State<OverlayIdioma> {
         width: MediaQuery.of(context).size.width * 0.05,
         height: MediaQuery.of(context).size.height * 0.05,
         margin: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.005, vertical: screenHeight * 0.001),
+            horizontal: screenWidth * 0.001, vertical: screenHeight * 0.001),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: _selectedLanguage == _languageMap[language]
@@ -639,8 +645,7 @@ class OverlayServicio extends StatefulWidget {
 
 class _OverlayServicioState extends State<OverlayServicio>
     with SingleTickerProviderStateMixin {
-  bool isBodyPro = true;
-  String? selectedGender;
+  bool isOverlayVisible = false;
 
   @override
   void initState() {
@@ -652,104 +657,139 @@ class _OverlayServicioState extends State<OverlayServicio>
     super.dispose();
   }
 
+  void toggleOverlay() {
+    setState(() {
+      isOverlayVisible = !isOverlayVisible;
+    });
+
+    debugPrint('isOverlayVisible después de toggleOverlay: $isOverlayVisible');
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return MainOverlay(
-      title: Text(
-        tr(context, 'Servicio técnico').toUpperCase(),
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 34.sp,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF2be4f3),
-        ),
-      ),
-      content: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.03, vertical: screenHeight * 0.03),
-        child: Column(
-          children: [
-            // Título "Contacto"
-            Padding(
-              padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-              child: Text(
-                tr(context, 'Contacto').toUpperCase(),
-                style: TextStyle(
-                    color: const Color(0xFF28E2F5),
-                    fontSize: 25.sp,
-                    fontWeight: FontWeight.bold),
-              ),
+    return Stack(
+      children: [
+        MainOverlay(
+          title: Text(
+            tr(context, 'Servicio técnico').toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 34.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2be4f3),
             ),
-
-            // Descripción del servicio
-            Padding(
-              padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-              child: Text(
-                tr(context,
-                    'Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional'),
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.normal),
-                textAlign: TextAlign.center,
-              ),
-            ),
-
-            // Contenedor con el contacto
-            Expanded(
-              child: Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: screenWidth * 0.8, // Ajuste de ancho
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 46, 46, 46),
-                    borderRadius: BorderRadius.circular(7.0),
+          ),
+          content: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.03, vertical: screenHeight * 0.03),
+            child: Column(
+              children: [
+                // Título "Contacto"
+                Padding(
+                  padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                  child: Text(
+                    tr(context, 'Contacto').toUpperCase(),
+                    style: TextStyle(
+                        color: const Color(0xFF28E2F5),
+                        fontSize: 25.sp,
+                        fontWeight: FontWeight.bold),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.03,
-                        vertical: screenHeight * 0.03),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      // Alineación vertical
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      // Alineación horizontal
+                ),
+
+                // Descripción del servicio
+                Padding(
+                  padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                  child: Text(
+                    tr(context,
+                        'Estamos listos para ayudarte, contacta con nuestro servicio técnico y obtén asistencia profesional'),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.normal),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                // Contenedor con el contacto y el botón de engranaje
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Stack(
                       children: [
-                        Text(
-                          "E-MAIL: technical_service@i-motiongroup.com",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.normal),
-                          textAlign: TextAlign.center,
+                        // Contenedor de Información de Contacto
+                        Container(
+                          width: screenWidth * 0.8,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 46, 46, 46),
+                            borderRadius: BorderRadius.circular(7.0),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.03,
+                              vertical: screenHeight * 0.03),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "E-MAIL: technical_service@i-motiongroup.com",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.normal),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+                              Text(
+                                "WHATSAPP: (+34) 618 112 271",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.normal),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: screenHeight * 0.02),
-                        // Espacio entre las líneas
-                        Text(
-                          "WHATSAPP: (+34) 618 112 271",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.normal),
-                          textAlign: TextAlign.center,
+
+                        // Botón de engranaje en la esquina inferior derecha
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: IconButton(
+                            icon:
+                            Icon(Icons.settings, color: Colors.white, size: 30),
+                            onPressed: () {
+                              toggleOverlay(); // Muestra el overlay de servicio
+                            },
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
+          onClose: widget.onClose,
         ),
-      ),
-      onClose: widget.onClose,
+
+        // Overlay de Servicio Técnico (se muestra si isOverlayVisible es true)
+        if (isOverlayVisible)
+          Positioned.fill(
+            child: OverlayBackup(
+              onClose: () {
+                toggleOverlay(); // Oculta el overlay cuando se cierra
+              },
+            ),
+          ),
+      ],
     );
   }
 }
+
 
 class OverlayAdmins extends StatefulWidget {
   final VoidCallback onClose;
@@ -946,8 +986,8 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
             // Aquí defines el ancho del diálogo
             height: MediaQuery.of(context).size.height * 0.3,
             padding: EdgeInsets.symmetric(
-                vertical: MediaQuery.of(context).size.height * 0.01,
-                horizontal: MediaQuery.of(context).size.width * 0.01),
+                horizontal: MediaQuery.of(context).size.height * 0.01,
+                vertical: MediaQuery.of(context).size.width * 0.01),
             decoration: BoxDecoration(
               color: const Color(0xFF494949),
               borderRadius: BorderRadius.circular(7),
@@ -956,57 +996,58 @@ class _OverlayCrearNuevoState extends State<OverlayCrearNuevo>
                 width: MediaQuery.of(context).size.width * 0.001,
               ),
             ),
-            child: Column(
-              children: [
-                Text(
-                  tr(context, '¡Alerta!').toUpperCase(),
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Text(
-                  tr(context, 'Debes completar el formulario para continuar')
-                      .toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side: BorderSide(
-                      width: MediaQuery.of(context).size.height * 0.001,
-                      color: const Color(0xFF2be4f3),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    tr(context, '¡Entendido!').toUpperCase(),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    tr(context, '¡Alerta!').toUpperCase(),
                     style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        color: Colors.red,
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                ),
-              ],
+                  Text(
+                    tr(context, 'Debes completar el formulario para continuar')
+                        .toUpperCase(),
+                    style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.width * 0.01),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.all(10.0),
+                      side: BorderSide(
+                        width: MediaQuery.of(context).size.width * 0.001,
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    child: Text(
+                      tr(context, '¡Entendido!').toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
-
   Widget _buildTabBar() {
     return Container(
       height: MediaQuery.of(context).size.height *
@@ -1681,7 +1722,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                                       : _userProfileType,
                                           // Esto es por si el valor no coincide con ninguno de los anteriores
                                           style: TextStyle(
-                                            fontSize: 15.sp,
+                                            fontSize: 14.sp,
                                             color: Colors.white,
                                           ),
                                         )
@@ -1941,7 +1982,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                             horizontal: screenWidth * 0.02,
                                             vertical: screenHeight * 0.02,
                                           ),
-                                          width: screenWidth * 0.2,
+                                          width: screenWidth * 0.15,
                                           height: screenHeight * 0.15,
                                           child: CustomPaint(
                                             painter: IMCGaugePainter(
@@ -2258,13 +2299,16 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
       ),
       content: Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
-        child: Column(
-          children: [
-            // Primer Expanded para MAC y Dropdown de estado
-            Expanded(
-              flex: 1,
-              child: Row(
+          horizontal: screenWidth * 0.02,
+          vertical: screenHeight * 0.02,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            // Ensures Column takes only required space
+            children: [
+              // 🔹 Primer Row: MAC y Estado
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
@@ -2279,7 +2323,8 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                       textAlign: TextAlign.left,
                     ),
                   ),
-                  Expanded(
+                  Flexible(
+                    fit: FlexFit.loose, // Allows it to size itself properly
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -2291,7 +2336,6 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                           alignment: Alignment.center,
                           decoration: _inputDecoration(),
                           child: AbsorbPointer(
-                            // Bloquea la interacción
                             child: DropdownButton<String>(
                               hint:
                                   Text('Seleccione', style: _dropdownHintStyle),
@@ -2309,7 +2353,6 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                                 ),
                               ],
                               onChanged: null,
-                              // Bloquea la acción de cambio
                               dropdownColor: const Color(0xFF313030),
                               icon: Icon(
                                 Icons.arrow_drop_down,
@@ -2318,297 +2361,166 @@ class _OverlayMciInfoState extends State<OverlayMciInfo> {
                               ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Row(
+              SizedBox(height: screenHeight * 0.02),
+
+              // 🔹 Contenedor de Info y Recarga (Ambos en una fila)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Contenedor oscuro 1
-                  Expanded(
-                      child: Column(
-                    children: [
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(10.0),
-                          side: BorderSide(
+                  // 🔹 Columna de Información
+                  Flexible(
+                    fit: FlexFit.loose, // Prevents infinite height error
+                    child: Column(
+                      children: [
+                        OutlinedButton(
+                          onPressed: () {},
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.all(10.0),
+                            side: BorderSide(
                               width: screenWidth * 0.001,
-                              color: const Color(0xFF2be4f3)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7),
+                              color: const Color(0xFF2be4f3),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            backgroundColor: Colors.transparent,
                           ),
-                          backgroundColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          tr(context, 'Info').toUpperCase(),
-                          style: TextStyle(
-                            color: const Color(0xFF2be4f3),
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.bold,
+                          child: Text(
+                            tr(context, 'Info').toUpperCase(),
+                            style: TextStyle(
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      Container(
-                        height: screenHeight * 0.2,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 46, 46, 46),
-                          borderRadius: BorderRadius.circular(7.0),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.01,
-                              vertical: screenHeight * 0.01),
+                        SizedBox(height: screenHeight * 0.01),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 46, 46, 46),
+                            borderRadius: BorderRadius.circular(7.0),
+                          ),
+                          padding: EdgeInsets.all(screenWidth * 0.02),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // Primera columna
-                              Expanded(
+                              Flexible(
+                                fit: FlexFit.loose,
+                                // Allows it to take only necessary space
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    // Fila para C:
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'C: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          // Espacio vacío para agregar el dato
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Espacio entre las filas
-                                    // Fila para T:
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'T: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Fila para CT:
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'CT: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Fila para CP:
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'CP: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    _buildInfoRow('C: ', ''),
+                                    _buildInfoRow('T: ', ''),
+                                    _buildInfoRow('CT: ', ''),
+                                    _buildInfoRow('CP: ', ''),
                                   ],
                                 ),
                               ),
-                              // Espacio entre columnas
-                              SizedBox(width: screenWidth * 0.01),
-                              // Espacio entre la primera y segunda columna
-                              // Segunda columna
-                              Expanded(
+                              Flexible(
+                                fit: FlexFit.loose,
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    // Fila para V:
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'V: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'LS: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Fila para FS:
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'FS: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    // Fila para TS:
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'TS: ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    _buildInfoRow('V: ', ''),
+                                    _buildInfoRow('LS: ', ''),
+                                    _buildInfoRow('FS: ', ''),
+                                    _buildInfoRow('TS: ', ''),
                                   ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  )),
+                      ],
+                    ),
+                  ),
+
                   SizedBox(width: screenWidth * 0.05),
-                  Expanded(
-                      child: Column(
-                    children: [
-                      OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(10.0),
-                          side: BorderSide(
+
+                  // 🔹 Columna de Recarga
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: Column(
+                      children: [
+                        OutlinedButton(
+                          onPressed: () {},
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.all(10.0),
+                            side: BorderSide(
                               width: screenWidth * 0.001,
-                              color: const Color(0xFF2be4f3)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7),
+                              color: const Color(0xFF2be4f3),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            backgroundColor: Colors.transparent,
                           ),
-                          backgroundColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          tr(context, 'Recarga').toUpperCase(),
-                          style: TextStyle(
-                            color: const Color(0xFF2be4f3),
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.bold,
+                          child: Text(
+                            tr(context, 'Recarga').toUpperCase(),
+                            style: TextStyle(
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      Container(
-                        height: screenHeight * 0.2,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 46, 46, 46),
-                          borderRadius: BorderRadius.circular(7.0),
+                        SizedBox(height: screenHeight * 0.01),
+
+                        // 🔹 Contenedor de recarga
+                        Container(
+                          height: screenHeight * 0.2,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 46, 46, 46),
+                            borderRadius: BorderRadius.circular(7.0),
+                          ),
+                          padding: EdgeInsets.all(screenWidth * 0.02),
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.01,
-                              vertical: screenHeight * 0.01),
-                          child: Container(),
-                        ),
-                      ),
-                    ],
-                  )),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       onClose: widget.onClose,
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15.sp,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2663,83 +2575,90 @@ class _OverlayLicenciaBlocState extends State<OverlayLicenciaBloc> {
           horizontal: screenWidth * 0.02,
           vertical: screenHeight * 0.02,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // 🔹 Mensaje principal
-            Text(
-              tr(context,
-                  'Su licencia está bloqueada, por favor contacte con el servicio técnico'),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 30.sp,
+        child: SingleChildScrollView(
+          // 🔹 Permite desplazamiento
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            // 🔹 Evita que el contenido ocupe espacio extra
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 🔹 Mensaje principal
+              Text(
+                tr(context,
+                    'Su licencia está bloqueada, por favor contacte con el servicio técnico'),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 30.sp,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
+              SizedBox(height: screenHeight * 0.03),
 
-            // 🔹 Contenedor con la información de contacto
-            Container(
-              width: screenWidth * 0.8,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 46, 46, 46),
-                borderRadius: BorderRadius.circular(7.0),
+              // 🔹 Contenedor con la información de contacto
+              Container(
+                width: screenWidth * 0.8,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 46, 46, 46),
+                  borderRadius: BorderRadius.circular(7.0),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03,
+                  vertical: screenHeight * 0.03,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "E-MAIL: technical_service@i-motiongroup.com",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25.sp,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    Text(
+                      "WHATSAPP: (+34) 618 112 271",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25.sp,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.03,
-                vertical: screenHeight * 0.03,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // 📌 Centrado
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    "E-MAIL: technical_service@i-motiongroup.com",
+              SizedBox(height: screenHeight * 0.03),
+
+              // 🔹 Botón de cerrar siempre accesible
+              Align(
+                alignment: Alignment.bottomRight,
+                child: OutlinedButton(
+                  onPressed: () {
+                    widget.onClose();
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    side:
+                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    tr(context, 'Cerrar').toUpperCase(),
                     style: TextStyle(
-                      color: Colors.white,
+                      color: const Color(0xFF2be4f3),
                       fontSize: 25.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: screenHeight * 0.02),
-                  Text(
-                    "WHATSAPP: (+34) 618 112 271",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25.sp,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: OutlinedButton(
-                onPressed: () {
-                  widget.onClose();
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.all(10.0),
-                  side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7),
-                  ),
-                  backgroundColor: Colors.transparent,
-                ),
-                child: Text(
-                  tr(context, 'Cerrar').toUpperCase(),
-                  style: TextStyle(
-                    color: const Color(0xFF2be4f3),
-                    fontSize: 25.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
                 ),
               ),
-            )
-            // 🔹 Botón de salir
-          ],
+            ],
+          ),
         ),
       ),
       onClose: widget.onClose,

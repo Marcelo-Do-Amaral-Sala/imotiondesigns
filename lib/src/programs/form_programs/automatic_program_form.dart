@@ -500,9 +500,12 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                             0.0),
                                                     child: Center(
                                                       child: IconButton(
-                                                        icon: const Icon(
-                                                            Icons.delete,
-                                                            color: Colors.red),
+                                                        icon: Icon(
+                                                          Icons.delete,
+                                                          color: Colors.red,
+                                                          size: screenHeight *
+                                                              0.05,
+                                                        ),
                                                         onPressed: () {
                                                           // Acceder al id del programa de la secuencia
                                                           int idPrograma =

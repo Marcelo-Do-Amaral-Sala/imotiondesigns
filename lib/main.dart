@@ -57,6 +57,7 @@ Future<void> main() async {
 
   print('✅ Idioma cargado en main.dart: $savedLanguage');
   await ScreenUtil.ensureScreenSize();
+
   runApp(
     MultiProvider(
       providers: [
@@ -73,9 +74,11 @@ Future<void> main() async {
         builder: (context, child) {
           return LayoutBuilder(
             builder: (context, constraints) {
-              return App(
-                screenWidth: constraints.maxWidth,
-                screenHeight: constraints.maxHeight,
+              return SafeArea( // 🔹 Se agregó SafeArea para evitar notch o barras del sistema
+                child: App(
+                  screenWidth: constraints.maxWidth,
+                  screenHeight: constraints.maxHeight,
+                ),
               );
             },
           );

@@ -225,113 +225,133 @@ class _ClientsDataState extends State<ClientsData> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
-          child: Container(
-            width: screenWidth * 0.4,
-            height: screenHeight * 0.3,
-            padding: EdgeInsets.symmetric(
-                vertical: screenHeight * 0.01, horizontal: screenWidth * 0.01),
-            decoration: BoxDecoration(
-              color: const Color(0xFF494949),
-              borderRadius: BorderRadius.circular(7),
-              border: Border.all(
-                color: const Color(0xFF28E2F5),
-                width: screenWidth * 0.001,
-              ),
+          backgroundColor: const Color(0xFF494949),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+            side: BorderSide(
+              color: const Color(0xFF28E2F5),
+              width: screenWidth * 0.001,
             ),
+          ),
+          child: SizedBox(
+            width: screenWidth * 0.4, // 🔹 Mantiene el tamaño original
+            height: screenHeight * 0.35,
             child: Column(
               children: [
-                Text(
-                  tr(context, 'Confirmar borrado').toUpperCase(),
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                Text(
-                  tr(context, '¿Estás seguro que quieres borrar este cliente?')
-                      .toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Cerrar el diálogo
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.01,
-                            vertical: screenHeight * 0.01),
-                        side: BorderSide(
-                          width: screenWidth * 0.001,
-                          color: const Color(0xFF2be4f3),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        backgroundColor: Colors.transparent,
-                      ),
-                      child: Text(
-                        tr(context, 'Cancelar').toUpperCase(),
-                        style: TextStyle(
-                          color: const Color(0xFF2be4f3),
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    OutlinedButton(
-                      onPressed: () async {
-                        DatabaseHelper dbHelper = DatabaseHelper();
-                        await dbHelper.deleteClient(clientId); // Borrar cliente
-
-                        // Mostrar Snackbar de éxito
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              tr(context, 'Cliente borrado correctamente')
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 17.sp),
+                // Contenido desplazable con SingleChildScrollView
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.02,
+                          horizontal: screenWidth * 0.02),
+                      child: Column(
+                        children: [
+                          Text(
+                            tr(context, 'Confirmar borrado').toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 30.sp,
+                              fontWeight: FontWeight.bold,
                             ),
-                            backgroundColor: Colors.orange,
-                            duration: const Duration(seconds: 2),
+                            textAlign: TextAlign.center,
                           ),
-                        );
-
-                        Navigator.of(context).pop(); // Cierra el diálogo
-                        widget.onClose(); // Lógica post-cierre
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.01,
-                            vertical: screenHeight * 0.01),
-                        side: BorderSide(
-                          width: screenWidth * 0.001,
-                          color: Colors.red,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                      child: Text(
-                        tr(context, '¡Sí, estoy seguro!').toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
+                          SizedBox(height: screenHeight * 0.02),
+                          Text(
+                            tr(context,
+                                '¿Estás seguro que quieres borrar este cliente?')
+                                .toUpperCase(),
+                            style:
+                            TextStyle(color: Colors.white, fontSize: 25.sp),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
+                ),
+                // Botones de acción en la parte inferior
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.02,
+                      vertical: screenHeight * 0.02),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Cerrar el diálogo
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.01,
+                              vertical: screenHeight * 0.01),
+                          side: BorderSide(
+                            width: screenWidth * 0.001,
+                            color: const Color(0xFF2be4f3),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          backgroundColor: Colors.transparent,
+                        ),
+                        child: Text(
+                          tr(context, 'Cancelar').toUpperCase(),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: () async {
+                          DatabaseHelper dbHelper = DatabaseHelper();
+                          await dbHelper.deleteClient(clientId); // Borrar cliente
+
+                          // Mostrar Snackbar de éxito
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                tr(context, 'Cliente borrado correctamente')
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 17.sp),
+                              ),
+                              backgroundColor: Colors.orange,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+
+                          Navigator.of(context).pop(); // Cierra el diálogo
+                          widget.onClose(); // Lógica post-cierre
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.01,
+                              vertical: screenHeight * 0.01),
+                          side: BorderSide(
+                            width: screenWidth * 0.001,
+                            color: Colors.red,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Text(
+                          tr(context, '¡Sí, estoy seguro!').toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -340,6 +360,7 @@ class _ClientsDataState extends State<ClientsData> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -352,286 +373,290 @@ class _ClientsDataState extends State<ClientsData> {
           vertical: screenHeight * 0.03,
           horizontal: screenWidth * 0.03,
         ),
-        child: Column(
-          children: [
-            // Primer contenedor de formulario, que ocupa el espacio disponible
-            Expanded(
-              flex: 2, // Ocupa más espacio en la pantalla
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Fila 1: Campos ID, Nombre, Estado
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Nombre').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _nameController,
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir nombre'),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.05),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Estado').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedOption,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: 'Activo',
-                                      child: Text(tr(context, 'Activo'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'Inactivo',
-                                      child: Text(tr(context, 'Inactivo'),
-                                          style: _dropdownItemStyle)),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedOption = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon: Icon(Icons.arrow_drop_down,
-                                    color: const Color(0xFF2be4f3),
-                                    size: screenHeight * 0.05),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: screenHeight * 0.05),
-                  // Fila 2: Campos de Género, Fecha de Nacimiento, Teléfono
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Género').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedGender,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: 'Hombre',
-                                      child: Text(tr(context, 'Hombre'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'Mujer',
-                                      child: Text(tr(context, 'Mujer'),
-                                          style: _dropdownItemStyle)),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedGender = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon: Icon(Icons.arrow_drop_down,
-                                    color: const Color(0xFF2be4f3),
-                                    size: screenHeight * 0.05),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.03),
-                            Text(
-                                tr(context, 'Fecha de nacimiento')
-                                    .toUpperCase(),
-                                style: _labelStyle),
-                            GestureDetector(
-                              onTap: () => _selectDate(context),
-                              child: Container(
+        child: SingleChildScrollView( // 🔹 Permite desplazamiento en pantallas pequeñas
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: screenHeight*0.5, // 🔹 Evita que el contenido colapse
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Primer contenedor de formulario, que ocupa el espacio disponible
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Fila 1: Campos ID, Nombre, Estado
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(tr(context, 'Nombre').toUpperCase(),
+                                  style: _labelStyle),
+                              Container(
                                 alignment: Alignment.center,
                                 decoration: _inputDecoration(),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                child: Text(_birthDate ?? 'DD/MM/YYYY',
-                                    style: _inputTextStyle),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.03),
-                            Text(tr(context, 'Teléfono').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _phoneController,
-                                focusNode: _phoneFocus,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir teléfono'),
+                                child: TextField(
+                                  controller: _nameController,
+                                  style: _inputTextStyle,
+                                  decoration: _inputDecorationStyle(
+                                    hintText: tr(context, 'Introducir nombre'),
+                                  ),
                                 ),
-                                onSubmitted: (_) => FocusScope.of(context)
-                                    .requestFocus(_heightFocus),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(width: screenWidth * 0.1),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Altura (cm)').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _heightController,
-                                focusNode: _heightFocus,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(3),
-                                ],
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                    hintText: tr(context, 'Introducir altura')),
-                                onSubmitted: (_) => FocusScope.of(context)
-                                    .requestFocus(_weightFocus),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.03),
-                            Text(tr(context, 'Peso (kg)').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _weightController,
-                                focusNode: _weightFocus,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(3),
-                                ],
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir peso'),
+                        SizedBox(width: screenWidth * 0.05),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(tr(context, 'Estado').toUpperCase(),
+                                  style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: DropdownButton<String>(
+                                  hint: Text(tr(context, 'Seleccione'),
+                                      style: _dropdownHintStyle),
+                                  value: selectedOption,
+                                  items: [
+                                    DropdownMenuItem(
+                                        value: 'Activo',
+                                        child: Text(tr(context, 'Activo'),
+                                            style: _dropdownItemStyle)),
+                                    DropdownMenuItem(
+                                        value: 'Inactivo',
+                                        child: Text(tr(context, 'Inactivo'),
+                                            style: _dropdownItemStyle)),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedOption = value;
+                                    });
+                                  },
+                                  dropdownColor: const Color(0xFF313030),
+                                  icon: Icon(Icons.arrow_drop_down,
+                                      color: const Color(0xFF2be4f3),
+                                      size: screenHeight * 0.05),
                                 ),
-                                onSubmitted: (_) => FocusScope.of(context)
-                                    .requestFocus(_emailFocus),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: screenHeight * 0.05),
+                    // Fila 2: Género, Fecha de Nacimiento, Teléfono
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(tr(context, 'Género').toUpperCase(),
+                                  style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: DropdownButton<String>(
+                                  hint: Text(tr(context, 'Seleccione'),
+                                      style: _dropdownHintStyle),
+                                  value: selectedGender,
+                                  items: [
+                                    DropdownMenuItem(
+                                        value: 'Hombre',
+                                        child: Text(tr(context, 'Hombre'),
+                                            style: _dropdownItemStyle)),
+                                    DropdownMenuItem(
+                                        value: 'Mujer',
+                                        child: Text(tr(context, 'Mujer'),
+                                            style: _dropdownItemStyle)),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedGender = value;
+                                    });
+                                  },
+                                  dropdownColor: const Color(0xFF313030),
+                                  icon: Icon(Icons.arrow_drop_down,
+                                      color: const Color(0xFF2be4f3),
+                                      size: screenHeight * 0.05),
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.03),
+                              Text(
+                                  tr(context, 'Fecha de nacimiento')
+                                      .toUpperCase(),
+                                  style: _labelStyle),
+                              GestureDetector(
+                                onTap: () => _selectDate(context),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  decoration: _inputDecoration(),
+                                  padding: const EdgeInsets.symmetric(vertical: 15),
+                                  child: Text(_birthDate ?? 'DD/MM/YYYY',
+                                      style: _inputTextStyle),
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.03),
+                              Text(tr(context, 'Teléfono').toUpperCase(),
+                                  style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _phoneController,
+                                  focusNode: _phoneFocus,
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  style: _inputTextStyle,
+                                  decoration: _inputDecorationStyle(
+                                      hintText: tr(context, 'Introducir teléfono')),
+                                  onSubmitted: (_) =>
+                                      FocusScope.of(context).requestFocus(_heightFocus),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: screenWidth * 0.1),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(tr(context, 'Altura (cm)').toUpperCase(),
+                                  style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _heightController,
+                                  focusNode: _heightFocus,
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(3),
+                                  ],
+                                  style: _inputTextStyle,
+                                  decoration: _inputDecorationStyle(
+                                    hintText: tr(context, 'Introducir altura'),
+                                  ),
+                                  onSubmitted: (_) =>
+                                      FocusScope.of(context).requestFocus(_weightFocus),
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.03),
+                              Text(tr(context, 'Peso (kg)').toUpperCase(),
+                                  style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _weightController,
+                                  focusNode: _weightFocus,
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: const TextInputType.numberWithOptions(
+                                      decimal: true),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                                    LengthLimitingTextInputFormatter(3),
+                                  ],
+                                  style: _inputTextStyle,
+                                  decoration: _inputDecorationStyle(
+                                    hintText: tr(context, 'Introducir peso'),
+                                  ),
+                                  onSubmitted: (_) =>
+                                      FocusScope.of(context).requestFocus(_emailFocus),
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.03),
+                              Text('E-MAIL', style: _labelStyle),
+                              Container(
+                                alignment: Alignment.center,
+                                decoration: _inputDecoration(),
+                                child: TextField(
+                                  controller: _emailController,
+                                  focusNode: _emailFocus,
+                                  keyboardType: TextInputType.emailAddress,
+                                  textInputAction: TextInputAction.done,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                                  ],
+                                  style: _inputTextStyle,
+                                  decoration: _inputDecorationStyle(
+                                    hintText: tr(context, 'Introducir e-mail'),
+                                  ),
+                                  onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      ],
+                    ),
+                    SizedBox(height: screenHeight * 0.05),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
+                          onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
+                          onTap: () {
+                            _deleteClients(context, clientId!);
+                          },
+                          child: AnimatedScale(
+                            scale: scaleFactorRemove,
+                            duration: const Duration(milliseconds: 100),
+                            child: SizedBox(
+                              width: screenWidth * 0.1,
+                              height: screenHeight * 0.1,
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/papelera.png',
+                                  fit: BoxFit.scaleDown,
+                                ),
                               ),
                             ),
-                            SizedBox(height: screenHeight * 0.03),
-                            Text('E-MAIL', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _emailController,
-                                focusNode: _emailFocus,
-                                textInputAction: TextInputAction.done,
-                                keyboardType: TextInputType.emailAddress,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.deny(
-                                      RegExp(r'\s')),
-                                ],
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                    hintText: tr(context, 'Introducir e-mail')),
-                                onSubmitted: (_) =>
-                                    FocusScope.of(context).unfocus(),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                          onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                          onTap: () {
+                            _updateData(); // Llama a la función pasando el ID
+                          },
+                          child: AnimatedScale(
+                            scale: scaleFactorTick,
+                            duration: const Duration(milliseconds: 100),
+                            child: SizedBox(
+                              width: screenWidth * 0.1,
+                              height: screenHeight * 0.1,
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/tick.png',
+                                  fit: BoxFit.scaleDown,
+                                ),
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.01),
-            // Fila para el ícono de "tick" alineado a la parte inferior
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
-                  onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-                  onTap: () {
-                    _deleteClients(context, clientId!);
-                  },
-                  child: AnimatedScale(
-                    scale: scaleFactorRemove,
-                    duration: const Duration(milliseconds: 100),
-                    child: SizedBox(
-                      width: screenWidth * 0.08,
-                      height: screenHeight * 0.08,
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/papelera.png',
-                          fit: BoxFit.scaleDown,
-                        ),
-                      ),
+                      ],
                     ),
-                  ),
-                ),
-                GestureDetector(
-                  onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                  onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                  onTap: () {
-                    _updateData(); // Llama a la función pasando el ID
-                  },
-                  child: AnimatedScale(
-                    scale: scaleFactorTick,
-                    duration: const Duration(milliseconds: 100),
-                    child: SizedBox(
-                      width: screenWidth * 0.08,
-                      height: screenHeight * 0.08,
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/tick.png',
-                          fit: BoxFit.scaleDown,
-                        ),
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

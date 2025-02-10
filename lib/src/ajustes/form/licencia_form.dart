@@ -30,7 +30,7 @@ class LicenciaFormView extends StatefulWidget {
 
 class _LicenciaFormViewState extends State<LicenciaFormView> {
   double scaleFactorBack = 1.0;
-  double _sliderValue = 25;
+  double _tiempoSesion = 25;
   final _nLicenciaController = TextEditingController();
   final _nameController = TextEditingController();
   final _countryController = TextEditingController();
@@ -64,6 +64,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
   String licenciaMac = '';
   List<Map<String, dynamic>> mcis = [];
   bool isOverlayVisible = false;
+  bool isTimeSaved=false;
   int overlayIndex = -1;
   String? overlayMac;
   bool? overlayMacBle;
@@ -85,11 +86,13 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
         _countryController.text = AppState.instance.pais;
         _phoneController.text = AppState.instance.telefono;
         _emailController.text = AppState.instance.email;
+        _tiempoSesion = AppState.instance.tiempoSesion;
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus(); // 🔹 Asegurar que no haya focus al abrir la vista
     });
+    isTimeSaved=false;
   }
 
   @override
@@ -221,10 +224,10 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
         _phoneController.text.isEmpty ||
         _emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "DEBES RELLENAR TODOS LOS CAMPOS",
-            style: TextStyle(color: Colors.white, fontSize: 17),
+            tr(context, "Debes rellenar todos los campos").toUpperCase(),
+            style: TextStyle(color: Colors.white, fontSize: 17.sp),
           ),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
@@ -325,7 +328,6 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
           AppState.instance.macBleList = macBleList;
           AppState.instance.bloqueada = estadoBloqueada;
           AppState.instance.licenciaData = licenciaData;
-
           // Guardar la lista de MCIs en AppState
           AppState.instance.mcis = mcis;
 
@@ -343,7 +345,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "LICENCIA NO VÁLIDA",
+            tr(context, "Licencia no válida").toUpperCase(),
             style: TextStyle(color: Colors.white, fontSize: 17.sp),
           ),
           backgroundColor: Colors.red,
@@ -394,6 +396,23 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
     return licenciaInfo;
   }
 
+  Future<void> _guardarTiempoSesion(double tiempo) async {
+    AppState.instance.tiempoSesion = _tiempoSesion;
+    await AppState.instance.saveState(); // Guarda en SharedPreferences
+    setState(() {
+      isTimeSaved = true; // Cambia el estado a "guardado"
+    });
+
+    print("✅ Tiempo de sesión guardado: $tiempo minutos (${(tiempo * 60).toInt()} segundos)");
+    Future.delayed(Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          isTimeSaved = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -403,12 +422,15 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          SizedBox.expand(
+          // Imagen de fondo corregida
+          Positioned.fill(
             child: Image.asset(
               'assets/images/fondo.jpg',
               fit: BoxFit.cover,
             ),
           ),
+
+          // Contenedor superior con título y botón de regreso
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.02,
@@ -444,23 +466,14 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         horizontal: screenWidth * 0.008,
                                         vertical: screenHeight * 0.008,
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              tr(context, 'Licencia')
-                                                  .toUpperCase(),
-                                              style: TextStyle(
-                                                color: const Color(0xFF28E2F5),
-                                                fontSize: 34.sp,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ],
+                                      child: Text(
+                                        tr(context, 'Licencia').toUpperCase(),
+                                        style: TextStyle(
+                                          color: const Color(0xFF28E2F5),
+                                          fontSize: 34.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                   ],
@@ -483,10 +496,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                     setState(() => scaleFactorBack = 0.90),
                                 onTapUp: (_) =>
                                     setState(() => scaleFactorBack = 1.0),
-                                onTap: () {
-                                  widget
-                                      .onBack(); // Llama al callback para volver a la vista anterior
-                                },
+                                onTap: widget.onBack,
                                 child: AnimatedScale(
                                   scale: scaleFactorBack,
                                   duration: const Duration(milliseconds: 100),
@@ -512,40 +522,43 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
               ],
             ),
           ),
-          Stack(children: [
-            Positioned(
-              top: screenHeight * 0.25,
-              // Ajusta este valor según lo que necesites
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.05,
-                  vertical: screenHeight * 0.05,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Columna que contiene los dos primeros Expanded y el botón
-                    Expanded(
-                      flex: 2,
+          Stack(
+            children: [
+              Positioned(
+                top: screenHeight * 0.25,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                    vertical: screenHeight * 0.05,
+                  ),
+                  child: SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: screenHeight * 0.5,
+                      ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            tr(context, 'Datos licencia').toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF2be4f3),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: screenHeight * 0.02),
-                          Row(
+                          Column(
                             children: [
-                              // Primer Expanded: Formulario izquierdo
+                              Text(
+                                tr(context, 'Datos licencia').toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 22.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF2be4f3),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: screenHeight * 0.01),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,12 +572,18 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _nLicenciaController,
-                                        focusNode: _nLicenciaFocus, // 🔹 FocusNode asignado
+                                        focusNode: _nLicenciaFocus,
+                                        // 🔹 FocusNode asignado
                                         keyboardType: TextInputType.text,
-                                        textInputAction: TextInputAction.next, // 🔹 Muestra "Siguiente"
+                                        textInputAction: TextInputAction.next,
+                                        // 🔹 Muestra "Siguiente"
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir nº licencia')),
-                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_nameFocus), // 🔹 Mover foco al siguiente campo
+                                        decoration: _inputDecorationStyle(
+                                            hintText: tr(context,
+                                                'Introducir nº licencia')),
+                                        onSubmitted: (_) =>
+                                            FocusScope.of(context).requestFocus(
+                                                _nameFocus), // 🔹 Mover foco al siguiente campo
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -575,14 +594,17 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       decoration: _inputDecoration(),
                                       child: TextField(
                                         controller: _nameController,
-                                        focusNode: _nameFocus, // 🔹 FocusNode asignado
+                                        focusNode: _nameFocus,
+                                        // 🔹 FocusNode asignado
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: 'Introducir nombre'),
-                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_adressFocus),
+                                        decoration: _inputDecorationStyle(
+                                            hintText: 'Introducir nombre'),
+                                        onSubmitted: (_) =>
+                                            FocusScope.of(context)
+                                                .requestFocus(_adressFocus),
                                       ),
-
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
                                     Text(tr(context, 'Dirección').toUpperCase(),
@@ -596,8 +618,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir dirección')),
-                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_cityFocus),
+                                        decoration: _inputDecorationStyle(
+                                            hintText: tr(context,
+                                                'Introducir dirección')),
+                                        onSubmitted: (_) =>
+                                            FocusScope.of(context)
+                                                .requestFocus(_cityFocus),
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -612,15 +638,18 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir ciudad')),
-                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_provinciaFocus),
+                                        decoration: _inputDecorationStyle(
+                                            hintText: tr(
+                                                context, 'Introducir ciudad')),
+                                        onSubmitted: (_) =>
+                                            FocusScope.of(context)
+                                                .requestFocus(_provinciaFocus),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
                               SizedBox(width: screenWidth * 0.05),
-                              // Segundo Expanded: Formulario derecho
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,8 +665,12 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir provincia')),
-                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_countryFocus),
+                                        decoration: _inputDecorationStyle(
+                                            hintText: tr(context,
+                                                'Introducir provincia')),
+                                        onSubmitted: (_) =>
+                                            FocusScope.of(context)
+                                                .requestFocus(_countryFocus),
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -652,10 +685,13 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.next,
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir país')),
-                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocus),
+                                        decoration: _inputDecorationStyle(
+                                            hintText:
+                                                tr(context, 'Introducir país')),
+                                        onSubmitted: (_) =>
+                                            FocusScope.of(context)
+                                                .requestFocus(_phoneFocus),
                                       ),
-
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
                                     Text(tr(context, 'Teléfono').toUpperCase(),
@@ -669,12 +705,18 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                         keyboardType: TextInputType.number,
                                         textInputAction: TextInputAction.next,
                                         inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.digitsOnly,
-                                          LengthLimitingTextInputFormatter(10), // Limita la longitud del teléfono
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                          LengthLimitingTextInputFormatter(10),
+                                          // Limita la longitud del teléfono
                                         ],
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir teléfono')),
-                                        onSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
+                                        decoration: _inputDecorationStyle(
+                                            hintText: tr(context,
+                                                'Introducir teléfono')),
+                                        onSubmitted: (_) =>
+                                            FocusScope.of(context)
+                                                .requestFocus(_emailFocus),
                                       ),
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
@@ -685,14 +727,132 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                                       child: TextField(
                                         controller: _emailController,
                                         focusNode: _emailFocus,
-                                        keyboardType: TextInputType.emailAddress,
-                                        textInputAction: TextInputAction.done, // 🔹 Último campo, muestra "Hecho"
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        textInputAction: TextInputAction.done,
+                                        // 🔹 Último campo, muestra "Hecho"
                                         inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter.deny(RegExp(r'\s')), // 🔹 Evita espacios en blanco
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s')),
+                                          // 🔹 Evita espacios en blanco
                                         ],
                                         style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(hintText: tr(context, 'Introducir e-mail')),
-                                        onSubmitted: (_) => FocusScope.of(context).unfocus(), // 🔹 Cierra el teclado
+                                        decoration: _inputDecorationStyle(
+                                            hintText: tr(
+                                                context, 'Introducir e-mail')),
+                                        onSubmitted: (_) => FocusScope.of(
+                                                context)
+                                            .unfocus(), // 🔹 Cierra el teclado
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: screenWidth * 0.05),
+                              Flexible(
+                                flex: 2,
+                                fit: FlexFit.loose,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      tr(context, 'Nº de licencia')
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 22.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF2be4f3),
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.001,
+                                          vertical: screenHeight * 0.001,
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            // Encabezado de la tabla
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                buildCell('MAC'),
+                                                buildCell(tr(context, 'Tipo')
+                                                    .toUpperCase()),
+                                                buildCell(tr(context, 'Estado')
+                                                    .toUpperCase()),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.01),
+
+                                            // Contenido de la tabla con Scroll
+                                            SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.3,
+                                              // Altura definida para evitar error
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  children: AppState
+                                                      .instance.mcis
+                                                      .map((row) {
+                                                    String mac =
+                                                        row['mac'] ?? ''; // MAC
+                                                    bool macBle =
+                                                        row['macBle'] ??
+                                                            false; // macBle
+                                                    String estado = AppState
+                                                                .instance
+                                                                .bloqueada ==
+                                                            '1'
+                                                        ? 'Bloqueada'
+                                                        : 'Activa'; // Estado basado en la propiedad bloqueada
+
+                                                    return Column(
+                                                      children: [
+                                                        DataRowWidget(
+                                                          mac: mac,
+                                                          macBle: macBle,
+                                                          estado: estado,
+                                                          onTap: () {
+                                                            setState(() {
+                                                              // Actualizar los valores del overlay
+                                                              overlayMac = mac;
+                                                              overlayMacBle =
+                                                                  macBle;
+                                                              overlayEstado =
+                                                                  estado;
+                                                              toggleOverlay(
+                                                                  0); // Llamar a toggleOverlay con el nuevo estado
+                                                            });
+                                                          },
+                                                        ),
+                                                        SizedBox(
+                                                          height: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height *
+                                                              0.01,
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }).toList(),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -701,240 +861,135 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                             ],
                           ),
                           SizedBox(height: screenHeight * 0.05),
-                          // OutlinedButton debajo de los dos Expanded
-                          Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                OutlinedButton(
-                                  onPressed: _validarLicencia,
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.01,
-                                      vertical: screenHeight * 0.01,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Columna existente para Validar Licencia
+                              Column(
+                                children: [
+                                  OutlinedButton(
+                                    onPressed: _validarLicencia,
+                                    style: OutlinedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.01,
+                                        vertical: screenHeight * 0.01,
+                                      ),
+                                      side: BorderSide(
+                                          width: screenWidth * 0.001,
+                                          color: const Color(0xFF2be4f3)),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(7),
+                                      ),
+                                      backgroundColor: Colors.transparent,
                                     ),
-                                    side: BorderSide(
-                                        width: screenWidth * 0.001,
-                                        color: const Color(0xFF2be4f3)),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
-                                    backgroundColor: Colors.transparent,
-                                  ),
-                                  child: Text(
-                                    tr(context, 'Validar licencia')
-                                        .toUpperCase(),
-                                    style: TextStyle(
-                                      color: const Color(0xFF2be4f3),
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                if (AppState.instance.isLicenciaValida)
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        left: screenWidth * 0.01),
                                     child: Text(
-                                      tr(context, 'Licencia validada')
+                                      tr(context, 'Validar licencia')
                                           .toUpperCase(),
                                       style: TextStyle(
-                                        color: Colors.green,
-                                        fontSize: 22.sp,
+                                        color: const Color(0xFF2be4f3),
+                                        fontSize: 17.sp,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
+                                  if (AppState.instance.isLicenciaValida)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: screenWidth * 0.01),
+                                      child: Text(
+                                        tr(context, 'Licencia validada')
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontSize: 22.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+
+                              Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        tr(context, 'Tiempo de sesión')
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: screenHeight * 0.001),
+                                      // Slider para seleccionar el tiempo de sesión (20-30 min)
+                                      Slider(
+                                        value: _tiempoSesion,
+                                        min: 20,
+                                        max: 30,
+                                        divisions: 10,
+                                        // 🔹 Permite valores en intervalos de 1 minuto
+                                        label: _tiempoSesion.toInt().toString(),
+                                        activeColor: const Color(0xFF2be4f3),
+                                        inactiveColor: Colors.grey,
+                                        onChanged: (double value) {
+                                          setState(() {
+                                            _tiempoSesion = value;
+                                          });
+                                        },
+                                      ),
+                                      // 🔹 Texto dinámico que muestra el tiempo seleccionado
+                                      Text(
+                                        "${_tiempoSesion.toInt()} min",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  OutlinedButton(
+                                    onPressed: () async {
+                                      await _guardarTiempoSesion(_tiempoSesion);
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.01,
+                                        vertical: screenHeight * 0.01,
+                                      ),
+                                      side: BorderSide(
+                                        width: screenWidth * 0.001,
+                                        color: isTimeSaved ? Colors.green : const Color(0xFF2be4f3), // 🔹 Cambia a verde si se guardó
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(7),
+                                      ),
+                                      backgroundColor: Colors.transparent,
+                                    ),
+                                    child: Icon(
+                                      isTimeSaved ? Icons.check : Icons.save, // 🔹 Cambia el icono
+                                      color: isTimeSaved ? Colors.green : const Color(0xFF2be4f3),
+                                      size: screenHeight * 0.03,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(width: screenWidth * 0.05),
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        // Ajusta el tamaño del Column a su contenido
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        // Alinea el texto y el contenedor al inicio
-                        children: [
-                          Text(
-                            tr(context, 'Nº de licencia').toUpperCase(),
-                            // Texto fijo
-                            style: TextStyle(
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF2be4f3),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Expanded(
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.001,
-                                  vertical: screenHeight * 0.001,
-                                ),
-                                child: Column(
-                                  children: [
-                                    // Encabezado de la tabla
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        buildCell('MAC'),
-                                        buildCell(
-                                          tr(context, 'Tipo').toUpperCase(),
-                                        ),
-                                        buildCell(
-                                          tr(context, 'Estado').toUpperCase(),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.01),
-                                    Expanded(
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          children:
-                                              AppState.instance.mcis.map((row) {
-                                            String mac =
-                                                row['mac'] ?? ''; // MAC
-                                            bool macBle = row['macBle'] ??
-                                                false; // macBle
-                                            String estado = AppState
-                                                        .instance.bloqueada ==
-                                                    '1'
-                                                ? 'Bloqueada'
-                                                : 'Activa'; // Estado basado en la propiedad bloqueada
-
-                                            return Column(
-                                              children: [
-                                                DataRowWidget(
-                                                  mac: mac,
-                                                  macBle: macBle,
-                                                  estado: estado,
-                                                  onTap: () {
-                                                    setState(() {
-                                                      // Actualizar los valores del overlay
-                                                      // Establece las variables del overlay aquí
-                                                      overlayMac = mac;
-                                                      overlayMacBle = macBle;
-                                                      overlayEstado = estado;
-                                                      toggleOverlay(
-                                                          0); // Llamar a toggleOverlay con el nuevo estado
-                                                    });
-                                                  },
-                                                ),
-                                                SizedBox(
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.01),
-                                              ],
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Expanded(
-                                flex: 1,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      tr(context, 'Tiempo de sesión')
-                                          .toUpperCase(),
-                                      style: TextStyle(
-                                        fontSize: 17.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            double _sliderValue = 25; // Valor inicial
-                                            return Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      '0',
-                                                      style: TextStyle(
-                                                        fontSize: 14.sp,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: Slider(
-                                                        value: _sliderValue,
-                                                        min: 0,
-                                                        max: 30,
-                                                        divisions: 30,
-                                                        label: '${_sliderValue.round()}',
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _sliderValue = value;
-                                                          });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      '30',
-                                                      style: TextStyle(
-                                                        fontSize: 14.sp,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  '${_sliderValue.round()} minutos',
-                                                  style: TextStyle(
-                                                    fontSize: 16.sp,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                      ),
-                    ),
-                    ],
+                  ),
                 ),
               ),
-            ),
-            if (isOverlayVisible)
-              Positioned(
-                top: screenHeight * 0.2,
-                bottom: screenHeight * 0.2,
+              if (isOverlayVisible)
+                Positioned(
+                  top: screenHeight * 0.2,
+                  bottom: screenHeight * 0.2,
                 right: screenWidth * 0.1,
                 left: screenWidth * 0.1,
                 child: Align(
@@ -943,7 +998,7 @@ class _LicenciaFormViewState extends State<LicenciaFormView> {
                         overlayMacBle, overlayEstado)),
               ),
             ],
-          ),
+          )
         ],
       ),
     );

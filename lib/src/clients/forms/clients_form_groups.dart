@@ -111,7 +111,6 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
       print("- ${group['nombre']} (ID: ${group['id']})");
     });
   }
-
   // Cargar el cliente más reciente desde la base de datos
   Future<void> _loadMostRecentClient() async {
     final dbHelper = DatabaseHelper();
@@ -127,22 +126,32 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
     }
   }
 
-  // Función para actualizar los grupos musculares del cliente
+// Función para actualizar los grupos musculares del cliente
   Future<void> updateClientGroups() async {
-    List<int> selectedGroupIds =
-    getSelectedGroupIds(); // Obtener los IDs de los grupos seleccionados
+    List<int> selectedGroupIds = getSelectedGroupIds(); // Obtener los IDs seleccionados
 
-    // Llamar al método en DatabaseHelper para actualizar la relación en la tabla
-    await dbHelper.updateClientGroups(clientId!, selectedGroupIds);
+    try {
+      // Llamar al método en DatabaseHelper para actualizar la relación en la tabla
+      await dbHelper.updateClientGroups(clientId!, selectedGroupIds);
 
-    // Imprimir los grupos actualizados
-    print("Grupos musculares actualizados para el cliente $clientId:");
-    selectedGroupIds.forEach((groupId) {
-      final groupName =
-      groupIds.keys.firstWhere((key) => groupIds[key] == groupId);
-      print("- $groupName (ID: $groupId)");
-    });
+      // Imprimir los grupos actualizados
+      print("✅ Grupos musculares actualizados para el cliente $clientId:");
+      selectedGroupIds.forEach((groupId) {
+        try {
+          final groupName = groupIds.keys.firstWhere((key) => groupIds[key] == groupId);
+          print("- $groupName (ID: $groupId)");
+        } catch (e) {
+          print("⚠️ Advertencia: No se encontró el grupo con ID $groupId en groupIds.");
+        }
+      });
 
+    } catch (e) {
+      print("❌ Error interno al imprimir grupos musculares: $e");
+    }
+
+    // ✅ Verificar si el widget sigue montado antes de acceder a `context`
+    if (!mounted) return;
+    // ✅ Mostrar mensaje de éxito
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -157,6 +166,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
       ),
     );
   }
+
+
 
   /// Crear el checkbox redondo personalizado
   Widget customCheckbox(String option) {
@@ -576,7 +587,8 @@ class _ClientsFormGroupsState extends State<ClientsFormGroups> {
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
-                      updateClientGroups();
+                      await updateClientGroups();
+
                       widget.onClose();
                     },
                     child: AnimatedScale(

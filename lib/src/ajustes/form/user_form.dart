@@ -205,359 +205,352 @@ class UserDataFormState extends State<UserDataForm> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox.expand(
-
       child: Padding(
         padding: EdgeInsets.symmetric(
           vertical: screenHeight * 0.03,
           horizontal: screenWidth * 0.03,
         ),
-        child: Column(
-          children: [
-            // Primer contenedor de formulario, que ocupa el espacio disponible
-            Expanded(
-              flex: 2, // Ocupa más espacio en la pantalla
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: SingleChildScrollView( // 🔹 Habilita el scroll en formularios largos
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Fila 1: Campos ID, Nombre, Estado
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Nombre').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _nameController,
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir nombre'),
-                                ),
-                              ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(tr(context, 'Nombre').toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: TextField(
+                            controller: _nameController,
+                            style: _inputTextStyle,
+                            decoration: _inputDecorationStyle(
+                              hintText: tr(context, 'Introducir nombre'),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      SizedBox(width: screenWidth * 0.02),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Estado').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedOption,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: 'Activo',
-                                      child: Text(tr(context, 'Activo'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'Inactivo',
-                                      child: Text(tr(context, 'Inactivo'),
-                                          style: _dropdownItemStyle)),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedOption = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon:  Icon(Icons.arrow_drop_down,
-                                    color: const Color(0xFF2be4f3), size: screenHeight*0.05),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.02),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Usuario').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _userController,
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Nombre de usuario'),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  SizedBox(height: screenHeight * 0.05),
-                  // Fila 2: Campos de Género, Fecha de Nacimiento, Teléfono
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tr(context, 'Género').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedGender,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: 'Hombre',
-                                      child: Text(tr(context, 'Hombre'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'Mujer',
-                                      child: Text(tr(context, 'Mujer'),
-                                          style: _dropdownItemStyle)),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedGender = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon:  Icon(Icons.arrow_drop_down,
-                                    color: const Color(0xFF2be4f3), size: screenHeight*0.05),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text(
-                                tr(context, 'Fecha de nacimiento')
-                                    .toUpperCase(),
-                                style: _labelStyle),
-                            GestureDetector(
-                              onTap: () => _selectDate(context),
-                              child: Container(
-                                alignment: Alignment.center,
-                                decoration: _inputDecoration(),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                child: Text(_birthDate ?? 'DD/MM/YYYY',
-                                    style: _inputTextStyle),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text(tr(context, 'Teléfono').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _phoneController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir teléfono'),
-                                ),
-                              ),
-                            ),
-                          ],
+                  SizedBox(width: screenWidth * 0.02),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(tr(context, 'Estado').toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: DropdownButton<String>(
+                            hint: Text(tr(context, 'Seleccione'),
+                                style: _dropdownHintStyle),
+                            value: selectedOption,
+                            items: [
+                              DropdownMenuItem(
+                                  value: 'Activo',
+                                  child: Text(tr(context, 'Activo'),
+                                      style: _dropdownItemStyle)),
+                              DropdownMenuItem(
+                                  value: 'Inactivo',
+                                  child: Text(tr(context, 'Inactivo'),
+                                      style: _dropdownItemStyle)),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedOption = value;
+                              });
+                            },
+                            dropdownColor: const Color(0xFF313030),
+                            icon:  Icon(Icons.arrow_drop_down,
+                                color: const Color(0xFF2be4f3), size: screenHeight*0.05),
+                          ),
                         ),
-                      ),
-                      SizedBox(width: screenWidth * 0.05),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('E-MAIL', style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: TextField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.deny(
-                                      RegExp(r'\s')),
-                                ],
-                                style: _inputTextStyle,
-                                decoration: _inputDecorationStyle(
-                                  hintText: tr(context, 'Introducir e-mail'),
-                                ),
-                              ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(tr(context, 'Usuario').toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: TextField(
+                            controller: _userController,
+                            style: _inputTextStyle,
+                            decoration: _inputDecorationStyle(
+                              hintText: tr(context, 'Nombre de usuario'),
                             ),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text(tr(context, 'Fecha de alta').toUpperCase(),
-                                style: _labelStyle),
-                            GestureDetector(
-                              onTap: () => _selectAltaDate(context),
-                              child: Container(
-                                alignment: Alignment.center,
-                                decoration: _inputDecoration(),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                child: Text(_altaDate ?? 'DD/MM/YYYY',
-                                    style: _inputTextStyle),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text(tr(context, 'Tipo de perfil').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedTipoPerfil,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: 'Administrador',
-                                      child: Text(tr(context, 'Administrador'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'Entrenador',
-                                      child: Text(tr(context, 'Entrenador'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'Ambos',
-                                      child: Text(tr(context, 'Ambos'),
-                                          style: _dropdownItemStyle)),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedTipoPerfil = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon:  Icon(Icons.arrow_drop_down,
-                                    color: const Color(0xFF2be4f3), size: screenHeight*0.05),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: screenWidth * 0.05,
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                tr(context, 'Control de sesiones')
-                                    .toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedControlSesiones,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: 'Sí',
-                                      child: Text(tr(context, 'Sí'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'No',
-                                      child: Text(tr(context, 'No'),
-                                          style: _dropdownItemStyle)),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedControlSesiones = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon:  Icon(Icons.arrow_drop_down,
-                                    color: const Color(0xFF2be4f3), size: screenHeight*0.05),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text(tr(context, 'Control de tiempo').toUpperCase(),
-                                style: _labelStyle),
-                            Container(
-                              alignment: Alignment.center,
-                              decoration: _inputDecoration(),
-                              child: DropdownButton<String>(
-                                hint: Text(tr(context, 'Seleccione'),
-                                    style: _dropdownHintStyle),
-                                value: selectedControlTiempo,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: 'Sí',
-                                      child: Text(tr(context, 'Sí'),
-                                          style: _dropdownItemStyle)),
-                                  DropdownMenuItem(
-                                      value: 'No',
-                                      child: Text(tr(context, 'No'),
-                                          style: _dropdownItemStyle)),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedControlTiempo = value;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF313030),
-                                icon:  Icon(Icons.arrow_drop_down,
-                                    color: const Color(0xFF2be4f3), size: screenHeight*0.05),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-
-            // Fila para el ícono de "tick" alineado a la parte inferior
-            Align(
-              alignment: Alignment.bottomRight,
-              child: GestureDetector(
-                onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
-                onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
-                onTap: () {
-                  _collectUserData();
-                  print("TICK PULSADA");
-                },
-                child: AnimatedScale(
-                  scale: scaleFactorTick,
-                  duration: const Duration(milliseconds: 100),
-                  child: SizedBox(
-                    width: screenWidth * 0.1, // Ajusta el tamaño de la imagen
-                    height: screenHeight * 0.1,
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/tick.png',
-                        fit: BoxFit.scaleDown,
+              SizedBox(height: screenHeight * 0.05),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(tr(context, 'Género').toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: DropdownButton<String>(
+                            hint: Text(tr(context, 'Seleccione'),
+                                style: _dropdownHintStyle),
+                            value: selectedGender,
+                            items: [
+                              DropdownMenuItem(
+                                  value: 'Hombre',
+                                  child: Text(tr(context, 'Hombre'),
+                                      style: _dropdownItemStyle)),
+                              DropdownMenuItem(
+                                  value: 'Mujer',
+                                  child: Text(tr(context, 'Mujer'),
+                                      style: _dropdownItemStyle)),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedGender = value;
+                              });
+                            },
+                            dropdownColor: const Color(0xFF313030),
+                            icon:  Icon(Icons.arrow_drop_down,
+                                color: const Color(0xFF2be4f3), size: screenHeight*0.05),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(
+                            tr(context, 'Fecha de nacimiento')
+                                .toUpperCase(),
+                            style: _labelStyle),
+                        GestureDetector(
+                          onTap: () => _selectDate(context),
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: _inputDecoration(),
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 15),
+                            child: Text(_birthDate ?? 'DD/MM/YYYY',
+                                style: _inputTextStyle),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(tr(context, 'Teléfono').toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: TextField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            style: _inputTextStyle,
+                            decoration: _inputDecorationStyle(
+                              hintText: tr(context, 'Introducir teléfono'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.05),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('E-MAIL', style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: TextField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.deny(
+                                  RegExp(r'\s')),
+                            ],
+                            style: _inputTextStyle,
+                            decoration: _inputDecorationStyle(
+                              hintText: tr(context, 'Introducir e-mail'),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(tr(context, 'Fecha de alta').toUpperCase(),
+                            style: _labelStyle),
+                        GestureDetector(
+                          onTap: () => _selectAltaDate(context),
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: _inputDecoration(),
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 15),
+                            child: Text(_altaDate ?? 'DD/MM/YYYY',
+                                style: _inputTextStyle),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(tr(context, 'Tipo de perfil').toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: DropdownButton<String>(
+                            hint: Text(tr(context, 'Seleccione'),
+                                style: _dropdownHintStyle),
+                            value: selectedTipoPerfil,
+                            items: [
+                              DropdownMenuItem(
+                                  value: 'Administrador',
+                                  child: Text(tr(context, 'Administrador'),
+                                      style: _dropdownItemStyle)),
+                              DropdownMenuItem(
+                                  value: 'Entrenador',
+                                  child: Text(tr(context, 'Entrenador'),
+                                      style: _dropdownItemStyle)),
+                              DropdownMenuItem(
+                                  value: 'Ambos',
+                                  child: Text(tr(context, 'Ambos'),
+                                      style: _dropdownItemStyle)),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedTipoPerfil = value;
+                              });
+                            },
+                            dropdownColor: const Color(0xFF313030),
+                            icon:  Icon(Icons.arrow_drop_down,
+                                color: const Color(0xFF2be4f3), size: screenHeight*0.05),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: screenWidth * 0.05,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            tr(context, 'Control de sesiones')
+                                .toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: DropdownButton<String>(
+                            hint: Text(tr(context, 'Seleccione'),
+                                style: _dropdownHintStyle),
+                            value: selectedControlSesiones,
+                            items: [
+                              DropdownMenuItem(
+                                  value: 'Sí',
+                                  child: Text(tr(context, 'Sí'),
+                                      style: _dropdownItemStyle)),
+                              DropdownMenuItem(
+                                  value: 'No',
+                                  child: Text(tr(context, 'No'),
+                                      style: _dropdownItemStyle)),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedControlSesiones = value;
+                              });
+                            },
+                            dropdownColor: const Color(0xFF313030),
+                            icon:  Icon(Icons.arrow_drop_down,
+                                color: const Color(0xFF2be4f3), size: screenHeight*0.05),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(tr(context, 'Control de tiempo').toUpperCase(),
+                            style: _labelStyle),
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: _inputDecoration(),
+                          child: DropdownButton<String>(
+                            hint: Text(tr(context, 'Seleccione'),
+                                style: _dropdownHintStyle),
+                            value: selectedControlTiempo,
+                            items: [
+                              DropdownMenuItem(
+                                  value: 'Sí',
+                                  child: Text(tr(context, 'Sí'),
+                                      style: _dropdownItemStyle)),
+                              DropdownMenuItem(
+                                  value: 'No',
+                                  child: Text(tr(context, 'No'),
+                                      style: _dropdownItemStyle)),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedControlTiempo = value;
+                              });
+                            },
+                            dropdownColor: const Color(0xFF313030),
+                            icon:  Icon(Icons.arrow_drop_down,
+                                color: const Color(0xFF2be4f3), size: screenHeight*0.05),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // 🔹 Botón de Confirmación (Tick)
+              SizedBox(height: screenHeight * 0.05),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: GestureDetector(
+                  onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
+                  onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
+                  onTap: () {
+                    _collectUserData();
+                    print("TICK PULSADA");
+                  },
+                  child: AnimatedScale(
+                    scale: scaleFactorTick,
+                    duration: const Duration(milliseconds: 100),
+                    child: SizedBox(
+                      width: screenWidth * 0.1,
+                      height: screenHeight * 0.1,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/tick.png',
+                          fit: BoxFit.scaleDown,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+
+
   }
 
 // Ajustes de estilos para simplificar

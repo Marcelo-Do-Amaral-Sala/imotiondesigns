@@ -611,7 +611,8 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),
                     onTap: () async {
-                      updateClientGroups();
+                      await updateClientGroups();
+                      widget.onClose();
                     },
                     child: AnimatedScale(
                       scale: scaleFactorTick,

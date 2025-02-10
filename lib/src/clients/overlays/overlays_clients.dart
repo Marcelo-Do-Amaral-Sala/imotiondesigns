@@ -321,56 +321,58 @@ class _OverlayCrearState extends State<OverlayCrear>
                 width: MediaQuery.of(context).size.width * 0.001,
               ),
             ),
-            child: Column(
-              children: [
-                Text(
-                  tr(context, '¡Alerta!').toUpperCase(),
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Text(
-                  tr(context, 'Debes completar el formulario para continuar')
-                      .toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side: BorderSide(
-                      width: MediaQuery.of(context).size.width * 0.001,
-                      color: const Color(0xFF2be4f3),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    tr(context, '¡Entendido!').toUpperCase(),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    tr(context, '¡Alerta!').toUpperCase(),
                     style: TextStyle(
-                      color: const Color(0xFF2be4f3),
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        color: Colors.red,
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                ),
-              ],
-            ),
+                  Text(
+                    tr(context, 'Debes completar el formulario para continuar')
+                        .toUpperCase(),
+                    style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height:  MediaQuery.of(context).size.width * 0.01),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.all(10.0),
+                      side: BorderSide(
+                        width: MediaQuery.of(context).size.width * 0.001,
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    child: Text(
+                      tr(context, '¡Entendido!').toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),),
           ),
         );
       },
     );
   }
+
 
   Widget _buildTabBar() {
     return Container(

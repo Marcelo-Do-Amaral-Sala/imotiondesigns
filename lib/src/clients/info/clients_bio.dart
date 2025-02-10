@@ -72,11 +72,11 @@ class _ClientsBioState extends State<ClientsBio> {
           vertical: screenHeight * 0.03,
           horizontal: screenWidth * 0.03, // Padding dinámico
         ),
-        child: Column(
-          children: [
-            // Contenedor principal con columnas expandibles
-            Expanded(
-              child: Column(
+        child: SingleChildScrollView( // 🔹 Permite desplazamiento si es necesario
+          child: Column(
+            children: [
+              // Contenedor principal con columnas expandibles
+              Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Fila de campos de texto e ID
@@ -86,11 +86,13 @@ class _ClientsBioState extends State<ClientsBio> {
                   _buildBioRow(screenHeight, screenWidth),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+
+
   }
 
   Widget _buildInputRow(double screenWidth) {

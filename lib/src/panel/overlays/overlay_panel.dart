@@ -42,46 +42,41 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    buildCustomCheckboxTile(
-                      tr(context, "Individual").toUpperCase(),
-                    ),
-                    buildCustomCheckboxTile(
-                      tr(context, "Recovery").toUpperCase(),
-                    ),
-                    buildCustomCheckboxTile(
-                      tr(context, "Automáticos").toUpperCase(),
-                    ),
-                    buildCustomCheckboxTile(
-                      tr(context, "Libre").toUpperCase(),
-                    ),
-                  ],
-                ),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.01,
+          horizontal: MediaQuery.of(context).size.width * 0.02,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            // 🔹 Evita que los elementos ocupen más espacio
+            children: [
+              buildCustomCheckboxTile(
+                tr(context, "Individual").toUpperCase(),
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Align(
-                alignment: Alignment.bottomCenter,
+              buildCustomCheckboxTile(
+                tr(context, "Recovery").toUpperCase(),
+              ),
+              buildCustomCheckboxTile(
+                tr(context, "Automáticos").toUpperCase(),
+              ),
+              buildCustomCheckboxTile(
+                tr(context, "Libre").toUpperCase(),
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
                 child: OutlinedButton(
                   onPressed: () {
                     if (selectedProgram != null) {
-                      widget.onProgramSelected(
-                          selectedProgram!); // Llama a la función para pasar el programa seleccionado
+                      widget.onProgramSelected(selectedProgram!);
                     }
-                    widget.onClose(); // Cierra el overlay
+                    widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.height * 0.01,
+                      horizontal: MediaQuery.of(context).size.width * 0.01,
+                    ),
                     side:
                         const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
@@ -100,8 +95,8 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       onClose: widget.onClose,
@@ -109,21 +104,29 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
   }
 
   Widget buildCustomCheckboxTile(String option) {
-    return ListTile(
-      leading: customCheckbox(option),
-      title: Text(
-        option,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 24.sp,
-          fontWeight: FontWeight.normal,
-        ),
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.height *
+            0.0, // 🔹 Reduce espacio vertical
       ),
-      onTap: () {
-        setState(() {
-          selectedProgram = option; // Actualiza la selección
-        });
-      },
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        // 🔹 Elimina padding interno del ListTile
+        leading: customCheckbox(option),
+        title: Text(
+          option,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24.sp,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
+        onTap: () {
+          setState(() {
+            selectedProgram = option;
+          });
+        },
+      ),
     );
   }
 
@@ -131,13 +134,16 @@ class _OverlayTipoProgramaState extends State<OverlayTipoPrograma> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedProgram = option; // Actualiza la selección
+          selectedProgram = option;
         });
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.04,
         height: MediaQuery.of(context).size.height * 0.04,
-        margin: const EdgeInsets.all(5.0),
+        margin: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.001,
+          horizontal: MediaQuery.of(context).size.width * 0.001,
+        ),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: selectedProgram == option
@@ -350,7 +356,10 @@ class _OverlaySeleccionarProgramaIndividualState
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.03,
+          horizontal: MediaQuery.of(context).size.width * 0.03,
+        ),
         child: Container(
           width: screenWidth,
           decoration: BoxDecoration(
@@ -385,8 +394,10 @@ class _OverlaySeleccionarProgramaIndividualState
           List<Map<String, dynamic>> row = rows[rowIndex];
 
           return Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.01,
+              horizontal: MediaQuery.of(context).size.width * 0.01,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               // Cambiado a start para ajustar desde la izquierda
@@ -395,7 +406,7 @@ class _OverlaySeleccionarProgramaIndividualState
                 String nombre = program['nombre'] ?? 'Sin nombre';
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                   // Espacio entre los elementos
                   child: GestureDetector(
                     onTap: () {
@@ -442,12 +453,10 @@ class _OverlaySeleccionarProgramaIndividualState
 
   void _showProgramDetailsDialog(BuildContext context,
       Map<String, dynamic> program, double screenHeight, double screenWidth) {
-    // Asegúrate de que los valores sean correctos y estén bien asignados
     var frecuencia = program['frecuencia'] ?? 'Sin descripción';
     var rampa = program['rampa'] ?? 'Sin descripción';
     var pausa = program['pausa'] ?? 'Sin información de equipamiento';
-    var contraccion =
-        program['contraccion'] ?? 'Sin información de equipamiento';
+    var contraccion = program['contraccion'] ?? 'Sin información de equipamiento';
     var pulso = program['pulso'] ?? 'Sin información de equipamiento';
 
     showDialog(
@@ -455,66 +464,73 @@ class _OverlaySeleccionarProgramaIndividualState
       builder: (context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-            side: const BorderSide(
-              color: Color(0xFF2be4f3),
-            ),
+            side: const BorderSide(color: Color(0xFF2be4f3)),
             borderRadius: BorderRadius.circular(7),
           ),
           backgroundColor: const Color(0xFF2E2E2E),
           child: Container(
             width: screenWidth * 0.3,
             constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.55, // Fijar altura máxima
+              maxHeight: screenHeight * 0.5, // 🔹 Ajusta la altura máxima
             ),
-            padding: const EdgeInsets.all(25.0),
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.02,
+              horizontal: MediaQuery.of(context).size.width * 0.02,
+            ),
             child: Column(
-              // Centra todo en el eje vertical
+              mainAxisSize: MainAxisSize.min, // 🔹 Permite que el contenido se ajuste
               children: [
-                SingleChildScrollView(
-                  child: Center(
-                    // Usa el widget Center para centrar el contenido
+                Expanded(
+                  child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           tr(context, "Datos").toUpperCase(),
                           style: TextStyle(
-                              color: const Color(0xFF2be4f3),
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              decorationColor: const Color(0xFF2be4f3)),
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 30.sp,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                            decorationColor: const Color(0xFF2be4f3),
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.03),
                         _buildDetailRow(
-                            '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
-                            frecuencia,
-                            ' μs'),
+                          '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
+                          frecuencia,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Rampa").toUpperCase()}: ',
-                            rampa,
-                            ' μs'),
+                          '${tr(context, "Rampa").toUpperCase()}: ',
+                          rampa,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Pausa").toUpperCase()}: ',
-                            pausa,
-                            ' μs'),
+                          '${tr(context, "Pausa").toUpperCase()}: ',
+                          pausa,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Contracción").toUpperCase()}: ',
-                            contraccion,
-                            ' μs'),
+                          '${tr(context, "Contracción").toUpperCase()}: ',
+                          contraccion,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Pulso (ms)").toUpperCase()}: ',
-                            pulso,
-                            ' μs'),
+                          '${tr(context, "Pulso (ms)").toUpperCase()}: ',
+                          pulso,
+                          ' μs',
+                        ),
                       ],
                     ),
                   ),
                 ),
+                SizedBox(height: screenHeight * 0.02), // 🔹 Espaciado antes del botón
                 Align(
                   alignment: Alignment.bottomRight,
                   child: OutlinedButton(
@@ -522,9 +538,11 @@ class _OverlaySeleccionarProgramaIndividualState
                       Navigator.of(context).pop();
                     },
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.all(10.0),
-                      side: const BorderSide(
-                          width: 1.0, color: Color(0xFF2be4f3)),
+                      padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.01,
+                        horizontal: MediaQuery.of(context).size.width * 0.01,
+                      ),
+                      side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(7),
                       ),
@@ -548,6 +566,7 @@ class _OverlaySeleccionarProgramaIndividualState
       },
     );
   }
+
 
   // Función para construir las filas con los detalles
   Widget _buildDetailRow(String label, dynamic value, String suffix) {
@@ -678,7 +697,10 @@ class _OverlaySeleccionarProgramaRecoveryState
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.03,
+          horizontal: MediaQuery.of(context).size.width * 0.03,
+        ),
         child: Container(
           width: screenWidth,
           decoration: BoxDecoration(
@@ -713,8 +735,10 @@ class _OverlaySeleccionarProgramaRecoveryState
           List<Map<String, dynamic>> row = rows[rowIndex];
 
           return Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.01,
+              horizontal: MediaQuery.of(context).size.width * 0.02,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               // Cambiado a start para ajustar desde la izquierda
@@ -723,7 +747,7 @@ class _OverlaySeleccionarProgramaRecoveryState
                 String nombre = program['nombre'] ?? 'Sin nombre';
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                   // Espacio entre los elementos
                   child: GestureDetector(
                     onTap: () {
@@ -772,12 +796,10 @@ class _OverlaySeleccionarProgramaRecoveryState
 
   void _showProgramDetailsDialog(BuildContext context,
       Map<String, dynamic> program, double screenHeight, double screenWidth) {
-    // Asegúrate de que los valores sean correctos y estén bien asignados
     var frecuencia = program['frecuencia'] ?? 'Sin descripción';
     var rampa = program['rampa'] ?? 'Sin descripción';
     var pausa = program['pausa'] ?? 'Sin información de equipamiento';
-    var contraccion =
-        program['contraccion'] ?? 'Sin información de equipamiento';
+    var contraccion = program['contraccion'] ?? 'Sin información de equipamiento';
     var pulso = program['pulso'] ?? 'Sin información de equipamiento';
 
     showDialog(
@@ -785,66 +807,70 @@ class _OverlaySeleccionarProgramaRecoveryState
       builder: (context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-            side: const BorderSide(
-              color: Color(0xFF2be4f3),
-            ),
+            side: const BorderSide(color: Color(0xFF2be4f3)),
             borderRadius: BorderRadius.circular(7),
           ),
           backgroundColor: const Color(0xFF2E2E2E),
           child: Container(
             width: screenWidth * 0.3,
             constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.55, // Fijar altura máxima
+              maxHeight: screenHeight * 0.55, // 🔹 Limita la altura máxima
             ),
             padding: const EdgeInsets.all(25.0),
             child: Column(
-              // Centra todo en el eje vertical
+              mainAxisSize: MainAxisSize.min, // 🔹 Permite que el contenido se ajuste
               children: [
-                SingleChildScrollView(
-                  child: Center(
-                    // Usa el widget Center para centrar el contenido
+                Expanded(
+                  child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           tr(context, "Datos").toUpperCase(),
                           style: TextStyle(
-                              color: const Color(0xFF2be4f3),
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              decorationColor: const Color(0xFF2be4f3)),
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 30.sp,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                            decorationColor: const Color(0xFF2be4f3),
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.03),
                         _buildDetailRow(
-                            '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
-                            frecuencia,
-                            ' μs'),
+                          '${tr(context, "Frecuencia (Hz)").toUpperCase()}: ',
+                          frecuencia,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Rampa").toUpperCase()}: ',
-                            rampa,
-                            ' μs'),
+                          '${tr(context, "Rampa").toUpperCase()}: ',
+                          rampa,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Pausa").toUpperCase()}: ',
-                            pausa,
-                            ' μs'),
+                          '${tr(context, "Pausa").toUpperCase()}: ',
+                          pausa,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Contracción").toUpperCase()}: ',
-                            contraccion,
-                            ' μs'),
+                          '${tr(context, "Contracción").toUpperCase()}: ',
+                          contraccion,
+                          ' μs',
+                        ),
                         SizedBox(height: screenHeight * 0.02),
                         _buildDetailRow(
-                            '${tr(context, "Pulso (ms)").toUpperCase()}: ',
-                            pulso,
-                            ' μs'),
+                          '${tr(context, "Pulso (ms)").toUpperCase()}: ',
+                          pulso,
+                          ' μs',
+                        ),
                       ],
                     ),
                   ),
                 ),
+                SizedBox(height: screenHeight * 0.02), // 🔹 Espaciado antes del botón
                 Align(
                   alignment: Alignment.bottomRight,
                   child: OutlinedButton(
@@ -853,8 +879,7 @@ class _OverlaySeleccionarProgramaRecoveryState
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.all(10.0),
-                      side: const BorderSide(
-                          width: 1.0, color: Color(0xFF2be4f3)),
+                      side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(7),
                       ),
@@ -1013,7 +1038,10 @@ class _OverlaySeleccionarProgramaAutomaticState
         ),
       ),
       content: Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.03,
+          horizontal: MediaQuery.of(context).size.width * 0.03,
+        ),
         child: Container(
           width: screenWidth,
           decoration: BoxDecoration(
@@ -1048,8 +1076,10 @@ class _OverlaySeleccionarProgramaAutomaticState
           List<Map<String, dynamic>> row = rows[rowIndex];
 
           return Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.01,
+          horizontal: MediaQuery.of(context).size.width * 0.02,
+          ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: row.map((program) {
@@ -1058,7 +1088,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                     program['nombre_programa_automatico'] ?? 'Sin nombre';
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  padding:  EdgeInsets.symmetric(horizontal: screenWidth*0.02),
                   child: GestureDetector(
                     onTap: () {
                       // Aquí solo seleccionamos el programa si no está seleccionado aún
@@ -1124,163 +1154,121 @@ class _OverlaySeleccionarProgramaAutomaticState
       builder: (context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-            side: const BorderSide(
-              color: Color(0xFF2be4f3),
-            ),
+            side: const BorderSide(color: Color(0xFF2be4f3)),
             borderRadius: BorderRadius.circular(7),
           ),
           backgroundColor: const Color(0xFF2E2E2E),
           child: Container(
-            width: screenWidth * 0.7, // Ajusta el tamaño del contenedor
+            width: screenWidth * 0.7, // 🔹 Ajusta el ancho del diálogo
             constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.8, // Fijar altura máxima
+              maxHeight: screenHeight * 0.8, // 🔹 Fija la altura máxima
             ),
-            padding: const EdgeInsets.all(25.0),
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.02,
+              horizontal: MediaQuery.of(context).size.width * 0.02,
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min, // 🔹 Ajusta la altura del contenido
               children: [
-                Text(
-                  tr(context, 'Datos').toUpperCase(),
-                  style: TextStyle(
-                    color: const Color(0xFF2be4f3),
-                    fontSize: 30.sp,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                    decorationColor: const Color(0xFF2be4f3),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: screenHeight * 0.02),
-
-                // Sección de DESCRIPCIÓN
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tr(context, 'Duración').toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.sp,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.01),
-                    Text(
-                      '${formatNumber(duracion)} min',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.01),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tr(context, 'Descripción').toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.sp,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.01),
-                    Text(
-                      descripcion,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.01),
-
-                // Sección de EQUIPAMIENTO
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tr(context, 'Equipamiento').toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.sp,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.01),
-                    Text(
-                      tipoEquipamiento,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.01),
-
-                Text(
-                  tr(context, 'Subprogramas').toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.01),
-
-                if (subprogramas.isNotEmpty)
-                  // ScrollView para la tabla
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Container(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Table(
-                          border: TableBorder.all(
-                            color: Colors.white,
-                            width: 1,
-                          ),
-                          children: [
-                            // Encabezado de la tabla
-                            TableRow(
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF2be4f3),
-                              ),
-                              children: [
-                                _tableCell(tr(context, 'Orden').toUpperCase()),
-                                _tableCell(tr(context, 'Nombre').toUpperCase()),
-                                _tableCell(
-                                    tr(context, 'Duración').toUpperCase()),
-                                _tableCell(tr(context, 'Ajuste').toUpperCase()),
-                              ],
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ✅ Encabezado
+                        Center(
+                          child: Text(
+                            tr(context, 'Datos').toUpperCase(),
+                            style: TextStyle(
+                              color: const Color(0xFF2be4f3),
+                              fontSize: 30.sp,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              decorationColor: const Color(0xFF2be4f3),
                             ),
-                            // Filas de los subprogramas
-                            ...subprogramas.map((subprograma) {
-                              String subnombre =
-                                  subprograma['nombre'] ?? 'Sin nombre';
-                              double subduracion = subprograma['duracion'] ?? 0;
-                              double subajuste = subprograma['ajuste'] ?? 0;
-                              int suborden = subprograma['orden'] ?? 0;
-
-                              return TableRow(
-                                children: [
-                                  _tableCell('$suborden'),
-                                  _tableCell(subnombre),
-                                  _tableCell('$subduracion'),
-                                  _tableCell('$subajuste'),
-                                ],
-                              );
-                            }).toList(),
-                          ],
+                          ),
                         ),
-                      ),
+                        SizedBox(height: screenHeight * 0.02),
+                        // ✅ Información General
+                        _buildInfoSection(
+                          title: tr(context, 'Duración'),
+                          value: '${formatNumber(duracion)} min',
+                        ),
+                        _buildInfoSection(
+                          title: tr(context, 'Descripción'),
+                          value: descripcion,
+                        ),
+                        _buildInfoSection(
+                          title: tr(context, 'Equipamiento'),
+                          value: tipoEquipamiento,
+                        ),
+
+                        // ✅ Tabla de Subprogramas
+                        if (subprogramas.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                tr(context, 'Subprogramas').toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.01),
+                              Container(
+                                constraints: BoxConstraints(
+                                  maxHeight: screenHeight * 0.4, // 🔹 Hace que la tabla sea más visible
+                                ),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Table(
+                                    border: TableBorder.all(
+                                      color: Colors.white,
+                                      width: 1,
+                                    ),
+                                    children: [
+                                      // Encabezado
+                                      TableRow(
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF2be4f3),
+                                        ),
+                                        children: [
+                                          _tableCell(tr(context, 'Orden').toUpperCase()),
+                                          _tableCell(tr(context, 'Nombre').toUpperCase()),
+                                          _tableCell(tr(context, 'Duración').toUpperCase()),
+                                          _tableCell(tr(context, 'Ajuste').toUpperCase()),
+                                        ],
+                                      ),
+                                      // Filas
+                                      ...subprogramas.map((subprograma) {
+                                        String subnombre = subprograma['nombre'] ?? 'Sin nombre';
+                                        double subduracion = subprograma['duracion'] ?? 0;
+                                        double subajuste = subprograma['ajuste'] ?? 0;
+                                        int suborden = subprograma['orden'] ?? 0;
+
+                                        return TableRow(
+                                          children: [
+                                            _tableCell('$suborden'),
+                                            _tableCell(subnombre),
+                                            _tableCell('$subduracion'),
+                                            _tableCell('$subajuste'),
+                                          ],
+                                        );
+                                      }).toList(),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
                   ),
-                SizedBox(height: screenHeight * 0.01),
-                // Botón de Cerrar
+                ),
+                SizedBox(height: screenHeight * 0.02), // 🔹 Espaciado antes del botón
+                // ✅ Botón de Cerrar
                 Align(
                   alignment: Alignment.bottomRight,
                   child: OutlinedButton(
@@ -1288,9 +1276,11 @@ class _OverlaySeleccionarProgramaAutomaticState
                       Navigator.of(context).pop();
                     },
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.all(10.0),
-                      side: const BorderSide(
-                          width: 1.0, color: Color(0xFF2be4f3)),
+                      padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.01,
+                        horizontal: MediaQuery.of(context).size.width * 0.01,
+                      ),
+                      side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(7),
                       ),
@@ -1303,7 +1293,6 @@ class _OverlaySeleccionarProgramaAutomaticState
                         fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
@@ -1315,6 +1304,33 @@ class _OverlaySeleccionarProgramaAutomaticState
     );
   }
 
+// 🔹 Sección de Información Reutilizable
+  Widget _buildInfoSection({required String title, required String value}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18.sp,
+          ),
+        ),
+        SizedBox(height: MediaQuery.of(context).size.height*0.0001),
+        Text(
+          value,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 16.sp,
+          ),
+        ),
+        SizedBox(height: MediaQuery.of(context).size.height*0.005),
+      ],
+    );
+  }
+
+
   String formatNumber(double number) {
     return number % 1 == 0
         ? number.toInt().toString()
@@ -1323,7 +1339,10 @@ class _OverlaySeleccionarProgramaAutomaticState
 
   Widget _tableCell(String text) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.height * 0.01,
+        horizontal: MediaQuery.of(context).size.width * 0.01,
+      ),
       child: Text(
         text,
         style: TextStyle(

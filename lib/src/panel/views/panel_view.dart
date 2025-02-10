@@ -81,11 +81,6 @@ class _PanelViewState extends State<PanelView>
   @override
   void initState() {
     super.initState();
-    /*  Future.delayed(const Duration(milliseconds: 2000), () {
-      setState(() {
-        showBlackScreen = false;
-      });
-    });*/
     initializeAndConnectBLE();
     _subscription = bleConnectionService.deviceUpdates.listen((update) {
       final macAddress = update['macAddress'];
@@ -604,6 +599,7 @@ class _PanelViewState extends State<PanelView>
                                                         neonColor: _getBorderColor(
                                                             deviceConnectionStatus[
                                                             macAddress]),
+                                                        screenWidth: screenWidth,
                                                         opacity:
                                                         _getOpacityForDevice(
                                                             macAddress),
@@ -722,7 +718,7 @@ class _PanelViewState extends State<PanelView>
                                                                               width:
                                                                               screenWidth * 0.0085,
                                                                               height:
-                                                                              screenHeight * 0.01,
+                                                                              screenHeight * 0.004,
                                                                               color: index <= (batteryStatuses[macAddress] ?? -1)
                                                                                   ? _lineColor(macAddress)
                                                                                   : Colors.white.withOpacity(0.5),
@@ -818,7 +814,10 @@ class _PanelViewState extends State<PanelView>
                                           }
                                         },
                                         style: OutlinedButton.styleFrom(
-                                          padding: const EdgeInsets.all(10.0),
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: MediaQuery.of(context).size.height * 0.01,
+                                            horizontal: MediaQuery.of(context).size.width * 0.01,
+                                          ),
                                           side: BorderSide(
                                             width: screenWidth * 0.001,
                                             color: const Color(0xFF2be4f3),
@@ -912,19 +911,6 @@ class _PanelViewState extends State<PanelView>
               ],
             ),
           ),
-          /*         if (showBlackScreen)
-            Container(
-              color: Colors.black,
-              child: Center(
-                child: Text(
-                  tr(context, "Cargando panel...").toUpperCase(),
-                  style: TextStyle(
-                      color: const Color(0xFF28E2F5),
-                      fontSize: 40.sp,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),*/
         ],
       ),
     );
@@ -1025,6 +1011,7 @@ class _PanelViewState extends State<PanelView>
                                                 neonColor: _getBorderColor(
                                                     deviceConnectionStatus[
                                                     macAddress]),
+                                                screenWidth: MediaQuery.of(context).size.width,
                                               ),
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(
@@ -1212,6 +1199,7 @@ class _PanelViewState extends State<PanelView>
                                                 neonColor: _getBorderColor(
                                                     deviceConnectionStatus[
                                                     macAddress]),
+                                                screenWidth: MediaQuery.of(context).size.width,
                                               ),
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(
@@ -1461,99 +1449,106 @@ class _PanelViewState extends State<PanelView>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+            side: const BorderSide(color: Color(0xFF28E2F5)),
+          ),
+          backgroundColor: const Color(0xFF494949),
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
-            height: MediaQuery.of(context).size.height * 0.33,
-            padding: EdgeInsets.symmetric(
-                vertical: MediaQuery.of(context).size.height * 0.02,
-                horizontal: MediaQuery.of(context).size.width * 0.01),
-            decoration: BoxDecoration(
-              color: const Color(0xFF494949),
-              borderRadius: BorderRadius.circular(7),
-              border: Border.all(
-                color: const Color(0xFF28E2F5),
-                width: MediaQuery.of(context).size.width * 0.001,
-              ),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.3, // 🔹 Fija altura máxima
             ),
-            child: Column(
-              children: [
-                Text(
-                  tr(context, 'Aviso').toUpperCase(),
-                  style: TextStyle(
-                    color: const Color(0xFF2be4f3),
-                    decoration: TextDecoration.underline,
-                    decorationColor: const Color(0xFF28E2F5),
-                    fontSize: 30.sp,
-                    fontWeight: FontWeight.bold,
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.02,
+              horizontal: MediaQuery.of(context).size.width * 0.02,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // 🔹 Permite que el contenido se ajuste mejor
+                children: [
+                  // ✅ Título
+                  Text(
+                    tr(context, 'Aviso').toUpperCase(),
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      decoration: TextDecoration.underline,
+                      decorationColor: const Color(0xFF28E2F5),
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Text(
-                  tr(context, '¿Quieres salir del panel?').toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pop(); // Cierra el diálogo sin hacer nada
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF2be4f3)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // ✅ Mensaje de salida
+                  Text(
+                    tr(context, '¿Quieres salir del panel?').toUpperCase(),
+                    style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                  // ✅ Fila de botones con `Expanded`
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // 🔹 Cierra el diálogo sin hacer nada
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFF2be4f3)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                        ),
+                        child: Text(
+                          tr(context, 'Cancelar').toUpperCase(),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        tr(context, 'Cancelar').toUpperCase(),
-                        style: TextStyle(
-                          color: const Color(0xFF2be4f3),
-                          fontSize: 17.sp,
-                        ),
-                      ),
-                    ),
-                    OutlinedButton(
-                      onPressed: () async {
-                        try {
-                          bleConnectionService.disposeBle();
-                          widget.onBack();
-                          Navigator.of(context).pop();
-                        } catch (e) {
-                          if (kDebugMode) {
-                            print("❌ Error en disposeBle(): $e");
+                      OutlinedButton(
+                        onPressed: () async {
+                          try {
+                            bleConnectionService.disposeBle();
+                            widget.onBack();
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            if (kDebugMode) {
+                              print("❌ Error en disposeBle(): $e");
+                            }
                           }
-                        }
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.red),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          backgroundColor: Colors.red,
                         ),
-                        backgroundColor: Colors.red,
-                      ),
-                      child: Text(
-                        tr(context, 'Salir del panel').toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
+                        child: Text(
+                          tr(context, 'Salir del panel').toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
+
 
   Color _lineColor(String? macAddress) {
     // Obtener el estado de la batería de la dirección MAC proporcionada
@@ -2008,6 +2003,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         selectedIndivProgram!['video'].isNotEmpty) {
       _initializeVideoController(selectedIndivProgram!['video']);
     }
+    _loadTiempoSesion();
   }
   @override
   void didChangeDependencies() {
@@ -2025,6 +2021,20 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     }
   }
 
+  Future<void> _loadTiempoSesion() async {
+    await AppState.instance.loadState(); // 🔹 Cargar estado desde SharedPreferences
+
+    // 🔹 Asignar tiempo desde SharedPreferences
+    int tiempoSesionCargado = AppState.instance.tiempoSesion.toInt();
+
+    setState(() {
+      totalTime = tiempoSesionCargado * 60; // Convertir minutos a segundos
+      print("✅ Tiempo de sesión cargado: $tiempoSesionCargado minutos (${totalTime} segundos)");
+    });
+
+    // 🔹 Actualizar la UI correctamente
+    _updateTime(tiempoSesionCargado);
+  }
   Future<void> _preloadImages() async {
     // Itera sobre las claves del mapa y precarga las imágenes principales
     for (int key in imagePaths.keys) {
@@ -3606,88 +3616,103 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+            side: const BorderSide(color: Color(0xFF28E2F5)),
+          ),
+          backgroundColor: const Color(0xFF494949),
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
-            // Aquí defines el ancho del diálogo
-            height: MediaQuery.of(context).size.height * 0.3,
-            padding: EdgeInsets.symmetric(
-                vertical: MediaQuery.of(context).size.height * 0.02,
-                horizontal: MediaQuery.of(context).size.width * 0.01),
-            decoration: BoxDecoration(
-              color: const Color(0xFF494949),
-              borderRadius: BorderRadius.circular(7),
-              border: Border.all(
-                color: const Color(0xFF28E2F5),
-                width: MediaQuery.of(context).size.width * 0.001,
-              ),
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height * 0.3,
+              maxHeight: MediaQuery.of(context).size.height * 0.3, // 🔹 Fija altura máxima
             ),
-            child: Column(
-              children: [
-                Text(
-                  tr(context, 'Aviso').toUpperCase(),
-                  style: TextStyle(
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.02,
+              horizontal: MediaQuery.of(context).size.width * 0.02,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // 🔹 Se ajusta al contenido
+                children: [
+                  // ✅ Título
+                  Text(
+                    tr(context, 'Aviso').toUpperCase(),
+                    style: TextStyle(
                       color: const Color(0xFF2be4f3),
                       fontSize: 30.sp,
                       decoration: TextDecoration.underline,
                       decorationColor: const Color(0xFF28E2F5),
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Text(
-                  tr(context, '¿Quieres resetear todo?').toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontSize: 25.sp),
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pop(); // Cierra el diálogo sin hacer nada
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF2be4f3)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // ✅ Mensaje de confirmación
+                  Text(
+                    tr(context, '¿Quieres resetear todo?').toUpperCase(),
+                    style: TextStyle(color: Colors.white, fontSize: 25.sp),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                  // ✅ Fila de botones con `Expanded`
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // 🔹 Cierra el diálogo sin hacer nada
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFF2be4f3)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                        ),
+                        child: Text(
+                          tr(context, 'Cancelar').toUpperCase(),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        tr(context, 'Cancelar').toUpperCase(),
-                        style: TextStyle(
-                            color: const Color(0xFF2be4f3), fontSize: 17.sp),
-                      ),
-                    ),
-                    OutlinedButton(
-                      onPressed: () async {
-                        playBeep();
-                        Navigator.of(context).pop();
-                        _clearGlobals();
-                        await bleConnectionService
-                            ._stopElectrostimulationSession(widget.macAddress!);
-                      },
-                      style: OutlinedButton.styleFrom(
+                      OutlinedButton(
+                        onPressed: () async {
+                          playBeep();
+                          Navigator.of(context).pop();
+                          _clearGlobals();
+                          await bleConnectionService
+                              ._stopElectrostimulationSession(widget.macAddress!);
+                        },
+                        style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.red),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(7),
                           ),
-                          backgroundColor: Colors.red),
-                      child: Text(
-                        tr(context, '¡Sí, quiero resetear!').toUpperCase(),
-                        style: TextStyle(color: Colors.white, fontSize: 17.sp),
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Text(
+                          tr(context, '¡Sí, quiero resetear!').toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
+
 
   @override
   void dispose() {
@@ -4437,7 +4462,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       style: TextStyle(
                                                         color:
                                                         const Color(0xFF2be4f3),
-                                                        fontSize: 18.sp,
+                                                        fontSize: 15.sp,
                                                         fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
@@ -4470,7 +4495,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       }
                                     },
                                     style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.all(10.0),
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: MediaQuery.of(context).size.height * 0.01,
+                                        horizontal: MediaQuery.of(context).size.width * 0.01,
+                                      ),
                                       side: BorderSide(
                                         width: screenWidth * 0.001,
                                         color: const Color(0xFF2be4f3),
@@ -8978,7 +9006,6 @@ class BleConnectionService {
 
   void updateMacAddresses(List<String> macAddresses) async {
     debugPrint("🔍 Direcciones MAC obtenidas: $macAddresses");
-
     // 🔥 Esperar 2 segundos antes de intentar la reconexión
     await Future.delayed(Duration(seconds: 2));
 
@@ -9113,7 +9140,6 @@ class BleConnectionService {
     _subscriptions.clear();
     _connectionStreams.clear();
     debugPrint("✅ BLE limpiado sin cerrar StreamControllers.");
-    flutterReactiveBle.initialize();
   }
 
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppState {
@@ -18,7 +19,7 @@ class AppState {
   Map<String, dynamic> licenciaData = {};
   List<Map<String, dynamic>> allLicencias = [];
   List<Map<String, dynamic>> mcis = []; // Lista de MCIs
-
+  double tiempoSesion = 25;
 
   // Constructor privado para el patrón Singleton
   AppState._privateConstructor();
@@ -33,7 +34,7 @@ class AppState {
   Future<void> loadState() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Cargar los valores de los controladores
+    // Cargar datos
     nLicencia = prefs.getString('nLicencia') ?? '';
     nombre = prefs.getString('name') ?? '';
     direccion = prefs.getString('adress') ?? '';
@@ -47,7 +48,10 @@ class AppState {
     macBleList = prefs.getStringList('macBleList') ?? [];
     bloqueada = prefs.getString('bloqueada') ?? '';
 
-    // Cargar los mapas y listas desde JSON
+    // Cargar `tiempoSesion`, asegurando que tiene un valor válido
+    tiempoSesion = prefs.getDouble('tiempoSesion') ?? 25;
+
+    // Cargar JSON
     String? licenciaDataJson = prefs.getString('licenciaData');
     if (licenciaDataJson != null) {
       licenciaData = Map<String, dynamic>.from(jsonDecode(licenciaDataJson));
@@ -58,12 +62,13 @@ class AppState {
       allLicencias = List<Map<String, dynamic>>.from(jsonDecode(allLicenciasJson));
     }
 
-    // Cargar la lista de MCIs desde SharedPreferences
+    // Cargar MCIs
     String? mcisJson = prefs.getString('mcis');
     if (mcisJson != null) {
       mcis = List<Map<String, dynamic>>.from(jsonDecode(mcisJson));
     }
   }
+
 
   // Función para guardar el estado en SharedPreferences
   Future<void> saveState() async {
@@ -80,18 +85,20 @@ class AppState {
     await prefs.setString('email', email);
     await prefs.setBool('isLicenciaValida', isLicenciaValida);
 
-    // Guardar las listas
+    // Guardar listas
     await prefs.setStringList('macList', macList);
     await prefs.setStringList('macBleList', macBleList);
     await prefs.setString('bloqueada', bloqueada);
 
+    // Guardar `tiempoSesion`
+    await prefs.setDouble('tiempoSesion', tiempoSesion);
+
     // Guardar los mapas y listas como JSON
     await prefs.setString('licenciaData', jsonEncode(licenciaData));
     await prefs.setString('allLicencias', jsonEncode(allLicencias));
-
-    // Guardar la lista de MCIs como JSON
     await prefs.setString('mcis', jsonEncode(mcis));
   }
+
 }
 
 

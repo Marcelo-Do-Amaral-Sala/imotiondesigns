@@ -131,10 +131,21 @@ class MainMenuViewState extends State<MainMenuView>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.8, // Ancho máximo
-              maxHeight: MediaQuery.of(context).size.height * 0.6, // Alto máximo
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            // Ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.3,
+            // Alto del diálogo
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.01,
+                vertical: MediaQuery.of(context).size.height * 0.01),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: MediaQuery.of(context).size.width * 0.001,
+              ),
             ),
             child: SingleChildScrollView(
               child: Container(
@@ -142,17 +153,8 @@ class MainMenuViewState extends State<MainMenuView>
                   horizontal: MediaQuery.of(context).size.width * 0.01,
                   vertical: MediaQuery.of(context).size.height * 0.01,
                 ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF494949),
-                  borderRadius: BorderRadius.circular(7),
-                  border: Border.all(
-                    color: const Color(0xFF28E2F5),
-                    width: MediaQuery.of(context).size.width * 0.001,
-                  ),
-                ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       tr(context, 'Aviso').toUpperCase(),
@@ -165,13 +167,13 @@ class MainMenuViewState extends State<MainMenuView>
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 10.h),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                     Text(
                       tr(context, 'Para usar el panel de control debe validar su licencia'),
                       style: TextStyle(color: Colors.white, fontSize: 24.sp),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                     OutlinedButton(
                       onPressed: () {
                         Navigator.of(context).pop(); // Cerrar el diálogo
@@ -266,7 +268,8 @@ class MainMenuViewState extends State<MainMenuView>
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.4, // Ancho máximo
-              maxHeight: MediaQuery.of(context).size.height * 0.4, // Alto máximo
+              maxHeight:
+                  MediaQuery.of(context).size.height * 0.2, // Alto máximo
             ),
             child: Container(
                 padding: EdgeInsets.symmetric(
@@ -281,7 +284,9 @@ class MainMenuViewState extends State<MainMenuView>
                     width: MediaQuery.of(context).size.width * 0.001,
                   ),
                 ),
+              child: SingleChildScrollView(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       ('¿${tr(context, 'Cerrar sesión')}?').toUpperCase(),
@@ -292,7 +297,7 @@ class MainMenuViewState extends State<MainMenuView>
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const Spacer(),
+                    SizedBox(height:  MediaQuery.of(context).size.width * 0.02),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -346,6 +351,7 @@ class MainMenuViewState extends State<MainMenuView>
                   ],
                 ),
               ),
+            ),
 
           ),
         );

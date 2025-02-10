@@ -1,9 +1,10 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../utils/translation_utils.dart';
 import '../db/db_helper.dart';
 
@@ -82,31 +83,64 @@ class LoginViewState extends State<LoginView> {
 
   Future<void> _requestLocationPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      PermissionStatus permission = PermissionStatus.denied;
+      // Verificar si los permisos ya están concedidos
+      bool isLocationGranted = await Permission.location.isGranted;
+      bool isLocationAlwaysGranted = await Permission.locationAlways.isGranted;
+      bool isNearbyWifiGranted = true; // Valor por defecto en caso de que no sea necesario
 
-      if (Platform.isAndroid) {
-        permission = await Permission.location.request();
-        if (permission == PermissionStatus.granted) {
-          permission = await Permission.locationAlways.request();
-        } if (permission == PermissionStatus.granted) {
-          permission = await Permission.nearbyWifiDevices.request();
-        }
-      } else if (Platform.isIOS) {
-        permission = await Permission.locationWhenInUse.request();
-        if (permission == PermissionStatus.granted) {
-          permission = await Permission.locationAlways.request();
+      // Si es Android 13 o superior, verificar si el permiso de Nearby WiFi es necesario
+      if (Platform.isAndroid && (await _isAndroid13OrHigher())) {
+        isNearbyWifiGranted = await Permission.nearbyWifiDevices.isGranted;
+      }
+
+      // Si todos los permisos ya están concedidos, salir de la función
+      if (isLocationGranted && isLocationAlwaysGranted && isNearbyWifiGranted) {
+        debugPrint("✅ Todos los permisos de ubicación ya están concedidos. No se volverán a solicitar.");
+        return;
+      }
+
+      // Solicitar permisos solo si no están concedidos
+      if (!isLocationGranted) {
+        PermissionStatus permission = await Permission.location.request();
+        if (permission != PermissionStatus.granted) {
+          debugPrint("❌ Permiso de ubicación denegado.");
+          return;
         }
       }
 
-      if (permission == PermissionStatus.denied ||
-          permission == PermissionStatus.permanentlyDenied) {
-        debugPrint("Permiso de ubicación denegado o denegado permanentemente.");
-        openAppSettings();
-      } else {
-        debugPrint("Permisos de ubicación concedidos.");
+      if (!isLocationAlwaysGranted) {
+        PermissionStatus permission = await Permission.locationAlways.request();
+        if (permission != PermissionStatus.granted) {
+          debugPrint("❌ Permiso de ubicación siempre denegado.");
+          return;
+        }
       }
+
+      // Solo pedir Nearby WiFi Devices si es Android 13 o superior
+      if (Platform.isAndroid && (await _isAndroid13OrHigher()) && !isNearbyWifiGranted) {
+        PermissionStatus permission = await Permission.nearbyWifiDevices.request();
+        if (permission != PermissionStatus.granted) {
+          debugPrint("❌ Permiso de dispositivos WiFi cercanos denegado.");
+          return;
+        }
+      }
+
+      debugPrint("✅ Permisos de ubicación correctamente concedidos.");
     }
   }
+
+// Función para verificar si el dispositivo tiene Android 13 o superior
+  Future<bool> _isAndroid13OrHigher() async {
+    return Platform.isAndroid && int.parse(await _getAndroidVersion()) >= 33;
+  }
+
+// Obtener la versión de Android
+  Future<String> _getAndroidVersion() async {
+    return await Process.run('getprop', ['ro.build.version.sdk']).then((result) => result.stdout.toString().trim());
+  }
+
+
+
 
   Future<void> _fetchAdmins() async {
     final dbHelper = DatabaseHelper();
@@ -171,74 +205,82 @@ class LoginViewState extends State<LoginView> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
             height: MediaQuery.of(context).size.height * 0.2,
-            padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height *0.01, horizontal: MediaQuery.of(context).size.height *0.02),
+            // Ajustar altura
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.01,
+              horizontal: MediaQuery.of(context).size.height * 0.02,
+            ),
             decoration: BoxDecoration(
               color: const Color(0xFF494949),
               borderRadius: BorderRadius.circular(7),
               border: Border.all(
                 color: const Color(0xFF28E2F5),
-                width:  MediaQuery.of(context).size.height *0.001,
+                width: MediaQuery.of(context).size.height * 0.001,
               ),
             ),
-            child: Column(
-              children: [
-                Text(
-                  ('¿${tr(context, 'Cerrar aplicación')}?').toUpperCase(),
-                  style: TextStyle(
-                    color: const Color(0xFF2be4f3),
-                    fontSize: 30.sp,
-                    fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              // 🔹 Permite desplazamiento en caso de contenido largo
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // 🔹 Ajusta al contenido
+                children: [
+                  Text(
+                    ('¿${tr(context, 'Cerrar aplicación')}?').toUpperCase(),
+                    style: TextStyle(
+                      color: const Color(0xFF2be4f3),
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pop(); // Cierra el diálogo sin hacer nada
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF2be4f3)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pop(); // Cierra el diálogo sin hacer nada
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFF2be4f3)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                        ),
+                        child: Text(
+                          tr(context, 'Cancelar').toUpperCase(),
+                          style: TextStyle(
+                            color: const Color(0xFF2be4f3),
+                            fontSize: 17.sp,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        tr(context, 'Cancelar').toUpperCase(),
-                        style: TextStyle(
-                          color: const Color(0xFF2be4f3),
-                          fontSize: 17.sp,
+                      OutlinedButton(
+                        onPressed: () async {
+                          // Cerrar la app completamente
+                          if (Platform.isAndroid || Platform.isIOS) {
+                            exit(0); // 🔹 Forzar el cierre de la app
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.red),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Text(
+                          tr(context, 'Cerrar aplicación').toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                          ),
                         ),
                       ),
-                    ),
-                    OutlinedButton(
-                      onPressed: () async {
-                        // Cerrar la app completamente y detenerla
-                        if (Platform.isAndroid || Platform.isIOS) {
-                          exit(0); // Cerrar la app por completo
-                        }
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                      child: Text(
-                        tr(context, 'Cerrar aplicación').toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -252,7 +294,8 @@ class LoginViewState extends State<LoginView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
+      // Permitir que el teclado empuje la pantalla
       body: Stack(
         children: [
           SizedBox.expand(
@@ -279,162 +322,161 @@ class LoginViewState extends State<LoginView> {
                             horizontal: screenWidth * 0.05,
                             vertical: screenHeight * 0.02,
                           ),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                width: screenWidth * 0.25,
-                                height: screenHeight * 0.15,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/recuadro.png',
-                                      fit: BoxFit.fill,
-                                    ),
-                                    Padding(
-                                      padding:  EdgeInsets.symmetric( horizontal: screenWidth * 0.005,
-                                        vertical: screenHeight * 0.002,),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              tr(context, 'Iniciar sesión')
-                                                  .toUpperCase(),
-                                              style: TextStyle(
-                                                color: const Color(0xFF28E2F5),
-                                                fontSize: 30.sp,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ],
+                          child: SingleChildScrollView( // 🔹 Permite que el contenido sea deslizable
+                            child: Column(
+                              children: [
+                                // Recuadro fijo
+                                SizedBox(
+                                  width: screenWidth * 0.25,
+                                  height: screenHeight * 0.15,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/recuadro.png',
+                                        fit: BoxFit.fill,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // Campo para el nombre de usuario
-                              SizedBox(height: screenHeight * 0.05),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        tr(context, 'Nombre de usuario')
-                                            .toUpperCase(),
-                                        style: _labelStyle),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: _user,
-                                        focusNode: _userFocusNode, // 🔹 Asigna FocusNode al campo de usuario
-                                        keyboardType: TextInputType.text,
-                                        style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText: tr(context, ''),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.005,
+                                          vertical: screenHeight * 0.002,
                                         ),
-                                        textInputAction: TextInputAction.next, // Muestra "Siguiente" en el teclado
-                                        onSubmitted: (_) {
-                                          FocusScope.of(context).requestFocus(_pwdFocusNode); // 🔹 Mueve el foco al campo de contraseña
-                                        },
+                                        child: Text(
+                                          tr(context, 'Iniciar sesión').toUpperCase(),
+                                          style: TextStyle(
+                                            color: const Color(0xFF28E2F5),
+                                            fontSize: 30.sp,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              // Campo para la contraseña con asteriscos visibles
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
+                                SizedBox(height: screenHeight * 0.1),
+                                // 🔹 Contenedor deslizable de TextFields
+                                SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Nombre de usuario
+                                      Text(
+                                        tr(context, 'Nombre de usuario').toUpperCase(),
+                                        style: _labelStyle,
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        decoration: _inputDecoration(),
+                                        child: TextField(
+                                          controller: _user,
+                                          focusNode: _userFocusNode,
+                                          keyboardType: TextInputType.text,
+                                          style: _inputTextStyle,
+                                          decoration: _inputDecorationStyle(
+                                            hintText: tr(context, ''),
+                                          ),
+                                          textInputAction: TextInputAction.next,
+                                          onSubmitted: (_) {
+                                            FocusScope.of(context).requestFocus(_pwdFocusNode);
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(height: screenHeight * 0.03),
+                                      Text(
                                         tr(context, 'Contraseña').toUpperCase(),
-                                        style: _labelStyle),
-                                    SizedBox(height: screenHeight * 0.01),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      decoration: _inputDecoration(),
-                                      child: TextField(
-                                        controller: _pwd,
-                                        focusNode: _pwdFocusNode, // 🔹 Asigna FocusNode al campo de contraseña
-                                        keyboardType: TextInputType.text,
-                                        obscureText: _isPasswordHidden,
-                                        style: _inputTextStyle,
-                                        decoration: _inputDecorationStyle(
-                                          hintText: tr(context, ''),
-                                          suffixIcon: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                _isPasswordHidden = !_isPasswordHidden;
-                                              });
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.only(right: screenWidth * 0.01),
-                                              width: screenWidth * 0.01,
-                                              height: screenHeight * 0.01,
-                                              child: Image.asset(
-                                                _isPasswordHidden ? 'assets/images/ojo1.png' : 'assets/images/ojo2.png',
-                                                fit: BoxFit.scaleDown,
+                                        style: _labelStyle,
+                                      ),
+                                      SizedBox(height: screenHeight * 0.01),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        decoration: _inputDecoration(),
+                                        child: TextField(
+                                          controller: _pwd,
+                                          focusNode: _pwdFocusNode,
+                                          keyboardType: TextInputType.text,
+                                          obscureText: _isPasswordHidden,
+                                          style: _inputTextStyle,
+                                          decoration: _inputDecorationStyle(
+                                            hintText: tr(context, ''),
+                                            suffixIcon: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _isPasswordHidden = !_isPasswordHidden;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.only(right: screenWidth * 0.01),
+                                                width: screenWidth * 0.01,
+                                                height: screenHeight * 0.01,
+                                                child: Image.asset(
+                                                  _isPasswordHidden
+                                                      ? 'assets/images/ojo1.png'
+                                                      : 'assets/images/ojo2.png',
+                                                  fit: BoxFit.scaleDown,
+                                                ),
                                               ),
                                             ),
                                           ),
+                                          textInputAction: TextInputAction.done,
+                                          onSubmitted: (_) {
+                                            FocusScope.of(context).unfocus();
+                                          },
                                         ),
-                                        textInputAction: TextInputAction.done, // Muestra "Hecho" en el teclado
-                                        onSubmitted: (_) {
-                                          FocusScope.of(context).unfocus(); // 🔹 Cierra el teclado al presionar "Hecho"
-                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Mensaje de error
+                                if (_errorMessage.isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+                                    child: Text(
+                                      _errorMessage,
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 16.sp,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              // Mensaje de error
-                              if (_errorMessage.isNotEmpty)
-                                  Text(
-                                    _errorMessage,
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16.sp,
+                                  ),
+                                SizedBox(height: screenHeight * 0.1),
+                                // Botón de "Entrar"
+                                OutlinedButton(
+                                  onPressed: () async {
+                                    FocusScope.of(context).unfocus();
+                                    await _validateLogin();
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.all(10.0),
+                                    side: BorderSide(
+                                      width: screenWidth * 0.001,
+                                      color: const Color(0xFF2be4f3),
                                     ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    backgroundColor: Colors.transparent,
                                   ),
-                              // Botón de inicio de sesión
-                              OutlinedButton(
-                                onPressed: () async {
-                                  // Cerrar el teclado
-                                  FocusScope.of(context).unfocus();
-
-                                  // Llamar a la función de validación
-                                  await _validateLogin();
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.all(10.0),
-                                  side:  BorderSide(
-                                      width: screenWidth*0.001, color: const Color(0xFF2be4f3)),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(7),
+                                  child: Text(
+                                    tr(context, 'Entrar').toUpperCase(),
+                                    style: TextStyle(
+                                      color: const Color(0xFF2be4f3),
+                                      fontSize: 25.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  backgroundColor: Colors.transparent,
                                 ),
-                                child: Text(
-                                  tr(context, 'Entrar').toUpperCase(),
-                                  style: TextStyle(
-                                    color: const Color(0xFF2be4f3),
-                                    fontSize: 25.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
+
                       SizedBox(width: screenWidth * 0.01),
+
+                      // Imagen del logo y botón de salir (fijo)
                       Expanded(
                         flex: 3,
                         child: Stack(
@@ -452,10 +494,8 @@ class LoginViewState extends State<LoginView> {
                               top: 0,
                               right: 0,
                               child: GestureDetector(
-                                onTapDown: (_) =>
-                                    setState(() => scaleFactorBack = 0.90),
-                                onTapUp: (_) =>
-                                    setState(() => scaleFactorBack = 1.0),
+                                onTapDown: (_) => setState(() => scaleFactorBack = 0.90),
+                                onTapUp: (_) => setState(() => scaleFactorBack = 1.0),
                                 onTap: () {
                                   _closeApp(context);
                                 },
@@ -484,6 +524,7 @@ class LoginViewState extends State<LoginView> {
               ],
             ),
           ),
+
         ],
       ),
     );

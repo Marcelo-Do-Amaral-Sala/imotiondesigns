@@ -123,8 +123,9 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                       horizontal: MediaQuery.of(context).size.width * 0.01,
                     ),
                     side: BorderSide(
-                        width: MediaQuery.of(context).size.width * 0.001,
-                        color: Color(0xFF2be4f3)),
+                      width: MediaQuery.of(context).size.width * 0.001,
+                      color: Color(0xFF2be4f3),
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
@@ -141,26 +142,27 @@ class _OverlayBioimpedanciaState extends State<OverlayBioimpedancia>
                   ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                // 🔹 Envuelve en SingleChildScrollView para que sea deslizable
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInputField(
-                          tr(context, 'Nombre').toUpperCase(), _nameController),
-                      _buildInputField(tr(context, 'Género').toUpperCase(),
-                          _genderController),
-                      _buildInputField(tr(context, 'Peso (kg)').toUpperCase(),
-                          _weightController),
-                      _buildInputField(tr(context, 'Altura (cm)').toUpperCase(),
-                          _heightController),
-                      _buildInputField('E-MAIL', _emailController),
-                    ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildInputField(tr(context, 'Nombre').toUpperCase(), _nameController),
+                        _buildInputField(tr(context, 'Género').toUpperCase(), _genderController),
+                        _buildInputField(tr(context, 'Peso (kg)').toUpperCase(), _weightController),
+                        _buildInputField(tr(context, 'Altura (cm)').toUpperCase(), _heightController),
+                        _buildInputField('E-MAIL', _emailController),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         ),
+
         const VerticalDivider(color: Color(0xFF28E2F5)),
         Expanded(
           child: Padding(

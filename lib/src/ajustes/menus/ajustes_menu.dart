@@ -276,18 +276,37 @@ class _AjustesMenuViewState extends State<AjustesMenuView>
           // Overlay: Esto se coloca fuera del contenido principal y en el centro de la pantalla
           if (isOverlayVisible)
             Positioned(
-              // Aplica medidas personalizadas solo para el overlay 3
-              top: overlayIndex == 3 ? screenHeight * 0.1 : screenHeight * 0.2,
-              // Puedes ajustar estos valores como quieras
-              bottom:
-                  overlayIndex == 3 ? screenHeight * 0.1 : screenHeight * 0.2,
-              left: overlayIndex == 3 ? screenWidth * 0.4 : screenWidth * 0.4,
-              right: overlayIndex == 3 ? screenWidth * 0.1 : screenWidth * 0.1,
+              // Aplica medidas personalizadas para overlayIndex 3 y 1
+              top: overlayIndex == 3
+                  ? screenHeight * 0.1
+                  : overlayIndex == 1
+                  ? screenHeight * 0.25 // 🔹 Más pequeño para overlayIndex 1
+                  : screenHeight * 0.2,
+
+              bottom: overlayIndex == 3
+                  ? screenHeight * 0.1
+                  : overlayIndex == 1
+                  ? screenHeight * 0.25 // 🔹 Más pequeño para overlayIndex 1
+                  : screenHeight * 0.2,
+
+              left: overlayIndex == 3
+                  ? screenWidth * 0.4
+                  : overlayIndex == 1
+                  ? screenWidth * 0.4 // 🔹 Más centrado para overlayIndex 1
+                  : screenWidth * 0.4,
+
+              right: overlayIndex == 3
+                  ? screenWidth * 0.1
+                  : overlayIndex == 1
+                  ? screenWidth * 0.1 // 🔹 Más pequeño para overlayIndex 1
+                  : screenWidth * 0.1,
+
               child: Align(
                 alignment: Alignment.center,
                 child: _getOverlayWidget(overlayIndex),
               ),
             ),
+
         ],
       ),
     );
