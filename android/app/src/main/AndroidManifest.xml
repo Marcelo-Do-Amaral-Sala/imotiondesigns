@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Funciones del dispositivo necesarias -->
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
     <uses-feature android:name="android.hardware.location.gps"/>
     <uses-feature android:name="android.hardware.bluetooth"/>
@@ -7,6 +8,7 @@
         android:label="imotion25"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true"
         android:enableOnBackInvokedCallback="true">
 
         <activity
@@ -35,31 +37,33 @@
             android:value="2" />
     </application>
 
-    <!-- Permisos básicos -->
+    <!-- 📌 Permisos de almacenamiento -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+
+    <!-- 📡 Permisos de Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <!-- Permisos de Bluetooth -->
+    <!-- 📲 Permisos de Bluetooth -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
 
-    <!-- Permisos de ubicación (solo hasta Android 11) -->
+    <!-- 📍 Permisos de ubicación (Solo hasta Android 11) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30"/>
 
-    <!-- Permiso de ubicación en segundo plano (solo si es necesario) -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- 🌍 Permiso de ubicación en segundo plano (Solo si es necesario) -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
-    <!-- Permiso para dispositivos cercanos en Android 12+ -->
-    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"/>
-
-    <!-- Declaración de intent para escaneo de dispositivos en Android 12+ -->
+    <!-- 📥 Permisos para descarga de archivos -->
     <queries>
+        <package android:name="com.android.providers.downloads" />
         <intent>
             <action android:name="android.bluetooth.adapter.action.REQUEST_DISCOVERABLE"/>
         </intent>

@@ -303,11 +303,21 @@
     "Información adicional" : "Información adicional",
     "Recomendaciones" : "Recomendaciones",
     "Su licencia está bloqueada, por favor contacte con el servicio técnico" : "Su licencia está bloqueada, por favor contacte con el servicio técnico",
-    "Para usar el panel de control debe validar su licencia" : "Para usar el panel de control debe validar su licencia"
+    "Para usar el panel de control debe validar su licencia" : "Para usar el panel de control debe validar su licencia",
+    "Soporte técnico" :  "Soporte técnico",
+    "Verificación de seguridad" : " Verificación de seguridad",
+    "Para continuar resuelva:" : "Para continuar resuelva:",
+    "Verificar" : "Verificar",
+    "Introduce el resultado" : "Introduce el resultado",
+    "Importar cliente" : "Importar cliente",
+    "Recargar programas": "Recargar programas",
+    "Recargar MCI 18000": "Recargar MCI 18000",
+    "Buscar MyBodyPro" : "Buscar MyBodyPro",
+    "Tiempo a 100" : "Tiempo a 100"
   },
   "en": {
     "Panel de control": "Dashboard",
-    "Clientes": "Customers",
+    "Clientes": "Clients",
     "Programas": "Programmes",
     "Bioimpedancia": "Bioimpedance",
     "Tutoriales": "Tutorials",
@@ -610,7 +620,17 @@
     "Información adicional": "Additional information",
     "Recomendaciones": "Recommendations",
     "Su licencia está bloqueada, por favor contacte con el servicio técnico" : "Your license is blocked, please contact technical support",
-    "Para usar el panel de control debe validar su licencia" : "To use the control panel, you must validate your license"
+    "Para usar el panel de control debe validar su licencia" : "To use the control panel, you must validate your license",
+    "Soporte técnico": "Technical Support",
+    "Verificación de seguridad": "Security Verification",
+    "Para continuar resuelva:": "To continue, solve:",
+    "Verificar": "Verify",
+    "Introduce el resultado": "Enter the result",
+    "Importar cliente": "Import client",
+    "Recargar programas": "Reload programs",
+    "Recargar MCI 18000": "Reload MCI 18000",
+    "Buscar MyBodyPro": "Search MyBodyPro",
+    "Tiempo a 100": "Time to 100"
   },
   "fr": {
     "Panel de control": "Panneau de contrôle",
@@ -917,7 +937,17 @@
     "Información adicional": "Informations supplémentaires",
     "Recomendaciones": "Recommandations",
     "Su licencia está bloqueada, por favor contacte con el servicio técnico" : "Votre licence est bloquée, veuillez contacter le support technique",
-    "Para usar el panel de control debe validar su licencia" : "Pour utiliser le panneau de contrôle, vous devez valider votre licence"
+    "Para usar el panel de control debe validar su licencia" : "Pour utiliser le panneau de contrôle, vous devez valider votre licence",
+    "Soporte técnico": "Support technique",
+    "Verificación de seguridad": "Vérification de sécurité",
+    "Para continuar resuelva:": "Pour continuer, résolvez :",
+    "Verificar": "Vérifier",
+    "Introduce el resultado": "Entrez le résultat",
+    "Importar cliente": "Importer un client",
+    "Recargar programas": "Recharger les programmes",
+    "Recargar MCI 18000": "Recharger MCI 18000",
+    "Buscar MyBodyPro": "Rechercher MyBodyPro",
+    "Tiempo a 100": "Temps à 100"
   },
   "it": {
     "Panel de control": "Pannello di controllo",
@@ -1224,7 +1254,17 @@
     "Información adicional": "Informazioni aggiuntive",
     "Recomendaciones": "Raccomandazioni",
     "Su licencia está bloqueada, por favor contacte con el servicio técnico" : "La tua licenza è bloccata, contatta il supporto tecnico",
-    "Para usar el panel de control debe validar su licencia" : "Per utilizzare il pannello di controllo, devi convalidare la tua licenza"
+    "Para usar el panel de control debe validar su licencia" : "Per utilizzare il pannello di controllo, devi convalidare la tua licenza",
+    "Soporte técnico": "Supporto tecnico",
+    "Verificación de seguridad": "Verifica di sicurezza",
+    "Para continuar resuelva:": "Per continuare, risolvi:",
+    "Verificar": "Verificare",
+    "Introduce el resultado": "Inserisci il risultato",
+    "Importar cliente": "Importa cliente",
+    "Recargar programas": "Ricaricare programmi",
+    "Recargar MCI 18000": "Ricaricare MCI 18000",
+    "Buscar MyBodyPro": "Cercare MyBodyPro",
+    "Tiempo a 100": "Tempo a 100"
   },
   "pt": {
     "Panel de control": "Painel de controle",
@@ -1531,7 +1571,17 @@
     "Información adicional": "Informações adicionais",
     "Recomendaciones": "Recomendações",
     "Su licencia está bloqueada, por favor contacte con el servicio técnico" : "Sua licença está bloqueada, entre em contato com o suporte técnico",
-    "Para usar el panel de control debe validar su licencia" : "Para usar o painel de controle, você deve validar sua licença"
+    "Para usar el panel de control debe validar su licencia" : "Para usar o painel de controle, você deve validar sua licença",
+    "Soporte técnico": "Suporte técnico",
+    "Verificación de seguridad": "Verificação de segurança",
+    "Para continuar resuelva:": "Para continuar, resolva:",
+    "Verificar": "Verificar",
+    "Introduce el resultado": "Insira o resultado",
+    "Importar cliente": "Importar cliente",
+    "Recargar programas": "Recarregar programas",
+    "Recargar MCI 18000": "Recarregar MCI 18000",
+    "Buscar MyBodyPro": "Buscar MyBodyPro",
+    "Tiempo a 100": "Tempo a 100"
   },
   "dt": {
     "Panel de control": "Dashboard",
@@ -1838,6 +1888,16 @@
     "Información adicional": "Zusätzliche Informationen",
     "Recomendaciones": "Empfehlungen",
     "Su licencia está bloqueada, por favor contacte con el servicio técnico" : "Ihre Lizenz ist gesperrt, bitte kontaktieren Sie den technischen Support",
-    "Para usar el panel de control debe validar su licencia" : "Um das Steuerungspanel zu verwenden, müssen Sie Ihre Lizenz validieren"
+    "Para usar el panel de control debe validar su licencia" : "Um das Steuerungspanel zu verwenden, müssen Sie Ihre Lizenz validieren",
+    "Soporte técnico": "Technischer Support",
+    "Verificación de seguridad": "Sicherheitsüberprüfung",
+    "Para continuar resuelva:": "Um fortzufahren, lösen Sie:",
+    "Verificar": "Überprüfen",
+    "Introduce el resultado": "Geben Sie das Ergebnis ein",
+    "Importar cliente": "Kunde importieren",
+    "Recargar programas": "Programme neu laden",
+    "Recargar MCI 18000": "MCI 18000 neu laden",
+    "Buscar MyBodyPro": "MyBodyPro suchen",
+    "Tiempo a 100": "Zeit bis 100"
   }
 }

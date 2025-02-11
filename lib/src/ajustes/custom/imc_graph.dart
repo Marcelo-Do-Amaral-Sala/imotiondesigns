@@ -2,182 +2,185 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:path/path.dart';
 
-class IMCGaugePainter extends CustomPainter {
-  final double imcValue; // Valor del IMC para posicionar el indicador
+import '../../../utils/translation_utils.dart';
 
-  IMCGaugePainter({required this.imcValue});
+class IMCLinearGaugePainter extends CustomPainter {
+  final double imcValue;
+
+  IMCLinearGaugePainter({required this.imcValue});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final width = size.width;
-    final height = size.height;
+    final width = size.width * 1.5; // Aumentar el largo
+    final height = size.height * 0.9;
 
-    // Pintura del contorno grisáceo
+    // Pintura del contorno
     final borderPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = Colors.grey
-      ..strokeWidth = 80; // Grosor del contorno
+      ..color = Colors.white
+      ..strokeWidth = width * 0.005; // Borde más fino
 
-    // Pintura del arco principal
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 70; // Grosor del arco principal
+    // Pintura del fondo de la barra
+    final backgroundPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.grey[300]!;
 
-    // Colores de las categorías (basados en la imagen)
+    // Colores de las categorías
     final colors = [
-      Colors.blue, // Peso bajo
-      Colors.green, // Peso normal
-      Colors.yellowAccent, // Sobrepeso
-      Colors.orange, // Obesidad leve
-      Colors.red, // Obesidad media
-      Colors.red[900]!, // Obesidad mórbida
+      Colors.blue,
+      Colors.green,
+      Colors.yellowAccent,
+      Colors.orange,
     ];
 
-    // Rangos de IMC y sus límites (basados en la imagen)
-    final ranges = [
-      {'min': 0.0, 'max': 18.5}, // Peso bajo
-      {'min': 18.5, 'max': 25}, // Peso normal
-      {'min': 25, 'max': 30}, // Sobrepeso
-      {'min': 30, 'max': 35}, // Obesidad leve
-      {'min': 35, 'max': 40}, // Obesidad media
-      {'min': 40, 'max': 100}, // Obesidad mórbida
+    // Rango de valores IMC
+    final imcRanges = [
+      0.0,    // Inicio
+      18.5,   // Bajo peso
+      25.0,   // Normal
+      30.0,   // Sobrepeso
+      40.0,   // Obesidad
     ];
 
-    // Etiquetas de texto para los rangos
-    final labels = [
-      '<18.5',
-      '18.5-25',
-      '25-30',
-      '30-35',
-      '35-40',
-      '>40',
-    ];
+    // Cantidad de segmentos
+    final numSegments = colors.length;
+    final segmentWidth = width / numSegments;
 
-    final startAngle = pi; // Inicia a 180 grados
-    final sweepAngle = pi; // Longitud total del arco
-    final segmentAngle = sweepAngle / ranges.length; // Ángulo de cada franja
+    // Dibujar el fondo de la barra
+    final barRect = Rect.fromLTWH(0, height / 3, width, height / 3);
+    canvas.drawRect(barRect, backgroundPaint);
 
-    // Dibuja el contorno grisáceo
-    canvas.drawArc(
-      Rect.fromCenter(
-        center: Offset(width / 2, height),
-        width: width,
-        height: height * 2,
-      ),
-      startAngle,
-      sweepAngle,
-      false,
-      borderPaint,
-    );
+    double currentX = 0;
+    for (int i = 0; i < numSegments; i++) {
+      final paint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = colors[i];
 
-    double currentAngle = startAngle;
+      final segmentRect = Rect.fromLTWH(currentX, height / 3, segmentWidth, height / 3);
+      canvas.drawRect(segmentRect, paint);
 
-    for (int i = 0; i < ranges.length; i++) {
-      // Pintar el arco del rango
-      paint.color = colors[i];
-      canvas.drawArc(
-        Rect.fromCenter(
-          center: Offset(width / 2, height),
-          width: width,
-          height: height * 2,
-        ),
-        currentAngle,
-        segmentAngle,
-        false,
-        paint,
-      );
-
-// Posicionar el texto en la parte superior de la franja
-      final textAngle = currentAngle + segmentAngle / 2;
-      final textRadius = height * 1.15; // Aumentar el radio para subir el texto
-
-// Calcular la posición exacta del texto en la parte superior del arco
-      final textX = width / 2 + cos(textAngle) * textRadius;
-      final textY = height + sin(textAngle) * textRadius;
-
-// Guardar el estado del canvas
-      canvas.save();
-
-// Mover el canvas al punto donde irá el texto
-      canvas.translate(textX, textY);
-
-// NO ROTAR el canvas para que el texto quede horizontal
-
-// Dibujar el texto centrado en la posición
-      final textPainter = TextPainter(
-        text: TextSpan(
-          text: labels[i],
-          style: TextStyle(
-            fontSize: 10.sp,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      );
-      textPainter.layout();
-
-      final textOffset = Offset(
-        -textPainter.width / 1.8, // Centrar horizontalmente
-        -textPainter.height / 2.5, // Ajustar verticalmente para alinearlo bien
-      );
-      textPainter.paint(canvas, textOffset);
-
-// Restaurar el estado del canvas
-      canvas.restore();
-
-
-
-      // Avanzar al siguiente segmento
-      currentAngle += segmentAngle;
+      currentX += segmentWidth;
     }
 
-    // Indicador con forma de flecha precisa
-    final indicatorPaint = Paint()..color = Colors.black;
+    // Dibujar el contorno de la barra
+    canvas.drawRect(barRect, borderPaint);
 
-    // Calcular el ángulo exacto del indicador según el IMC
-    double calculateIndicatorAngle(double imc) {
-      for (int i = 0; i < ranges.length; i++) {
-        final range = ranges[i];
-        if (imc >= range['min']! && imc <= range['max']!) {
-          final normalizedValue =
-              (imc - range['min']!) / (range['max']! - range['min']!);
-          return startAngle + i * segmentAngle + normalizedValue * segmentAngle;
+    // Calcular la posición del indicador según el IMC
+    double indicatorX = 0.0;
+    if (imcValue < imcRanges[1]) {
+      indicatorX = 0;
+    } else if (imcValue > imcRanges.last) {
+      indicatorX = width - 5;
+    } else {
+      for (int i = 0; i < imcRanges.length - 1; i++) {
+        if (imcValue >= imcRanges[i] && imcValue < imcRanges[i + 1]) {
+          double rangeStart = imcRanges[i];
+          double rangeEnd = imcRanges[i + 1];
+          double segmentStartX = (i * segmentWidth);
+          double segmentEndX = ((i + 1) * segmentWidth);
+          indicatorX = segmentStartX + ((imcValue - rangeStart) / (rangeEnd - rangeStart)) * (segmentEndX - segmentStartX);
+          break;
         }
       }
-      return startAngle; // Valor por defecto si el IMC no está en el rango
     }
 
-    final indicatorAngle = calculateIndicatorAngle(imcValue);
+    // Pintura para el indicador del IMC
+    final indicatorPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.black;
 
-    final indicatorLength = height * 0.85; // Longitud de la flecha
-    final arrowWidth = 6.0; // Ancho reducido para mayor precisión
-
-    // Puntos de la flecha precisa
-    final tip = Offset(
-      width / 2 + cos(indicatorAngle) * indicatorLength,
-      height + sin(indicatorAngle) * indicatorLength,
+    // Dibujar el indicador en la posición calculada
+    canvas.drawLine(
+      Offset(indicatorX, height / height*0.01),
+      Offset(indicatorX, height / 1.5),
+      indicatorPaint..strokeWidth = width*0.01,
     );
-    final left = Offset(
-      width / 2 + cos(indicatorAngle - pi / 2) * arrowWidth,
-      height + sin(indicatorAngle - pi / 2) * arrowWidth,
-    );
-    final right = Offset(
-      width / 2 + cos(indicatorAngle + pi / 2) * arrowWidth,
-      height + sin(indicatorAngle + pi / 2) * arrowWidth,
-    );
-
-    // Dibuja la flecha precisa
-    final path = Path()
-      ..moveTo(tip.dx, tip.dy)
-      ..lineTo(left.dx, left.dy)
-      ..lineTo(right.dx, right.dy)
-      ..close();
-
-    canvas.drawPath(path, indicatorPaint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
+
+class CircleFillPainter extends CustomPainter {
+  final double progress;
+
+  CircleFillPainter(this.progress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint strokePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    final Paint fillPaint = Paint()
+      ..color = const Color(0xFF2be4f3)
+      ..style = PaintingStyle.fill;
+
+    final double radius = size.width / 2;
+    Offset center = size.center(Offset.zero);
+
+    // Dibujar el círculo de fondo
+    canvas.drawCircle(center, radius, strokePaint);
+
+    // Dibujar la parte rellena del progreso
+    Rect rect = Rect.fromCircle(center: center, radius: radius);
+    double sweepAngle = 2 * pi * progress;
+    canvas.drawArc(rect, -pi / 2, sweepAngle, true, fillPaint);
+
+    if (progress >= 1.0) {
+      // Dibujar icono de tick cuando el progreso sea 100%
+      final Paint tickPaint = Paint()
+        ..color = Colors.white
+        ..strokeWidth = 4.0
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      final double tickSize = radius * 0.8; // Tamaño del tick en relación al radio del círculo
+
+      // Coordenadas del tick (✓), centrado dentro del círculo
+      Offset start = Offset(center.dx - tickSize * 0.3, center.dy + tickSize * 0.1);
+      Offset mid = Offset(center.dx - tickSize * 0.1, center.dy + tickSize * 0.3);
+      Offset end = Offset(center.dx + tickSize * 0.3, center.dy - tickSize * 0.2);
+
+      // Dibujar el tick
+      Path path = Path()
+        ..moveTo(start.dx, start.dy)
+        ..lineTo(mid.dx, mid.dy)
+        ..lineTo(end.dx, end.dy);
+
+      canvas.drawPath(path, tickPaint);
+    } else {
+      // Mostrar porcentaje mientras no haya terminado
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: "${(progress * 100).toInt()}%",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CircleFillPainter oldDelegate) {
+    return oldDelegate.progress != progress;
+  }
+}
+
+
+
+
+

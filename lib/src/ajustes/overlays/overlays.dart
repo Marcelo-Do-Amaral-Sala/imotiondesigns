@@ -1,14 +1,15 @@
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/form/user_form_bonos.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_activity.dart';
 import 'package:imotion_designs/src/ajustes/info/admins_list_view.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,7 @@ import '../../db/db_helper.dart';
 import '../../db/db_helper_traducciones.dart';
 import '../../servicios/generate_pdf.dart';
 import '../../servicios/licencia_state.dart';
+import '../../servicios/recomendations.dart';
 import '../../servicios/sync.dart';
 import '../../servicios/translation_provider.dart';
 import '../custom/imc_graph.dart';
@@ -779,7 +781,7 @@ class _OverlayServicioState extends State<OverlayServicio>
         // Overlay de Servicio Técnico (se muestra si isOverlayVisible es true)
         if (isOverlayVisible)
           Positioned.fill(
-            child: OverlayBackup(
+            child: OverlayOperacion(
               onClose: () {
                 toggleOverlay(); // Oculta el overlay cuando se cierra
               },
@@ -790,6 +792,304 @@ class _OverlayServicioState extends State<OverlayServicio>
   }
 }
 
+class OverlayOperacion extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const OverlayOperacion({super.key, required this.onClose});
+
+  @override
+  _OverlayOperacionState createState() => _OverlayOperacionState();
+}
+
+class _OverlayOperacionState extends State<OverlayOperacion>
+    with SingleTickerProviderStateMixin {
+  final _operationController = TextEditingController();
+  List<int> _randomNumbers = [];
+  int _correctSum = 0;
+  String _errorMessage = '';
+  bool _isVerified = false; // Nueva variable de estado
+
+  @override
+  void initState() {
+    super.initState();
+    _generateRandomNumbers();
+  }
+
+  void _generateRandomNumbers() {
+    final random = Random();
+    _randomNumbers = List.generate(4, (_) => random.nextInt(10) + 1);
+    _correctSum = _randomNumbers.reduce((a, b) => a + b);
+    setState(() {});
+  }
+
+  void _verifySum() {
+    if (int.tryParse(_operationController.text) == _correctSum) {
+      setState(() {
+        _errorMessage = '';
+        _isVerified = true; // Cambia la vista a la nueva pantalla
+      });
+      debugPrint('Verificación correcta');
+    } else {
+      setState(() {
+        _errorMessage = 'Resultado erróneo';
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _operationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return MainOverlay(
+      title: Text(
+        _isVerified
+            ? tr(context, 'Soporte técnico')
+                .toUpperCase() // Título cambia si se verifica
+            : tr(context, 'Verificación de seguridad').toUpperCase(),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 34.sp,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF2be4f3),
+        ),
+      ),
+      content: Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.03, vertical: screenHeight * 0.03),
+        child: SingleChildScrollView(
+          child: _isVerified
+              ? _buildSuccessContent()
+              : _buildVerificationContent(),
+        ),
+      ),
+      onClose: widget.onClose,
+    );
+  }
+
+// Nueva pantalla cuando la verificación es correcta
+  Widget _buildSuccessContent() {
+    double buttonSize = 120.sp; // Tamaño uniforme para los botones
+    double spacing = 15.sp; // Espaciado entre botones
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    List<String> buttonTexts = [
+      tr(context, 'Importar cliente'),
+      tr(context, 'Recargar programas'),
+      tr(context, 'Recargar MCI 18000'),
+      tr(context, 'Buscar MyBodyPro'),
+      tr(context, 'Tiempo a 100'),
+    ];
+    // Lista de funciones correspondientes a cada botón
+    List<VoidCallback> buttonActions = [
+      () => debugPrint("Importar cliente presionado"),
+      () => debugPrint("Recargar programas presionado"),
+      () => debugPrint("Recargar MCI 18000 presionado"),
+      () => debugPrint("Buscar MyBodyPro presionado"),
+      () => debugPrint("Tiempo a 100 presionado"),
+    ];
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Primera fila con 3 botones
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(3, (index) {
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+                child: SizedBox(
+                  width: buttonSize,
+                  height: buttonSize,
+                  child: OutlinedButton(
+                    onPressed: buttonActions[index],
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.01,
+                          vertical: screenHeight * 0.01),
+                      side: BorderSide(
+                        width: screenWidth * 0.001,
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: Color.fromARGB(255, 46, 46, 46),
+                    ),
+                    child: Text(
+                      tr(context, buttonTexts[index]).toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+          SizedBox(height: spacing),
+          // Segunda fila con 2 botones centrados entre los espacios de la fila superior
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(2, (index) {
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing * 1.5),
+                child: SizedBox(
+                  width: buttonSize,
+                  height: buttonSize,
+                  child: OutlinedButton(
+                    onPressed: buttonActions[index + 3],
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.01,
+                          vertical: screenHeight * 0.01),
+                      side: BorderSide(
+                        width: screenWidth * 0.001,
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: Color.fromARGB(255, 46, 46, 46),
+                    ),
+                    child: Text(
+                      tr(context, buttonTexts[index + 3]).toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Pantalla original con el formulario de verificación
+  Widget _buildVerificationContent() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          tr(context, 'Para continuar resuelva:'),
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 25.sp,
+              fontWeight: FontWeight.normal),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: screenHeight * 0.05),
+        Flexible(
+          fit: FlexFit.loose,
+          child: Container(
+            width: screenWidth * 0.4,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 46, 46, 46),
+              borderRadius: BorderRadius.circular(7.0),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.02,
+                  vertical: screenHeight * 0.02),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    _randomNumbers.join('  '),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  TextField(
+                    controller: _operationController,
+                    style: _inputTextStyle,
+                    keyboardType: TextInputType.number,
+                    decoration: _inputDecorationStyle(
+                      hintText: tr(context, 'Introduce el resultado'),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  if (_errorMessage.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        _errorMessage,
+                        style: TextStyle(color: Colors.red, fontSize: 14.sp),
+                      ),
+                    ),
+                  OutlinedButton(
+                    onPressed: _verifySum,
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.01,
+                          vertical: screenHeight * 0.01),
+                      side: BorderSide(
+                        width: screenWidth * 0.001,
+                        color: const Color(0xFF2be4f3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    child: Text(
+                      tr(context, 'Verificar').toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF2be4f3),
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecorationStyle(
+      {String hintText = '', bool enabled = true}) {
+    return InputDecoration(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
+      filled: true,
+      fillColor: Colors.transparent,
+      isDense: true,
+      hintText: hintText,
+      hintStyle: TextStyle(color: Colors.grey, fontSize: 14.sp),
+      enabled: enabled,
+    );
+  }
+
+  TextStyle get _inputTextStyle =>
+      TextStyle(color: Colors.white, fontSize: 14.sp);
+}
 
 class OverlayAdmins extends StatefulWidget {
   final VoidCallback onClose;
@@ -1150,6 +1450,7 @@ class _OverlayVitaState extends State<OverlayVita>
   String _userProfileType = '';
   String resumenRespuestas = "";
   bool hideOptions = false;
+  bool hidePdf = true;
   bool isOverlayVisible = false; // Controla la visibilidad del overlay
   bool isClientSelected = false; // Controla la visibilidad del overlay
   int overlayIndex = -1; // -1 indica que no hay overlay visible
@@ -1159,12 +1460,76 @@ class _OverlayVitaState extends State<OverlayVita>
   double scaleFactorCliente = 1.0;
   final GlobalKey _repaintBoundaryKey = GlobalKey();
   List<Map<String, dynamic>> questions = [];
+  late AnimationController _controller;
+  bool _isVisible = false;
+  List<String> messages = [
+    "Procesando información...",
+    "Obteniendo datos del cliente...",
+    "Creando rutinas personalizadas...",
+  ];
+  int _currentMessageIndex = -1;
+  bool _isCompleted = false;
+  List<Map<String, dynamic>> allIndividualPrograms = [];
+  List<Map<String, dynamic>> allRecoPrograms = [];
+  List<Map<String, dynamic>> allAutoPrograms = [];
 
   @override
   void initState() {
     super.initState();
     _checkUserLoginStatus();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    );
+    fetchAllPrograms();
+    requestManageStoragePermission();
+    requestStoragePermission();
   }
+
+
+  Future<bool> requestStoragePermission() async {
+    if (await Permission.storage.isGranted) {
+      print("✅ Permiso de almacenamiento ya concedido.");
+      return true;
+    }
+
+    var status = await Permission.storage.request();
+    if (status.isGranted) {
+      print("✅ Permiso de almacenamiento concedido.");
+      return true;
+    } else if (status.isDenied) {
+      print("❌ Permiso de almacenamiento denegado.");
+      return false;
+    } else if (status.isPermanentlyDenied) {
+      print("⚠️ Permiso permanentemente denegado. Abriendo configuración...");
+      await openAppSettings();
+      return false;
+    }
+    return false;
+  }
+
+  Future<bool> requestManageStoragePermission() async {
+    if (await Permission.manageExternalStorage.isGranted) {
+      print("✅ Permiso de almacenamiento completo ya concedido.");
+      return true;
+    }
+
+    var status = await Permission.manageExternalStorage.request();
+    if (status.isGranted) {
+      print("✅ Permiso de almacenamiento completo concedido.");
+      return true;
+    } else if (status.isDenied) {
+      print("❌ Permiso de almacenamiento denegado.");
+      return false;
+    } else if (status.isPermanentlyDenied) {
+      print("⚠️ Permiso permanentemente denegado. Abriendo configuración...");
+      await openAppSettings();
+      return false;
+    }
+    return false;
+  }
+
+
 
   @override
   void dispose() {
@@ -1175,8 +1540,41 @@ class _OverlayVitaState extends State<OverlayVita>
     questions.clear();
     currentQuestion = 0;
     isClientSelected = false;
-
+    _controller.dispose();
     super.dispose();
+  }
+
+  void checkAndStartAnimation() {
+    if (_allQuestionsAnswered()) {
+      setState(() {
+        _isVisible = true;
+        _startMessageSequence();
+      });
+      _controller.forward().whenComplete(() {
+        setState(() {
+          hidePdf = false;
+        });
+      });
+    }
+  }
+
+  void _startMessageSequence() async {
+    for (int i = 0; i < messages.length; i++) {
+      await Future.delayed(Duration(seconds: 1));
+      if (mounted) {
+        setState(() {
+          _currentMessageIndex = i;
+        });
+      }
+    }
+
+    // Cuando la animación termina, mostrar mensaje final
+    await Future.delayed(Duration(seconds: 1));
+    if (mounted) {
+      setState(() {
+        _isCompleted = true;
+      });
+    }
   }
 
   Future<void> _checkUserLoginStatus() async {
@@ -1396,6 +1794,7 @@ class _OverlayVitaState extends State<OverlayVita>
           "isBot": true,
         });
         hideOptions = true;
+        checkAndStartAnimation();
       });
 
       // Desplazar al final después del mensaje final
@@ -1433,6 +1832,89 @@ class _OverlayVitaState extends State<OverlayVita>
     });
 
     return resumen;
+  }
+
+  Future<Map<String, dynamic>> obtenerRecomendacion(
+      Map<String, dynamic> answers,
+      List<Map<String, dynamic>> allIndividualPrograms,
+      List<Map<String, dynamic>> allRecoPrograms,
+      List<Map<String, dynamic>> allAutoPrograms) async {
+    String experiencia = answers['Experiencia'] ?? "";
+    String condicion = answers['Nivel'] ?? "";
+    String diasEntrenamientoStr = answers['Días'] ?? "0";
+    int diasEntrenamiento =
+        int.tryParse(RegExp(r'\d+').stringMatch(diasEntrenamientoStr) ?? "0") ??
+            0;
+    String objetivo = answers['Objetivo'] ?? "";
+
+    print(
+        "Valores obtenidos - Experiencia: $experiencia, Condición: $condicion, Días: $diasEntrenamiento, Objetivo: $objetivo");
+
+    // Obtener la recomendación basada en las respuestas del usuario
+    FitnessRecommendation? recomendacion =
+        getRecommendation(experiencia, condicion, diasEntrenamiento, objetivo);
+
+    if (recomendacion == null) {
+      return {"title": "Recomendación", "value": "No disponible", "images": []};
+    }
+
+    // Lista para almacenar los programas con sus imágenes
+    List<Map<String, String>> programData = [];
+
+    // Obtener nombres de los programas recomendados
+    List<String> programNames = recomendacion.programas.split(', ');
+
+    // Buscar en las listas de programas
+    for (String program in programNames) {
+      Map<String, dynamic>? foundProgram;
+
+      // Buscar en los programas automáticos
+      foundProgram = allAutoPrograms.firstWhere(
+        (p) =>
+            p["nombre"].toString().trim().toLowerCase() ==
+            program.trim().toLowerCase(),
+        orElse: () => {},
+      );
+
+      // Si no se encuentra en automáticos, buscar en individuales
+      if (foundProgram.isEmpty) {
+        foundProgram = allIndividualPrograms.firstWhere(
+          (p) =>
+              p["nombre"].toString().trim().toLowerCase() ==
+              program.trim().toLowerCase(),
+          orElse: () => {},
+        );
+      }
+
+      // Si no se encuentra en individuales, buscar en recovery
+      if (foundProgram.isEmpty) {
+        foundProgram = allRecoPrograms.firstWhere(
+          (p) =>
+              p["nombre"].toString().trim().toLowerCase() ==
+              program.trim().toLowerCase(),
+          orElse: () => {},
+        );
+      }
+
+      // Si se encontró el programa, agregarlo a la lista
+      if (foundProgram.isNotEmpty) {
+        programData.add({
+          "name": foundProgram["nombre"],
+          "image": foundProgram["imagen"],
+          // Se asume que la base de datos almacena la ruta de la imagen
+        });
+      } else {
+        print("❌ No se encontró imagen para el programa: $program");
+      }
+    }
+
+    return {
+      "title": "Recomendación",
+      "value": recomendacion.toString(),
+      "intensidad": recomendacion.intensidad,
+      "duracion": recomendacion.duracion,
+      "images": programData, // Lista con nombres de programas e imágenes
+    };
   }
 
   bool _allQuestionsAnswered() {
@@ -1527,6 +2009,35 @@ class _OverlayVitaState extends State<OverlayVita>
     final image = await _captureWidget();
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     return byteData!.buffer.asUint8List();
+  }
+
+  Future<void> fetchAllPrograms() async {
+    final db = await DatabaseHelper().database;
+
+    try {
+      allAutoPrograms =
+          await DatabaseHelper().obtenerProgramasAutomaticosConSubprogramas(db);
+      print("✅ Programas automáticos cargados: ${allAutoPrograms.length}");
+    } catch (e) {
+      print("❌ Error cargando programas automáticos: $e");
+    }
+
+    try {
+      allIndividualPrograms = await DatabaseHelper()
+          .obtenerProgramasPredeterminadosPorTipoIndividual(db);
+      print(
+          "✅ Programas individuales cargados: ${allIndividualPrograms.length}");
+    } catch (e) {
+      print("❌ Error cargando programas individuales: $e");
+    }
+
+    try {
+      allRecoPrograms = await DatabaseHelper()
+          .obtenerProgramasPredeterminadosPorTipoRecovery(db);
+      print("✅ Programas de recuperación cargados: ${allRecoPrograms.length}");
+    } catch (e) {
+      print("❌ Error cargando programas de recuperación: $e");
+    }
   }
 
   @override
@@ -1864,324 +2375,359 @@ class _OverlayVitaState extends State<OverlayVita>
                         ),
                       ),
                       child: Column(
+                        mainAxisSize: MainAxisSize.max,
                         children: [
                           // Título
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.001),
-                                child: Text(
-                                  tr(context, "Tus resultados").toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 25.sp,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: const Color(0xFF2be4f3),
-                                    color: const Color(0xFF2be4f3),
-                                  ),
-                                ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.001),
+                            child: Text(
+                              tr(context, "Tus resultados").toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 25.sp,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                                decorationColor: const Color(0xFF2be4f3),
+                                color: const Color(0xFF2be4f3),
                               ),
                             ),
                           ),
 
-                          // Información del cliente
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                for (var item in [
-                                  {
-                                    'label':
-                                        tr(context, 'Nombre').toUpperCase(),
-                                    'value': _clientName
-                                  },
-                                  {
-                                    'label': tr(context, 'Género').toUpperCase(),
-                                    'value': (_clientGender == null || _clientGender!.isEmpty)
-                                        ? '' // Si _clientGender es nulo o está vacío, se asigna una cadena vacía
-                                        : (_clientGender == 'Hombre'
-                                        ? tr(context, 'Hombre') // Si es Hombre, se traduce como 'Hombre'
-                                        : tr(context, 'Mujer')), // Si es Mujer, se traduce como 'Mujer'
-                                  }
-                                  ,
-
-                                  {
-                                    'label': tr(context, 'Edad').toUpperCase(),
-                                    'value': _clientAge != null
-                                        ? _clientAge.toString()
-                                        : "",
-                                    // Si _clientAge es nulo, muestra un texto vacío
-                                  },
-                                  {
-                                    'label': tr(context, 'Altura (cm)')
-                                        .toUpperCase(),
-                                    'value': _clientHeight != null
-                                        ? '$_clientHeight cm'
-                                        : "",
-                                    // Si _clientHeight es nulo, muestra un texto vacío
-                                  },
-                                  {
-                                    'label':
-                                        tr(context, 'Peso (kg)').toUpperCase(),
-                                    'value': _clientWeight != null
-                                        ? '$_clientWeight kg'
-                                        : "",
-                                    // Si _clientWeight es nulo, muestra un texto vacío
-                                  },
-                                ])
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        tr(context, item['label']!)
-                                            .toUpperCase(),
-                                        style: TextStyle(
+                          SizedBox(height: screenHeight * 0.03),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              for (var item in [
+                                {
+                                  'label': tr(context, 'Nombre').toUpperCase(),
+                                  'value': _clientName
+                                },
+                                {
+                                  'label': tr(context, 'Género').toUpperCase(),
+                                  'value': _clientGender ?? ''
+                                },
+                                {
+                                  'label': tr(context, 'Edad').toUpperCase(),
+                                  'value': _clientAge?.toString() ?? ''
+                                },
+                                {
+                                  'label':
+                                      tr(context, 'Altura (cm)').toUpperCase(),
+                                  'value': _clientHeight != null
+                                      ? '$_clientHeight cm'
+                                      : ''
+                                },
+                                {
+                                  'label':
+                                      tr(context, 'Peso (kg)').toUpperCase(),
+                                  'value': _clientWeight != null
+                                      ? '$_clientWeight kg'
+                                      : ''
+                                },
+                              ])
+                                Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Text(
+                                      item['label']!,
+                                      style: TextStyle(
                                           fontSize: 18.sp,
                                           color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      item['value']!,
+                                      style: TextStyle(
+                                          fontSize: 15.sp, color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                          SizedBox(height: screenHeight * 0.03),
+                          // IMC Gráfico y Leyenda
+                          RepaintBoundary(
+                            key: _repaintBoundaryKey,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.01,
+                                  vertical: screenHeight * 0.01),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: screenWidth * 0.12,
+                                        height: screenHeight * 0.08,
+                                        child: CustomPaint(
+                                          painter: IMCLinearGaugePainter(
+                                              imcValue: result['imc']),
                                         ),
                                       ),
                                       Text(
-                                        item['value']!,
+                                        'IMC: ${result['imc'].toStringAsFixed(1)}',
                                         style: TextStyle(
-                                          fontSize: 15.sp,
-                                          color: Colors.white,
+                                            fontSize: 18.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: _buildLegend(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: screenHeight * 0.02),
+                          _isVisible
+                              ? Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.01,
+                                    vertical: screenHeight * 0.01,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      // Círculo de progreso
+                                      AnimatedBuilder(
+                                        animation: _controller,
+                                        builder: (context, child) {
+                                          return CustomPaint(
+                                            size: Size(screenHeight * 0.15,
+                                                screenHeight * 0.15),
+                                            painter: CircleFillPainter(
+                                              _controller.value,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      SizedBox(width: screenWidth * 0.01),
+                                      // Mensajes dinámicos
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (!_isCompleted)
+                                              Text(
+                                                'Generando tu PDF'
+                                                    .toUpperCase(),
+                                                style: TextStyle(
+                                                  fontSize: 18.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            SizedBox(
+                                                height: screenHeight * 0.01),
+                                            // Si la animación ha terminado, mostrar mensaje final
+                                            if (_isCompleted)
+                                              Text(
+                                                tr(context,
+                                                        "PDF generado correctamente")
+                                                    .toUpperCase(),
+                                                style: TextStyle(
+                                                    color: Colors.lightGreen,
+                                                    fontSize: 18.sp,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )
+                                            else
+                                              // Mensajes que aparecen progresivamente
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: List.generate(
+                                                  _currentMessageIndex + 1,
+                                                  // Mostrar mensajes según el tiempo
+                                                  (index) => Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical:
+                                                                screenHeight *
+                                                                    0.001),
+                                                    child: Text(
+                                                      messages[index],
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16.sp),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                              ],
-                            ),
-                          ),
-
-                          // Gráfico y leyenda
-                          Expanded(
-                            flex: 3,
-                            child: RepaintBoundary(
-                              key: _repaintBoundaryKey,
-                              // Clave para capturar este widget
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.01,
-                                  vertical: screenHeight * 0.05,
+                                )
+                              : SizedBox.shrink(),
+                          SizedBox(height: screenHeight * 0.05),
+                          if (!hidePdf) ...[
+                            Column(
+                              children: [
+                                Text(
+                                  tr(context, "Consulte aquí sus resultados")
+                                      .toUpperCase(),
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.normal),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
+                                SizedBox(height: screenHeight * 0.01),
+                                Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    Column(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: screenWidth * 0.02,
-                                            vertical: screenHeight * 0.02,
+                                    OutlinedButton(
+                                      onPressed: (selectedBioClient != null && _allQuestionsAnswered())
+                                          ? () async {
+                                        final resumen = mostrarResumen();
+                                        final recomendacion = await obtenerRecomendacion(
+                                            answers, allIndividualPrograms, allRecoPrograms, allAutoPrograms);
+                                        final imageBytes = await _captureAsBytes();
+                                        final result = calcularIMC(
+                                          peso: _clientWeight!.toDouble(),
+                                          altura: _clientHeight!.toDouble(),
+                                          genero: _clientGender!,
+                                        );
+
+                                        final generator = CustomPdfGenerator();
+                                        final sanitizedClientName = _clientName!
+                                            .replaceAll(RegExp(r'[^\w\s]'), '')
+                                            .replaceAll(' ', '_');
+                                        final pdfFileName = 'Informe_${sanitizedClientName.toLowerCase()}.pdf';
+
+                                        final file = await generator.generateAndSavePdf(
+                                          context,
+                                          pdfFileName,
+                                          _clientName!,
+                                          _clientGender!,
+                                          _clientAge!,
+                                          _clientHeight!,
+                                          _clientWeight!,
+                                          resumen,
+                                          recomendacion,
+                                          imageBytes,
+                                          result,
+                                        );
+
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'PDF guardado en DESCARGAS',
+                                              style: TextStyle(color: Colors.white, fontSize: 17.sp),
+                                            ),
+                                            backgroundColor: Colors.green,
+                                            duration: const Duration(seconds: 2),
                                           ),
-                                          width: screenWidth * 0.15,
-                                          height: screenHeight * 0.15,
-                                          child: CustomPaint(
-                                            painter: IMCGaugePainter(
-                                                imcValue: result['imc']),
-                                          ),
+                                        );
+                                      }
+                                          : null, // Desactivar botón si las condiciones no se cumplen
+                                      style: OutlinedButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.02,
+                                          vertical: screenHeight * 0.02,
                                         ),
-                                        SizedBox(height: screenHeight * 0.01),
-                                        Text(
-                                          'IMC: ${result['imc'].toStringAsFixed(1)}',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
+                                        foregroundColor: Colors.white,
+                                        backgroundColor: Colors.black,
+                                        side: BorderSide(
+                                          color: const Color(0xFF2be4f3),
+                                          width: screenWidth * 0.001,
                                         ),
-                                      ],
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(7),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        tr(context, 'Descargar PDF').toUpperCase(),
+                                        style: TextStyle(fontSize: 20.sp, color: Colors.white),
+                                      ),
                                     ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: _buildLegend(),
+
+
+                                    OutlinedButton(
+                                      onPressed: (selectedBioClient != null &&
+                                              _allQuestionsAnswered())
+                                          ? () async {
+                                              final resumen = mostrarResumen();
+                                              final recomendacion =
+                                                  await obtenerRecomendacion(
+                                                      answers,
+                                                      allIndividualPrograms,
+                                                      allRecoPrograms,
+                                                      allAutoPrograms);
+                                              final result = calcularIMC(
+                                                  peso:
+                                                      _clientWeight!.toDouble(),
+                                                  altura:
+                                                      _clientHeight!.toDouble(),
+                                                  genero: _clientGender!);
+                                              final imageBytes =
+                                                  await _captureAsBytes();
+                                              final generator =
+                                                  CustomPdfGenerator();
+                                              final sanitizedClientName =
+                                                  _clientName!
+                                                      .replaceAll(
+                                                          RegExp(r'[^\w\s]'),
+                                                          '')
+                                                      .replaceAll(' ', '_');
+                                              final pdfFileName =
+                                                  'informe_${sanitizedClientName.toLowerCase()}.pdf';
+                                              await generator
+                                                  .generateAndOpenPdf(
+                                                      context,
+                                                      pdfFileName,
+                                                      _clientName!,
+                                                      _clientGender!,
+                                                      _clientAge!,
+                                                      _clientHeight!,
+                                                      _clientWeight!,
+                                                      resumen,
+                                                      recomendacion,
+                                                      imageBytes,
+                                                      result);
+                                            }
+                                          : null,
+                                      style: OutlinedButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: screenWidth * 0.02,
+                                            vertical: screenHeight * 0.02),
+                                        foregroundColor: Colors.white,
+                                        backgroundColor:
+                                            const Color(0xFF2be4f3),
+                                        side: BorderSide(
+                                            color: const Color(0xFF2be4f3),
+                                            width: screenWidth * 0.001),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                      ),
+                                      child: Text(
+                                          tr(context, 'Ver PDF').toUpperCase(),
+                                          style: TextStyle(
+                                              fontSize: 20.sp,
+                                              color: Colors.white)),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.001),
-                                child: Text(
-                                  tr(context,
-                                          "Según tus datos te recomendamos:")
-                                      .toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 22.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // Botones
-                          Expanded(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                OutlinedButton(
-                                  onPressed: (selectedBioClient != null &&
-                                          _allQuestionsAnswered())
-                                      ? () async {
-                                          final resumen = mostrarResumen();
-                                          final result = calcularIMC(
-                                            peso: _clientWeight!.toDouble(),
-                                            altura: _clientHeight!.toDouble(),
-                                            genero: _clientGender!,
-                                          );
-                                          final imageBytes =
-                                              await _captureAsBytes();
-                                          final generator =
-                                              CustomPdfGenerator();
-                                          final sanitizedClientName =
-                                              _clientName!
-                                                  .replaceAll(
-                                                      RegExp(r'[^\w\s]'), '')
-                                                  .replaceAll(' ', '_');
-                                          final pdfFileName =
-                                              'informe_${sanitizedClientName.toLowerCase()}.pdf';
-
-                                          await generator.generateAndOpenPdf(
-                                            context,
-                                            pdfFileName,
-                                            _clientName!,
-                                            _clientGender!,
-                                            _clientAge!,
-                                            _clientHeight!,
-                                            _clientWeight!,
-                                            resumen,
-                                            imageBytes,
-                                            result,
-                                          );
-                                        }
-                                      : null,
-                                  // Botón desactivado si las condiciones no se cumplen
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.02,
-                                      vertical: screenHeight * 0.02,
-                                    ),
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: const Color(0xFF2be4f3),
-                                    side: BorderSide(
-                                      color: const Color(0xFF2be4f3),
-                                      width: screenWidth * 0.001,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    tr(context, 'Ver PDF').toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 20.sp,
-                                      color: Colors
-                                          .white, // Mismo color para botón deshabilitado
-                                    ),
-                                  ),
-                                ),
-                                OutlinedButton(
-                                  onPressed: (selectedBioClient != null &&
-                                          _allQuestionsAnswered())
-                                      ? () async {
-                                          final resumen = mostrarResumen();
-                                          final imageBytes =
-                                              await _captureAsBytes();
-                                          final result = calcularIMC(
-                                            peso: _clientWeight!.toDouble(),
-                                            altura: _clientHeight!.toDouble(),
-                                            genero: _clientGender!,
-                                          );
-                                          final generator =
-                                              CustomPdfGenerator();
-                                          final sanitizedClientName =
-                                              _clientName!
-                                                  .replaceAll(
-                                                      RegExp(r'[^\w\s]'), '')
-                                                  .replaceAll(' ', '_');
-                                          final pdfFileName =
-                                              'informe_${sanitizedClientName.toLowerCase()}.pdf';
-
-                                          final file = await generator
-                                              .generateAndSavePdf(
-                                            context,
-                                            pdfFileName,
-                                            // Nombre dinámico con un número agregado si es necesario
-                                            _clientName!,
-                                            _clientGender!,
-                                            _clientAge!,
-                                            _clientHeight!,
-                                            _clientWeight!,
-                                            resumen,
-                                            imageBytes,
-                                            result,
-                                          );
-
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                tr(context,
-                                                        'PDF guardado en DESCARGAS')
-                                                    .toUpperCase(),
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 17.sp),
-                                              ),
-                                              backgroundColor: Colors.green,
-                                              duration:
-                                                  const Duration(seconds: 2),
-                                            ),
-                                          );
-                                        }
-                                      : null,
-                                  // Botón desactivado si las condiciones no se cumplen
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.02,
-                                      vertical: screenHeight * 0.02,
-                                    ),
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.black,
-                                    side: BorderSide(
-                                      color: const Color(0xFF2be4f3),
-                                      width: screenWidth * 0.001,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(7),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    tr(context, 'Descargar PDF').toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 20.sp,
-                                      color: Colors
-                                          .white, // Mismo color para botón deshabilitado
-                                    ),
-                                  ),
-                                ),
                               ],
-                            ),
-                          ),
+                            )
+                          ]
                         ],
                       ),
                     ),
@@ -2200,17 +2746,13 @@ class _OverlayVitaState extends State<OverlayVita>
       Colors.green, // Normal
       Colors.yellow, // Sobrepeso
       Colors.orange, // Obesidad
-      Colors.red, // Obesidad marcada
-      Colors.red[900]!, // Obesidad mórbida
     ];
 
     final labels = [
-      tr(context, 'Bajo peso'),
-      tr(context, 'Normal'),
-      tr(context, 'Sobrepeso'),
-      tr(context, 'Obesidad'),
-      tr(context, 'Obesidad marcada'),
-      tr(context, 'Obesidad mórbida'),
+      '${tr(context, 'Bajo peso')}  (<18,5)',
+      '${tr(context, 'Normal')} (18,5-24,9)',
+      '${tr(context, 'Sobrepeso')} (25-29,9)',
+      '${tr(context, 'Obesidad')} (>30)',
     ];
 
     return List.generate(colors.length, (index) {
@@ -2638,9 +3180,12 @@ class _OverlayLicenciaBlocState extends State<OverlayLicenciaBloc> {
                     widget.onClose();
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(10.0),
-                    side:
-                        const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.01,
+                      vertical: screenHeight * 0.01,
+                    ),
+                    side: BorderSide(
+                        width: screenHeight * 0.001, color: Color(0xFF2be4f3)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7),
                     ),
