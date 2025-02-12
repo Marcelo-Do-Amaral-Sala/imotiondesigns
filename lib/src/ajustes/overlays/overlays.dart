@@ -1479,7 +1479,7 @@ class _OverlayVitaState extends State<OverlayVita>
     _checkUserLoginStatus();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: Duration(seconds: 4), // Misma duración que los mensajes
     );
     fetchAllPrograms();
     requestManageStoragePermission();
@@ -1552,6 +1552,7 @@ class _OverlayVitaState extends State<OverlayVita>
       });
       _controller.forward().whenComplete(() {
         setState(() {
+          _isCompleted = true;
           hidePdf = false;
         });
       });
@@ -1560,20 +1561,12 @@ class _OverlayVitaState extends State<OverlayVita>
 
   void _startMessageSequence() async {
     for (int i = 0; i < messages.length; i++) {
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(Duration(milliseconds: 800));
       if (mounted) {
         setState(() {
           _currentMessageIndex = i;
         });
       }
-    }
-
-    // Cuando la animación termina, mostrar mensaje final
-    await Future.delayed(Duration(seconds: 1));
-    if (mounted) {
-      setState(() {
-        _isCompleted = true;
-      });
     }
   }
 
@@ -1680,12 +1673,12 @@ class _OverlayVitaState extends State<OverlayVita>
   void updateClientData() {
     if (selectedBioClient != null && selectedBioClient!.isNotEmpty) {
       setState(() {
-        // Actualizar datos del cliente
+        // 📌 Actualizar datos del cliente
         _clientName = selectedBioClient?['name'] ?? '';
         String birthdate = selectedBioClient?['birthdate'] ?? '';
         _clientGender = selectedBioClient?['gender'] ?? '';
 
-        // Convertir fecha de nacimiento a edad
+        // 📌 Convertir fecha de nacimiento a edad
         try {
           _clientAge = calculateAge(birthdate).toString();
         } catch (e) {
@@ -1696,10 +1689,20 @@ class _OverlayVitaState extends State<OverlayVita>
         _clientHeight = selectedBioClient?['height'];
         _clientWeight = selectedBioClient?['weight'];
 
-        // Reiniciar preguntas y chat
+        // 📌 Reiniciar preguntas y chat
         resetQuestions();
+        chatMessages.clear(); // Limpiar mensajes anteriores
 
-        // Asegurar que la primera pregunta se muestre
+        // 📌 Reiniciar animación y estado de generación
+        _isVisible = false; // Oculta la animación
+        _isCompleted = false; // Reinicia el estado de finalización
+        hidePdf = true; // Oculta el PDF
+        _currentMessageIndex = -1; // Reinicia los mensajes
+
+        // 📌 Reiniciar animación
+        _controller.reset(); // Detiene la animación y la reinicia
+
+        // 📌 Asegurar que la primera pregunta se muestre
         if (questions.isNotEmpty) {
           chatMessages.add({
             "text": questions[0]["question"], // Primera pregunta
@@ -1931,56 +1934,19 @@ class _OverlayVitaState extends State<OverlayVita>
       String classification = "";
       Color color = Colors.black;
 
-      // Clasificación del IMC para hombres y mujeres
-      if (genero == 'Hombre') {
-        if (imc < 17) {
-          classification = tr(context, 'Desnutrición');
-          color = Colors.purple;
-        } else if (imc >= 17 && imc < 20) {
-          classification = tr(context, 'Bajo peso');
-          color = Colors.blue;
-        } else if (imc >= 20 && imc < 25) {
-          classification = tr(context, 'Normal');
-          color = Colors.green;
-        } else if (imc >= 25 && imc < 30) {
-          classification = tr(context, 'Sobrepeso');
-          color = Colors.yellow;
-        } else if (imc >= 30 && imc < 35) {
-          classification = tr(context, 'Obesidad');
-          color = Colors.orange;
-        } else if (imc >= 35 && imc < 40) {
-          classification = tr(context, 'Obesidad marcada');
-          color = Colors.red;
-        } else {
-          classification = tr(context, 'Obesidad mórbida');
-          color = Colors.red[900]!;
-        }
-      } else if (genero == tr(context, 'Mujer')) {
-        if (imc < 16) {
-          classification = tr(context, 'Desnutrición');
-          color = Colors.purple;
-        } else if (imc >= 16 && imc < 21) {
-          classification = tr(context, 'Bajo peso');
-          color = Colors.blue;
-        } else if (imc >= 21 && imc < 24) {
-          classification = tr(context, 'Normal');
-          color = Colors.green;
-        } else if (imc >= 24 && imc < 30) {
-          classification = tr(context, 'Sobrepeso');
-          color = Colors.yellow;
-        } else if (imc >= 30 && imc < 35) {
-          classification = tr(context, 'Obesidad');
-          color = Colors.orange;
-        } else if (imc >= 35 && imc < 40) {
-          classification = tr(context, 'Obesidad marcada');
-          color = Colors.red;
-        } else {
-          classification = tr(context, 'Obesidad mórbida');
-          color = Colors.red[900]!;
-        }
+      // Clasificación del IMC basada en _buildLegend()
+      if (imc < 18.5) {
+        classification = tr(context, 'Bajo peso');
+        color = Colors.blue;
+      } else if (imc >= 18.5 && imc < 24.9) {
+        classification = tr(context, 'Normal');
+        color = Colors.green;
+      } else if (imc >= 25.0 && imc < 29.9) {
+        classification = tr(context, 'Sobrepeso');
+        color = Colors.yellow;
       } else {
-        classification = "N/A";
-        color = Colors.grey;
+        classification = tr(context, 'Obesidad');
+        color = Colors.orange;
       }
 
       return {
@@ -1991,7 +1957,7 @@ class _OverlayVitaState extends State<OverlayVita>
     } else {
       return {
         "imc": 0.0,
-        "classification": "Datos incompletos",
+        "classification": "",
         "color": Colors.grey,
       };
     }
@@ -2054,7 +2020,7 @@ class _OverlayVitaState extends State<OverlayVita>
           )
         : {
             "imc": 0.0,
-            "classification": tr(context, 'Datos incompletos'),
+            "classification": tr(context, ''),
             // Mensaje para datos incompletos
             "color": Colors.grey,
           };
@@ -2359,7 +2325,7 @@ class _OverlayVitaState extends State<OverlayVita>
                       ],
                     ),
                   ),
-                  // Segundo Expanded: Contenedor vacío
+                  //VerticalDivider(  color: Color(0xFF2be4f3).withOpacity(0.5),),
                   Expanded(
                     flex: 1, // Proporción del espacio asignado
                     child: Container(
@@ -2377,7 +2343,7 @@ class _OverlayVitaState extends State<OverlayVita>
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          // Título
+                          // 📌 SECCIÓN: TÍTULO
                           Padding(
                             padding: EdgeInsets.symmetric(
                                 horizontal: screenWidth * 0.001),
@@ -2394,66 +2360,92 @@ class _OverlayVitaState extends State<OverlayVita>
                           ),
 
                           SizedBox(height: screenHeight * 0.03),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                          // 📌 SECCIÓN: INFORMACIÓN DEL USUARIO
+                          Table(
+                            border: TableBorder.all(color: Color(0xFF2be4f3).withOpacity(0.5), width: screenWidth * 0.001),
+                            columnWidths: {
+                              0: IntrinsicColumnWidth(),
+                              1: IntrinsicColumnWidth(),
+                              2: IntrinsicColumnWidth(),
+                              3: IntrinsicColumnWidth(flex: 2),
+                              4: IntrinsicColumnWidth(),
+                            },
                             children: [
-                              for (var item in [
-                                {
-                                  'label': tr(context, 'Nombre').toUpperCase(),
-                                  'value': _clientName
-                                },
-                                {
-                                  'label': tr(context, 'Género').toUpperCase(),
-                                  'value': _clientGender ?? ''
-                                },
-                                {
-                                  'label': tr(context, 'Edad').toUpperCase(),
-                                  'value': _clientAge?.toString() ?? ''
-                                },
-                                {
-                                  'label':
-                                      tr(context, 'Altura (cm)').toUpperCase(),
-                                  'value': _clientHeight != null
-                                      ? '$_clientHeight cm'
-                                      : ''
-                                },
-                                {
-                                  'label':
-                                      tr(context, 'Peso (kg)').toUpperCase(),
-                                  'value': _clientWeight != null
-                                      ? '$_clientWeight kg'
-                                      : ''
-                                },
-                              ])
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Text(
-                                      item['label']!,
-                                      style: TextStyle(
-                                          fontSize: 18.sp,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                              // Fila de encabezados
+                              TableRow(
+                                decoration: BoxDecoration(color: Colors.black),
+                                children: [
+                                  for (var item in [
+                                    {'label': tr(context, 'Nombre').toUpperCase()},
+                                    {'label': tr(context, 'Género').toUpperCase()},
+                                    {'label': tr(context, 'Edad').toUpperCase()},
+                                    {'label': tr(context, 'Altura (cm)').toUpperCase()},
+                                    {'label': tr(context, 'Peso (kg)').toUpperCase()},
+                                  ])
+                                    TableCell(
+                                      verticalAlignment: TableCellVerticalAlignment.middle,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.008,
+                                          vertical: screenHeight * 0.02,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          item['label']!,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 18.sp,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    Text(
-                                      item['value']!,
-                                      style: TextStyle(
-                                          fontSize: 15.sp, color: Colors.white),
+                                ],
+                              ),
+                              // Fila de valores
+                              TableRow(
+                                children: [
+                                  for (var item in [
+                                    {'value': _clientName},
+                                    {'value': _clientGender ?? ''},
+                                    {'value': _clientAge?.toString() ?? ''},
+                                    {'value': _clientHeight != null ? '$_clientHeight cm' : ''},
+                                    {'value': _clientWeight != null ? '$_clientWeight kg' : ''},
+                                  ])
+                                    TableCell(
+                                      verticalAlignment: TableCellVerticalAlignment.middle,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.002,
+                                          vertical: screenHeight * 0.02,
+                                        ),
+                                        color: Color(0xFF2be4f3).withOpacity(0.1),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          item['value']!,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ],
-                                ),
+                                ],
+                              ),
                             ],
                           ),
-                          SizedBox(height: screenHeight * 0.03),
-                          // IMC Gráfico y Leyenda
+                          // 📌 SECCIÓN: IMC (GRÁFICO + LEYENDA)
                           RepaintBoundary(
                             key: _repaintBoundaryKey,
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.01,
-                                  vertical: screenHeight * 0.01),
+                                horizontal: screenWidth * 0.02,
+                                vertical: screenHeight * 0.02,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(
@@ -2472,12 +2464,29 @@ class _OverlayVitaState extends State<OverlayVita>
                                               imcValue: result['imc']),
                                         ),
                                       ),
-                                      Text(
-                                        'IMC: ${result['imc'].toStringAsFixed(1)}',
-                                        style: TextStyle(
-                                            fontSize: 18.sp,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'IMC: ${result['imc'].toStringAsFixed(1)}',
+                                            style: TextStyle(
+                                                fontSize: 18.sp,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white),
+                                          ),
+                                          SizedBox(width: screenWidth * 0.03),
+                                          Text(
+                                            result['classification'],
+                                            // Muestra "Normal", "Sobrepeso", etc.
+                                            style: TextStyle(
+                                              fontSize: 18.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: result[
+                                                  'color'], // Color obtenido de calcularIMC()
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -2491,35 +2500,37 @@ class _OverlayVitaState extends State<OverlayVita>
                             ),
                           ),
                           SizedBox(height: screenHeight * 0.02),
-                          _isVisible
-                              ? Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.01,
-                                    vertical: screenHeight * 0.01,
-                                  ),
-                                  child: Row(
+                          // 📌 SECCIÓN RESERVADA PARA LA ANIMACIÓN
+                          Container(
+                            height: screenHeight * 0.2,
+                            // Espacio fijo para la animación
+                            alignment: Alignment.center,
+                            child: _isVisible
+                                ? Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      // Círculo de progreso
-                                      AnimatedBuilder(
-                                        animation: _controller,
-                                        builder: (context, child) {
-                                          return CustomPaint(
-                                            size: Size(screenHeight * 0.15,
-                                                screenHeight * 0.15),
-                                            painter: CircleFillPainter(
-                                              _controller.value,
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                      if (!_isCompleted)
+                                        AnimatedBuilder(
+                                          animation: _controller,
+                                          builder: (context, child) {
+                                            return CustomPaint(
+                                              size: Size(screenHeight * 0.1,
+                                                  screenHeight * 0.1),
+                                              painter: CircleFillPainter(
+                                                  _controller.value),
+                                            );
+                                          },
+                                        ),
                                       SizedBox(width: screenWidth * 0.01),
-                                      // Mensajes dinámicos
+
+                                      // 📌 SECCIÓN FIJA: MENSAJES
                                       Expanded(
                                         child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                              CrossAxisAlignment.center,
                                           children: [
                                             if (!_isCompleted)
                                               Text(
@@ -2533,26 +2544,26 @@ class _OverlayVitaState extends State<OverlayVita>
                                               ),
                                             SizedBox(
                                                 height: screenHeight * 0.01),
-                                            // Si la animación ha terminado, mostrar mensaje final
                                             if (_isCompleted)
-                                              Text(
-                                                tr(context,
-                                                        "PDF generado correctamente")
-                                                    .toUpperCase(),
-                                                style: TextStyle(
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  tr(context,
+                                                          "PDF generado correctamente")
+                                                      .toUpperCase(),
+                                                  style: TextStyle(
                                                     color: Colors.lightGreen,
                                                     fontSize: 18.sp,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
                                               )
                                             else
-                                              // Mensajes que aparecen progresivamente
                                               Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.center,
                                                 children: List.generate(
                                                   _currentMessageIndex + 1,
-                                                  // Mostrar mensajes según el tiempo
                                                   (index) => Padding(
                                                     padding:
                                                         EdgeInsets.symmetric(
@@ -2572,10 +2583,11 @@ class _OverlayVitaState extends State<OverlayVita>
                                         ),
                                       ),
                                     ],
-                                  ),
-                                )
-                              : SizedBox.shrink(),
-                          SizedBox(height: screenHeight * 0.05),
+                                  )
+                                : SizedBox.shrink(),
+                          ),
+
+                          // 📌 SECCIÓN FIJA: BOTONES
                           if (!hidePdf) ...[
                             Column(
                               children: [
@@ -2596,22 +2608,33 @@ class _OverlayVitaState extends State<OverlayVita>
                                       onPressed: (selectedBioClient != null && _allQuestionsAnswered())
                                           ? () async {
                                         final resumen = mostrarResumen();
-                                        final recomendacion = await obtenerRecomendacion(
-                                            answers, allIndividualPrograms, allRecoPrograms, allAutoPrograms);
-                                        final imageBytes = await _captureAsBytes();
-                                        final result = calcularIMC(
-                                          peso: _clientWeight!.toDouble(),
-                                          altura: _clientHeight!.toDouble(),
-                                          genero: _clientGender!,
-                                        );
+                                              final recomendacion =
+                                                  await obtenerRecomendacion(
+                                                      answers,
+                                                      allIndividualPrograms,
+                                                      allRecoPrograms,
+                                                      allAutoPrograms);
+                                              final imageBytes =
+                                                  await _captureAsBytes();
+                                              final result = calcularIMC(
+                                                  peso:
+                                                      _clientWeight!.toDouble(),
+                                                  altura:
+                                                      _clientHeight!.toDouble(),
+                                                  genero: _clientGender!);
 
-                                        final generator = CustomPdfGenerator();
-                                        final sanitizedClientName = _clientName!
-                                            .replaceAll(RegExp(r'[^\w\s]'), '')
+                                              final generator = CustomPdfGenerator();
+                                        final sanitizedClientName =
+                                        _clientName!
+                                            .replaceAll(
+                                            RegExp(r'[^\w\s]'),
+                                            '')
                                             .replaceAll(' ', '_');
-                                        final pdfFileName = 'Informe_${sanitizedClientName.toLowerCase()}.pdf';
+                                              final pdfFileName =
+                                                  'Informe_${sanitizedClientName.toLowerCase()}.pdf';
 
-                                        final file = await generator.generateAndSavePdf(
+                                              await generator
+                                            .generateAndSavePdf(
                                           context,
                                           pdfFileName,
                                           _clientName!,
@@ -2636,29 +2659,27 @@ class _OverlayVitaState extends State<OverlayVita>
                                           ),
                                         );
                                       }
-                                          : null, // Desactivar botón si las condiciones no se cumplen
+                                          : null,
                                       style: OutlinedButton.styleFrom(
                                         padding: EdgeInsets.symmetric(
-                                          horizontal: screenWidth * 0.02,
-                                          vertical: screenHeight * 0.02,
-                                        ),
+                                            horizontal: screenWidth * 0.02,
+                                            vertical: screenHeight * 0.02),
                                         foregroundColor: Colors.white,
                                         backgroundColor: Colors.black,
                                         side: BorderSide(
-                                          color: const Color(0xFF2be4f3),
-                                          width: screenWidth * 0.001,
-                                        ),
+                                            color: const Color(0xFF2be4f3),
+                                            width: screenWidth * 0.001),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(7),
-                                        ),
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
                                       ),
                                       child: Text(
-                                        tr(context, 'Descargar PDF').toUpperCase(),
-                                        style: TextStyle(fontSize: 20.sp, color: Colors.white),
-                                      ),
+                                          tr(context, 'Descargar PDF')
+                                              .toUpperCase(),
+                                          style: TextStyle(
+                                              fontSize: 20.sp,
+                                              color: Colors.white)),
                                     ),
-
-
                                     OutlinedButton(
                                       onPressed: (selectedBioClient != null &&
                                               _allQuestionsAnswered())
@@ -2727,7 +2748,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                 ),
                               ],
                             )
-                          ]
+                          ],
                         ],
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
@@ -115,13 +116,59 @@ Estos programas están diseñados para aumentar progresivamente la frecuencia ca
         ? programNames.join(", ")
         : "No hay programas disponibles";
 
-// Crear la cadena con la interpolación
     String entrenamiento = tr(context,
-        '''En esta parte central, enfócate en los programas seleccionados para fuerza e hipertrofia muscular, como $nombresProgramas. Estos están diseñados para maximizar la activación muscular y promover el desarrollo de fuerza y masa muscular. 
+        '''En esta parte central, enfócate en los programas sugeridos $nombresProgramas. Estos están diseñados para maximizar la activación muscular y promover el desarrollo de fuerza y masa muscular. 
 Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acompaña los estímulos eléctricos con ejercicios funcionales o de resistencia según tu plan.''');
 
     String relax = tr(context,
         '''Finaliza la sesión con programas específicos para la relajación y recuperación, como Contracturas, Relax o Drenaje. Durante este tiempo, aprovecha para reducir gradualmente la frecuencia cardíaca, realizar estiramientos estáticos o simplemente relajarte. Estos programas ayudan a disminuir la tensión muscular, favorecer la circulación y preparar tu cuerpo para una recuperación óptima.''');
+    String consMensaje = tr(context, 'Tips de entrenamiento');
+    String agradecimiento =
+        tr(context, 'Gracias por confiar en el equipo de i-motion Group.');
+
+    final List<String> consejos = [
+      tr(context, 'Mantente hidratado para optimizar tu sesión de EMS.'),
+      tr(context,
+          'Bebe agua antes del entrenamiento para mejorar la conducción eléctrica.'),
+      tr(context,
+          'Hidratarte antes te ayuda a preparar el cuerpo para la sesión.'),
+      tr(context, 'Durante el entrenamiento, toma pequeños sorbos de agua.'),
+      tr(context, 'No esperes a tener sed, la hidratación constante es clave.'),
+      tr(context,
+          'Al finalizar, bebe suficiente agua para recuperar los líquidos perdidos.'),
+      tr(context, 'La hidratación favorece la recuperación muscular.'),
+      tr(context,
+          'Beber agua reduce la fatiga y maximiza los beneficios del EMS.'),
+      tr(context, 'La nutrición adecuada potencia los resultados del EMS.'),
+      tr(context,
+          'Antes del entrenamiento, consume carbohidratos ligeros para energía.'),
+      tr(context, 'Evita comidas pesadas antes de tu sesión.'),
+      tr(context,
+          'Después del EMS, prioriza proteínas de calidad para la recuperación.'),
+      tr(context, 'Acompaña las proteínas con carbohidratos complejos.'),
+      tr(context,
+          'Ajusta tu alimentación según tu objetivo: ganar músculo, perder grasa o mantenerte.'),
+      tr(context,
+          'Consulta a un especialista para un plan nutricional personalizado.'),
+      tr(context,
+          'Una dieta balanceada mejora la recuperación y el rendimiento.'),
+      tr(context, 'El descanso es clave para la recuperación muscular.'),
+      tr(context, 'Duerme lo suficiente después de cada sesión de EMS.'),
+      tr(context,
+          'No trabajes los mismos músculos en un lapso menor a 24-48 horas.'),
+      tr(context,
+          'El tiempo de reposo permite la reparación y fortalecimiento muscular.'),
+      tr(context, 'Evita el sobreentrenamiento para prevenir lesiones.'),
+      tr(context, 'Combina el descanso con hidratación y buena alimentación.'),
+      tr(context, 'Un sueño de calidad mejora los efectos del entrenamiento.'),
+    ];
+
+    final random = Random();
+    final consejo1 = consejos[random.nextInt(consejos.length)];
+    String consejo2;
+    do {
+      consejo2 = consejos[random.nextInt(consejos.length)];
+    } while (consejo2 == consejo1);
 
     pdf.addPage(
       pw.Page(
@@ -476,19 +523,18 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 16.sp, // Título más grande y llamativo
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                   textAlign: pw.TextAlign.center,
                 ),
                 pw.SizedBox(height: 20),
-
                 // SECCIÓN 1: CALENTAMIENTO
                 pw.Text(
                   encabezado1,
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 15.sp, // Negrita y más grande
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                 ),
                 pw.SizedBox(height: 5),
@@ -509,7 +555,7 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 15.sp, // Negrita y más grande
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                 ),
                 pw.SizedBox(height: 5),
@@ -530,7 +576,7 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 15.sp, // Negrita y más grande
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                 ),
                 pw.SizedBox(height: 5),
@@ -543,10 +589,56 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                   ),
                   textAlign: pw.TextAlign.start,
                 ),
-
+                pw.SizedBox(height: 30),
+                pw.Container(
+                  width: double.infinity, // Hace que ocupe todo el ancho
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('#E0E0E0'),
+                    borderRadius: pw.BorderRadius.circular(16),
+                  ),
+                  padding: pw.EdgeInsets.all(5),
+                  child: pw.Text(consMensaje,
+                      style: pw.TextStyle(
+                        font: oswaldBoldFont,
+                        fontSize: 18.sp,
+                        color: PdfColor.fromHex('#020659'),
+                      ),
+                      textAlign: pw.TextAlign.center),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  '• $consejo1',
+                  style: pw.TextStyle(
+                    font: oswaldBoldFont,
+                    fontSize: 15.sp, // Mismo formato
+                    color: PdfColors.black,
+                  ),
+                  textAlign: pw.TextAlign.start,
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  '• $consejo2',
+                  style: pw.TextStyle(
+                    font: oswaldBoldFont,
+                    fontSize: 15.sp, // Mismo formato
+                    color: PdfColors.black,
+                  ),
+                  textAlign: pw.TextAlign.start,
+                ),
                 pw.Spacer(),
-
-                // PIE DE PÁGINA CON DIVISOR
+                pw.Align(
+                  alignment: pw.Alignment.bottomRight,
+                  child: pw.Text(
+                    agradecimiento,
+                    style: pw.TextStyle(
+                      font: oswaldRegularFont,
+                      fontSize: 20.sp, // Mismo formato
+                      color: PdfColors.black,
+                    ),
+                    textAlign: pw.TextAlign.start,
+                  ),
+                ),
+                pw.Spacer(),
                 pw.Align(
                   alignment: pw.Alignment.center,
                   child: pw.Text(
@@ -565,7 +657,6 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
         },
       ),
     );
-
 // Obtener el directorio correcto
     Directory? directory;
 
@@ -669,8 +760,8 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                     style: pw.TextStyle(font: oswaldBoldFont, fontSize: 12.sp)),
                 if (programImageBytes != null)
                   pw.Container(
-                    width: 80,
-                    height: 80,
+                    width: 100,
+                    height: 100,
                     child: pw.Image(
                       pw.MemoryImage(programImageBytes),
                       fit: pw.BoxFit.contain,
@@ -721,7 +812,7 @@ Estos programas están diseñados para aumentar progresivamente la frecuencia ca
 
 // Crear la cadena con la interpolación
     String entrenamiento = tr(context,
-        '''En esta parte central, enfócate en los programas seleccionados para fuerza e hipertrofia muscular, como $nombresProgramas. Estos están diseñados para maximizar la activación muscular y promover el desarrollo de fuerza y masa muscular. 
+        '''En esta parte central, enfócate en los programas sugeridos $nombresProgramas. Estos están diseñados para maximizar la activación muscular y promover el desarrollo de fuerza y masa muscular. 
 Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acompaña los estímulos eléctricos con ejercicios funcionales o de resistencia según tu plan.''');
 
     String relax = tr(context,
@@ -1080,19 +1171,18 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 16.sp, // Título más grande y llamativo
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                   textAlign: pw.TextAlign.center,
                 ),
                 pw.SizedBox(height: 20),
-
                 // SECCIÓN 1: CALENTAMIENTO
                 pw.Text(
                   encabezado1,
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 15.sp, // Negrita y más grande
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                 ),
                 pw.SizedBox(height: 5),
@@ -1113,7 +1203,7 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 15.sp, // Negrita y más grande
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                 ),
                 pw.SizedBox(height: 5),
@@ -1134,7 +1224,7 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                   style: pw.TextStyle(
                     font: oswaldBoldFont,
                     fontSize: 15.sp, // Negrita y más grande
-                    color: PdfColors.black,
+                    color: PdfColor.fromHex('#020659'),
                   ),
                 ),
                 pw.SizedBox(height: 5),
@@ -1149,7 +1239,6 @@ Asegúrate de ajustar la intensidad de acuerdo con tu nivel y objetivos, y acomp
                 ),
 
                 pw.Spacer(),
-
                 // PIE DE PÁGINA CON DIVISOR
                 pw.Align(
                   alignment: pw.Alignment.center,
