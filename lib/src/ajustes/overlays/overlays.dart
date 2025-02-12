@@ -1463,9 +1463,6 @@ class _OverlayVitaState extends State<OverlayVita>
   late AnimationController _controller;
   bool _isVisible = false;
   List<String> messages = [
-    "Procesando información...",
-    "Obteniendo datos del cliente...",
-    "Creando rutinas personalizadas...",
   ];
   int _currentMessageIndex = -1;
   bool _isCompleted = false;
@@ -1484,6 +1481,11 @@ class _OverlayVitaState extends State<OverlayVita>
     fetchAllPrograms();
     requestManageStoragePermission();
     requestStoragePermission();
+    messages = [
+      tr(context, 'Procesando información...'),
+      tr(context, 'Obteniendo datos del cliente...'),
+      tr(context, 'Creando rutinas personalizadas...'),
+    ];
   }
 
 
@@ -1838,53 +1840,70 @@ class _OverlayVitaState extends State<OverlayVita>
   }
 
   Future<Map<String, dynamic>> obtenerRecomendacion(
+      BuildContext context,
       Map<String, dynamic> answers,
       List<Map<String, dynamic>> allIndividualPrograms,
       List<Map<String, dynamic>> allRecoPrograms,
       List<Map<String, dynamic>> allAutoPrograms) async {
-    String experiencia = answers['Experiencia'] ?? "";
-    String condicion = answers['Nivel'] ?? "";
-    String diasEntrenamientoStr = answers['Días'] ?? "0";
+
+    // Obtener valores sin traducir directamente de `answers`
+    String experiencia = answers[tr(context,"Experiencia")] ?? "";
+    String condicion = answers[tr(context,"Nivel")] ?? "";
+    String diasEntrenamientoStr = answers[tr(context,"Días")] ?? "0";
     int diasEntrenamiento =
-        int.tryParse(RegExp(r'\d+').stringMatch(diasEntrenamientoStr) ?? "0") ??
-            0;
-    String objetivo = answers['Objetivo'] ?? "";
+        int.tryParse(RegExp(r'\d+').stringMatch(diasEntrenamientoStr) ?? "0") ?? 0;
+    String objetivo = answers[tr(context,"Objetivo")] ?? "";
 
-    print(
-        "Valores obtenidos - Experiencia: $experiencia, Condición: $condicion, Días: $diasEntrenamiento, Objetivo: $objetivo");
+    print("🔍 Valores originales obtenidos:");
+    print("Experiencia: $experiencia");
+    print("Condición: $condicion");
+    print("Días de entrenamiento: $diasEntrenamiento");
+    print("Objetivo: $objetivo");
 
-    // Obtener la recomendación basada en las respuestas del usuario
-    FitnessRecommendation? recomendacion =
-        getRecommendation(experiencia, condicion, diasEntrenamiento, objetivo);
+    // Obtener recomendación sin traducir
+    FitnessRecommendation? recomendacionOriginal =
+    getRecommendation(context, experiencia, condicion, diasEntrenamiento, objetivo);
 
-    if (recomendacion == null) {
-      return {"title": "Recomendación", "value": "No disponible", "images": []};
+    if (recomendacionOriginal == null) {
+      return {
+        "title": tr(context, "Recomendación"),
+        "value": tr(context, "No disponible"),
+        "images": [],
+        "original": {
+          "title": "Recomendación",
+          "value": "No disponible",
+        }
+      };
     }
 
-    // Lista para almacenar los programas con sus imágenes
+    // Aplicar traducción a la recomendación antes de devolverla
+    FitnessRecommendation recomendacionTraducida = recomendacionOriginal.translated(context);
+
+    print("✅ Recomendación original encontrada:");
+    print(recomendacionOriginal.toString());
+
+    print("🌍 Recomendación traducida:");
+    print(recomendacionTraducida.toString());
+
+    // Lista para almacenar los programas con sus imágenes en versión original y traducida
     List<Map<String, String>> programData = [];
 
-    // Obtener nombres de los programas recomendados
-    List<String> programNames = recomendacion.programas.split(', ');
+    // Obtener nombres de los programas recomendados (versión original)
+    List<String> programNamesOriginal = recomendacionOriginal.programas.split(', ');
 
-    // Buscar en las listas de programas
-    for (String program in programNames) {
+    for (String program in programNamesOriginal) {
       Map<String, dynamic>? foundProgram;
 
       // Buscar en los programas automáticos
       foundProgram = allAutoPrograms.firstWhere(
-        (p) =>
-            p["nombre"].toString().trim().toLowerCase() ==
-            program.trim().toLowerCase(),
+            (p) => p["nombre"].toString().trim().toLowerCase() == program.trim().toLowerCase(),
         orElse: () => {},
       );
 
       // Si no se encuentra en automáticos, buscar en individuales
       if (foundProgram.isEmpty) {
         foundProgram = allIndividualPrograms.firstWhere(
-          (p) =>
-              p["nombre"].toString().trim().toLowerCase() ==
-              program.trim().toLowerCase(),
+              (p) => p["nombre"].toString().trim().toLowerCase() == program.trim().toLowerCase(),
           orElse: () => {},
         );
       }
@@ -1892,9 +1911,7 @@ class _OverlayVitaState extends State<OverlayVita>
       // Si no se encuentra en individuales, buscar en recovery
       if (foundProgram.isEmpty) {
         foundProgram = allRecoPrograms.firstWhere(
-          (p) =>
-              p["nombre"].toString().trim().toLowerCase() ==
-              program.trim().toLowerCase(),
+              (p) => p["nombre"].toString().trim().toLowerCase() == program.trim().toLowerCase(),
           orElse: () => {},
         );
       }
@@ -1902,9 +1919,9 @@ class _OverlayVitaState extends State<OverlayVita>
       // Si se encontró el programa, agregarlo a la lista
       if (foundProgram.isNotEmpty) {
         programData.add({
-          "name": foundProgram["nombre"],
+          "name_original": foundProgram["nombre"], // Nombre original del programa
+          "name_translated": tr(context, foundProgram["nombre"]),
           "image": foundProgram["imagen"],
-          // Se asume que la base de datos almacena la ruta de la imagen
         });
       } else {
         print("❌ No se encontró imagen para el programa: $program");
@@ -1912,13 +1929,20 @@ class _OverlayVitaState extends State<OverlayVita>
     }
 
     return {
-      "title": "Recomendación",
-      "value": recomendacion.toString(),
-      "intensidad": recomendacion.intensidad,
-      "duracion": recomendacion.duracion,
-      "images": programData, // Lista con nombres de programas e imágenes
+      "title": tr(context, "Recomendación"),
+      "value": recomendacionTraducida.toString(),
+      "intensidad": recomendacionTraducida.intensidad,
+      "duracion": recomendacionTraducida.duracion,
+      "images": programData, // Lista con nombres de programas en versión original y traducida
+      "original": {
+        "title": "Recomendación",
+        "value": recomendacionOriginal.toString(),
+        "intensidad": recomendacionOriginal.intensidad,
+        "duracion": recomendacionOriginal.duracion,
+      }
     };
   }
+
 
   bool _allQuestionsAnswered() {
     return questions.every((q) => answers.containsKey(q['key']));
@@ -2499,7 +2523,7 @@ class _OverlayVitaState extends State<OverlayVita>
                               ),
                             ),
                           ),
-                          SizedBox(height: screenHeight * 0.02),
+                          SizedBox(height: screenHeight * 0.01),
                           // 📌 SECCIÓN RESERVADA PARA LA ANIMACIÓN
                           Container(
                             height: screenHeight * 0.2,
@@ -2534,7 +2558,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                           children: [
                                             if (!_isCompleted)
                                               Text(
-                                                'Generando tu PDF'
+                                                tr(context, 'Generando tu pdf')
                                                     .toUpperCase(),
                                                 style: TextStyle(
                                                   fontSize: 18.sp,
@@ -2549,7 +2573,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                                 alignment: Alignment.center,
                                                 child: Text(
                                                   tr(context,
-                                                          "PDF generado correctamente")
+                                                          "Pdf generado correctamente")
                                                       .toUpperCase(),
                                                   style: TextStyle(
                                                     color: Colors.lightGreen,
@@ -2610,6 +2634,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                         final resumen = mostrarResumen();
                                               final recomendacion =
                                                   await obtenerRecomendacion(
+                                                    context,
                                                       answers,
                                                       allIndividualPrograms,
                                                       allRecoPrograms,
@@ -2650,9 +2675,11 @@ class _OverlayVitaState extends State<OverlayVita>
 
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text(
-                                              'PDF guardado en DESCARGAS',
-                                              style: TextStyle(color: Colors.white, fontSize: 17.sp),
+                                                  content: Text(
+                                                    tr(context,
+                                                            'Pdf guardado en descargas')
+                                                        .toUpperCase(),
+                                                    style: TextStyle(color: Colors.white, fontSize: 17.sp),
                                             ),
                                             backgroundColor: Colors.green,
                                             duration: const Duration(seconds: 2),
@@ -2687,6 +2714,7 @@ class _OverlayVitaState extends State<OverlayVita>
                                               final resumen = mostrarResumen();
                                               final recomendacion =
                                                   await obtenerRecomendacion(
+                                                    context,
                                                       answers,
                                                       allIndividualPrograms,
                                                       allRecoPrograms,

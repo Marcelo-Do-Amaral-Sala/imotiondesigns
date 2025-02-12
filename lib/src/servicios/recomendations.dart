@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+
+import '../../utils/translation_utils.dart';
+
 class FitnessRecommendation {
   final String experiencia;
   final String condicion;
@@ -17,11 +21,24 @@ class FitnessRecommendation {
     required this.duracion,
   });
 
+  FitnessRecommendation translated(BuildContext context) {
+    return FitnessRecommendation(
+      experiencia: tr(context,experiencia),
+      condicion: tr(context,condicion),
+      diasEntrenamiento: diasEntrenamiento,
+      objetivo: tr(context,objetivo),
+      programas: programas,
+      intensidad: intensidad, // No es necesario traducir si es un rango numérico
+      duracion: tr(context,duracion),
+    );
+  }
+
   @override
   String toString() {
     return "Para el objetivo '$objetivo' con experiencia '$experiencia', condición física '$condicion' y entrenamiento $diasEntrenamiento días a la semana, se recomienda los programas: $programas, con una intensidad de $intensidad y una duración de $duracion.";
   }
 }
+
 
 List<FitnessRecommendation> recommendations = [
   ///PRINCIPIANTES
@@ -425,20 +442,46 @@ List<FitnessRecommendation> recommendations = [
       duracion: "25 minutos por sesión"),
 ];
 
-FitnessRecommendation? getRecommendation(String experiencia, String condicion, int diasEntrenamiento, String objetivo) {
-  return recommendations.firstWhere(
-        (rec) => rec.experiencia.toLowerCase() == experiencia.toLowerCase() &&
+/// 🔹 Nueva función para traducir todas las recomendaciones antes de buscar
+List<FitnessRecommendation> getTranslatedRecommendations(BuildContext context) {
+  return recommendations.map((rec) => rec.translated(context)).toList();
+}
+
+/// 🔹 Obtener recomendación buscando en la lista traducida
+FitnessRecommendation? getRecommendation(
+    BuildContext context, String experiencia, String condicion, int diasEntrenamiento, String objetivo) {
+
+  List<FitnessRecommendation> translatedRecommendations = getTranslatedRecommendations(context);
+
+  print("🔍 Buscando recomendación en lista traducida con los valores:");
+  print("Experiencia: $experiencia");
+  print("Condición: $condicion");
+  print("Días de entrenamiento: $diasEntrenamiento");
+  print("Objetivo: $objetivo");
+
+  FitnessRecommendation? recomendacion = translatedRecommendations.firstWhere(
+        (rec) =>
+    rec.experiencia.toLowerCase() == experiencia.toLowerCase() &&
         rec.condicion.toLowerCase() == condicion.toLowerCase() &&
         rec.diasEntrenamiento == diasEntrenamiento &&
         rec.objetivo.toLowerCase() == objetivo.toLowerCase(),
-    orElse: () => FitnessRecommendation(
-      experiencia: experiencia,
-      condicion: condicion,
-      diasEntrenamiento: diasEntrenamiento,
-      objetivo: objetivo,
-      programas: "No se encontraron programas recomendados",
-      intensidad: "N/A",
-      duracion: "N/A",
-    ),
+    orElse: () {
+      print("⚠️ No se encontró ninguna recomendación para los valores dados.");
+      return FitnessRecommendation(
+        experiencia: experiencia,
+        condicion: condicion,
+        diasEntrenamiento: diasEntrenamiento,
+        objetivo: objetivo,
+        programas: tr(context, "No se encontraron programas recomendados"),
+        intensidad: "N/A",
+        duracion: "N/A",
+      );
+    },
   );
+
+  print("✅ Recomendación encontrada:");
+  print(recomendacion.toString());
+
+  return recomendacion;
 }
+
