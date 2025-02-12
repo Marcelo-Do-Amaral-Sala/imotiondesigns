@@ -1016,7 +1016,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                '${tr(context, gruposBioShape[i]['nombre']).toUpperCase()} (ms)',
                                 style: _labelStyle,
                               ),
                               Container(
@@ -1050,7 +1050,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                '${tr(context, gruposBioShape[i]['nombre']).toUpperCase()} (ms)',
                                 style: _labelStyle,
                               ),
                               Container(
@@ -1084,7 +1084,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                '${tr(context, gruposBioShape[i]['nombre']).toUpperCase()} (ms)',
                                 style: _labelStyle,
                               ),
                               Container(
@@ -1175,7 +1175,7 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                  '${tr(context, gruposBioJacket[i]['nombre']).toUpperCase()} (ms)',
                   style: _labelStyle,
                 ),
                 Container(
@@ -1338,7 +1338,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText:
+                                                        tr(context, groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
                                                           groupName],
@@ -1500,7 +1501,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText:
+                                                        tr(context, groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
                                                           groupName],
@@ -1580,7 +1582,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText:
+                                                        tr(context, groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
                                                           groupName],
@@ -1743,7 +1746,8 @@ class IndividualProgramFormState extends State<IndividualProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText:
+                                                        tr(context, groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
                                                           groupName],

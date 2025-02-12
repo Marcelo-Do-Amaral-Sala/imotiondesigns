@@ -74,7 +74,7 @@ class _SplashViewState extends State<SplashView> {
         await DatabaseHelperWeb().initializeDatabase();
       } else if (Platform.isAndroid || Platform.isIOS) {
         debugPrint("Inicializando base de datos para Móviles...");
-        await DatabaseHelper().initializeDatabase();
+        await DatabaseHelper().initializeDatabase(context);
       } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
         debugPrint("Inicializando base de datos para Desktop...");
         databaseFactory = databaseFactoryFfi;

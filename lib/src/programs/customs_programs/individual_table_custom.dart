@@ -28,7 +28,7 @@ class _IndividualTableWidgetState extends State<IndividualTableWidget> {
                   children: [
                     DataRowWidget(
                       imagen: row['imagen'] ?? '',
-                      nombre: row['nombre'] ?? '',
+                      nombre: tr(context, row['nombre']).toUpperCase(),
                       frecuencia: (row['frecuencia'] is double)
                           ? row['frecuencia']
                           : double.tryParse(row['frecuencia'].toString()) ??

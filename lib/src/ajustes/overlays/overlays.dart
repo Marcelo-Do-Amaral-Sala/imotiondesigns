@@ -75,7 +75,7 @@ class _OverlayBackupState extends State<OverlayBackup>
       });
 
       DatabaseHelper dbHelper = DatabaseHelper();
-      await dbHelper.initializeDatabase();
+      await dbHelper.initializeDatabase(context);
 
       print('BASE DE DATOS INICIALIZADA');
 
@@ -95,7 +95,7 @@ class _OverlayBackupState extends State<OverlayBackup>
       });
 
       // Reabrir la base de datos después de subir el backup
-      await dbHelper.initializeDatabase();
+      await dbHelper.initializeDatabase(context);
 
       setState(() {
         progress = 1.0; // Progreso completo
@@ -145,7 +145,7 @@ class _OverlayBackupState extends State<OverlayBackup>
       });
 
       // Inicializar la base de datos (asegúrate de que esté abierta después de la eliminación)
-      await dbHelper.initializeDatabase();
+      await dbHelper.initializeDatabase(context);
       setState(() {
         progress = 0.3; // Progreso después de la inicialización
       });

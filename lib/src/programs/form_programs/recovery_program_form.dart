@@ -1014,7 +1014,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                '${tr(context, gruposBioShape[i]['nombre']).toUpperCase()} (ms)',
                                 style: _labelStyle,
                               ),
                               Container(
@@ -1048,7 +1048,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                '${tr(context, gruposBioShape[i]['nombre']).toUpperCase()} (ms)',
                                 style: _labelStyle,
                               ),
                               Container(
@@ -1082,7 +1082,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${gruposBioShape[i]['nombre'].toUpperCase()} (ms)',
+                                '${tr(context, gruposBioShape[i]['nombre']).toUpperCase()} (ms)',
                                 style: _labelStyle,
                               ),
                               Container(
@@ -1172,7 +1172,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${gruposBioJacket[i]['nombre'].toUpperCase()} (ms)',
+                  '${tr(context, gruposBioJacket[i]['nombre']).toUpperCase()} (ms)',
                   style: _labelStyle,
                 ),
                 Container(
@@ -1335,7 +1335,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText: tr(context,groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
                                                       groupName],
@@ -1497,7 +1497,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText: tr(context,groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintJacketColors[
                                                       groupName],
@@ -1577,7 +1577,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText: tr(context,groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
                                                       groupName],
@@ -1740,7 +1740,7 @@ class RecoveryProgramFormState extends State<RecoveryProgramForm>
                                                       fontSize: 15.sp),
                                                   textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    hintText: groupName,
+                                                    hintText: tr(context,groupName),
                                                     hintStyle: TextStyle(
                                                       color: hintShapeColors[
                                                       groupName],

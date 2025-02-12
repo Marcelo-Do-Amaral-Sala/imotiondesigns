@@ -55,7 +55,7 @@ class _ClientsViewState extends State<ClientsView> {
 
         // Usamos el factory de sqflite para dispositivos móviles
         await DatabaseHelper()
-            .initializeDatabase(); // Inicializamos la base de datos con el helper de móviles
+            .initializeDatabase(context); // Inicializamos la base de datos con el helper de móviles
       } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
         // Para plataformas de escritorio (Windows, macOS, Linux)
         debugPrint("Inicializando base de datos para Desktop...");

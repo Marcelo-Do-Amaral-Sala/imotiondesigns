@@ -27,7 +27,7 @@ class SubprogramTableWidget extends StatelessWidget {
                           ? subprograma['orden']
                           : int.tryParse(subprograma['orden'].toString()) ?? 0,
                       // Índice (empezando desde 1)
-                      nombre: subprograma['nombre'] ?? 'N/A',
+                      nombre: tr(context, subprograma['nombre']).toUpperCase(),
                       // Manejo de duracionTotal y ajuste como valores double
                       duracion: (subprograma['duracion'] is double)
                           ? subprograma['duracion']

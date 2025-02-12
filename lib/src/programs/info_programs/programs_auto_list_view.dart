@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 
 class ProgramsAutoListView extends StatefulWidget {
@@ -117,7 +118,7 @@ class _ProgramsAutoListViewState extends State<ProgramsAutoListView> {
         child: Column(
           children: [
             Text(
-              program['nombre_programa_automatico'] ?? 'Sin nombre',
+              tr(context,program['nombre_programa_automatico']).toUpperCase(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: const Color(0xFF2be4f3),

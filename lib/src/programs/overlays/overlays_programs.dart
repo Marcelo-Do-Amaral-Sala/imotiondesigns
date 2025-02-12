@@ -163,7 +163,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
                                 children: [
                                   TextSpan(
                                     text:
-                                        'Nº${program['id_programa_automatico']}  ${program['nombre_programa_automatico']} - ',
+                                        'Nº${program['id_programa_automatico']}  ${tr(context,program['nombre_programa_automatico']).toUpperCase()} - ',
                                     style: TextStyle(
                                       fontSize: 25.sp,
                                       fontWeight: FontWeight.bold,
@@ -189,7 +189,7 @@ class _OverlayAutoState extends State<OverlayAuto> {
 
                             // Texto adicional para la descripción del programa
                             Text(
-                              '${program['descripcion_programa_automatico'] ?? 'No disponible'}',
+                              '${tr(context,program['descripcion_programa_automatico'])}',
                               softWrap: true,
                               overflow: TextOverflow.visible,
                               style: TextStyle(

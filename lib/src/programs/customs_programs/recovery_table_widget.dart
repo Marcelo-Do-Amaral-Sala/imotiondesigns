@@ -29,7 +29,7 @@ class _RecoveryTableWidgetState extends State<RecoveryTableWidget> {
                   children: [
                     DataRowWidget(
                       imagen: row['imagen'] ?? '',
-                      nombre: row['nombre'] ?? '',
+                      nombre: tr(context, row['nombre']).toUpperCase(),
                       frecuencia: (row['frecuencia'] is double)
                           ? row['frecuencia']
                           : double.tryParse(row['frecuencia'].toString()) ?? 0.0,

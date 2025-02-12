@@ -92,8 +92,8 @@
     "Contracción": "Contracción",
     "Pausa": "Pausa",
     "Calibración": "Calibración",
-    "Strength 1": "Strength 1",
-    "Strength 2": "Strength 2",
+    "Fuerza 1": "Fuerza 1",
+    "Fuerza 2": "Fuerza 2",
     "Abdominal": "Abdominal",
     "Slim": "Slim",
     "Body building": "Body building",
@@ -355,7 +355,9 @@
     "El tiempo de reposo permite la reparación y fortalecimiento muscular." : "El tiempo de reposo permite la reparación y fortalecimiento muscular.",
     "Evita el sobreentrenamiento para prevenir lesiones." : "Evita el sobreentrenamiento para prevenir lesiones.",
     "Combina el descanso con hidratación y buena alimentación." : "Combina el descanso con hidratación y buena alimentación.",
-    "Un sueño de calidad mejora los efectos del entrenamiento." : "Un sueño de calidad mejora los efectos del entrenamiento."
+    "Un sueño de calidad mejora los efectos del entrenamiento." : "Un sueño de calidad mejora los efectos del entrenamiento.",
+    "Aumento de la resistencia y retraso de la fatiga": "Aumento de la resistencia y retraso de la fatiga",
+    "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc.": "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc."
   },
   "en": {
     "Panel de control": "Dashboard",
@@ -450,8 +452,8 @@
     "Contracción": "Contraction",
     "Pausa": "Pause",
     "Calibración": "Calibration",
-    "Strength 1": "Strength 1",
-    "Strength 2": "Strength 2",
+    "Fuerza 1": "Strength 1",
+    "Fuerza 2": "Strength 2",
     "Abdominal": "Abdominal",
     "Slim": "Slim",
     "Body building": "Body building",
@@ -714,7 +716,10 @@
     "El tiempo de reposo permite la reparación y fortalecimiento muscular." : "Rest time allows for muscle repair and strengthening.",
     "Evita el sobreentrenamiento para prevenir lesiones." : "Avoid overtraining to prevent injuries.",
     "Combina el descanso con hidratación y buena alimentación." : "Combine rest with hydration and good nutrition.",
-    "Un sueño de calidad mejora los efectos del entrenamiento." : "Quality sleep enhances training effects."
+    "Un sueño de calidad mejora los efectos del entrenamiento." : "Quality sleep enhances training effects.",
+    "Aumento de la resistencia y retraso de la fatiga": "Increase in endurance and delay of fatigue",
+    "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc.": "Increase in the number and size of muscle fibers. Increases muscle mass and basal metabolism, improves posture, etc."
+
   },
   "fr": {
     "Panel de control": "Panneau de contrôle",
@@ -809,8 +814,8 @@
     "Contracción": "Contraction",
     "Pausa": "Pause",
     "Calibración": "Calibration",
-    "Strength 1": "Force 1",
-    "Strength 2": "Force 2",
+    "Fuerza 1": "Force 1",
+    "Fuerza 2": "Force 2",
     "Abdominal": "Abdominaux",
     "Slim": "Minceur",
     "Body building": "Musculation",
@@ -1073,7 +1078,9 @@
     "Procesando información..." : "Traitement des informations...",
     "Obteniendo datos del cliente..." : "Récupération des données du client...",
     "Creando rutinas personalizadas..." : "Création de routines personnalisées...",
-    "25 minutos por sesión" : "25 minutes par séance"
+    "25 minutos por sesión" : "25 minutes par séance",
+    "Aumento de la resistencia y retraso de la fatiga": "Augmentation de l'endurance et retard de la fatigue",
+    "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc.": "Augmentation du nombre et de la taille des fibres musculaires. Augmente la masse musculaire et le métabolisme basal, améliore la posture, etc."
   },
   "it": {
     "Panel de control": "Pannello di controllo",
@@ -1168,8 +1175,8 @@
     "Contracción": "Contrazione",
     "Pausa": "Pausa",
     "Calibración": "Calibrazione",
-    "Strength 1": "Forza 1",
-    "Strength 2": "Forza 2",
+    "Fuerza 1": "Forza 1",
+    "Fuerza 2": "Forza 2",
     "Abdominal": "Addominali",
     "Slim": "Dimagrimento",
     "Body building": "Body building",
@@ -1432,7 +1439,10 @@
     "Procesando información..." : "Elaborazione delle informazioni...",
     "Obteniendo datos del cliente..." : "Recupero dei dati del cliente...",
     "Creando rutinas personalizadas..." : "Creazione di routine personalizzate...",
-    "25 minutos por sesión" : "25 minuti per sessione"
+    "25 minutos por sesión" : "25 minuti per sessione",
+    "Aumento de la resistencia y retraso de la fatiga": "Aumento della resistenza e ritardo dell'affaticamento",
+    "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc.": "Aumento del numero e della dimensione delle fibre muscolari. Aumenta la massa muscolare e il metabolismo basale, migliora la postura, ecc."
+
   },
   "pt": {
     "Panel de control": "Painel de controle",
@@ -1526,8 +1536,8 @@
     "Contracción": "Contração",
     "Pausa": "Pausa",
     "Calibración": "Calibração",
-    "Strength 1": "Força 1",
-    "Strength 2": "Força 2",
+    "Fuerza 1": "Força 1",
+    "Fuerza 2": "Força 2",
     "Abdominal": "Abdominais",
     "Slim": "Emagrecimento",
     "Body building": "Musculação",
@@ -1791,7 +1801,10 @@
     "Procesando información..." : "Processando informações...",
     "Obteniendo datos del cliente..." : "Obtendo dados do cliente...",
     "Creando rutinas personalizadas..." : "Criando rotinas personalizadas...",
-    "25 minutos por sesión" : "25 minutos por sessão"
+    "25 minutos por sesión" : "25 minutos por sessão",
+    "Aumento de la resistencia y retraso de la fatiga": "Aumento da resistência e atraso da fadiga",
+    "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc.": "Aumento do número e do tamanho das fibras musculares. Aumenta a massa muscular e o metabolismo basal, melhora a postura, etc."
+
   },
   "dt": {
     "Panel de control": "Dashboard",
@@ -1886,8 +1899,8 @@
     "Contracción": "Kontraktion",
     "Pausa": "Pause",
     "Calibración": "Kalibrierung",
-    "Strength 1": "Stärke 1",
-    "Strength 2": "Stärke 2",
+    "Fuerza 1": "Stärke 1",
+    "Fuerza 2": "Stärke 2",
     "Abdominal": "Bauch",
     "Slim": "Schlank",
     "Body building": "Krafttraining",
@@ -2150,6 +2163,8 @@
     "Procesando información..." : "Daten werden verarbeitet...",
     "Obteniendo datos del cliente..." : "Kundendaten werden abgerufen...",
     "Creando rutinas personalizadas..." : "Personalisierte Routinen werden erstellt...",
-    "25 minutos por sesión" : "25 Minuten pro Sitzung"
+    "25 minutos por sesión" : "25 Minuten pro Sitzung",
+    "Aumento de la resistencia y retraso de la fatiga": "Erhöhung der Ausdauer und Verzögerung der Ermüdung",
+    "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc.": "Erhöhung der Anzahl und Größe der Muskelfasern. Erhöht die Muskelmasse und den Grundumsatz, verbessert die Haltung usw."
   }
 }

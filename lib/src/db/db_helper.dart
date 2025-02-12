@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -10,6 +11,10 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   static Database? _database;
+  BuildContext? _context;
+
+  List<String?> strings = List.filled(38, null, growable: true);
+
 
   factory DatabaseHelper() {
     return _instance;
@@ -21,32 +26,94 @@ class DatabaseHelper {
     if (_database != null) {
       return _database!;
     }
-    _database = await _initDatabase();
+
+    if (_context == null) {
+      throw Exception(
+          "⚠️ La base de datos debe inicializarse con contexto usando initializeDatabase(context).");
+    }
+
+    // Inicializa la base de datos automáticamente si no estaba lista
+    await initializeDatabase(_context!);
     return _database!;
   }
 
-  Future<Database> _initDatabase() async {
+  Future<Database> _initDatabase(BuildContext context) async {
     // Asegúrate de que la base de datos no se sobrescriba si ya existe
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'my_database.db');
 
     return await openDatabase(
       path,
-      version: 111,
+      version: 1,
       // Incrementamos la versión a 3
-      onCreate: _onCreate,
+      onCreate: (db, version) async {
+        print("✅ Base de datos creada. Ejecutando _onCreate...");
+        await _onCreate(db, version, context);
+      },
       // Método que se ejecuta solo al crear la base de datos
       onUpgrade:
           _onUpgrade, // Método que se ejecuta al actualizar la base de datos
     );
   }
 
-  // Inicializar la base de datos al inicio de la app
-  Future<void> initializeDatabase() async {
-    await database; // Esto asegura que la base de datos esté inicializada
+  Future<void> initializeDatabase(BuildContext context) async {
+    if (_database != null) return; // Si ya está inicializada, no hacer nada
+    _context = context;
+    _database = await _initDatabase(context);
+    print("📌 Estado actual de _database: $_database, _context: $_context");
   }
 
-  Future<void> _onCreate(Database db, int version) async {
+  void initializeTranslations(BuildContext context) {
+    strings[0] = 'Calibración';
+    strings[1] = 'Fuerza 1';
+    strings[2] = 'Fuerza 2';
+    strings[3] = 'Glúteos';
+    strings[4] = 'Abdominal';
+    strings[5] = 'Celulitis';
+    strings[6] = 'Resistencia';
+    strings[7] = 'Definición';
+    strings[8] = 'Suelo pélvico';
+    strings[9] = 'Tonificación';
+    strings[10] = 'Fuerza';
+    strings[11] = 'Hipertrofia';
+    strings[12] = 'Resistencia 1';
+    strings[13] = 'Resistencia 2';
+    strings[14] = 'Dolor mecánico';
+    strings[15] = 'Dolor neurálgico';
+    strings[16] = 'Dolor químico';
+    strings[17] = 'Contracturas';
+    strings[18] = 'Drenaje';
+    strings[19] = "Aumento de la resistencia y retraso de la fatiga";
+    strings[20] = "Fortalece los músculos del suelo pélvico";
+    strings[21] =
+        "Aumento de la fuerza trabajando la potencia del músculo y quema de grasa";
+    strings[22] =
+        "Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal, mejora la postura corporal, etc.";
+    strings[23] =
+        "Aumento de la resistencia a la fatiga y recuperación entre entrenamientos";
+    strings[24] =
+        "Aumento de la resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado";
+    strings[25] =
+        "Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo";
+    strings[26] =
+        "Programa experto. Entrenamiento para la mejora de la condición física";
+    strings[27] = "Quema de grasa y creación de nuevas células";
+    strings[28] = "Pectorales";
+    strings[29] = "Trapecios";
+    strings[30] = "Dorsales";
+    strings[31] = "Glúteos";
+    strings[32] = "Isquiotibiales";
+    strings[33] = "Lumbares";
+    strings[34] = "Abdomen";
+    strings[35] = "Cuádriceps";
+    strings[36] = "Bíceps";
+    strings[37] = "Gemelos";
+  }
+
+  Future<void> _onCreate(Database db, int version, BuildContext context) async {
+    initializeTranslations(
+        context); // Llamar a la función para traducir antes de insertar
+
     // Crear la tabla clientes
     await db.execute('''
   CREATE TABLE IF NOT EXISTS clientes (
@@ -112,43 +179,43 @@ class DatabaseHelper {
 
     // Insertar valores predeterminados en la tabla grupos_musculares
     await db.insert('grupos_musculares',
-        {'nombre': 'Pectorales', 'imagen': 'assets/images/Pectorales.png'});
+        {'nombre': strings[28], 'imagen': 'assets/images/Pectorales.png'});
     print('Inserted into grupos_musculares: Pectorales');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Trapecios', 'imagen': 'assets/images/Trapecios.png'});
+        {'nombre': strings[29], 'imagen': 'assets/images/Trapecios.png'});
     print('Inserted into grupos_musculares: Trapecios');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Dorsales', 'imagen': 'assets/images/Dorsales.png'});
+        {'nombre': strings[30], 'imagen': 'assets/images/Dorsales.png'});
     print('Inserted into grupos_musculares: Dorsales');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Glúteos', 'imagen': 'assets/images/Glúteos.png'});
+        {'nombre': strings[31], 'imagen': 'assets/images/Glúteos.png'});
     print('Inserted into grupos_musculares: Glúteos');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Isquiotibiales', 'imagen': 'assets/images/Isquios.png'});
+        {'nombre': strings[32], 'imagen': 'assets/images/Isquios.png'});
     print('Inserted into grupos_musculares: Isquiotibiales');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Lumbares', 'imagen': 'assets/images/Lumbares.png'});
+        {'nombre': strings[33], 'imagen': 'assets/images/Lumbares.png'});
     print('Inserted into grupos_musculares: Lumbares');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Abdomen', 'imagen': 'assets/images/Abdominales.png'});
+        {'nombre': strings[34], 'imagen': 'assets/images/Abdominales.png'});
     print('Inserted into grupos_musculares: Abdominales');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Cuádriceps', 'imagen': 'assets/images/Cuádriceps.png'});
+        {'nombre': strings[35], 'imagen': 'assets/images/Cuádriceps.png'});
     print('Inserted into grupos_musculares: Cuádriceps');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Bíceps', 'imagen': 'assets/images/Bíceps.png'});
+        {'nombre': strings[36], 'imagen': 'assets/images/Bíceps.png'});
     print('Inserted into grupos_musculares: Bíceps');
 
     await db.insert('grupos_musculares',
-        {'nombre': 'Gemelos', 'imagen': 'assets/images/Gemelos.png'});
+        {'nombre': strings[37], 'imagen': 'assets/images/Gemelos.png'});
     print('Inserted into grupos_musculares: Gemelos');
 
     await db.execute('''
@@ -162,70 +229,70 @@ class DatabaseHelper {
 
     // BIO-JACKET
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Trapecios',
+      'nombre': strings[29],
       'imagen': 'assets/images/Trapecios.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Trapecios" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Dorsales',
+      'nombre': strings[30],
       'imagen': 'assets/images/Dorsales.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Dorsales" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Lumbares',
+      'nombre': strings[33],
       'imagen': 'assets/images/Lumbares.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Lumbares" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Glúteos',
+      'nombre': strings[31],
       'imagen': 'assets/images/Glúteos.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Glúteos" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Isquiotibiales',
+      'nombre': strings[32],
       'imagen': 'assets/images/Isquios.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Isquios" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Pectorales',
+      'nombre': strings[28],
       'imagen': 'assets/images/Pectorales.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Pectorales" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Abdomen',
+      'nombre': strings[34],
       'imagen': 'assets/images/Abdominales.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Abdomen" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Cuádriceps',
+      'nombre': strings[35],
       'imagen': 'assets/images/Cuádriceps.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Cuádriceps" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Bíceps',
+      'nombre': strings[36],
       'imagen': 'assets/images/Bíceps.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
     print('INSERTADO "Bíceps" TIPO "BIO-JACKET"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Gemelos',
+      'nombre': strings[37],
       'imagen': 'assets/images/Gemelos.png',
       'tipo_equipamiento': 'BIO-JACKET'
     });
@@ -233,49 +300,49 @@ class DatabaseHelper {
 
     // BIO-SHAPE
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Lumbares',
+      'nombre': strings[33],
       'imagen': 'assets/images/lumbares_pantalon.png',
       'tipo_equipamiento': 'BIO-SHAPE'
     });
     print('INSERTADO "Lumbares" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Glúteos',
+      'nombre': strings[31],
       'imagen': 'assets/images/gluteo_shape.png',
       'tipo_equipamiento': 'BIO-SHAPE'
     });
     print('INSERTADO "Glúteo superior" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Isquiotibiales',
+      'nombre': strings[32],
       'imagen': 'assets/images/isquios_pantalon.png',
       'tipo_equipamiento': 'BIO-SHAPE'
     });
     print('INSERTADO "Isquiotibiales" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Abdomen',
+      'nombre': strings[34],
       'imagen': 'assets/images/abdomen_pantalon.png',
       'tipo_equipamiento': 'BIO-SHAPE'
     });
     print('INSERTADO "Abdominales" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Cuádriceps',
+      'nombre': strings[35],
       'imagen': 'assets/images/cuadriceps_pantalon.png',
       'tipo_equipamiento': 'BIO-SHAPE'
     });
     print('INSERTADO "Cuádriceps" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Bíceps',
+      'nombre': strings[36],
       'imagen': 'assets/images/biceps_pantalon.png',
       'tipo_equipamiento': 'BIO-SHAPE'
     });
     print('INSERTADO "Bíceps" TIPO "BIO-SHAPE"');
 
     await db.insert('grupos_musculares_equipamiento', {
-      'nombre': 'Gemelos',
+      'nombre': strings[37],
       'imagen': 'assets/images/gemelos_pantalon.png',
       'tipo_equipamiento': 'BIO-SHAPE'
     });
@@ -322,86 +389,89 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Inserciones para el tipo de equipamiento 'BIO-JACKET'
       await txn.insert('cronaxia', {
-        'nombre': 'Trapecio',
+        'nombre': strings[29],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Lumbares',
+        'nombre': strings[33],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Dorsales',
+        'nombre': strings[30],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Glúteos',
+        'nombre': strings[31],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Isquiotibiales',
+        'nombre': strings[32],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Pectorales',
+        'nombre': strings[28],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Abdomen',
+        'nombre': strings[34],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Cuádriceps',
+        'nombre': strings[35],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Bíceps',
+        'nombre': strings[36],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Gemelos',
+        'nombre': strings[37],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-JACKET'
       });
 
       // Inserciones para el tipo de equipamiento 'BIO-SHAPE'
       await txn.insert('cronaxia', {
-        'nombre': 'Lumbares',
+        'nombre': strings[33],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-SHAPE'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Glúteos',
+        'nombre': strings[31],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-SHAPE'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Isquiotibiales',
+        'nombre': strings[32],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-SHAPE'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Abdomen',
+        'nombre': strings[34],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-SHAPE'
       });
       await txn.insert('cronaxia', {
-        'nombre': 'Cuádriceps',
+        'nombre': strings[35],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-SHAPE'
       });
-      await txn.insert('cronaxia',
-          {'nombre': 'Bíceps', 'valor': 0.0, 'tipo_equipamiento': 'BIO-SHAPE'});
       await txn.insert('cronaxia', {
-        'nombre': 'Gemelos',
+        'nombre': strings[36],
+        'valor': 0.0,
+        'tipo_equipamiento': 'BIO-SHAPE'
+      });
+      await txn.insert('cronaxia', {
+        'nombre': strings[37],
         'valor': 0.0,
         'tipo_equipamiento': 'BIO-SHAPE'
       });
@@ -424,7 +494,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId1 = await txn.insert('programas_predeterminados', {
-        'nombre': 'CALIBRACIÓN',
+        'nombre': strings[0],
         'imagen': 'assets/images/CALIBRACION.png',
         'frecuencia': 80,
         'rampa': 10,
@@ -486,7 +556,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId2 = await txn.insert('programas_predeterminados', {
-        'nombre': 'STRENGTH 1',
+        'nombre': strings[1],
         'imagen': 'assets/images/STRENGTH1.png',
         'frecuencia': 85,
         'pulso': 350,
@@ -542,7 +612,7 @@ class DatabaseHelper {
     });
     await db.transaction((txn) async {
       int programaId3 = await txn.insert('programas_predeterminados', {
-        'nombre': 'STRENGTH 2',
+        'nombre': strings[2],
         'imagen': 'assets/images/STRENGTH2.png',
         'frecuencia': 85,
         'rampa': 10,
@@ -596,7 +666,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId4 = await txn.insert('programas_predeterminados', {
-        'nombre': 'GLÚTEOS',
+        'nombre': strings[3],
         'imagen': 'assets/images/GLUTEOS.png',
         'frecuencia': 85,
         'rampa': 10,
@@ -679,7 +749,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId5 = await txn.insert('programas_predeterminados', {
-        'nombre': 'ABDOMINAL',
+        'nombre': strings[4],
         'imagen': 'assets/images/ABDOMINAL.png',
         'frecuencia': 43,
         'rampa': 8,
@@ -1133,7 +1203,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId12 = await txn.insert('programas_predeterminados', {
-        'nombre': 'CELULITIS',
+        'nombre': strings[5],
         'imagen': 'assets/images/CELULITIS.png',
         'frecuencia': 10,
         'rampa': 5,
@@ -1198,7 +1268,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId13 = await txn.insert('programas_predeterminados', {
-        'nombre': 'RESISTENCIA',
+        'nombre': strings[6],
         'imagen': 'assets/images/RESISTENCIA.png',
         'frecuencia': 43,
         'rampa': 5,
@@ -1262,7 +1332,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId14 = await txn.insert('programas_predeterminados', {
-        'nombre': 'DEFINICIÓN',
+        'nombre': strings[7],
         'imagen': 'assets/images/DEFINICION.png',
         'frecuencia': 33,
         'rampa': 5,
@@ -1391,7 +1461,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId16 = await txn.insert('programas_predeterminados', {
-        'nombre': 'SUELO PÉLVICO',
+        'nombre': strings[8],
         'imagen': 'assets/images/SUELOPELV.png',
         'frecuencia': 85,
         'rampa': 10,
@@ -1456,7 +1526,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId17 = await txn.insert('programas_predeterminados', {
-        'nombre': 'DOLOR MECÁNICO',
+        'nombre': strings[14],
         'imagen': 'assets/images/DOLORMECANICO.png',
         'frecuencia': 5,
         'rampa': 5,
@@ -1521,7 +1591,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId18 = await txn.insert('programas_predeterminados', {
-        'nombre': 'DOLOR QUÍMICO',
+        'nombre': strings[16],
         'imagen': 'assets/images/DOLORQUIM.png',
         'frecuencia': 110,
         'rampa': 5,
@@ -1585,7 +1655,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId19 = await txn.insert('programas_predeterminados', {
-        'nombre': 'DOLOR NEURÁLGICO',
+        'nombre': strings[15],
         'imagen': 'assets/images/DOLORNEU.png',
         'frecuencia': 150,
         'rampa': 5,
@@ -1713,7 +1783,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId21 = await txn.insert('programas_predeterminados', {
-        'nombre': 'CONTRACTURAS',
+        'nombre': strings[17],
         'imagen': 'assets/images/CONTRACTURAS.png',
         'frecuencia': 120,
         'rampa': 10,
@@ -1789,7 +1859,7 @@ class DatabaseHelper {
     await db.transaction((txn) async {
       // Paso 1: Insertar el programa en la tabla programas_predeterminados
       int programaId22 = await txn.insert('programas_predeterminados', {
-        'nombre': 'DRENAJE',
+        'nombre': strings[18],
         'imagen': 'assets/images/DRENAJE.png',
         'frecuencia': 21,
         'rampa': 5,
@@ -2008,9 +2078,9 @@ class DatabaseHelper {
       try {
         // Insertamos el programa automático "TONIFICACIÓN"
         int idProgramaAutomatico = await txn.insert('Programas_Automaticos', {
-          'nombre': 'TONIFICACIÓN',
+          'nombre': strings[9],
           'imagen': 'assets/images/TONING.png',
-          'descripcion': 'Aumento de la resistencia y retraso de la fatiga.',
+          'descripcion':  strings[19],
           'duracionTotal': 25,
           'tipo_equipamiento': 'AMBOS',
         });
@@ -2172,9 +2242,9 @@ class DatabaseHelper {
       try {
         // Insertamos el programa automático "GLÚTEOS"
         int idProgramaAutomatico2 = await txn.insert('Programas_Automaticos', {
-          'nombre': 'GLÚTEOS',
+          'nombre': strings[3],
           'imagen': 'assets/images/GLUTEOS.png',
-          'descripcion': 'Fortalece los músculos del suelo pélvico',
+          'descripcion':  strings[20],
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2345,9 +2415,9 @@ class DatabaseHelper {
       try {
         // Insertamos el programa automático "SUELO PÉLVICO"
         int idProgramaAutomatico3 = await txn.insert('Programas_Automaticos', {
-          'nombre': 'SUELO PÉLVICO',
+          'nombre': strings[8],
           'imagen': 'assets/images/SUELOPELV.png',
-          'descripcion': 'Fortalece los músculos del suelo pélvico',
+          'descripcion':  strings[20],
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'AMBOS',
         });
@@ -2514,10 +2584,10 @@ class DatabaseHelper {
       try {
         // Insertamos el programa automático "FUERZA"
         int idProgramaAutomatico4 = await txn.insert('Programas_Automaticos', {
-          'nombre': 'FUERZA',
+          'nombre': strings[10],
           'imagen': 'assets/images/STRENGTH.png',
           'descripcion':
-              'Aumento de la fuerza trabajando la potencia del músculo y quema de grasa',
+          strings[21],
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'AMBOS',
         });
@@ -2663,10 +2733,10 @@ class DatabaseHelper {
       try {
         // Insertamos el programa automático "HIPERTROFIA"
         int idProgramaAutomatico5 = await txn.insert('Programas_Automaticos', {
-          'nombre': 'HIPERTROFIA',
+          'nombre': strings[11],
           'imagen': 'assets/images/HIPERTROFIA.png',
           'descripcion':
-              'Incremento del número de fibras musculares y el tamaño de las mismas. Aumenta la masa muscular y el metabolismo basal. Activa la circulación sanguínea, tonificación general, mejora la postura corporal y aumenta la densidad ósea.',
+          strings[22],
           'duracionTotal': 25, // Duración total del programa en minutos
           'tipo_equipamiento': 'AMBOS',
         });
@@ -2817,10 +2887,10 @@ class DatabaseHelper {
       try {
         // Insertamos el programa automático "RESISTENCIA 1"
         int idProgramaAutomatico6 = await txn.insert('Programas_Automaticos', {
-          'nombre': 'RESISTENCIA 1',
+          'nombre': strings[12],
           'imagen': 'assets/images/RESISTENCIA(ENDURANCE).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos',
+          strings[23],
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -2972,10 +3042,10 @@ class DatabaseHelper {
       try {
         // Insertamos el programa automático "RESISTENCIA 2"
         int idProgramaAutomatico7 = await txn.insert('Programas_Automaticos', {
-          'nombre': 'RESISTENCIA 2',
+          'nombre': strings[13],
           'imagen': 'assets/images/RESISTENCIA2(ENDURANCE2).png',
           'descripcion':
-              'Aumento de resistencia a la fatiga y recuperación entre entrenamientos. Nivel avanzado',
+          strings[24],
           'duracionTotal': 25,
           'tipo_equipamiento': 'AMBOS',
         });
@@ -3142,7 +3212,7 @@ class DatabaseHelper {
           'nombre': 'CARDIO',
           'imagen': 'assets/images/CARDIO.png',
           'descripcion':
-              'Mejora del rendimiento cardiopulmonar y oxigenación del cuerpo',
+          strings[25],
           'duracionTotal': 25,
           'tipo_equipamiento': 'AMBOS',
         });
@@ -3327,7 +3397,7 @@ class DatabaseHelper {
           'nombre': 'CROSS MAX',
           'imagen': 'assets/images/CROSSMAX.png',
           'descripcion':
-              'Programa experto. Entrenamiento para la mejora de la condición física.',
+          strings[26],
           'duracionTotal': 25,
           'tipo_equipamiento': 'AMBOS',
         });
@@ -3493,7 +3563,7 @@ class DatabaseHelper {
         int idProgramaAutomatico10 = await txn.insert('Programas_Automaticos', {
           'nombre': 'SLIM',
           'imagen': 'assets/images/SLIM.png',
-          'descripcion': 'Quema de grasa y creación de nuevas células.',
+          'descripcion':  strings[27],
           'duracionTotal': 25,
           'tipo_equipamiento': 'BIO-JACKET',
         });
@@ -3731,23 +3801,10 @@ CREATE TABLE IF NOT EXISTS usuario_perfil (
 
     print('Relación entre usuario y perfil insertada');
 
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS videotutoriales (
-        id_tutorial INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        imagen TEXT,
-        video TEXT
-      );
-    ''');
-    await db.insert('videotutoriales', {
-      'nombre': 'LICENCIA',
-      'imagen': 'assets/images/RELAX.png',
-      'video': 'assets/videos/tutorial.mp4'
-    });
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 111) {
+    if (oldVersion < 1) {
       print("ONPUGRADE EJECUTADIO");
     }
   }
