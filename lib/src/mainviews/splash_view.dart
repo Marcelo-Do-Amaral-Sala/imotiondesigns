@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../db/db_helper.dart';
@@ -71,14 +70,14 @@ class _SplashViewState extends State<SplashView> {
       if (kIsWeb) {
         debugPrint("Inicializando base de datos para Web...");
         databaseFactory = databaseFactoryFfi;
-        await DatabaseHelperWeb().initializeDatabase();
+        await DatabaseHelperWeb().initializeDatabase(context);
       } else if (Platform.isAndroid || Platform.isIOS) {
         debugPrint("Inicializando base de datos para Móviles...");
         await DatabaseHelper().initializeDatabase(context);
       } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
         debugPrint("Inicializando base de datos para Desktop...");
         databaseFactory = databaseFactoryFfi;
-        await DatabaseHelperPC().initializeDatabase();
+        await DatabaseHelperPC().initializeDatabase(context);
       } else {
         throw UnsupportedError(
             'Plataforma no soportada para la base de datos.');

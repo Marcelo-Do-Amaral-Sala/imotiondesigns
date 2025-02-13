@@ -403,7 +403,7 @@ class _OverlaySeleccionarProgramaIndividualState
               // Cambiado a start para ajustar desde la izquierda
               children: row.map((program) {
                 String imagen = program['imagen'] ?? 'assets/default_image.png';
-                String nombre = program['nombre'] ?? 'Sin nombre';
+                String nombre = tr(context, program['nombre']).toUpperCase();
 
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
@@ -411,7 +411,8 @@ class _OverlaySeleccionarProgramaIndividualState
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        individualSelectedProgram = program['nombre'];
+                        individualSelectedProgram =
+                            tr(context, program['nombre']);
                       });
                       print("Programa seleccionado en overlay: $program");
                       widget.onIndivProgramSelected(
@@ -744,7 +745,7 @@ class _OverlaySeleccionarProgramaRecoveryState
               // Cambiado a start para ajustar desde la izquierda
               children: row.map((program) {
                 String imagen = program['imagen'] ?? 'assets/default_image.png';
-                String nombre = program['nombre'] ?? 'Sin nombre';
+                String nombre = tr(context, program['nombre']).toUpperCase();
 
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
@@ -753,7 +754,8 @@ class _OverlaySeleccionarProgramaRecoveryState
                     onTap: () {
                       // Aquí solo seleccionamos el programa si no está seleccionado aún
                       setState(() {
-                        recoverySelectedProgram = program['nombre'];
+                        recoverySelectedProgram =
+                            tr(context, program['nombre']);
                       });
 
                       widget.onRecoProgramSelected(
@@ -1085,7 +1087,8 @@ class _OverlaySeleccionarProgramaAutomaticState
               children: row.map((program) {
                 String imagen = program['imagen'] ?? 'assets/default_image.png';
                 String nombre =
-                    program['nombre_programa_automatico'] ?? 'Sin nombre';
+                    tr(context, program['nombre_programa_automatico'])
+                        .toUpperCase();
 
                 return Padding(
                   padding:  EdgeInsets.symmetric(horizontal: screenWidth*0.02),
@@ -1144,7 +1147,7 @@ class _OverlaySeleccionarProgramaAutomaticState
       Map<String, dynamic> program, double screenHeight, double screenWidth) {
     var duracion = program['duracionTotal'] ?? 'Sin descripción';
     String descripcion =
-        program['descripcion_programa_automatico'] ?? 'Sin descripción';
+        tr(context, program['descripcion_programa_automatico']);
     String tipoEquipamiento =
         program['tipo_equipamiento'] ?? 'Sin información de equipamiento';
     List<Map<String, dynamic>> subprogramas = program['subprogramas'] ?? [];
@@ -1219,7 +1222,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                               SizedBox(height: screenHeight * 0.01),
                               Container(
                                 constraints: BoxConstraints(
-                                  maxHeight: screenHeight * 0.4, // 🔹 Hace que la tabla sea más visible
+                                  maxHeight: screenHeight, // 🔹 Hace que la tabla sea más visible
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
@@ -1243,7 +1246,9 @@ class _OverlaySeleccionarProgramaAutomaticState
                                       ),
                                       // Filas
                                       ...subprogramas.map((subprograma) {
-                                        String subnombre = subprograma['nombre'] ?? 'Sin nombre';
+                                        String subnombre =
+                                            tr(context, subprograma['nombre'])
+                                                .toUpperCase();
                                         double subduracion = subprograma['duracion'] ?? 0;
                                         double subajuste = subprograma['ajuste'] ?? 0;
                                         int suborden = subprograma['orden'] ?? 0;
@@ -1267,7 +1272,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                     ),
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.02), // 🔹 Espaciado antes del botón
+                SizedBox(height: screenHeight * 0.01), // 🔹 Espaciado antes del botón
                 // ✅ Botón de Cerrar
                 Align(
                   alignment: Alignment.bottomRight,
@@ -1325,7 +1330,7 @@ class _OverlaySeleccionarProgramaAutomaticState
             fontSize: 16.sp,
           ),
         ),
-        SizedBox(height: MediaQuery.of(context).size.height*0.005),
+
       ],
     );
   }

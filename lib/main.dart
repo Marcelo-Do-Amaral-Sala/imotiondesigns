@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +12,9 @@ import 'package:imotion_designs/src/servicios/provider.dart';
 import 'package:imotion_designs/src/servicios/sync.dart';
 import 'package:imotion_designs/src/servicios/translation_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
 import 'firebase_options.dart';
 
 Future<void> main() async {

@@ -4127,15 +4127,16 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                       Column(
                                         children: [
                                           Text(
-                                            selectedIndivProgram?['nombre']
-                                                ?.toUpperCase() ??
-                                                tr(context, 'Nombre programa')
-                                                    .toUpperCase(),
+                                            tr(
+                                              context,
+                                              selectedIndivProgram?['nombre'] ?? 'Nombre programa', // Traduce el nombre si existe, si no, usa 'Nombre programa'
+                                            ).toUpperCase(), // Convierte el resultado en mayúsculas
                                             style: TextStyle(
                                               color: const Color(0xFF2be4f3),
                                               fontSize: 15.sp,
                                             ),
                                           ),
+
                                           GestureDetector(
                                             onTap: widget.selectedKey == null ||
                                                 isRunning
@@ -4267,12 +4268,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   Column(
                                                     children: [
                                                       Text(
-                                                        selectedAutoProgram![
-                                                        'nombre_programa_automatico']
-                                                            ?.toUpperCase() ??
-                                                            tr(context,
-                                                                'Programa automático desconocido')
-                                                                .toUpperCase(),
+                                                        tr(
+                                                            context,
+                                                            selectedAutoProgram?[
+                                                            'nombre_programa_automatico'] ??
+                                                                'Nombre programa')
+                                                            .toUpperCase(),
+                                                        // Convierte el texto traducido en mayúsculas
                                                         style: TextStyle(
                                                           color:
                                                           const Color(0xFF2be4f3),
@@ -4313,12 +4315,13 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                   Column(
                                                     children: [
                                                       Text(
-                                                        selectedAutoProgram?[
-                                                        'nombre_programa_automatico']
-                                                            ?.toUpperCase() ??
-                                                            tr(context,
+                                                        tr(
+                                                            context,
+                                                            selectedAutoProgram?[
+                                                            'nombre_programa_automatico'] ??
                                                                 'Nombre programa')
-                                                                .toUpperCase(),
+                                                            .toUpperCase(),
+                                                        // Convierte el texto traducido en mayúsculas
                                                         style: TextStyle(
                                                           color:
                                                           const Color(0xFF2be4f3),
@@ -4430,16 +4433,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                             ),
                                                           ),
                                                           TextSpan(
-                                                            text:
-                                                            '${selectedAutoProgram!['subprogramas'][currentSubprogramIndex]['nombre']?.toUpperCase() ?? tr(context, 'Subprograma desconocido').toUpperCase()}',
+                                                            text: tr(
+                                                                context,
+                                                                selectedAutoProgram?['subprogramas'][currentSubprogramIndex]['nombre'] ?? 'Subprograma desconocido'
+                                                            ).toUpperCase(), // Traducir y convertir a mayúsculas
                                                             style: TextStyle(
                                                               color: Colors.white,
                                                               fontSize: 15.sp,
-                                                              decoration:
-                                                              TextDecoration
-                                                                  .underline,
+                                                              decoration: TextDecoration.underline,
+                                                              decorationColor: Colors.white
                                                             ),
                                                           ),
+
                                                         ],
                                                       ),
                                                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
 

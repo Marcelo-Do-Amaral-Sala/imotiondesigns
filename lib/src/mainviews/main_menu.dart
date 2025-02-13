@@ -213,6 +213,94 @@ class MainMenuViewState extends State<MainMenuView>
     );
   }
 
+  Future<void> _showLicenseDialog2(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            // Ancho del diálogo
+            height: MediaQuery.of(context).size.height * 0.3,
+            // Alto del diálogo
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.01,
+                vertical: MediaQuery.of(context).size.height * 0.01),
+            decoration: BoxDecoration(
+              color: const Color(0xFF494949),
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: const Color(0xFF28E2F5),
+                width: MediaQuery.of(context).size.width * 0.001,
+              ),
+            ),
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.01,
+                  vertical: MediaQuery.of(context).size.height * 0.01,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      tr(context, 'Aviso').toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFF28E2F5),
+                        fontSize: 30.sp,
+                        decoration: TextDecoration.underline,
+                        decorationColor: const Color(0xFF28E2F5),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                    Text(
+                      tr(context,
+                          'Para usar el asistente virtual debe validar su licencia'),
+                      style: TextStyle(color: Colors.white, fontSize: 24.sp),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Cerrar el diálogo
+                        FocusScope.of(context).unfocus();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.01,
+                          vertical: MediaQuery.of(context).size.height * 0.01,
+                        ),
+                        side: BorderSide(
+                          width: MediaQuery.of(context).size.width * 0.001,
+                          color: const Color(0xFF2be4f3),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        backgroundColor: Colors.transparent,
+                      ),
+                      child: Text(
+                        tr(context, '¡Entendido!').toUpperCase(),
+                        style: TextStyle(
+                          color: const Color(0xFF2be4f3),
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> clearLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -592,7 +680,8 @@ class MainMenuViewState extends State<MainMenuView>
                                 ),
                               ),
                             ),
-                            Positioned(
+                            if (AppState.instance.nLicencia.isNotEmpty)
+                              Positioned(
                               bottom: 0,
                               right: 0,
                               child: Column(

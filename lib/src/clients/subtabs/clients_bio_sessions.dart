@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/bio_session_table.dart';
-import 'package:path/path.dart';
 
 import '../../../utils/translation_utils.dart';
 
