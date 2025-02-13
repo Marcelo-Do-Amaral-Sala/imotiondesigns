@@ -1229,7 +1229,7 @@ class _OverlaySeleccionarProgramaAutomaticState
                                   child: Table(
                                     border: TableBorder.all(
                                       color: Colors.white,
-                                      width: 1,
+                                      width: screenWidth * 0.001,
                                     ),
                                     children: [
                                       // Encabezado
@@ -1285,7 +1285,8 @@ class _OverlaySeleccionarProgramaAutomaticState
                         vertical: MediaQuery.of(context).size.height * 0.01,
                         horizontal: MediaQuery.of(context).size.width * 0.01,
                       ),
-                      side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                      side: BorderSide(
+                          width: screenWidth * 0.001, color: Color(0xFF2be4f3)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(7),
                       ),
@@ -1569,8 +1570,9 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                 });
               },
               dropdownColor: const Color(0xFF313030),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(0xFF2be4f3), size: 30),
+              icon: Icon(Icons.arrow_drop_down,
+                  color: Color(0xFF2be4f3),
+                  size: MediaQuery.of(context).size.height * 0.05),
             ),
           ),
         ],
@@ -1587,7 +1589,8 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
           borderRadius: BorderRadius.circular(7.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.02, vertical: screenHeight * 0.02),
           child: Column(
             children: [
               // Encabezado fijo
@@ -1600,7 +1603,7 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                   _buildHeaderCell(tr(context, 'Estado').toUpperCase()),
                 ],
               ),
-              const SizedBox(height: 10), // Espaciado entre encabezado y filas
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -1634,12 +1637,14 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
                                   _buildDataCell(client['name'] ?? ''),
                                   _buildDataCell(
                                       client['phone']?.toString() ?? ''),
-                                  _buildDataCell(client['status'] ?? ''),
+                                  _buildDataCell(tr(context,client['status'])),
                                 ],
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20), // Espaciado entre filas
+                          SizedBox(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.02),
                         ],
                       );
                     }).toList(),
@@ -1656,7 +1661,8 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
   Widget _buildHeaderCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+            horizontal:  MediaQuery.of(context).size.width* 0.01, vertical:  MediaQuery.of(context).size.height * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -1673,7 +1679,8 @@ class _OverlaySeleccionarClienteState extends State<OverlaySeleccionarCliente>
   Widget _buildDataCell(String text) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(
+            horizontal:  MediaQuery.of(context).size.width* 0.01, vertical:  MediaQuery.of(context).size.height * 0.01),
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -1830,8 +1837,9 @@ class _OverlayCiclosState extends State<OverlayCiclos> {
                   widget.onClose();
                 },
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.all(10.0),
-                  side: const BorderSide(width: 1.0, color: Color(0xFF2be4f3)),
+                  padding: EdgeInsets.symmetric(
+                      horizontal:  MediaQuery.of(context).size.width* 0.01, vertical:  MediaQuery.of(context).size.height * 0.01),
+                  side:  BorderSide(width: screenWidth*0.001, color: Color(0xFF2be4f3)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(7),
                   ),
