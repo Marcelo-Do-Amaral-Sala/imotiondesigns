@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/clients/custom_clients/bio_session_table.dart';
+import 'package:path/path.dart';
+
+import '../../../utils/translation_utils.dart';
 
 class BioSessionSubTab extends StatefulWidget {
   final List<Map<String, String>> bioimpedanceData;
@@ -31,7 +34,6 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -39,14 +41,12 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
 
     return Column(
       children: [
-        // Fila con el botón de retroceso
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             GestureDetector(
               onTap: () {
                 if (widget.selectedClientData != null) {
-                  // Convertir Map<String, dynamic> a Map<String, String>
                   Map<String, String> clientData = widget.selectedClientData!
                       .map((key, value) => MapEntry(key, value.toString()));
                   widget.onClientTap(clientData);
@@ -71,44 +71,43 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
           ],
         ),
         SizedBox(height: screenHeight * 0.02),
-
-        // Expansión de la interfaz
         Expanded(
-          child: Container(
-            padding: EdgeInsets.only(
-                bottom: screenHeight * 0.02,
-                left: screenWidth * 0.02,
-                right: screenWidth * 0.02),
-            child: Row(
-              children: [
-                // BioSessionTableWidget ocupará un 50% del espacio disponible
-                Expanded(
-                  flex: 5,
-                  child: BioSessionTableWidget(
-                    bioimpedanceData: widget.bioimpedanceData,
-                  ),
-                ),
-                // RadarChart ocupará el 50% del espacio disponible
-                Expanded(
-                  flex: 5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Usamos un Stack para superponer los widgets
-                      Stack(
-                        alignment: Alignment.center,
-                        // Aseguramos que estén centrados
-                        children: [
-                          CircunferenciasWidget(),
-                          // El widget de las circunferencias (debe ir abajo)
-                          SpiderChart(data: [90, 75, 90, 60, 85]),
-                          // El gráfico de araña (debe ir arriba)
-                        ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Container(
+              width: screenWidth,
+              padding: EdgeInsets.only(
+                  bottom: screenHeight * 0.02,
+                  left: screenWidth * 0.02,
+                  right: screenWidth * 0.02),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: SingleChildScrollView(
+                      child: BioSessionTableWidget(
+                        bioimpedanceData: widget.bioimpedanceData,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    flex: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircunferenciasWidget(),
+                            SpiderChart(data: [90, 75, 90, 60, 85]),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -116,6 +115,7 @@ class _BioSessionSubTabState extends State<BioSessionSubTab> {
     );
   }
 }
+
 
 class SpiderChart extends StatelessWidget {
   final List<int> data;
@@ -125,17 +125,18 @@ class SpiderChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: Size(MediaQuery.of(context).size.width * 0.3,
-          MediaQuery.of(context).size.height * 0.3),
-      painter: SpiderChartPainter(data),
+      size: Size(MediaQuery.of(context).size.width * 0.25,
+          MediaQuery.of(context).size.height * 0.25),
+      painter: SpiderChartPainter(data,context),
     );
   }
 }
 
 class SpiderChartPainter extends CustomPainter {
   final List<int> data;
+  final BuildContext context;
 
-  SpiderChartPainter(this.data);
+  SpiderChartPainter(this.data, this.context);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -205,12 +206,12 @@ class SpiderChartPainter extends CustomPainter {
     }
 
     List<String> labelsText = [
-      "HIDRATACIÓN SIN GRASA",
-      "EQUILIBRIO HÍDRICO",
-      "IMC",
-      "MASA GRASA",
-      "MÚSCULO",
-      "ESQUELETO",
+      tr(context, "Hidratación sin grasa").toUpperCase(),
+      tr(context, "Equilibrio hídrico").toUpperCase(),
+      tr(context, "Imc").toUpperCase(),
+      tr(context, "Masa grasa").toUpperCase(),
+      tr(context, "Músculo").toUpperCase(),
+      tr(context, "Esqueleto").toUpperCase(),
     ];
 
     // Dibujar las etiquetas
@@ -257,8 +258,8 @@ class CircunferenciasWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: Size(MediaQuery.of(context).size.width * 0.3,
-          MediaQuery.of(context).size.height * 0.3),
+      size: Size(MediaQuery.of(context).size.width * 0.25,
+          MediaQuery.of(context).size.height * 0.25),
       painter: CircunferenciasPainter(),
     );
   }

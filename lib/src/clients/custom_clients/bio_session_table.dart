@@ -20,9 +20,8 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
       children: [
         buildHeaderRow(), // Encabezado de columnas
         SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
+        SingleChildScrollView(
+          child: Column(
               children: List.generate(widget.bioimpedanceData.length, (index) {
                 var row = widget.bioimpedanceData[index];
                 return Column(
@@ -44,7 +43,6 @@ class _BioSessionTableWidgetState extends State<BioSessionTableWidget> {
               }),
             ),
           ),
-        ),
       ],
     );
   }

@@ -39,7 +39,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                       phone: (row['phone'] is int)
                           ? row['phone']
                           : int.tryParse(row['phone'].toString()) ?? 0,
-                      status: row['status'] ?? '',
+                      status: tr(context,row['status']),
                       onTap: () {
                         widget.onRowTap(row); // Pasar el mapa completo
                       },

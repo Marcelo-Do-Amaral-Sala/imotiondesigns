@@ -392,7 +392,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
-                                                  hintText: tr(context, group),
+                                                  hintText: tr(context, group).toUpperCase(),
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
                                                     fontSize: 15.sp,
@@ -568,7 +568,7 @@ class _ClientsGroupsState extends State<ClientsGroups> {
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
-                                                  hintText: tr(context, group),
+                                                  hintText: tr(context, group).toUpperCase(),
                                                   hintStyle: TextStyle(
                                                     color: hintColors[group],
                                                     fontSize: 15.sp,

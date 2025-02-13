@@ -81,7 +81,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
                 child: _buildTabBar(),
               ),
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.03,
+                width: MediaQuery.of(context).size.width * 0.01,
               ),
               Flexible(
                 flex: 8, // El contenido ocupa el 80% del ancho
@@ -141,7 +141,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
             text,
             style: TextStyle(
               color: isSelected ? const Color(0xFF2be4f3) : Colors.white,
-              fontSize: 14,
+              fontSize: 14.sp,
               fontWeight: FontWeight.bold,
               decoration:
                   isSelected ? TextDecoration.underline : TextDecoration.none,
@@ -175,8 +175,13 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
+    // Asegurar que solo mostramos los últimos 10 registros
+    List<FlSpot> filteredSpots =
+    spots.length > 10 ? spots.sublist(spots.length - 10) : spots;
+
     return Container(
-      padding:  EdgeInsets.symmetric(vertical: screenHeight*0.02, horizontal: screenWidth*0.02),
+      padding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.02, horizontal: screenWidth * 0.02),
       child: SizedBox(
         height: screenHeight,
         width: screenWidth,
@@ -189,19 +194,9 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
                   showTitles: true,
                   reservedSize: 38,
                   getTitlesWidget: (value, meta) {
-                    switch (value.toInt()) {
-                      case 0:
-                        return const Text('Ene');
-                      case 1:
-                        return const Text('Feb');
-                      case 2:
-                        return const Text('Mar');
-                      case 3:
-                        return const Text('Abr');
-                      case 4:
-                        return const Text('May');
-                      case 5:
-                        return const Text('Jun');
+                    int index = value.toInt();
+                    if (index >= 0 && index < filteredSpots.length) {
+                      return Text('M${index + 1}');
                     }
                     return const Text('');
                   },
@@ -210,72 +205,63 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 40,
+                  reservedSize: 80, // Aumentar espacio para que los textos se vean completos
                   getTitlesWidget: (value, meta) {
+                    String text = '';
                     switch (value.toInt()) {
                       case 0:
-                        return Text(tr(context, 'Excelente'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.sp,
-                            ));
+                        text = tr(context, 'Excelente');
+                        break;
                       case 20:
-                        return Text(tr(context, 'Muy bien'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.sp,
-                            ));
+                        text = tr(context, 'Muy bien');
+                        break;
                       case 40:
-                        return Text(tr(context, 'Normal'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.sp,
-                            ));
+                        text = tr(context, 'Normal');
+                        break;
                       case 60:
-                        return Text(tr(context, 'Cerca de la norma'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.sp,
-                            ));
+                        text = tr(context, 'Cerca de la norma');
+                        break;
                       case 80:
-                        return Text(tr(context, 'A vigilar'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.sp,
-                            ));
+                        text = tr(context, 'A vigilar');
+                        break;
                       case 100:
-                        return Text(tr(context, 'A tratar'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.sp,
-                            ));
+                        text = tr(context, 'A tratar');
+                        break;
                     }
-                    return const Text('');
+                    return Padding(
+                      padding:  EdgeInsets.only(right: screenWidth*0.01), // Espacio entre el texto y la gráfica
+                      child: Align(
+                        alignment: Alignment.center, // Alinear texto a la izquierda
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.sp,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
               topTitles:
-                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
-                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             borderData: FlBorderData(
               show: true,
-              border: Border.all(color: Colors.white, width: 1),
+              border: Border.all(color: Colors.white, width: screenWidth*0.001),
             ),
             minX: 0,
-            maxX: 5,
+            maxX: filteredSpots.length.toDouble() - 1,
             minY: 0,
             maxY: 100,
             lineBarsData: [
               LineChartBarData(
-                spots: spots,
+                spots: filteredSpots,
                 isCurved: true,
                 color: const Color(0xFF2be4f3),
                 belowBarData: BarAreaData(
@@ -294,7 +280,7 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
               LineChartBarData(
                 spots: [
                   FlSpot(0, 50),
-                  FlSpot(5, 50), // Dibuja una línea horizontal a 50
+                  FlSpot(filteredSpots.length.toDouble() - 1, 50),
                 ],
                 isCurved: false,
                 color: Colors.white,
@@ -308,6 +294,8 @@ class _EvolutionSubTabState extends State<EvolutionSubTab>
       ),
     );
   }
+
+
 
   List<FlSpot> _generateSampleDataHidratacion() {
     return [

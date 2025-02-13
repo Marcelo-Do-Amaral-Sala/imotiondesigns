@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../utils/translation_utils.dart';
 import '../forms/clients_form.dart';
 import '../forms/clients_form_groups.dart';
@@ -146,7 +147,7 @@ class _OverlayInfoState extends State<OverlayInfo>
         ClientsActivity(clientDataActivity: selectedClientData!),
         ClientsBonos(clientDataBonos: selectedClientData!),
         _showBioSubTab
-            ? _buildBioSubTabView()
+            ? _buildBioSubTabView(context)
             : _showEvolutionSubTab
                 ? _buildEvolutionSubTabView()
                 : ClientsBio(
@@ -175,40 +176,40 @@ class _OverlayInfoState extends State<OverlayInfo>
     );
   }
 
-  Widget _buildBioSubTabView() {
+  Widget _buildBioSubTabView(BuildContext context) {
     final List<Map<String, String>> bioimpedanceData = [
       {
-        'feature': 'HIDRATACIÓN SIN GRASA',
+        'feature': tr(context, "Hidratación sin grasa").toUpperCase(),
         'value': '54645',
         'ref': '65456',
         'result': '3432',
       },
       {
-        'feature': 'EQUILIBRIO HÍDRICO',
+        'feature': tr(context, "Equilibrio hídrico").toUpperCase(),
         'value': '54645',
         'ref': '65456',
         'result': '3432',
       },
       {
-        'feature': 'IMC',
+        'feature': tr(context, "Imc").toUpperCase(),
         'value': '54645',
         'ref': '65456',
         'result': '3432',
       },
       {
-        'feature': 'MASA GRASA',
+        'feature': tr(context, "Masa grasa").toUpperCase(),
         'value': '54645',
         'ref': '65456',
         'result': '3432',
       },
       {
-        'feature': 'MÚSCULO',
+        'feature': tr(context, "Músculo").toUpperCase(),
         'value': '54645',
         'ref': '65456',
         'result': '3432',
       },
       {
-        'feature': 'ESQUELETO',
+        'feature': tr(context, "Esqueleto").toUpperCase(),
         'value': '54645',
         'ref': '65456',
         'result': '3432',

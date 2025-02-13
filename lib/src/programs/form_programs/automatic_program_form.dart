@@ -459,7 +459,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                                     ),
                                                     child: Center(
                                                       child: Text(
-                                                        '${secuencia['programa']}',
+                                                        '${tr(context,secuencia['programa']).toUpperCase()}',
                                                         style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 15.sp),
@@ -879,7 +879,7 @@ class AutomaticProgramFormState extends State<AutomaticProgramForm> {
                                             return DropdownMenuItem<String>(
                                               value: program['nombre'],
                                               child: Text(
-                                                '${program['id_programa']} - ${program['nombre']}',
+                                                '${program['id_programa']} - ${tr(context,program['nombre']).toUpperCase()}',
                                                 style: _dropdownItemStyle,
                                               ),
                                             );
