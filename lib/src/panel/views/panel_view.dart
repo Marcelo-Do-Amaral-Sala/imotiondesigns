@@ -2658,36 +2658,43 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
 
   void onCycleSelected(String cycle) {
     setState(() {
-      selectedCycle = cycle; // Aquí actualizas el valor seleccionado
-      // 🔥 Si selecciona un ciclo, usar la imagen inicial y desactivar pausa
-      if (selectedCycle != null) {
-        imagePauseNotifier.value =  'assets/images/PAUSA.png';
-        _isPauseActive = false;
+      selectedCycle = cycle; // Actualizar el ciclo seleccionado
+      imagePauseNotifier.value = 'assets/images/PAUSA.png';
+      _isPauseActive = false;
+
+      // 🔥 Asignar valores del ciclo
+      if (selectedCycle == "${tr(context, 'Ciclo')} D") {
+        selectedRecoProgram = allRecoveryPrograms[3];
+      } else if (selectedCycle == "${tr(context, 'Ciclo')} A") {
+        valueRampa = 1.0;
+        valuePause = 1.0;
+        valueContraction = 3.0;
+      } else if (selectedCycle == "${tr(context, 'Ciclo')} B") {
+        valueRampa = 1.0;
+        valuePause = 1.0;
+        valueContraction = 6.0;
+      } else if (selectedCycle == "${tr(context, 'Ciclo')} C") {
+        valueRampa = 1.0;
+        valuePause = 1.0;
+        valueContraction = 4.0;
       }
 
-      if (selectedCycle == "${tr(context, 'Ciclo')} D") {
-        selectedRecoProgram = allRecoveryPrograms[3]; // 🔥 Direct assignment
-      } else if (selectedCycle == "${tr(context, 'Ciclo')} A") {
-        valueRampa = 1.0; // 🔥 Direct assignment
-        valuePause = 1.0; // 🔥 Direct assignment
-        valueContraction = 3.0; // 🔥 Direct assignment
-      } else if (selectedCycle == "${tr(context, 'Ciclo')} B") {
-        valueRampa = 1.0; // 🔥 Direct assignment
-        valuePause = 1.0; // 🔥 Direct assignment
-        valueContraction = 6.0; // 🔥 Direct assignment
-      } else if (selectedCycle == "${tr(context, 'Ciclo')} C") {
-        valueRampa = 1.0; // 🔥 Direct assignment
-        valuePause = 1.0; // 🔥 Direct assignment
-        valueContraction = 4.0; // 🔥 Direct assignment
-      }
       if (selectedCycle == '') {
-        selectedCycle = null; // 🔥 Direct assignment
+        selectedCycle = null;
       }
-      updateContractionAndPauseValues();
+
+      updateContractionAndPauseValues(); // Llamar a la función para actualizar valores
     });
+
     print("Ciclo seleccionado: $selectedCycle");
   }
+
   void updateContractionAndPauseValues() {
+    // 🔥 Si hay un ciclo seleccionado, no permitir que el programa lo sobrescriba
+    if (selectedCycle != null) {
+      return; // Salir sin cambiar los valores
+    }
+
     if (selectedProgram == tr(context, 'Individual').toUpperCase() &&
         selectedIndivProgram != null) {
       valueContraction =
@@ -3881,30 +3888,28 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                             // Se usa para que el `Align` funcione correctamente
                                             child: Align(
                                               alignment: Alignment.center,
-                                              child: ValueListenableBuilder<
-                                                  Map<String, dynamic>>(
-                                                valueListenable:
-                                                widget.clientSelectedMap,
-                                                builder: (context, clientMap,
-                                                    child) {
-                                                  final client = clientMap[
-                                                  widget.macAddress];
-                                                  if (client == null)
-                                                    return SizedBox();
-                                                  final int bonos =
-                                                      client['bonos'] ?? 0;
+                                              child: ValueListenableBuilder<Map<String, dynamic>>(
+                                                valueListenable: widget.clientSelectedMap,
+                                                builder: (context, clientMap, child) {
+                                                  final client = clientMap[widget.macAddress];
+
+                                                  if (client == null) return SizedBox(); // Si el cliente no existe, no mostrar nada
+
+                                                  final int? bonos = client['bonos'] as int?; // Asegurar que sea un int
+
+                                                  if (bonos == null || bonos == 0) return SizedBox(); // 🔥 Si bonos es 0 o null, ocultar el texto
 
                                                   return Text(
                                                     "$bonos",
                                                     style: TextStyle(
                                                       fontSize: 15.sp,
-                                                      fontWeight:
-                                                      FontWeight.bold,
+                                                      fontWeight: FontWeight.bold,
                                                       color: Colors.white,
                                                     ),
                                                   );
                                                 },
                                               ),
+
                                             ),
                                           ),
                                         ),

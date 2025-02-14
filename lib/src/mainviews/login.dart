@@ -47,7 +47,7 @@ class LoginViewState extends State<LoginView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _requestLocationPermissions();
+    solicitarPermisos();
     _fetchAdmins();
     _checkUserProfile();
     clearFields();
@@ -81,63 +81,24 @@ class LoginViewState extends State<LoginView> {
   }
 
 
-  Future<void> _requestLocationPermissions() async {
-    if (Platform.isAndroid || Platform.isIOS) {
-      // Verificar si los permisos ya están concedidos
-      bool isLocationGranted = await Permission.location.isGranted;
-      bool isLocationAlwaysGranted = await Permission.locationAlways.isGranted;
-      bool isNearbyWifiGranted = true; // Valor por defecto en caso de que no sea necesario
+  Future<void> solicitarPermisos() async {
+    print("📢 Solicitando permisos...");
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.bluetooth,
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.location,
+    ].request();
 
-      // Si es Android 13 o superior, verificar si el permiso de Nearby WiFi es necesario
-      if (Platform.isAndroid && (await _isAndroid13OrHigher())) {
-        isNearbyWifiGranted = await Permission.nearbyWifiDevices.isGranted;
-      }
+    statuses.forEach((permission, status) {
+      print("🟢 Permiso $permission: ${status.isGranted ? 'Otorgado' : 'Denegado'}");
+    });
 
-      // Si todos los permisos ya están concedidos, salir de la función
-      if (isLocationGranted && isLocationAlwaysGranted && isNearbyWifiGranted) {
-        debugPrint("✅ Todos los permisos de ubicación ya están concedidos. No se volverán a solicitar.");
-        return;
-      }
-
-      // Solicitar permisos solo si no están concedidos
-      if (!isLocationGranted) {
-        PermissionStatus permission = await Permission.location.request();
-        if (permission != PermissionStatus.granted) {
-          debugPrint("❌ Permiso de ubicación denegado.");
-          return;
-        }
-      }
-
-      if (!isLocationAlwaysGranted) {
-        PermissionStatus permission = await Permission.locationAlways.request();
-        if (permission != PermissionStatus.granted) {
-          debugPrint("❌ Permiso de ubicación siempre denegado.");
-          return;
-        }
-      }
-
-      // Solo pedir Nearby WiFi Devices si es Android 13 o superior
-      if (Platform.isAndroid && (await _isAndroid13OrHigher()) && !isNearbyWifiGranted) {
-        PermissionStatus permission = await Permission.nearbyWifiDevices.request();
-        if (permission != PermissionStatus.granted) {
-          debugPrint("❌ Permiso de dispositivos WiFi cercanos denegado.");
-          return;
-        }
-      }
-
-      debugPrint("✅ Permisos de ubicación correctamente concedidos.");
+    if (statuses.values.any((status) => status.isDenied)) {
+      print("⚠️ Algunos permisos fueron denegados.");
     }
   }
 
-// Función para verificar si el dispositivo tiene Android 13 o superior
-  Future<bool> _isAndroid13OrHigher() async {
-    return Platform.isAndroid && int.parse(await _getAndroidVersion()) >= 33;
-  }
-
-// Obtener la versión de Android
-  Future<String> _getAndroidVersion() async {
-    return await Process.run('getprop', ['ro.build.version.sdk']).then((result) => result.stdout.toString().trim());
-  }
 
 
 

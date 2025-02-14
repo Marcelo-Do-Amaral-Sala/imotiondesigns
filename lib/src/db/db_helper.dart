@@ -60,7 +60,6 @@ class DatabaseHelper {
     if (_database != null) return; // Si ya está inicializada, no hacer nada
     _context = context;
     _database = await _initDatabase(context);
-    print("📌 Estado actual de _database: $_database, _context: $_context");
   }
 
   void initializeTranslations(BuildContext context) {
