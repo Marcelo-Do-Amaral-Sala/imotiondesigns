@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
+import 'package:imotion_designs/src/servicios/bluetooth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/translation_utils.dart';
