@@ -2215,11 +2215,11 @@ class _OverlayVitaState extends State<OverlayVita>
                                           _userProfileType == 'Ambos'
                                               ? tr(context, 'Ambos')
                                               : _userProfileType == 'Entrenador'
-                                                  ? tr(context, 'Tr entrenador')
+                                                  ? tr(context, 'Entrenador')
                                                   : _userProfileType ==
                                                           'Administrador'
                                                       ? tr(context,
-                                                          'Tr administrador')
+                                                          'Administrador')
                                                       : _userProfileType,
                                           // Esto es por si el valor no coincide con ninguno de los anteriores
                                           style: TextStyle(
@@ -2466,7 +2466,7 @@ class _OverlayVitaState extends State<OverlayVita>
                             key: _repaintBoundaryKey,
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.02,
+                                horizontal: screenWidth * 0.01,
                                 vertical: screenHeight * 0.02,
                               ),
                               decoration: BoxDecoration(
@@ -2817,7 +2817,7 @@ class _OverlayVitaState extends State<OverlayVita>
             ),
           ),
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.01,
+            width: MediaQuery.of(context).size.width * 0.001,
           ),
 
           Text(
