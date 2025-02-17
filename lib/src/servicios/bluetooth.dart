@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
 class BleConnectionService {
-
-  BleConnectionService() {
-    debugPrint("🚀 Servicio BLE inicializado");
-  }
-
   final flutterReactiveBle = FlutterReactiveBle();
   StreamSubscription<List<int>>? notificationSubscription;
   final Map<String, StreamSubscription<List<int>>> _subscriptions = {};
@@ -26,21 +21,11 @@ class BleConnectionService {
   final StreamController<Map<String, dynamic>> _deviceUpdatesController =
   StreamController.broadcast();
 
-  void updateMacAddresses(List<String> macAddresses) async {
-    targetDeviceIds.clear();
-    connectedDevices.clear();
 
-    targetDeviceIds.addAll(macAddresses);
-    debugPrint("🔄 Lista de dispositivos objetivo actualizada: $targetDeviceIds");
-
-    List<String> availableDevices = await scanTargetDevices();
-
-    for (String deviceId in availableDevices) {
-      if (!connectedDevices.contains(deviceId)) {
-        connectToDeviceByMac(deviceId);
-      }
-    }
+  BleConnectionService() {
+    debugPrint("🚀 Servicio BLE inicializado");
   }
+
 
   /// 🎯 **Obtener stream del estado de conexión de un dispositivo**
   Stream<bool> connectionStateStream(String macAddress) {
@@ -83,6 +68,23 @@ class BleConnectionService {
   /// 📡 **Emitir actualizaciones del dispositivo**
   void emitDeviceUpdate(String macAddress, String key, dynamic value) {
     _deviceUpdatesController.add({'macAddress': macAddress, key: value});
+  }
+
+
+  void updateMacAddresses(List<String> macAddresses) async {
+    targetDeviceIds.clear();
+    connectedDevices.clear();
+
+    targetDeviceIds.addAll(macAddresses);
+    debugPrint("🔄 Lista de dispositivos objetivo actualizada: $targetDeviceIds");
+
+    List<String> availableDevices = await scanTargetDevices();
+
+    for (String deviceId in availableDevices) {
+      if (!connectedDevices.contains(deviceId)) {
+        connectToDeviceByMac(deviceId);
+      }
+    }
   }
 
   Future<List<String>> scanTargetDevices() async {
@@ -175,13 +177,6 @@ class BleConnectionService {
 
   /// 📡 **Obtener el estado de conexión global**
   bool get isConnected => connectedDevices.isNotEmpty;
-
-
-
-
-
-
-
 
 
 
@@ -1039,9 +1034,12 @@ $endpoints
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x13) {
           final retorno = data[2];
-          completer.complete(retorno == 1);
-          debugPrint(
-              "📥 FUN_RUN_EMS_R recibido desde $macAddress: ${retorno == 1 ? "OK" : "FAIL"}");
+          if (!completer.isCompleted) { // ✅ Evita completar más de una vez
+            completer.complete(retorno == 1);
+            debugPrint("📥 FUN_RUN_EMS_R recibido desde $macAddress: ${retorno == 1 ? "OK" : "FAIL"}");
+          } else {
+            debugPrint("⚠️ Se ignoró respuesta duplicada de $macAddress.");
+          }
         }
       }, onError: (error) {
         if (!completer.isCompleted) completer.completeError(error);
@@ -1385,12 +1383,10 @@ $endpoints
 
       final completer = Completer<Map<String, dynamic>>();
 
-      // Suscribirse a las notificaciones
       final subscription = flutterReactiveBle
           .subscribeToCharacteristic(characteristicTx)
           .listen((data) {
         if (data.isNotEmpty && data[0] == 0x19) {
-          // FUN_ALL_CANAL_EMS_R recibido
           final endpointResp = data[1];
           final resultado = data[2] == 1 ? "OK" : "FAIL";
           final valoresResp = data.sublist(3, 13).map((v) {
@@ -1403,14 +1399,20 @@ $endpoints
             'valoresCanales': valoresResp,
           };
 
-          completer.complete(response);
-          debugPrint(
-              "📥 FUN_ALL_CANAL_EMS_R recibido desde $macAddress: $response");
+          if (!completer.isCompleted) { // ✅ Evita completar más de una vez
+            completer.complete(response);
+            debugPrint("📥 FUN_ALL_CANAL_EMS_R recibido desde $macAddress: $response");
+          } else {
+            debugPrint("⚠️ Se ignoró respuesta duplicada de $macAddress.");
+          }
         }
       }, onError: (error) {
-        if (!completer.isCompleted) completer.completeError(error);
+        if (!completer.isCompleted) {
+          completer.completeError(error);
+        }
         debugPrint("❌ Error en notificación para $macAddress: $error");
       });
+
 
       // Guardar la suscripción
       _subscriptions[macAddress] = subscription;

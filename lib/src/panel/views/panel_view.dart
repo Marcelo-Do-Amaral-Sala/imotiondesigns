@@ -1790,6 +1790,8 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   bool _isImageOne = true;
   bool _hideControls = false;
   bool _isPauseActive = false;
+  bool _pauseTimerStarted = false;
+  bool _contraTimerStarted = false;
   GlobalKey<_PanelViewState> panelViewKey = GlobalKey<_PanelViewState>();
   String modulo =
       "imotion21"; // Cambia "moduloEjemplo" por el valor real del módulo.
@@ -1837,8 +1839,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   double seconds = 0.0;
   double progressContraction = 0.0;
   double progressPause = 0.0;
-  double elapsedTimeContraction = 0.0;
   double elapsedTimePause = 0.0;
+  double pausedTimePause = 0.0;
+  double elapsedTimeContraction = 0.0;
+  double pausedTimeContraction = 0.0;
   double valueContraction = 1.0;
   double valueRampa = 1.0;
   double valuePause = 1.0;
@@ -2946,14 +2950,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       setState(() {
         isRunning = true;
         isSessionStarted = true;
+        // Para el temporizador principal, reiniciamos el startTime
         startTime = DateTime.now();
-        // Inicia o reanuda el temporizador principal
+        // Al reanudar, elapsedTime se calculará sumando el tiempo acumulado al nuevo lapso
         _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
           if (mounted) {
             setState(() {
               elapsedTime = pausedTime +
                   DateTime.now().difference(startTime).inSeconds.toDouble();
-              progress = 1.0 - (elapsedTime / totalTime); // Reducir el progreso
+              progress = 1.0 - (elapsedTime / totalTime); // Actualiza el progreso
 
               seconds = (totalTime - elapsedTime).toInt() % 60;
               time = (totalTime - elapsedTime).toInt() ~/ 60;
@@ -2962,7 +2967,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                 _currentImageIndex = imagePaths.length - time;
               }
 
-              // Detiene el temporizador al alcanzar el tiempo total
+              // Detiene el temporizador principal al llegar al total
               if (elapsedTime >= totalTime) {
                 _stopAllTimersAndReset(widget.macAddress!);
               }
@@ -2970,16 +2975,20 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           }
         });
 
-        // Asegura que startSubprogramTimer solo se ejecute si ambos son no nulos
+        // Si se debe iniciar el temporizador del subprograma, se arranca
         if (selectedProgram != null && selectedAutoProgram != null) {
           startSubprogramTimer(widget.macAddress!);
         }
 
-        // Reanuda el temporizador de contracción o pausa
+        // Reanudar la fase en la que se pausó:
         if (isContractionPhase) {
+          // Restaurar el tiempo transcurrido de la contracción
+          elapsedTimeContraction = pausedTimeContraction;
           _startContractionTimer(valueContraction, widget.macAddress!,
               porcentajesMusculoTraje, porcentajesMusculoPantalon);
         } else {
+          // Restaurar el tiempo transcurrido de la pausa
+          elapsedTimePause = pausedTimePause;
           _startPauseTimer(valuePause, widget.macAddress!,
               porcentajesMusculoTraje, porcentajesMusculoPantalon);
         }
@@ -2991,13 +3000,18 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     if (mounted) {
       setState(() {
         stopElectrostimulationProcess(widget.macAddress!);
+
         isRunning = false;
         isSessionStarted = false;
         pausedTime = elapsedTime; // Guarda el tiempo del temporizador principal
+
+        // Guarda el estado de la fase actual
+        pausedTimePause = elapsedTimePause;
+        pausedTimeContraction = elapsedTimeContraction;
+
         _timer.cancel();
-        stopSubprogramTimer(
-            widget.macAddress!); // Detiene el temporizador de subprograma
-        _phaseTimer?.cancel(); // Detiene el temporizador de fase
+        stopSubprogramTimer(widget.macAddress!);
+        _phaseTimer?.cancel();
       });
     }
   }
@@ -3049,23 +3063,21 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       List<int> porcentajesMusculoTraje,
       List<int> porcentajesMusculoPantalon,
       ) {
-    _phaseTimer?.cancel(); // Detiene cualquier temporizador previo
+    _phaseTimer?.cancel(); // Cancela cualquier timer previo
 
-    // Verificar y sincronizar con el estado BLE
+    // Verifica el estado de la electroestimulación y actúa según corresponda
     if (isElectroOn == false) {
       if (selectedIndexEquip == 0) {
-        // Si el índice seleccionado es 0, iniciar la sesión para traje
         startFullElectrostimulationTrajeProcess(
             widget.macAddress!, porcentajesMusculoTraje, selectedProgram)
             .then((success) {
           if (success) {
             if (mounted) {
               setState(() {
-                isElectroOn = true; // Actualizar estado local
+                isElectroOn = true;
               });
             }
-
-            // Una vez confirmada la sesión, iniciar el temporizador de contracción
+            // Una vez confirmada, inicia la fase de contracción
             _startContractionPhase(contractionDuration, widget.macAddress!,
                 porcentajesMusculoTraje, porcentajesMusculoPantalon);
           } else {
@@ -3074,18 +3086,15 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
           }
         });
       } else if (selectedIndexEquip == 1) {
-        // Si el índice seleccionado es 1, iniciar la sesión para pantalón
         startFullElectrostimulationPantalonProcess(
             widget.macAddress!, porcentajesMusculoPantalon, selectedProgram)
             .then((success) {
           if (success) {
             if (mounted) {
               setState(() {
-                isElectroOn = true; // Actualizar estado local
+                isElectroOn = true;
               });
             }
-
-            // Una vez confirmada la sesión, iniciar el temporizador de contracción
             _startContractionPhase(contractionDuration, widget.macAddress!,
                 porcentajesMusculoTraje, porcentajesMusculoPantalon);
           } else {
@@ -3097,7 +3106,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         debugPrint("❌ Índice seleccionado no válido: $selectedIndex");
       }
     } else {
-      // Si ya está activo, inicia directamente el temporizador
+      // Si ya está activo, arranca directamente la fase
       _startContractionPhase(contractionDuration, widget.macAddress!,
           porcentajesMusculoTraje, porcentajesMusculoPantalon);
     }
@@ -3111,14 +3120,27 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) {
         setState(() {
+          // Si es la primera iteración, marcamos que ya inició el timer
+          if (!_contraTimerStarted) {
+            _contraTimerStarted = true;
+          }
+
+          // Se acumula el tiempo transcurrido en la fase de contracción
           elapsedTimeContraction += 0.1;
           progressContraction = elapsedTimeContraction / contractionDuration;
 
           if (elapsedTimeContraction >= contractionDuration) {
+            // Al finalizar la fase de contracción se reinician los contadores y se pasa a la fase de pausa
             elapsedTimeContraction = 0.0;
+            pausedTimeContraction = 0.0;
+            _contraTimerStarted = false; // reiniciamos la bandera
             isContractionPhase = false;
-            _startPauseTimer(valuePause, widget.macAddress!,
-                porcentajesMusculoTraje, porcentajesMusculoPantalon);
+            _startPauseTimer(
+              valuePause,
+              widget.macAddress!,
+              porcentajesMusculoTraje,
+              porcentajesMusculoPantalon,
+            );
           }
         });
       }
@@ -3130,31 +3152,25 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       List<int> porcentajesMusculoTraje,
       List<int> porcentajesMusculoPantalon,
       ) async {
-    // Detener cualquier temporizador previo
     _phaseTimer?.cancel();
 
     try {
-      // Intentar detener la electroestimulación antes de iniciar la pausa
       bool success = await stopElectrostimulationProcess(widget.macAddress!);
 
       if (success) {
-        debugPrint(
-            "✅ Electroestimulación detenida correctamente antes de la pausa.");
-        // Iniciar la fase de pausa, independientemente del resultado
-        _startPausePhase(
-          pauseDuration,
-          widget.macAddress!,
-          porcentajesMusculoTraje,
-          porcentajesMusculoPantalon,
-        );
+        debugPrint("✅ Electroestimulación detenida correctamente antes de la pausa.");
       } else {
-        debugPrint("⚠️ No había electroestimulación activa para detener.");
+        debugPrint("⚠️ No había electroestimulación activa para detener. Se continúa con la pausa.");
       }
+
+      // Se inicia la fase de pausa de todas formas:
+      _startPausePhase(pauseDuration, widget.macAddress!, porcentajesMusculoTraje, porcentajesMusculoPantalon);
     } catch (e) {
-      debugPrint(
-          "❌ Error al detener la electroestimulación antes de la pausa: $e");
+      debugPrint("❌ Error al detener la electroestimulación antes de la pausa: $e");
     }
   }
+
+
   void _startPausePhase(
       double pauseDuration,
       String macAddress,
@@ -3164,19 +3180,35 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
     _phaseTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mounted) {
         setState(() {
+          // Si es la primera vez que entra, marcamos que el timer ya inició
+          if (!_pauseTimerStarted) {
+            _pauseTimerStarted = true;
+          }
+
+          // Acumulamos el tiempo transcurrido en la pausa
           elapsedTimePause += 0.1;
           progressPause = elapsedTimePause / pauseDuration;
 
           if (elapsedTimePause >= pauseDuration) {
+            // Reinicia los contadores y pasa a la fase de contracción
             elapsedTimePause = 0.0;
+            pausedTimePause = 0.0;
+            _pauseTimerStarted = false;
             isContractionPhase = true;
-            _startContractionTimer(valueContraction, widget.macAddress!,
-                porcentajesMusculoTraje, porcentajesMusculoPantalon);
+            _startContractionTimer(
+              valueContraction,
+              widget.macAddress!,
+              porcentajesMusculoTraje,
+              porcentajesMusculoPantalon,
+            );
           }
         });
       }
     });
   }
+
+
+
   void startSubprogramTimer(String macAddress) {
     // Verificar si selectedAutoProgram es nulo y usar allAutoPrograms[0] si es el caso
     var programToUse = selectedAutoProgram ?? allAutomaticPrograms[0];
@@ -3399,7 +3431,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
       }
 
       // Ajustes de conversión
-      rampa *= 10;
+      rampa *= 1000;
       pulso /= 5;
 
       debugPrint(
@@ -3486,7 +3518,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
             "Cronaxia: ${cronaxia['nombre']}, Valor: ${cronaxia['valor']}");
       }
       // Ajustar los valores según las conversiones necesarias
-      rampa *= 10;
+      rampa *= 1000;
       pulso /= 5;
 
       debugPrint(
@@ -3572,16 +3604,25 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
   void _clearGlobals() async {
     if (mounted) {
       setState(() {
+        // Cancelar controladores de video y otros timers asociados
         _cancelVideoController();
+
+        // Cancelar timer de fase (usado en contracción y pausa)
         _phaseTimer?.cancel();
+        _phaseTimer = null;
+
+        // Cancelar timer de suscripción (u otro timer similar)
         timerSub?.cancel();
+        timerSub = null;
+
+        // Cancelar el timer principal (asegúrate de que _timer sea nullable)
         _timer.cancel();
 
-        // Reiniciar todas las variables globales
+        // Reiniciar todas las variables globales de control de la sesión
         isElectroOn = false;
         _isLoading = false;
 
-        // Restablecer valores de los programas y selección
+        // Restablecer valores de programas y selección
         selectedProgram = null;
         selectedAutoProgram = null;
         selectedIndivProgram = null;
@@ -3616,12 +3657,12 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         _isExpanded2 = false;
         _isExpanded3 = false;
 
-        // Restablecer imágenes y temporizador
+        // Restablecer imágenes y temporizador principal
         _currentImageIndex = 31 - 25;
         currentSubprogramIndex = 0;
         remainingTime = 0;
 
-        // Restablecer los estados de músculos
+        // Restablecer estados de músculos
         _isMusculoTrajeInactivo.fillRange(0, 10, false);
         _isMusculoPantalonInactivo.fillRange(0, 7, false);
         _isMusculoTrajeBloqueado.fillRange(0, 10, false);
@@ -3631,25 +3672,34 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
         subprogramElapsedTime = {};
         subprogramRemainingTime = {};
 
-        // Restablecer porcentajes
+        // Restablecer porcentajes de músculos
         porcentajesMusculoTraje.fillRange(0, 10, 0);
         porcentajesMusculoPantalon.fillRange(0, 7, 0);
 
-        // Reiniciar temporizadores generales
+        // Reiniciar temporizadores generales y variables asociadas
         elapsedTime = 0.0;
         elapsedTimeSub = 0.0;
         time = 25;
         seconds = 0.0;
         progress = 1.0;
+
         elapsedTimeContraction = 0.0;
+        pausedTimeContraction = 0.0;
         elapsedTimePause = 0.0;
+        pausedTimePause = 0.0;
         progressContraction = 0.0;
         progressPause = 0.0;
         startTime = DateTime.now();
         pausedTime = 0.0;
+
         valueRampa = 1.0;
         valuePause = 1.0;
         valueContraction = 1.0;
+
+        // Reiniciar las banderas de inicio de los timers de fase
+        _pauseTimerStarted = false;
+        _contraTimerStarted = false;
+
         _isPauseActive = false;
         _hideControls = false;
         _showVideo = false;
@@ -5570,7 +5620,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valueContraction),
+                                                            _contraTimerStarted
+                                                                ? (valueContraction - elapsedTimePause.floor())  // Muestra el valor decreciente
+                                                                : valueContraction                              // Antes de iniciar, muestra el valor inicial
+                                                        ),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
                                                         style: TextStyle(
                                                           fontSize: isFullScreen
@@ -5622,17 +5675,17 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valuePause),
-                                                        // Si es nulo, pasamos 0.0 como valor por defecto
+                                                            _pauseTimerStarted
+                                                                ? (valuePause - elapsedTimePause.floor())  // Muestra el valor decreciente
+                                                                : valuePause                              // Antes de iniciar, muestra el valor inicial
+                                                        ),
                                                         style: TextStyle(
-                                                          fontSize: isFullScreen
-                                                              ? 25.sp
-                                                              : 20.sp,
-                                                          fontWeight:
-                                                          FontWeight.bold,
+                                                          fontSize: isFullScreen ? 25.sp : 20.sp,
+                                                          fontWeight: FontWeight.bold,
                                                           color: Colors.red,
                                                         ),
                                                       )
+
                                                     ],
                                                   ),
                                                   SizedBox(
@@ -7245,7 +7298,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valueContraction),
+                                                            _contraTimerStarted
+                                                                ? (valueContraction - elapsedTimePause.floor())  // Muestra el valor decreciente
+                                                                : valueContraction                              // Antes de iniciar, muestra el valor inicial
+                                                        ),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
                                                         style: TextStyle(
                                                           fontSize: isFullScreen
@@ -7297,7 +7353,10 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       ),
                                                       Text(
                                                         formatNumber(
-                                                            valuePause),
+                                                            _pauseTimerStarted
+                                                                ? (valuePause - elapsedTimePause.floor())  // Muestra el valor decreciente
+                                                                : valuePause                              // Antes de iniciar, muestra el valor inicial
+                                                        ),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
                                                         style: TextStyle(
                                                           fontSize: isFullScreen
