@@ -8,8 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../../clients/overlays/main_overlay.dart';
+import '../../data_management/provider.dart';
 import '../../db/db_helper.dart';
-import '../../servicios/provider.dart';
 
 class OverlayTipoPrograma extends StatefulWidget {
   final VoidCallback onClose;

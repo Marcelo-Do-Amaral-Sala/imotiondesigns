@@ -9,7 +9,7 @@ import 'package:imotion_designs/src/ajustes/overlays/overlays.dart';
 import 'package:platform/platform.dart';
 
 import '../../../utils/translation_utils.dart';
-import '../../servicios/licencia_state.dart';
+import '../../data_management/licencia_state.dart';
 
 class LicenciaFormView extends StatefulWidget {
   final Function(Map<String, dynamic>) onMciTap;

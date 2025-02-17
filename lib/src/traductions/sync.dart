@@ -1,4 +1,4 @@
-import 'package:imotion_designs/src/servicios/translation.dart';
+import 'package:imotion_designs/src/traductions/translation.dart';
 import '../db/db_helper_traducciones.dart';
 
 

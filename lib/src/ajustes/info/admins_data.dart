@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/translation_utils.dart';
 import '../../db/db_helper.dart';
@@ -37,12 +38,21 @@ class AdminsDataState extends State<AdminsData> {
   double scaleFactorTick = 1.0;
   double scaleFactorRemove = 1.0;
   int? userId;
+  int? currentUserId;
 
   @override
   void initState() {
     super.initState();
     userId = int.tryParse(widget.adminData['id'].toString());
+    _loadCurrentUserId();
     _refreshControllers(); // Load initial data from the database
+  }
+
+  Future<void> _loadCurrentUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currentUserId = prefs.getInt('user_id'); // Asegúrate que esta clave coincide con la que usas en tu app
+    });
   }
 
   @override
@@ -889,27 +899,29 @@ class AdminsDataState extends State<AdminsData> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
-                    onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
-                    onTap: () {
-                      _deleteUsers(context, userId!);
-                    },
-                    child: AnimatedScale(
-                      scale: scaleFactorRemove,
-                      duration: const Duration(milliseconds: 100),
-                      child: SizedBox(
-                        width: screenWidth * 0.1,
-                        height: screenHeight * 0.1,
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/papelera.png',
-                            fit: BoxFit.scaleDown,
+                  // Solo mostrar el botón de borrado si el usuario actual es diferente
+                  if (currentUserId == 1 && userId !=currentUserId)
+                    GestureDetector(
+                      onTapDown: (_) => setState(() => scaleFactorRemove = 0.95),
+                      onTapUp: (_) => setState(() => scaleFactorRemove = 1.0),
+                      onTap: () {
+                        _deleteUsers(context, userId!);
+                      },
+                      child: AnimatedScale(
+                        scale: scaleFactorRemove,
+                        duration: const Duration(milliseconds: 100),
+                        child: SizedBox(
+                          width: screenWidth * 0.1,
+                          height: screenHeight * 0.1,
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/papelera.png',
+                              fit: BoxFit.scaleDown,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
                   GestureDetector(
                     onTapDown: (_) => setState(() => scaleFactorTick = 0.95),
                     onTapUp: (_) => setState(() => scaleFactorTick = 1.0),

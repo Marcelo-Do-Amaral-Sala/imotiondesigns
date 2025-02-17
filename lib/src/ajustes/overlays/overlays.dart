@@ -20,10 +20,10 @@ import '../../clients/overlays/main_overlay.dart';
 import '../../db/db_helper.dart';
 import '../../db/db_helper_traducciones.dart';
 import '../../servicios/generate_pdf.dart';
-import '../../servicios/licencia_state.dart';
+import '../../data_management/licencia_state.dart';
 import '../../servicios/recomendations.dart';
-import '../../servicios/sync.dart';
-import '../../servicios/translation_provider.dart';
+import '../../traductions/sync.dart';
+import '../../traductions/translation_provider.dart';
 import '../custom/imc_graph.dart';
 import '../form/user_form.dart';
 import '../info/admins_bonos.dart';
@@ -1920,7 +1920,7 @@ class _OverlayVitaState extends State<OverlayVita>
       if (foundProgram.isNotEmpty) {
         programData.add({
           "name_original": foundProgram["nombre"], // Nombre original del programa
-          "name_translated": tr(context, foundProgram["nombre"]),
+          "name_translated": tr(context, foundProgram["nombre"]).toUpperCase(),
           "image": foundProgram["imagen"],
         });
       } else {

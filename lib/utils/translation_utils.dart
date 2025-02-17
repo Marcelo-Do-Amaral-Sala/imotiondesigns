@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../src/servicios/translation_provider.dart'; // Ajusta la ruta
+import '../src/traductions/translation_provider.dart'; // Ajusta la ruta
 
 /// Función global para traducir claves
 String tr(BuildContext context, String key, {Map<String, String>? namedArgs}) {

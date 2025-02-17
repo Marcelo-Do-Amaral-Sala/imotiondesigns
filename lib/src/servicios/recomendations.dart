@@ -47,7 +47,7 @@ List<FitnessRecommendation> recommendations = [
     condicion: "Principiante",
     diasEntrenamiento: 1,
     objetivo: "Tonificar",
-    programas: "Strength 1, Strength 2, Body Building 1, Body Building 2",
+    programas: "Fuerza 1, Fuerza 2, Body Building 1, Body Building 2",
     intensidad: "10%-30%",
     duracion: "25 minutos por sesión",
   ),
@@ -88,7 +88,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Principiante",
       diasEntrenamiento: 2,
       objetivo: "Tonificar",
-      programas: "Strength 1, Body Building 1, Abdominal, Body Building 2",
+      programas: "Fuerza 1, Body Building 1, Abdominal, Body Building 2",
       intensidad: "10%-30%",
       duracion: "25 minutos por sesión"),
   FitnessRecommendation(
@@ -132,7 +132,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Principiante",
       diasEntrenamiento: 3,
       objetivo: "Tonificar",
-      programas: "Suelo Pélvico, Strength 2, Strength 1, Abdominal",
+      programas: "Suelo Pélvico, Fuerza 2, Fuerza 1, Abdominal",
       intensidad: "10%-30%",
       duracion: "25 minutos por sesión"),
 
@@ -178,7 +178,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Intermedio",
       diasEntrenamiento: 1,
       objetivo: "Tonificar",
-      programas: "Abdominal, Strength 1, Body Building 1, Body Building 2",
+      programas: "Abdominal, Fuerza 1, Body Building 1, Body Building 2",
       intensidad: "20%-40%",
       duracion: "25 minutos por sesión"),
 
@@ -222,7 +222,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Intermedio",
       diasEntrenamiento: 2,
       objetivo: "Tonificar",
-      programas: "Suelo Pélvico, Body Building 2, Strength 1, Abdominal",
+      programas: "Suelo Pélvico, Body Building 2, Fuerza 1, Abdominal",
       intensidad: "20%-40%",
       duracion: "25 minutos por sesión"),
   FitnessRecommendation(
@@ -266,7 +266,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Intermedio",
       diasEntrenamiento: 3,
       objetivo: "Tonificar",
-      programas: "Body Building 2, Suelo Pélvico, Body Building 1, Strength 1",
+      programas: "Body Building 2, Suelo Pélvico, Body Building 1, Fuerza 1",
       intensidad: "20%-40%",
       duracion: "25 minutos por sesión"),
 
@@ -311,7 +311,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Avanzado",
       diasEntrenamiento: 1,
       objetivo: "Tonificar",
-      programas: "Strength 1, Body Building 2, Abdominal, Strength 2",
+      programas: "Fuerza 1, Body Building 2, Abdominal, Fuerza 2",
       intensidad: "40%-70%",
       duracion: "25 minutos por sesión"),
 
@@ -356,7 +356,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Avanzado",
       diasEntrenamiento: 2,
       objetivo: "Tonificar",
-      programas: "Strength 2, Body Building 1, Suelo Pélvico, Strength 1",
+      programas: "Fuerza 2, Body Building 1, Suelo Pélvico, Fuerza 1",
       intensidad: "40%-70%",
       duracion: "25 minutos por sesión"),
 
@@ -401,7 +401,7 @@ List<FitnessRecommendation> recommendations = [
       condicion: "Avanzado",
       diasEntrenamiento: 3,
       objetivo: "Tonificar",
-      programas: "Strength 1, Body Building 2, Abdominal, Suelo Pélvico",
+      programas: "Fuerza 1, Body Building 2, Abdominal, Suelo Pélvico",
       intensidad: "40%-70%",
       duracion: "25 minutos por sesión"),
 
@@ -449,7 +449,17 @@ List<FitnessRecommendation> getTranslatedRecommendations(BuildContext context) {
 
 /// 🔹 Obtener recomendación buscando en la lista traducida
 FitnessRecommendation? getRecommendation(
-    BuildContext context, String experiencia, String condicion, int diasEntrenamiento, String objetivo) {
+    BuildContext context,
+    String experiencia,
+    String condicion,
+    int diasEntrenamiento,
+    String objetivo,
+    ) {
+  // Si experiencia es "No", se ignoran los demás campos y se retorna la primera recomendación.
+  if (experiencia.toLowerCase() == "no") {
+    print("Experiencia es 'No': se retorna la recomendación por defecto.");
+    return getTranslatedRecommendations(context).first;
+  }
 
   List<FitnessRecommendation> translatedRecommendations = getTranslatedRecommendations(context);
 

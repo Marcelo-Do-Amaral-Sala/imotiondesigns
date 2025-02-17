@@ -8,7 +8,7 @@ import '../../utils/translation_utils.dart';
 import '../bio/overlay_bio.dart';
 import '../db/db_helper.dart';
 import '../panel/views/panel_view.dart';
-import '../servicios/licencia_state.dart';
+import '../data_management/licencia_state.dart';
 
 class MainMenuView extends StatefulWidget {
   final Function() onNavigateToLogin;
