@@ -5621,7 +5621,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       Text(
                                                         formatNumber(
                                                             _contraTimerStarted
-                                                                ? (valueContraction - elapsedTimePause.floor())  // Muestra el valor decreciente
+                                                                ? (valueContraction - elapsedTimeContraction.floor())  // Muestra el valor decreciente
                                                                 : valueContraction                              // Antes de iniciar, muestra el valor inicial
                                                         ),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
@@ -7299,7 +7299,7 @@ class _ExpandedContentWidgetState extends State<ExpandedContentWidget>
                                                       Text(
                                                         formatNumber(
                                                             _contraTimerStarted
-                                                                ? (valueContraction - elapsedTimePause.floor())  // Muestra el valor decreciente
+                                                                ? (valueContraction - elapsedTimeContraction.floor())  // Muestra el valor decreciente
                                                                 : valueContraction                              // Antes de iniciar, muestra el valor inicial
                                                         ),
                                                         // Si es nulo, pasamos 0.0 como valor por defecto
